@@ -1,75 +1,159 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Image } from "expo-image";
+import { StyleSheet } from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
+    <ThemedView style={styles.container}>
+      {/* Header Section */}
+      <ThemedView style={styles.header}>
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+          source={require("@/assets/images/ace-logo-full-black.png")}
+          style={styles.logo}
+          contentFit="contain"
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
+        <ThemedText type="title" style={styles.companyName}>
+          ACE Remodeling
+        </ThemedText>
+        <ThemedText type="subtitle" style={styles.tagline}>
+          Transforming Austin Homes
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+
+      {/* Welcome Message */}
+      <ThemedView style={styles.welcomeSection}>
+        <ThemedText type="defaultSemiBold" style={styles.welcomeText}>
+          Ready to showcase our work!
+        </ThemedText>
+        <ThemedText style={styles.instructionText}>
+          Select a category below to view our featured projects
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+
+      {/* Category Navigation */}
+      <ThemedView style={styles.categoriesSection}>
+        <ThemedText type="subtitle" style={styles.categoriesTitle}>
+          Our Services
+        </ThemedText>
+
+        <ThemedView style={styles.categoryButtons}>
+          <ThemedView style={styles.categoryButton}>
+            <ThemedText
+              type="defaultSemiBold"
+              style={styles.categoryButtonText}
+            >
+              🏠 Kitchen
+            </ThemedText>
+            <ThemedText style={styles.categoryDescription}>
+              Kitchen remodeling and renovations
+            </ThemedText>
+          </ThemedView>
+
+          <ThemedView style={styles.categoryButton}>
+            <ThemedText
+              type="defaultSemiBold"
+              style={styles.categoryButtonText}
+            >
+              🚿 Bathroom
+            </ThemedText>
+            <ThemedText style={styles.categoryDescription}>
+              Bathroom transformations
+            </ThemedText>
+          </ThemedView>
+        </ThemedView>
+      </ThemedView>
+
+      {/* Footer */}
+      <ThemedView style={styles.footer}>
+        <ThemedText style={styles.footerText}>
+          Professional remodeling services in Austin, TX
         </ThemedText>
       </ThemedView>
-    </ParallaxScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  header: {
+    alignItems: "center",
+    marginTop: 60,
+    marginBottom: 40,
+    gap: 12,
+  },
+  logo: {
+    width: 250,
+    height: 100,
+    marginBottom: 16,
+  },
+  companyName: {
+    fontSize: 32,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  tagline: {
+    fontSize: 20,
+    textAlign: "center",
+    opacity: 0.8,
+  },
+  welcomeSection: {
+    alignItems: "center",
+    marginBottom: 40,
     gap: 8,
   },
-  stepContainer: {
-    gap: 8,
+  welcomeText: {
+    fontSize: 22,
+    textAlign: "center",
+  },
+  instructionText: {
+    fontSize: 16,
+    textAlign: "center",
+    opacity: 0.7,
+  },
+  categoriesSection: {
+    flex: 1,
+    gap: 20,
+  },
+  categoriesTitle: {
+    fontSize: 24,
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  categoryButtons: {
+    gap: 16,
+  },
+  categoryButton: {
+    backgroundColor: "#f0f0f0",
+    padding: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  categoryButtonText: {
+    fontSize: 20,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  categoryDescription: {
+    fontSize: 14,
+    opacity: 0.7,
+    textAlign: "center",
+  },
+  footer: {
+    alignItems: "center",
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+  },
+  footerText: {
+    fontSize: 14,
+    opacity: 0.6,
+    textAlign: "center",
   },
 });
