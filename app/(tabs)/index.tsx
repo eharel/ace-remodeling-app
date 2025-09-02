@@ -1,10 +1,21 @@
 import { Image } from "expo-image";
-import { StyleSheet } from "react-native";
+import { router } from "expo-router";
+import { Pressable, StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 
 export default function HomeScreen() {
+  const handleKitchenPress = () => {
+    router.push("/(tabs)/kitchens");
+  };
+
+  const handleBathroomPress = () => {
+    router.push("/(tabs)/bathrooms");
+  };
+
+  console.log("🏠 Home page loaded");
+
   return (
     <ThemedView style={styles.container}>
       {/* Header Section */}
@@ -39,7 +50,13 @@ export default function HomeScreen() {
         </ThemedText>
 
         <ThemedView style={styles.categoryButtons}>
-          <ThemedView style={styles.categoryButton}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.categoryButton,
+              pressed && styles.categoryButtonPressed,
+            ]}
+            onPress={handleKitchenPress}
+          >
             <ThemedText
               type="defaultSemiBold"
               style={styles.categoryButtonText}
@@ -49,9 +66,15 @@ export default function HomeScreen() {
             <ThemedText style={styles.categoryDescription}>
               Kitchen remodeling and renovations
             </ThemedText>
-          </ThemedView>
+          </Pressable>
 
-          <ThemedView style={styles.categoryButton}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.categoryButton,
+              pressed && styles.categoryButtonPressed,
+            ]}
+            onPress={handleBathroomPress}
+          >
             <ThemedText
               type="defaultSemiBold"
               style={styles.categoryButtonText}
@@ -61,7 +84,7 @@ export default function HomeScreen() {
             <ThemedText style={styles.categoryDescription}>
               Bathroom transformations
             </ThemedText>
-          </ThemedView>
+          </Pressable>
         </ThemedView>
       </ThemedView>
 
@@ -134,6 +157,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#e0e0e0",
+  },
+  categoryButtonPressed: {
+    backgroundColor: "#e0e0e0",
+    transform: [{ scale: 0.98 }],
   },
   categoryButtonText: {
     fontSize: 20,

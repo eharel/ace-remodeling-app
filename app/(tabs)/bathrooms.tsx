@@ -1,9 +1,24 @@
 import { StyleSheet } from "react-native";
 
+import { ProjectGallery } from "@/components/ProjectGallery";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { getProjectSummariesByCategory } from "@/data/mockProjects";
 
 export default function BathroomsScreen() {
+  const bathroomProjects = getProjectSummariesByCategory("bathroom");
+
+  const handleProjectPress = (project: any) => {
+    // TODO: Navigate to project detail view
+    console.log("Project pressed:", project.name);
+  };
+
+  console.log(
+    "🚿 Bathrooms page loaded - Found",
+    bathroomProjects.length,
+    "projects"
+  );
+
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
@@ -13,15 +28,12 @@ export default function BathroomsScreen() {
         </ThemedText>
       </ThemedView>
 
-      <ThemedView style={styles.content}>
-        <ThemedText style={styles.placeholderText}>
-          🚿 Bathroom projects will appear here
-        </ThemedText>
-        <ThemedText style={styles.descriptionText}>
-          This is where PMs can showcase bathroom remodeling work, including
-          before/after photos, project details, and client testimonials.
-        </ThemedText>
-      </ThemedView>
+      <ProjectGallery
+        projects={bathroomProjects}
+        title="Featured Bathroom Renovations"
+        subtitle="See our latest bathroom transformation projects"
+        onProjectPress={handleProjectPress}
+      />
     </ThemedView>
   );
 }
@@ -29,28 +41,11 @@ export default function BathroomsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   header: {
     marginTop: 60,
     marginBottom: 30,
+    paddingHorizontal: 20,
     gap: 8,
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-  },
-  placeholderText: {
-    fontSize: 24,
-    textAlign: "center",
-    opacity: 0.8,
-  },
-  descriptionText: {
-    fontSize: 16,
-    textAlign: "center",
-    opacity: 0.6,
-    maxWidth: 300,
   },
 });

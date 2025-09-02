@@ -1,27 +1,50 @@
 import { StyleSheet } from "react-native";
 
+import { ProjectGallery } from "@/components/ProjectGallery";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { getProjectSummariesByCategory } from "@/data/mockProjects";
 
 export default function KitchensScreen() {
+  const kitchenProjects = getProjectSummariesByCategory("kitchen");
+
+  const handleProjectPress = (project: any) => {
+    // TODO: Navigate to project detail view
+    console.log("Project pressed:", project.name);
+  };
+
+  console.log(
+    "🏠 Kitchens page loaded - Found",
+    kitchenProjects.length,
+    "projects"
+  );
+
+  // Debug: Log each project's details
+  kitchenProjects.forEach((project, index) => {
+    console.log(`Project ${index + 1}:`, {
+      id: project.id,
+      name: project.name,
+      thumbnail: project.thumbnail,
+      status: project.status,
+      category: project.category,
+    });
+  });
+
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
         <ThemedText type="title">Kitchen Projects</ThemedText>
         <ThemedText type="subtitle">
-          Create your dream kitchen with our remodeling expertise
+          Transform your kitchen with our expert remodeling services
         </ThemedText>
       </ThemedView>
 
-      <ThemedView style={styles.content}>
-        <ThemedText style={styles.placeholderText}>
-          🏠 Kitchen projects will appear here
-        </ThemedText>
-        <ThemedText style={styles.descriptionText}>
-          This is where PMs can showcase kitchen remodeling work, including
-          design concepts, material selections, and completed projects.
-        </ThemedText>
-      </ThemedView>
+      <ProjectGallery
+        projects={kitchenProjects}
+        title="Featured Kitchen Renovations"
+        subtitle="See our latest kitchen transformation projects"
+        onProjectPress={handleProjectPress}
+      />
     </ThemedView>
   );
 }
@@ -29,28 +52,11 @@ export default function KitchensScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   header: {
     marginTop: 60,
     marginBottom: 30,
+    paddingHorizontal: 20,
     gap: 8,
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-  },
-  placeholderText: {
-    fontSize: 24,
-    textAlign: "center",
-    opacity: 0.8,
-  },
-  descriptionText: {
-    fontSize: 16,
-    textAlign: "center",
-    opacity: 0.6,
-    maxWidth: 300,
   },
 });
