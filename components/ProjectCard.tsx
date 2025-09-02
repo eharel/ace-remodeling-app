@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import React from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, ViewStyle } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -9,9 +9,10 @@ import { ProjectSummary } from "@/types";
 interface ProjectCardProps {
   project: ProjectSummary;
   onPress?: (project: ProjectSummary) => void;
+  style?: ViewStyle;
 }
 
-export function ProjectCard({ project, onPress }: ProjectCardProps) {
+export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
   const handlePress = () => {
     onPress?.(project);
   };
@@ -41,7 +42,7 @@ export function ProjectCard({ project, onPress }: ProjectCardProps) {
   console.log(`   Thumbnail URL: ${project.thumbnail}`);
 
   return (
-    <Pressable onPress={handlePress} style={styles.container}>
+    <Pressable onPress={handlePress} style={[styles.container, style]}>
       <ThemedView style={styles.card}>
         {/* Project Image */}
         <Image
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
   status_completed: {
     backgroundColor: "#d4edda",
   },
-  status_in_progress: {
+  "status_in-progress": {
     backgroundColor: "#fff3cd",
   },
   status_planning: {

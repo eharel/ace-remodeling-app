@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList, StyleSheet, useWindowDimensions } from "react-native";
 
 import { ProjectSummary } from "@/types";
 import { ProjectCard } from "./ProjectCard";
@@ -19,8 +19,24 @@ export function ProjectGallery({
   subtitle,
   onProjectPress,
 }: ProjectGalleryProps) {
+  const { width } = useWindowDimensions();
+
+  // Calculate number of columns based on screen width
+  const getColumnCount = () => {
+    if (width >= 1024) return 3; // iPad Pro and larger
+    if (width >= 768) return 2; // iPad and smaller tablets
+    return 1; // iPhone and small devices
+  };
+
+  const columnCount = getColumnCount();
+  const itemWidth = (width - 40 - (columnCount - 1) * 16) / columnCount; // 40 for padding, 16 for gaps
+
   const renderProject = ({ item }: { item: ProjectSummary }) => (
-    <ProjectCard project={item} onPress={onProjectPress} />
+    <ProjectCard
+      project={item}
+      onPress={onProjectPress}
+      style={{ width: itemWidth }}
+    />
   );
 
   if (projects.length === 0) {
@@ -28,7 +44,7 @@ export function ProjectGallery({
       <ThemedView style={styles.emptyState}>
         <ThemedText style={styles.emptyText}>No projects found</ThemedText>
         <ThemedText style={styles.emptySubtext}>
-          Projects will appear here once they're added
+          Projects will appear here once they&apos;re added
         </ThemedText>
       </ThemedView>
     );
@@ -50,14 +66,19 @@ export function ProjectGallery({
         </ThemedView>
       )}
 
-      {/* Project List */}
+      {/* Project Grid */}
       <FlatList
         data={projects}
         renderItem={renderProject}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
-        numColumns={1}
+        numColumns={columnCount}
+        columnWrapperStyle={[
+          styles.row,
+          projects.length < columnCount && styles.rowCentered,
+        ]}
+        key={columnCount} // Force re-render when column count changes
       />
     </ThemedView>
   );
@@ -69,6 +90,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 20,
+    paddingHorizontal: 20,
     gap: 4,
   },
   title: {
@@ -97,5 +119,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     opacity: 0.4,
     textAlign: "center",
+  },
+  row: {
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  rowCentered: {
+    justifyContent: "center",
+    gap: 16, // Add spacing between centered items
   },
 });
