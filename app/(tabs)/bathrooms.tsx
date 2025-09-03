@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { StyleSheet } from "react-native";
 
 import { ProjectGallery } from "@/components/ProjectGallery";
@@ -9,8 +10,7 @@ export default function BathroomsScreen() {
   const bathroomProjects = getProjectSummariesByCategory("bathroom");
 
   const handleProjectPress = (project: any) => {
-    // TODO: Navigate to project detail view
-    console.log("Project pressed:", project.name);
+    router.push(`/project/${project.id}`);
   };
 
   console.log(
