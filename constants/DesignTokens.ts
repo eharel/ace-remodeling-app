@@ -91,9 +91,14 @@ export const DesignTokens = {
   // Typography Scale
   typography: {
     fontFamily: {
-      primary: "System",
-      secondary: "System",
+      primary: "Inter",
+      secondary: "Inter",
       mono: "SpaceMono",
+      // Specific weight mappings
+      regular: "Inter-Regular",
+      medium: "Inter-Medium",
+      semibold: "Inter-SemiBold",
+      bold: "Inter-Bold",
     },
 
     fontSize: {

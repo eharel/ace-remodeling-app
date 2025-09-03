@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     fontSize: styling.fontSize("2xl"),
     textAlign: "center",
     color: styling.color("text.primary"),
-    fontWeight: styling.fontWeight("semibold"),
+    fontFamily: styling.fontFamily("semibold"),
   },
   instructionText: {
     fontSize: styling.fontSize("lg"),
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: styling.spacing(4),
     color: styling.color("text.primary"),
-    fontWeight: styling.fontWeight("bold"),
+    fontFamily: styling.fontFamily("bold"),
   },
   categoryButtons: {
     gap: styling.spacing(4),

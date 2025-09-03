@@ -25,6 +25,9 @@ export const styling = {
   fontWeight: (weight: keyof typeof DesignTokens.typography.fontWeight) =>
     DesignTokens.typography.fontWeight[weight],
 
+  fontFamily: (family: keyof typeof DesignTokens.typography.fontFamily) =>
+    DesignTokens.typography.fontFamily[family],
+
   lineHeight: (height: keyof typeof DesignTokens.typography.lineHeight) =>
     DesignTokens.typography.lineHeight[height],
 

@@ -136,6 +136,19 @@ import { commonStyles } from '@/utils/styling';
 
 ## Typography Scale
 
+### Font Family
+
+- **Primary**: Inter - Modern, highly readable, professional
+- **Secondary**: Inter - Consistent across all text elements
+- **Mono**: SpaceMono - For code and technical content
+
+### Font Weights
+
+- **Regular**: Inter-Regular (400) - Body text and general content
+- **Medium**: Inter-Medium (500) - Subtle emphasis and captions
+- **Semibold**: Inter-SemiBold (600) - Subheadings and important text
+- **Bold**: Inter-Bold (700) - Main headings and titles
+
 ### Font Sizes
 
 - **xs**: 12px (Captions, labels)
@@ -147,14 +160,6 @@ import { commonStyles } from '@/utils/styling';
 - **3xl**: 28px (Page titles)
 - **4xl**: 32px (Hero titles)
 - **5xl**: 36px (Large displays)
-
-### Font Weights
-
-- **normal**: 400
-- **medium**: 500
-- **semibold**: 600
-- **bold**: 700
-- **extrabold**: 800
 
 ## Spacing System
 
