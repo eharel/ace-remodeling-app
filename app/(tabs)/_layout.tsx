@@ -1,6 +1,7 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform, Text } from "react-native";
+import { Platform } from "react-native";
 
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -15,7 +16,6 @@ export default function TabLayout() {
         headerShown: false,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             position: "absolute",
           },
           default: {},
@@ -26,8 +26,8 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 24 }}>🏠</Text>
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="home" size={size} color={color} />
           ),
         }}
       />
@@ -35,8 +35,8 @@ export default function TabLayout() {
         name="bathrooms"
         options={{
           title: "Bathrooms",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 24 }}>🚿</Text>
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="bathroom" size={size} color={color} />
           ),
         }}
       />
@@ -44,8 +44,8 @@ export default function TabLayout() {
         name="kitchens"
         options={{
           title: "Kitchens",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 24 }}>🏠</Text>
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="kitchen" size={size} color={color} />
           ),
         }}
       />
@@ -53,8 +53,8 @@ export default function TabLayout() {
         name="search"
         options={{
           title: "Search",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 24 }}>🔍</Text>
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="search" size={size} color={color} />
           ),
         }}
       />

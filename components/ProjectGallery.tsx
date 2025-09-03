@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { FlatList, StyleSheet, useWindowDimensions } from "react-native";
 
@@ -45,7 +46,12 @@ export function ProjectGallery({
   if (projects.length === 0) {
     return (
       <ThemedView style={styles.emptyState}>
-        <ThemedText style={styles.emptyIcon}>📋</ThemedText>
+        <MaterialIcons
+          name="folder-open"
+          size={64}
+          color="#cbd5e1"
+          style={styles.emptyIcon}
+        />
         <ThemedText style={styles.emptyText}>No projects found</ThemedText>
         <ThemedText style={styles.emptySubtext}>
           Projects will appear here once they&apos;re added
@@ -120,7 +126,7 @@ const styles = StyleSheet.create({
     gap: styling.spacing(4),
   },
   emptyIcon: {
-    fontSize: styling.fontSize("5xl"),
+    marginBottom: styling.spacing(4),
     opacity: 0.3,
   },
   emptyText: {

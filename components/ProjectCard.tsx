@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, ViewStyle } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { ProjectSummary } from "@/types";
+import { statusStyles, styling } from "@/utils/styling";
 
 interface ProjectCardProps {
   project: ProjectSummary;
@@ -53,7 +54,7 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
           onLoad={handleImageLoad}
           onLoadStart={handleImageLoadStart}
           placeholder="Loading..."
-          transition={200}
+          transition={styling.transition("normal")}
         />
 
         {/* Project Info */}
@@ -71,12 +72,7 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
             <ThemedView
               style={[
                 styles.statusBadge,
-                styles[
-                  `status_${project.status.replace(
-                    "-",
-                    "_"
-                  )}` as keyof typeof styles
-                ],
+                statusStyles[project.status as keyof typeof statusStyles],
               ]}
             >
               <ThemedText style={styles.statusText}>
@@ -97,74 +93,56 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: styling.spacing(4),
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: styling.color("background.card"),
+    borderRadius: styling.borderRadius("lg"),
     overflow: "hidden",
+    ...styling.shadow("md"),
+    borderWidth: 1,
+    borderColor: styling.color("accent.border"),
   },
   thumbnail: {
     width: "100%",
     height: 200,
   },
   content: {
-    padding: 16,
-    gap: 8,
+    padding: styling.spacing(5),
+    gap: styling.spacing(3),
   },
   title: {
-    fontSize: 18,
-    lineHeight: 22,
+    fontSize: styling.fontSize("lg"),
+    lineHeight: styling.lineHeight("tight"),
+    color: styling.color("text.primary"),
+    fontWeight: styling.fontWeight("semibold"),
   },
   description: {
-    fontSize: 14,
-    lineHeight: 18,
-    opacity: 0.7,
+    fontSize: styling.fontSize("base"),
+    lineHeight: styling.lineHeight("relaxed"),
+    color: styling.color("text.secondary"),
   },
   meta: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 8,
+    marginTop: styling.spacing(2),
   },
   statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  status_completed: {
-    backgroundColor: "#d4edda",
-  },
-  "status_in-progress": {
-    backgroundColor: "#fff3cd",
-  },
-  status_planning: {
-    backgroundColor: "#d1ecf1",
-  },
-  status_on_hold: {
-    backgroundColor: "#f8d7da",
+    paddingHorizontal: styling.spacing(3),
+    paddingVertical: styling.spacing(2),
+    borderRadius: styling.borderRadius("full"),
+    borderWidth: 1,
   },
   statusText: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: "#495057",
+    fontSize: styling.fontSize("xs"),
+    fontWeight: styling.fontWeight("semibold"),
+    textAlign: "center",
   },
   category: {
-    fontSize: 12,
-    opacity: 0.6,
+    fontSize: styling.fontSize("sm"),
+    color: styling.color("text.tertiary"),
     textTransform: "capitalize",
-  },
-  debugText: {
-    fontSize: 10,
-    color: "#888",
-    marginTop: 4,
+    fontWeight: styling.fontWeight("medium"),
   },
 });

@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
@@ -11,17 +12,21 @@ export default function SearchScreen() {
       <ThemedView style={styles.header}>
         <ThemedText type="title">Search Projects</ThemedText>
         <ThemedText type="subtitle">
-          Find specific projects and services
+          Find the perfect project for your client
         </ThemedText>
       </ThemedView>
-
       <ThemedView style={styles.content}>
+        <MaterialIcons
+          name="search"
+          size={64}
+          color="#cbd5e1"
+          style={styles.placeholderIcon}
+        />
         <ThemedText style={styles.placeholderText}>
-          🔍 Search functionality coming soon!
+          Search functionality will appear here
         </ThemedText>
         <ThemedText style={styles.descriptionText}>
-          This feature will allow PMs to quickly find specific projects, filter
-          by location, style, or project type.
+          This is where PMs can search and filter projects by various criteria.
         </ThemedText>
       </ThemedView>
     </ThemedView>
@@ -54,5 +59,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     opacity: 0.6,
     maxWidth: 300,
+  },
+  placeholderIcon: {
+    marginBottom: 16,
   },
 });

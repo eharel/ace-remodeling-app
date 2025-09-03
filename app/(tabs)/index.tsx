@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Pressable, StyleSheet } from "react-native";
@@ -15,7 +16,7 @@ export default function HomeScreen() {
     router.push("/(tabs)/bathrooms");
   };
 
-  console.log("🏠 Home page loaded");
+  console.log("Home page loaded");
 
   return (
     <ThemedView style={styles.container}>
@@ -59,11 +60,17 @@ export default function HomeScreen() {
             onPress={handleKitchenPress}
             android_ripple={{ color: styling.color("primary.100") }}
           >
+            <MaterialIcons
+              name="kitchen"
+              size={32}
+              color={styling.color("primary.500")}
+              style={styles.categoryIcon}
+            />
             <ThemedText
               type="defaultSemiBold"
               style={styles.categoryButtonText}
             >
-              🏠 Kitchen
+              Kitchen
             </ThemedText>
             <ThemedText style={styles.categoryDescription}>
               Kitchen remodeling and renovations
@@ -78,11 +85,17 @@ export default function HomeScreen() {
             onPress={handleBathroomPress}
             android_ripple={{ color: styling.color("primary.100") }}
           >
+            <MaterialIcons
+              name="bathroom"
+              size={32}
+              color={styling.color("primary.500")}
+              style={styles.categoryIcon}
+            />
             <ThemedText
               type="defaultSemiBold"
               style={styles.categoryButtonText}
             >
-              🚿 Bathroom
+              Bathroom
             </ThemedText>
             <ThemedText style={styles.categoryDescription}>
               Bathroom transformations
@@ -187,6 +200,9 @@ const styles = StyleSheet.create({
     color: styling.color("text.secondary"),
     textAlign: "center",
     lineHeight: styling.lineHeight("relaxed"),
+  },
+  categoryIcon: {
+    marginBottom: styling.spacing(2),
   },
   footer: {
     alignItems: "center",
