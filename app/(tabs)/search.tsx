@@ -4,6 +4,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 
 export default function SearchScreen() {
+  console.log("🔍 Search page loaded");
+
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
