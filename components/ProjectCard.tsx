@@ -63,13 +63,21 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
           </ThemedText>
 
           <ThemedText style={styles.description} numberOfLines={2}>
-            {project.briefDescription}
+            {project.briefDescription || "No description available"}
           </ThemedText>
 
           {/* Status and Category */}
           <ThemedView style={styles.meta}>
             <ThemedView
-              style={[styles.statusBadge, styles[`status_${project.status}`]]}
+              style={[
+                styles.statusBadge,
+                styles[
+                  `status_${project.status.replace(
+                    "-",
+                    "_"
+                  )}` as keyof typeof styles
+                ],
+              ]}
             >
               <ThemedText style={styles.statusText}>
                 {project.status.replace("-", " ").toUpperCase()}
@@ -153,5 +161,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     opacity: 0.6,
     textTransform: "capitalize",
+  },
+  debugText: {
+    fontSize: 10,
+    color: "#888",
+    marginTop: 4,
   },
 });

@@ -4,6 +4,7 @@ import { Pressable, StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { styling } from "@/utils/styling";
 
 export default function HomeScreen() {
   const handleKitchenPress = () => {
@@ -56,6 +57,7 @@ export default function HomeScreen() {
               pressed && styles.categoryButtonPressed,
             ]}
             onPress={handleKitchenPress}
+            android_ripple={{ color: styling.color("primary.100") }}
           >
             <ThemedText
               type="defaultSemiBold"
@@ -74,6 +76,7 @@ export default function HomeScreen() {
               pressed && styles.categoryButtonPressed,
             ]}
             onPress={handleBathroomPress}
+            android_ripple={{ color: styling.color("primary.100") }}
           >
             <ThemedText
               type="defaultSemiBold"
@@ -101,86 +104,100 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: styling.spacing(5),
+    backgroundColor: styling.color("background.secondary"),
   },
   header: {
     alignItems: "center",
-    marginTop: 60,
-    marginBottom: 40,
-    gap: 12,
+    marginTop: styling.spacing(16),
+    marginBottom: styling.spacing(10),
+    gap: styling.spacing(3),
   },
   logo: {
     width: 250,
     height: 100,
-    marginBottom: 16,
+    marginBottom: styling.spacing(4),
   },
   companyName: {
-    fontSize: 32,
+    fontSize: styling.fontSize("4xl"),
     textAlign: "center",
-    fontWeight: "bold",
+    fontWeight: styling.fontWeight("bold"),
+    color: styling.color("text.primary"),
+    lineHeight: styling.lineHeight("tight"),
   },
   tagline: {
-    fontSize: 20,
+    fontSize: styling.fontSize("xl"),
     textAlign: "center",
-    opacity: 0.8,
+    color: styling.color("text.secondary"),
+    fontWeight: styling.fontWeight("medium"),
   },
   welcomeSection: {
     alignItems: "center",
-    marginBottom: 40,
-    gap: 8,
+    marginBottom: styling.spacing(10),
+    gap: styling.spacing(2),
   },
   welcomeText: {
-    fontSize: 22,
+    fontSize: styling.fontSize("2xl"),
     textAlign: "center",
+    color: styling.color("text.primary"),
+    fontWeight: styling.fontWeight("semibold"),
   },
   instructionText: {
-    fontSize: 16,
+    fontSize: styling.fontSize("lg"),
     textAlign: "center",
-    opacity: 0.7,
+    color: styling.color("text.secondary"),
+    lineHeight: styling.lineHeight("relaxed"),
   },
   categoriesSection: {
     flex: 1,
-    gap: 20,
+    gap: styling.spacing(6),
   },
   categoriesTitle: {
-    fontSize: 24,
+    fontSize: styling.fontSize("2xl"),
     textAlign: "center",
-    marginBottom: 16,
+    marginBottom: styling.spacing(4),
+    color: styling.color("text.primary"),
+    fontWeight: styling.fontWeight("bold"),
   },
   categoryButtons: {
-    gap: 16,
+    gap: styling.spacing(4),
   },
   categoryButton: {
-    backgroundColor: "#f0f0f0",
-    padding: 24,
-    borderRadius: 12,
+    backgroundColor: styling.color("background.primary"),
+    padding: styling.spacing(6),
+    borderRadius: styling.borderRadius("lg"),
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: styling.color("neutral.200"),
+    ...styling.shadow("base"),
   },
   categoryButtonPressed: {
-    backgroundColor: "#e0e0e0",
+    backgroundColor: styling.color("neutral.100"),
     transform: [{ scale: 0.98 }],
+    ...styling.shadow("sm"),
   },
   categoryButtonText: {
-    fontSize: 20,
-    marginBottom: 8,
+    fontSize: styling.fontSize("xl"),
+    marginBottom: styling.spacing(2),
+    color: styling.color("text.primary"),
+    fontWeight: styling.fontWeight("semibold"),
   },
   categoryDescription: {
-    fontSize: 14,
-    opacity: 0.7,
+    fontSize: styling.fontSize("base"),
+    color: styling.color("text.secondary"),
     textAlign: "center",
+    lineHeight: styling.lineHeight("relaxed"),
   },
   footer: {
     alignItems: "center",
-    marginTop: 20,
-    paddingTop: 20,
+    marginTop: styling.spacing(5),
+    paddingTop: styling.spacing(5),
     borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
+    borderTopColor: styling.color("neutral.200"),
   },
   footerText: {
-    fontSize: 14,
-    opacity: 0.6,
+    fontSize: styling.fontSize("sm"),
+    color: styling.color("text.tertiary"),
     textAlign: "center",
   },
 });

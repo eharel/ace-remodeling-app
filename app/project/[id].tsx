@@ -219,7 +219,7 @@ export default function ProjectDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#f1f5f9",
   },
   errorState: {
     flex: 1,

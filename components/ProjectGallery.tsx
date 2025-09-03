@@ -2,6 +2,7 @@ import React from "react";
 import { FlatList, StyleSheet, useWindowDimensions } from "react-native";
 
 import { ProjectSummary } from "@/types";
+import { styling } from "@/utils/styling";
 import { ProjectCard } from "./ProjectCard";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
@@ -29,7 +30,9 @@ export function ProjectGallery({
   };
 
   const columnCount = getColumnCount();
-  const itemWidth = (width - 40 - (columnCount - 1) * 16) / columnCount; // 40 for padding, 16 for gaps
+  const itemWidth =
+    (width - styling.spacing(10) - (columnCount - 1) * styling.spacing(4)) /
+    columnCount;
 
   const renderProject = ({ item }: { item: ProjectSummary }) => (
     <ProjectCard
@@ -42,6 +45,7 @@ export function ProjectGallery({
   if (projects.length === 0) {
     return (
       <ThemedView style={styles.emptyState}>
+        <ThemedText style={styles.emptyIcon}>📋</ThemedText>
         <ThemedText style={styles.emptyText}>No projects found</ThemedText>
         <ThemedText style={styles.emptySubtext}>
           Projects will appear here once they&apos;re added
@@ -89,43 +93,55 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    marginBottom: 20,
-    paddingHorizontal: 20,
-    gap: 4,
+    marginBottom: styling.spacing(6),
+    paddingHorizontal: styling.spacing(5),
+    gap: styling.spacing(2),
   },
   title: {
-    fontSize: 24,
+    fontSize: styling.fontSize("2xl"),
+    color: styling.color("text.primary"),
+    fontWeight: styling.fontWeight("bold"),
+    lineHeight: styling.lineHeight("tight"),
   },
   subtitle: {
-    fontSize: 16,
-    opacity: 0.7,
+    fontSize: styling.fontSize("lg"),
+    color: styling.color("text.secondary"),
+    lineHeight: styling.lineHeight("relaxed"),
   },
   listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: styling.spacing(5),
+    paddingBottom: styling.spacing(5),
   },
   emptyState: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 40,
+    padding: styling.spacing(10),
+    gap: styling.spacing(4),
+  },
+  emptyIcon: {
+    fontSize: styling.fontSize("5xl"),
+    opacity: 0.3,
   },
   emptyText: {
-    fontSize: 18,
-    opacity: 0.6,
-    marginBottom: 8,
+    fontSize: styling.fontSize("xl"),
+    color: styling.color("text.secondary"),
+    fontWeight: styling.fontWeight("semibold"),
+    textAlign: "center",
   },
   emptySubtext: {
-    fontSize: 14,
-    opacity: 0.4,
+    fontSize: styling.fontSize("base"),
+    color: styling.color("text.tertiary"),
     textAlign: "center",
+    lineHeight: styling.lineHeight("relaxed"),
+    maxWidth: 300,
   },
   row: {
     justifyContent: "space-between",
-    marginBottom: 16,
+    marginBottom: styling.spacing(4),
   },
   rowCentered: {
     justifyContent: "center",
-    gap: 16, // Add spacing between centered items
+    gap: styling.spacing(4),
   },
 });
