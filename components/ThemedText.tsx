@@ -1,65 +1,148 @@
-import { StyleSheet, Text, type TextProps } from "react-native";
+import React, { useMemo } from "react";
+import { Text, type TextProps } from "react-native";
 
-import { useThemeColor } from "@/hooks/useThemeColor";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export type ThemedTextProps = TextProps & {
-  lightColor?: string;
-  darkColor?: string;
-  type?: "default" | "title" | "defaultSemiBold" | "subtitle" | "link";
+  variant?:
+    | "default"
+    | "title"
+    | "subtitle"
+    | "body"
+    | "caption"
+    | "link"
+    | "error"
+    | "success"
+    | "warning"
+    | "info";
+  type?: "default" | "defaultSemiBold"; // Legacy support
+  color?: string; // Allow custom color override
 };
 
 export function ThemedText({
   style,
-  lightColor,
-  darkColor,
-  type = "default",
+  variant = "default",
+  type, // Legacy support
+  color,
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+  const { theme, getThemeColor } = useTheme();
 
-  return (
-    <Text
-      style={[
-        { color },
-        type === "default" ? styles.default : undefined,
-        type === "title" ? styles.title : undefined,
-        type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
-        type === "subtitle" ? styles.subtitle : undefined,
-        type === "link" ? styles.link : undefined,
-        style,
-      ]}
-      {...rest}
-    />
-  );
+  // Generate theme-aware styles based on variant
+  const themedStyles = useMemo(() => {
+    const baseStyles: any = {};
+
+    // Apply variant-based styling
+    switch (variant) {
+      case "title":
+        baseStyles.fontSize = 32;
+        baseStyles.fontWeight = "bold";
+        baseStyles.lineHeight = 32;
+        baseStyles.fontFamily = "Inter-Bold";
+        baseStyles.color = color || getThemeColor("text.primary");
+        break;
+      case "subtitle":
+        baseStyles.fontSize = 20;
+        baseStyles.fontWeight = "bold";
+        baseStyles.fontFamily = "Inter-Bold";
+        baseStyles.color = color || getThemeColor("text.primary");
+        break;
+      case "body":
+        baseStyles.fontSize = 16;
+        baseStyles.lineHeight = 24;
+        baseStyles.fontFamily = "Inter-Regular";
+        baseStyles.color = color || getThemeColor("text.secondary");
+        break;
+      case "caption":
+        baseStyles.fontSize = 14;
+        baseStyles.fontFamily = "Inter-Regular";
+        baseStyles.color = color || getThemeColor("text.tertiary");
+        break;
+      case "link":
+        baseStyles.fontSize = 16;
+        baseStyles.lineHeight = 30;
+        baseStyles.fontFamily = "Inter-Regular";
+        baseStyles.color = color || getThemeColor("text.accent");
+        break;
+      case "error":
+        baseStyles.fontSize = 16;
+        baseStyles.lineHeight = 24;
+        baseStyles.fontFamily = "Inter-Regular";
+        baseStyles.color = color || getThemeColor("status.error");
+        break;
+      case "success":
+        baseStyles.fontSize = 16;
+        baseStyles.lineHeight = 24;
+        baseStyles.fontFamily = "Inter-Regular";
+        baseStyles.color = color || getThemeColor("status.success");
+        break;
+      case "warning":
+        baseStyles.fontSize = 16;
+        baseStyles.lineHeight = 24;
+        baseStyles.fontFamily = "Inter-Regular";
+        baseStyles.color = color || getThemeColor("status.warning");
+        break;
+      case "info":
+        baseStyles.fontSize = 16;
+        baseStyles.lineHeight = 24;
+        baseStyles.fontFamily = "Inter-Regular";
+        baseStyles.color = color || getThemeColor("status.info");
+        break;
+      case "default":
+      default:
+        baseStyles.fontSize = 16;
+        baseStyles.lineHeight = 24;
+        baseStyles.fontFamily = "Inter-Regular";
+        baseStyles.color = color || getThemeColor("text.primary");
+        break;
+    }
+
+    // Legacy type support (deprecated, use variant instead)
+    if (type === "defaultSemiBold") {
+      baseStyles.fontWeight = "600";
+      baseStyles.fontFamily = "Inter-SemiBold";
+    }
+
+    return baseStyles;
+  }, [variant, type, color, getThemeColor]);
+
+  return <Text style={[themedStyles, style]} {...rest} />;
 }
 
-const styles = StyleSheet.create({
-  default: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontFamily: "Inter-Regular",
+// Predefined text variants for common use cases
+export const ThemedTextVariants = {
+  // Heading variants
+  heading: {
+    variant: "title" as const,
   },
-  defaultSemiBold: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: "600",
-    fontFamily: "Inter-SemiBold",
+  subheading: {
+    variant: "subtitle" as const,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    lineHeight: 32,
-    fontFamily: "Inter-Bold",
+
+  // Content variants
+  body: {
+    variant: "body" as const,
   },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    fontFamily: "Inter-Bold",
+  caption: {
+    variant: "caption" as const,
   },
+
+  // Interactive variants
   link: {
-    lineHeight: 30,
-    fontSize: 16,
-    color: "#0a7ea4",
-    fontFamily: "Inter-Regular",
+    variant: "link" as const,
   },
-});
+
+  // Status variants
+  error: {
+    variant: "error" as const,
+  },
+  success: {
+    variant: "success" as const,
+  },
+  warning: {
+    variant: "warning" as const,
+  },
+  info: {
+    variant: "info" as const,
+  },
+} as const;

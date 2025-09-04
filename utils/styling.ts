@@ -1,6 +1,7 @@
-import { DesignTokens } from "@/constants/DesignTokens";
+import { DesignTokens, ThemeMappings } from "@/constants/DesignTokens";
+import { useTheme } from "@/contexts/ThemeContext";
 
-// Utility functions for consistent styling
+// Legacy styling utilities (for backward compatibility)
 export const styling = {
   // Color utilities
   color: (colorPath: string) => {
@@ -48,9 +49,87 @@ export const styling = {
     DesignTokens.zIndex[level],
 } as const;
 
+// NEW: Theme-aware styling utilities
+export const useThemeStyling = () => {
+  const {
+    theme,
+    getThemeColor,
+    getComponentColor,
+    currentTheme,
+    isDark,
+    isLight,
+  } = useTheme();
+
+  return {
+    // Theme-aware color utilities
+    themeColor: (path: string) => getThemeColor(path),
+    componentColor: (component: string, property: string) =>
+      getComponentColor(component, property),
+
+    // Theme state helpers
+    theme: currentTheme,
+    isDark,
+    isLight,
+
+    // Theme-aware design tokens
+    tokens: DesignTokens,
+    mappings: ThemeMappings,
+
+    // Legacy utilities (for backward compatibility)
+    ...styling,
+  };
+};
+
+// NEW: Theme-aware style generators
+export const createThemeStyles = (theme: "light" | "dark") => {
+  const themeColors = ThemeMappings[theme].colors;
+
+  return {
+    // Background styles
+    background: {
+      primary: { backgroundColor: themeColors.background.primary },
+      secondary: { backgroundColor: themeColors.background.secondary },
+      tertiary: { backgroundColor: themeColors.background.tertiary },
+      card: { backgroundColor: themeColors.background.card },
+      elevated: { backgroundColor: themeColors.background.elevated },
+    },
+
+    // Text styles
+    text: {
+      primary: { color: themeColors.text.primary },
+      secondary: { color: themeColors.text.secondary },
+      tertiary: { color: themeColors.text.tertiary },
+      inverse: { color: themeColors.text.inverse },
+      accent: { color: themeColors.text.accent },
+      error: { color: themeColors.status.error },
+      success: { color: themeColors.status.success },
+      warning: { color: themeColors.status.warning },
+      info: { color: themeColors.status.info },
+    },
+
+    // Border styles
+    border: {
+      primary: { borderColor: themeColors.border.primary },
+      secondary: { borderColor: themeColors.border.secondary },
+      accent: { borderColor: themeColors.border.accent },
+      error: { borderColor: themeColors.border.error },
+      success: { borderColor: themeColors.border.success },
+      warning: { borderColor: themeColors.border.warning },
+      info: { borderColor: themeColors.border.info },
+    },
+
+    // Interactive styles
+    interactive: {
+      primary: { backgroundColor: themeColors.interactive.primary },
+      secondary: { backgroundColor: themeColors.interactive.secondary },
+      disabled: { backgroundColor: themeColors.interactive.disabled },
+    },
+  };
+};
+
 // Predefined style combinations for common patterns
 export const commonStyles = {
-  // Card styles
+  // Card styles - UPDATED to use new theme system
   card: {
     backgroundColor: DesignTokens.colors.background.card,
     borderRadius: DesignTokens.borderRadius.lg,
@@ -60,7 +139,7 @@ export const commonStyles = {
     borderColor: DesignTokens.colors.accent.border,
   },
 
-  // Button styles
+  // Button styles - UPDATED to use new theme system
   button: {
     primary: {
       backgroundColor: DesignTokens.colors.primary[500],
@@ -79,7 +158,7 @@ export const commonStyles = {
     },
   },
 
-  // Text styles
+  // Text styles - UPDATED to use new theme system
   text: {
     heading: {
       fontSize: DesignTokens.typography.fontSize["2xl"],
@@ -107,7 +186,7 @@ export const commonStyles = {
     },
   },
 
-  // Layout styles
+  // Layout styles - UPDATED to use new theme system
   layout: {
     container: {
       flex: 1,
@@ -122,6 +201,7 @@ export const commonStyles = {
       borderColor: DesignTokens.colors.accent.border,
     },
     card: {
+      // New common card style
       backgroundColor: DesignTokens.colors.background.card,
       borderRadius: DesignTokens.borderRadius.lg,
       marginBottom: DesignTokens.spacing[4],
@@ -129,21 +209,15 @@ export const commonStyles = {
       borderWidth: 1,
       borderColor: DesignTokens.colors.accent.border,
     },
-    row: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    center: {
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    row: { flexDirection: "row", alignItems: "center" },
+    center: { alignItems: "center", justifyContent: "center" },
   },
 } as const;
 
-// Status-specific styles
+// Status styles - UPDATED to use new theme system
 export const statusStyles = {
   completed: {
-    backgroundColor: DesignTokens.colors.status.completed + "20", // 20% opacity
+    backgroundColor: DesignTokens.colors.status.completed + "20",
     borderColor: DesignTokens.colors.status.completed,
     color: DesignTokens.colors.status.completed,
   },
@@ -163,6 +237,34 @@ export const statusStyles = {
     color: DesignTokens.colors.status["on-hold"],
   },
 } as const;
+
+// NEW: Theme-aware status styles
+export const createThemeStatusStyles = (theme: "light" | "dark") => {
+  const themeColors = ThemeMappings[theme].colors;
+
+  return {
+    completed: {
+      backgroundColor: themeColors.status.successLight,
+      borderColor: themeColors.status.success,
+      color: themeColors.status.success,
+    },
+    "in-progress": {
+      backgroundColor: themeColors.status.warningLight,
+      borderColor: themeColors.status.warning,
+      color: themeColors.status.warning,
+    },
+    planning: {
+      backgroundColor: themeColors.status.infoLight,
+      borderColor: themeColors.status.info,
+      color: themeColors.status.info,
+    },
+    "on-hold": {
+      backgroundColor: themeColors.status.errorLight,
+      borderColor: themeColors.status.error,
+      color: themeColors.status.error,
+    },
+  };
+};
 
 // Export types for type safety
 export type StylingUtility = typeof styling;

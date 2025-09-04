@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import React from "react";
-import { Pressable, StyleSheet, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -57,7 +57,7 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
         />
 
         {/* Project Info */}
-        <ThemedView style={styles.content}>
+        <View style={styles.content}>
           <ThemedText type="defaultSemiBold" style={styles.title}>
             {project.name}
           </ThemedText>
@@ -67,8 +67,8 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
           </ThemedText>
 
           {/* Status and Category */}
-          <ThemedView style={styles.meta}>
-            <ThemedView
+          <View style={styles.meta}>
+            <View
               style={[
                 styles.statusBadge,
                 styles[
@@ -82,14 +82,14 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
               <ThemedText style={styles.statusText}>
                 {project.status.replace("-", " ").toUpperCase()}
               </ThemedText>
-            </ThemedView>
+            </View>
 
             <ThemedText style={styles.category}>
               {project.category.charAt(0).toUpperCase() +
                 project.category.slice(1)}
             </ThemedText>
-          </ThemedView>
-        </ThemedView>
+          </View>
+        </View>
       </ThemedView>
     </Pressable>
   );
@@ -100,17 +100,19 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f8f9fa",
     borderRadius: 12,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
   },
   thumbnail: {
     width: "100%",

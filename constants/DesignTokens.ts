@@ -1,6 +1,6 @@
 // Design Tokens - Single source of truth for all design values
 export const DesignTokens = {
-  // Color Palette
+  // Color Palette - Base colors (semantic names)
   colors: {
     // Primary Brand Colors
     primary: {
@@ -203,14 +203,211 @@ export const DesignTokens = {
   // Z-Index Scale
   zIndex: {
     hide: -1,
+    auto: "auto",
     base: 0,
+    docked: 10,
     dropdown: 1000,
-    sticky: 1020,
-    fixed: 1030,
-    modal: 1040,
-    popover: 1050,
-    tooltip: 1060,
+    sticky: 1100,
+    banner: 1200,
+    overlay: 1300,
+    modal: 1400,
+    popover: 1500,
+    skipLink: 1600,
+    toast: 1700,
+    tooltip: 1800,
   },
+} as const;
+
+// Theme Mappings - Maps semantic tokens to actual colors for light/dark
+export const ThemeMappings = {
+  light: {
+    colors: {
+      // Background colors
+      background: {
+        primary: "#ffffff",
+        secondary: "#f8fafc",
+        tertiary: "#f1f5f9",
+        accent: "#e2e8f0",
+        card: "#ffffff",
+        section: "#ffffff",
+        separator: "#e2e8f0",
+        elevated: "#ffffff",
+        overlay: "rgba(0, 0, 0, 0.5)",
+      },
+
+      // Text colors
+      text: {
+        primary: "#0f172a",
+        secondary: "#475569",
+        tertiary: "#64748b",
+        inverse: "#ffffff",
+        accent: "#3b82f6",
+        disabled: "#94a3b8",
+        placeholder: "#9ca3af",
+      },
+
+      // Border colors
+      border: {
+        primary: "#e2e8f0",
+        secondary: "#cbd5e1",
+        accent: "#3b82f6",
+        error: "#ef4444",
+        success: "#10b981",
+        warning: "#f59e0b",
+        info: "#3b82f6",
+      },
+
+      // Interactive colors
+      interactive: {
+        primary: "#3b82f6",
+        primaryHover: "#2563eb",
+        primaryPressed: "#1d4ed8",
+        secondary: "#64748b",
+        secondaryHover: "#475569",
+        secondaryPressed: "#334155",
+        disabled: "#e2e8f0",
+        disabledText: "#94a3b8",
+      },
+
+      // Status colors
+      status: {
+        success: "#10b981",
+        successLight: "#d1fae5",
+        warning: "#f59e0b",
+        warningLight: "#fef3c7",
+        error: "#ef4444",
+        errorLight: "#fee2e2",
+        info: "#3b82f6",
+        infoLight: "#dbeafe",
+      },
+
+      // Component-specific colors
+      components: {
+        button: {
+          primary: "#3b82f6",
+          primaryHover: "#2563eb",
+          secondary: "#64748b",
+          secondaryHover: "#475569",
+          outline: "transparent",
+          outlineBorder: "#e2e8f0",
+        },
+        card: {
+          background: "#ffffff",
+          border: "#e2e8f0",
+          shadow: "#000000",
+        },
+        input: {
+          background: "#ffffff",
+          border: "#e2e8f0",
+          borderFocus: "#3b82f6",
+          placeholder: "#9ca3af",
+        },
+      },
+    },
+  },
+
+  dark: {
+    colors: {
+      // Background colors
+      background: {
+        primary: "#0f172a",
+        secondary: "#1e293b",
+        tertiary: "#334155",
+        accent: "#475569",
+        card: "#1e293b",
+        section: "#1e293b",
+        separator: "#334155",
+        elevated: "#334155",
+        overlay: "rgba(0, 0, 0, 0.7)",
+      },
+
+      // Text colors
+      text: {
+        primary: "#f8fafc",
+        secondary: "#cbd5e1",
+        tertiary: "#94a3b8",
+        inverse: "#0f172a",
+        accent: "#60a5fa",
+        disabled: "#64748b",
+        placeholder: "#64748b",
+      },
+
+      // Border colors
+      border: {
+        primary: "#334155",
+        secondary: "#475569",
+        accent: "#60a5fa",
+        error: "#f87171",
+        success: "#34d399",
+        warning: "#fbbf24",
+        info: "#60a5fa",
+      },
+
+      // Interactive colors
+      interactive: {
+        primary: "#60a5fa",
+        primaryHover: "#93c5fd",
+        primaryPressed: "#3b82f6",
+        secondary: "#94a3b8",
+        secondaryHover: "#cbd5e1",
+        secondaryPressed: "#e2e8f0",
+        disabled: "#334155",
+        disabledText: "#64748b",
+      },
+
+      // Status colors
+      status: {
+        success: "#34d399",
+        successLight: "#064e3b",
+        warning: "#fbbf24",
+        warningLight: "#451a03",
+        error: "#f87171",
+        errorLight: "#450a0a",
+        info: "#60a5fa",
+        infoLight: "#1e3a8a",
+      },
+
+      // Component-specific colors
+      components: {
+        button: {
+          primary: "#60a5fa",
+          primaryHover: "#93c5fd",
+          secondary: "#94a3b8",
+          secondaryHover: "#cbd5e1",
+          outline: "transparent",
+          outlineBorder: "#334155",
+        },
+        card: {
+          background: "#1e293b",
+          border: "#334155",
+          shadow: "#000000",
+        },
+        input: {
+          background: "#1e293b",
+          border: "#334155",
+          borderFocus: "#60a5fa",
+          placeholder: "#64748b",
+        },
+      },
+    },
+  },
+} as const;
+
+// Theme Types
+export type ThemeMode = "light" | "dark" | "auto";
+export type ThemeVariant =
+  | "primary"
+  | "secondary"
+  | "card"
+  | "outline"
+  | "ghost"
+  | "elevated"
+  | "outlined";
+
+// Export the unified theme system
+export const UnifiedTheme = {
+  tokens: DesignTokens,
+  mappings: ThemeMappings,
 } as const;
 
 // Type-safe access to design tokens

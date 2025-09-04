@@ -5,6 +5,7 @@ import { Pressable, StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { styling } from "@/utils/styling";
 
 export default function HomeScreen() {
@@ -27,27 +28,30 @@ export default function HomeScreen() {
           style={styles.logo}
           contentFit="contain"
         />
-        <ThemedText type="title" style={styles.companyName}>
+        <ThemedText variant="title" style={styles.companyName}>
           ACE Remodeling
         </ThemedText>
-        <ThemedText type="subtitle" style={styles.tagline}>
+        <ThemedText variant="subtitle" style={styles.tagline}>
           Transforming Austin Homes
         </ThemedText>
       </ThemedView>
 
       {/* Welcome Message */}
       <ThemedView style={styles.welcomeSection}>
-        <ThemedText type="defaultSemiBold" style={styles.welcomeText}>
+        <ThemedText variant="body" style={styles.welcomeText}>
           Ready to showcase our work!
         </ThemedText>
-        <ThemedText style={styles.instructionText}>
+        <ThemedText variant="body" style={styles.instructionText}>
           Select a category below to view our featured projects
         </ThemedText>
       </ThemedView>
 
+      {/* Theme Toggle */}
+      <ThemeToggle />
+
       {/* Category Navigation */}
       <ThemedView style={styles.categoriesSection}>
-        <ThemedText type="subtitle" style={styles.categoriesTitle}>
+        <ThemedText variant="subtitle" style={styles.categoriesTitle}>
           Our Services
         </ThemedText>
 
