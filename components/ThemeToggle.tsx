@@ -16,26 +16,24 @@ export function ThemeToggle() {
   } = useTheme();
 
   const handleToggleTheme = () => {
+    // Cycle through: auto → light → dark → auto
     if (themeMode === "auto") {
-      // If auto, switch to explicit light/dark
-      setThemeMode(isDark ? "light" : "dark");
+      setThemeMode("light");
+    } else if (themeMode === "light") {
+      setThemeMode("dark");
     } else {
-      // If explicit, switch to auto
       setThemeMode("auto");
-    }
-  };
-
-  const handleExplicitToggle = () => {
-    if (themeMode !== "auto") {
-      setThemeMode(isDark ? "light" : "dark");
     }
   };
 
   const getThemeIcon = () => {
     if (themeMode === "auto") {
       return "auto-awesome";
+    } else if (themeMode === "light") {
+      return "light-mode";
+    } else {
+      return "dark-mode";
     }
-    return isDark ? "light-mode" : "dark-mode";
   };
 
   const getThemeLabel = () => {
@@ -80,45 +78,17 @@ export function ThemeToggle() {
         Theme: {getThemeLabel()}
       </ThemedText>
 
-      <View style={styles.buttonContainer}>
-        {/* Auto/Manual Toggle */}
-        <TouchableOpacity
-          style={[
-            dynamicStyles.button,
-            themeMode === "auto" && dynamicStyles.activeButton,
-          ]}
-          onPress={handleToggleTheme}
-        >
-          <MaterialIcons
-            name="auto-awesome"
-            size={20}
-            color={
-              themeMode === "auto"
-                ? getThemeColor("text.inverse")
-                : getThemeColor("text.tertiary")
-            }
-          />
-        </TouchableOpacity>
-
-        {/* Light/Dark Toggle */}
-        <TouchableOpacity
-          style={[
-            dynamicStyles.button,
-            themeMode !== "auto" && dynamicStyles.activeButton,
-          ]}
-          onPress={handleExplicitToggle}
-        >
-          <MaterialIcons
-            name={getThemeIcon()}
-            size={20}
-            color={
-              themeMode !== "auto"
-                ? getThemeColor("text.inverse")
-                : getThemeColor("text.tertiary")
-            }
-          />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={dynamicStyles.button}
+        onPress={handleToggleTheme}
+        activeOpacity={0.7}
+      >
+        <MaterialIcons
+          name={getThemeIcon()}
+          size={24}
+          color={getThemeColor("text.primary")}
+        />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -127,9 +97,5 @@ const styles = StyleSheet.create({
   label: {
     flex: 1,
     marginRight: 16,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    gap: 8,
   },
 });

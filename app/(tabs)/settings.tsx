@@ -21,6 +21,7 @@ export default function SettingsScreen() {
     },
     content: {
       padding: styling.spacing(4),
+      paddingTop: styling.spacing(10),
     },
     section: {
       marginBottom: styling.spacing(6),
