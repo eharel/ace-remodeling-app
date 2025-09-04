@@ -3,9 +3,45 @@ import { StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { useTheme } from "@/contexts/ThemeContext";
+import { styling } from "@/utils/styling";
 
 export default function SearchScreen() {
+  const { getThemeColor } = useTheme();
+
   console.log("🔍 Search page loaded");
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: styling.spacing(5),
+    },
+    header: {
+      marginTop: styling.spacing(15),
+      marginBottom: styling.spacing(8),
+      gap: styling.spacing(2),
+    },
+    content: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: styling.spacing(4),
+    },
+    placeholderText: {
+      fontSize: styling.fontSize("2xl"),
+      textAlign: "center",
+      opacity: 0.8,
+    },
+    descriptionText: {
+      fontSize: styling.fontSize("base"),
+      textAlign: "center",
+      opacity: 0.6,
+      maxWidth: 300,
+    },
+    placeholderIcon: {
+      marginBottom: styling.spacing(4),
+    },
+  });
 
   return (
     <ThemedView style={styles.container}>
@@ -19,7 +55,7 @@ export default function SearchScreen() {
         <MaterialIcons
           name="search"
           size={64}
-          color="#cbd5e1"
+          color={getThemeColor("text.tertiary")}
           style={styles.placeholderIcon}
         />
         <ThemedText style={styles.placeholderText}>
@@ -32,35 +68,3 @@ export default function SearchScreen() {
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  header: {
-    marginTop: 60,
-    marginBottom: 30,
-    gap: 8,
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-  },
-  placeholderText: {
-    fontSize: 24,
-    textAlign: "center",
-    opacity: 0.8,
-  },
-  descriptionText: {
-    fontSize: 16,
-    textAlign: "center",
-    opacity: 0.6,
-    maxWidth: 300,
-  },
-  placeholderIcon: {
-    marginBottom: 16,
-  },
-});

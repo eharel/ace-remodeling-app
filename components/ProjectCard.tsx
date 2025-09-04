@@ -4,7 +4,9 @@ import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { useTheme } from "@/contexts/ThemeContext";
 import { ProjectSummary } from "@/types";
+import { styling } from "@/utils/styling";
 
 interface ProjectCardProps {
   project: ProjectSummary;
@@ -13,6 +15,8 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
+  const { getThemeColor } = useTheme();
+
   const handlePress = () => {
     onPress?.(project);
   };
@@ -40,6 +44,77 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
     `🎨 Rendering ProjectCard for: ${project.name} (ID: ${project.id})`
   );
   console.log(`   Thumbnail URL: ${project.thumbnail}`);
+
+  const styles = StyleSheet.create({
+    container: {
+      marginBottom: styling.spacing(4),
+    },
+    card: {
+      backgroundColor: getThemeColor("background.card"),
+      borderRadius: styling.borderRadius("lg"),
+      shadowColor: getThemeColor("components.card.shadow"),
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.15,
+      shadowRadius: 6,
+      elevation: 4,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: getThemeColor("border.primary"),
+    },
+    thumbnail: {
+      width: "100%",
+      height: 200,
+    },
+    content: {
+      padding: styling.spacing(4),
+      gap: styling.spacing(2),
+    },
+    title: {
+      fontSize: styling.fontSize("lg"),
+      lineHeight: 22,
+    },
+    description: {
+      fontSize: styling.fontSize("sm"),
+      lineHeight: 18,
+      opacity: 0.7,
+    },
+    meta: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: styling.spacing(2),
+    },
+    statusBadge: {
+      paddingHorizontal: styling.spacing(2),
+      paddingVertical: styling.spacing(1),
+      borderRadius: styling.borderRadius("lg"),
+    },
+    status_completed: {
+      backgroundColor: getThemeColor("status.successLight"),
+    },
+    "status_in-progress": {
+      backgroundColor: getThemeColor("status.warningLight"),
+    },
+    status_planning: {
+      backgroundColor: getThemeColor("status.infoLight"),
+    },
+    status_on_hold: {
+      backgroundColor: getThemeColor("status.errorLight"),
+    },
+    statusText: {
+      fontSize: 10,
+      fontWeight: "600",
+      color: getThemeColor("text.secondary"),
+    },
+    category: {
+      fontSize: styling.fontSize("xs"),
+      opacity: 0.6,
+      textTransform: "capitalize",
+    },
+  });
 
   return (
     <Pressable onPress={handlePress} style={[styles.container, style]}>
@@ -94,74 +169,3 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  card: {
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-  },
-  thumbnail: {
-    width: "100%",
-    height: 200,
-  },
-  content: {
-    padding: 16,
-    gap: 8,
-  },
-  title: {
-    fontSize: 18,
-    lineHeight: 22,
-  },
-  description: {
-    fontSize: 14,
-    lineHeight: 18,
-    opacity: 0.7,
-  },
-  meta: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 8,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  status_completed: {
-    backgroundColor: "#d4edda",
-  },
-  "status_in-progress": {
-    backgroundColor: "#fff3cd",
-  },
-  status_planning: {
-    backgroundColor: "#d1ecf1",
-  },
-  status_on_hold: {
-    backgroundColor: "#f8d7da",
-  },
-  statusText: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: "#495057",
-  },
-  category: {
-    fontSize: 12,
-    opacity: 0.6,
-    textTransform: "capitalize",
-  },
-});

@@ -8,11 +8,26 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+
+// Navigation component that can use theme context
+function Navigation() {
+  const { currentTheme } = useTheme();
+
+  return (
+    <NavigationThemeProvider
+      value={currentTheme === "dark" ? DarkTheme : DefaultTheme}
+    >
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar style="auto" />
+    </NavigationThemeProvider>
+  );
+}
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
@@ -28,15 +43,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <NavigationThemeProvider
-        value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-      >
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </NavigationThemeProvider>
+      <Navigation />
     </ThemeProvider>
   );
 }
