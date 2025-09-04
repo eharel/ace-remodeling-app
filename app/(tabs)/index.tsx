@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -24,19 +24,18 @@ export default function HomeScreen() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      padding: styling.spacing(5),
       backgroundColor: getThemeColor("background.secondary"),
     },
     header: {
       alignItems: "center",
-      marginTop: styling.spacing(16),
-      marginBottom: styling.spacing(10),
-      gap: styling.spacing(3),
+      paddingTop: styling.spacing(20),
+      paddingBottom: styling.spacing(8),
+      paddingHorizontal: styling.spacing(6),
     },
     logo: {
-      width: 250,
-      height: 100,
-      marginBottom: styling.spacing(4),
+      width: 200,
+      height: 80,
+      marginBottom: styling.spacing(6),
     },
     companyName: {
       fontSize: styling.fontSize("4xl"),
@@ -44,38 +43,40 @@ export default function HomeScreen() {
       fontWeight: styling.fontWeight("bold"),
       color: getThemeColor("text.primary"),
       lineHeight: styling.lineHeight("tight"),
+      marginBottom: styling.spacing(2),
     },
     tagline: {
-      fontSize: styling.fontSize("xl"),
+      fontSize: styling.fontSize("lg"),
       textAlign: "center",
       color: getThemeColor("text.secondary"),
       fontWeight: styling.fontWeight("medium"),
     },
     welcomeSection: {
       alignItems: "center",
-      marginBottom: styling.spacing(10),
-      gap: styling.spacing(2),
+      paddingHorizontal: styling.spacing(6),
+      paddingBottom: styling.spacing(8),
     },
     welcomeText: {
-      fontSize: styling.fontSize("2xl"),
+      fontSize: styling.fontSize("xl"),
       textAlign: "center",
       color: getThemeColor("text.primary"),
       fontFamily: styling.fontFamily("semibold"),
+      marginBottom: styling.spacing(2),
     },
     instructionText: {
-      fontSize: styling.fontSize("lg"),
+      fontSize: styling.fontSize("base"),
       textAlign: "center",
       color: getThemeColor("text.secondary"),
       lineHeight: styling.lineHeight("relaxed"),
     },
     categoriesSection: {
       flex: 1,
-      gap: styling.spacing(6),
+      paddingHorizontal: styling.spacing(6),
     },
     categoriesTitle: {
-      fontSize: styling.fontSize("2xl"),
+      fontSize: styling.fontSize("xl"),
       textAlign: "center",
-      marginBottom: styling.spacing(4),
+      marginBottom: styling.spacing(6),
       color: getThemeColor("text.primary"),
       fontFamily: styling.fontFamily("bold"),
     },
@@ -97,24 +98,24 @@ export default function HomeScreen() {
       ...styling.shadow("sm"),
     },
     categoryButtonText: {
-      fontSize: styling.fontSize("xl"),
-      marginBottom: styling.spacing(2),
+      fontSize: styling.fontSize("lg"),
+      marginBottom: styling.spacing(1),
       color: getThemeColor("text.primary"),
       fontWeight: styling.fontWeight("semibold"),
     },
     categoryDescription: {
-      fontSize: styling.fontSize("base"),
+      fontSize: styling.fontSize("sm"),
       color: getThemeColor("text.secondary"),
       textAlign: "center",
       lineHeight: styling.lineHeight("relaxed"),
     },
     categoryIcon: {
-      marginBottom: styling.spacing(2),
+      marginBottom: styling.spacing(3),
     },
     footer: {
       alignItems: "center",
-      marginTop: styling.spacing(5),
-      paddingTop: styling.spacing(5),
+      paddingVertical: styling.spacing(6),
+      paddingHorizontal: styling.spacing(6),
       borderTopWidth: 1,
       borderTopColor: getThemeColor("border.primary"),
     },
@@ -128,7 +129,7 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
       {/* Header Section */}
-      <ThemedView style={styles.header}>
+      <View style={styles.header}>
         <Image
           source={require("@/assets/images/ace-logo-full-black.png")}
           style={styles.logo}
@@ -140,25 +141,25 @@ export default function HomeScreen() {
         <ThemedText variant="subtitle" style={styles.tagline}>
           Transforming Austin Homes
         </ThemedText>
-      </ThemedView>
+      </View>
 
       {/* Welcome Message */}
-      <ThemedView style={styles.welcomeSection}>
+      <View style={styles.welcomeSection}>
         <ThemedText variant="body" style={styles.welcomeText}>
           Ready to showcase our work!
         </ThemedText>
         <ThemedText variant="body" style={styles.instructionText}>
           Select a category below to view our featured projects
         </ThemedText>
-      </ThemedView>
+      </View>
 
       {/* Category Navigation */}
-      <ThemedView style={styles.categoriesSection}>
+      <View style={styles.categoriesSection}>
         <ThemedText variant="subtitle" style={styles.categoriesTitle}>
           Our Services
         </ThemedText>
 
-        <ThemedView style={styles.categoryButtons}>
+        <View style={styles.categoryButtons}>
           <Pressable
             style={({ pressed }) => [
               styles.categoryButton,
@@ -212,15 +213,15 @@ export default function HomeScreen() {
               Bathroom transformations
             </ThemedText>
           </Pressable>
-        </ThemedView>
-      </ThemedView>
+        </View>
+      </View>
 
       {/* Footer */}
-      <ThemedView style={styles.footer}>
+      <View style={styles.footer}>
         <ThemedText style={styles.footerText}>
           Professional remodeling services in Austin, TX
         </ThemedText>
-      </ThemedView>
+      </View>
     </ThemedView>
   );
 }
