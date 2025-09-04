@@ -242,7 +242,9 @@ export default function ProjectDetailScreen() {
 
   const renderLog = ({ item }: { item: any }) => (
     <ThemedView style={styles.logContainer}>
-      <ThemedText style={styles.logDate}>{item.date}</ThemedText>
+      <ThemedText style={styles.logDate}>
+        {item.date instanceof Date ? item.date.toLocaleDateString() : item.date}
+      </ThemedText>
       <ThemedText style={styles.logDescription}>{item.description}</ThemedText>
     </ThemedView>
   );
