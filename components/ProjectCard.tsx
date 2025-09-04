@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ProjectSummary } from "@/types";
+import { getStatusDisplayText, getStatusStyleKey } from "@/utils/statusUtils";
 import { styling } from "@/utils/styling";
 
 interface ProjectCardProps {
@@ -95,7 +96,7 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
     status_completed: {
       backgroundColor: getThemeColor("status.successLight"),
     },
-    "status_in-progress": {
+    status_in_progress: {
       backgroundColor: getThemeColor("status.warningLight"),
     },
     status_planning: {
@@ -146,16 +147,11 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
             <View
               style={[
                 styles.statusBadge,
-                styles[
-                  `status_${project.status.replace(
-                    "-",
-                    "_"
-                  )}` as keyof typeof styles
-                ] as ViewStyle,
+                styles[getStatusStyleKey(project.status)] as ViewStyle,
               ]}
             >
               <ThemedText style={styles.statusText}>
-                {project.status.replace("-", " ").toUpperCase()}
+                {getStatusDisplayText(project.status)}
               </ThemedText>
             </View>
 
