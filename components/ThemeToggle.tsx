@@ -6,7 +6,14 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { ThemedText } from "./ThemedText";
 
 export function ThemeToggle() {
-  const { themeMode, setThemeMode, currentTheme, isDark, isLight } = useTheme();
+  const {
+    themeMode,
+    setThemeMode,
+    currentTheme,
+    isDark,
+    isLight,
+    getThemeColor,
+  } = useTheme();
 
   const handleToggleTheme = () => {
     if (themeMode === "auto") {
@@ -38,8 +45,37 @@ export function ThemeToggle() {
     return currentTheme === "dark" ? "Dark" : "Light";
   };
 
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      backgroundColor: getThemeColor("background.secondary"),
+      borderRadius: 8,
+      marginVertical: 8,
+      borderWidth: 1,
+      borderColor: getThemeColor("border.primary"),
+    },
+    button: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: getThemeColor("background.card"),
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: getThemeColor("border.primary"),
+    },
+    activeButton: {
+      backgroundColor: getThemeColor("interactive.primary"),
+      borderColor: getThemeColor("interactive.primary"),
+    },
+  });
+
   return (
-    <View style={styles.container}>
+    <View style={dynamicStyles.container}>
       <ThemedText variant="caption" style={styles.label}>
         Theme: {getThemeLabel()}
       </ThemedText>
@@ -47,25 +83,39 @@ export function ThemeToggle() {
       <View style={styles.buttonContainer}>
         {/* Auto/Manual Toggle */}
         <TouchableOpacity
-          style={[styles.button, themeMode === "auto" && styles.activeButton]}
+          style={[
+            dynamicStyles.button,
+            themeMode === "auto" && dynamicStyles.activeButton,
+          ]}
           onPress={handleToggleTheme}
         >
           <MaterialIcons
             name="auto-awesome"
             size={20}
-            color={themeMode === "auto" ? "#ffffff" : "#666666"}
+            color={
+              themeMode === "auto"
+                ? getThemeColor("text.inverse")
+                : getThemeColor("text.tertiary")
+            }
           />
         </TouchableOpacity>
 
         {/* Light/Dark Toggle */}
         <TouchableOpacity
-          style={[styles.button, themeMode !== "auto" && styles.activeButton]}
+          style={[
+            dynamicStyles.button,
+            themeMode !== "auto" && dynamicStyles.activeButton,
+          ]}
           onPress={handleExplicitToggle}
         >
           <MaterialIcons
             name={getThemeIcon()}
             size={20}
-            color={themeMode !== "auto" ? "#ffffff" : "#666666"}
+            color={
+              themeMode !== "auto"
+                ? getThemeColor("text.inverse")
+                : getThemeColor("text.tertiary")
+            }
           />
         </TouchableOpacity>
       </View>
@@ -74,16 +124,6 @@ export function ThemeToggle() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
-    borderRadius: 8,
-    marginVertical: 8,
-  },
   label: {
     flex: 1,
     marginRight: 16,
@@ -92,19 +132,4 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
   },
-  button: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#f0f0f0",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  activeButton: {
-    backgroundColor: "#3b82f6",
-    borderColor: "#2563eb",
-  },
 });
-

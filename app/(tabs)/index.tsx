@@ -5,7 +5,6 @@ import { Pressable, StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { styling } from "@/utils/styling";
 
 export default function HomeScreen() {
@@ -45,9 +44,6 @@ export default function HomeScreen() {
           Select a category below to view our featured projects
         </ThemedText>
       </ThemedView>
-
-      {/* Theme Toggle */}
-      <ThemeToggle />
 
       {/* Category Navigation */}
       <ThemedView style={styles.categoriesSection}>
