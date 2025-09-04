@@ -72,6 +72,11 @@ export default function HomeScreen() {
     categoriesSection: {
       flex: 1,
       paddingHorizontal: styling.spacing(6),
+      paddingVertical: styling.spacing(6),
+      backgroundColor: getThemeColor("background.primary"),
+      borderRadius: styling.borderRadius("lg"),
+      marginHorizontal: styling.spacing(4),
+      ...styling.shadow("sm"),
     },
     categoriesTitle: {
       fontSize: styling.fontSize("xl"),
@@ -82,6 +87,8 @@ export default function HomeScreen() {
     },
     categoryButtons: {
       gap: styling.spacing(4),
+      width: "85%",
+      alignSelf: "center",
     },
     categoryButton: {
       backgroundColor: getThemeColor("background.card"),
@@ -91,6 +98,7 @@ export default function HomeScreen() {
       borderWidth: 1,
       borderColor: getThemeColor("border.primary"),
       ...styling.shadow("base"),
+      minHeight: 120,
     },
     categoryButtonPressed: {
       backgroundColor: getThemeColor("background.secondary"),

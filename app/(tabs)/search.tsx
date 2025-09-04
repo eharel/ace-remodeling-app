@@ -17,7 +17,7 @@ export default function SearchScreen() {
       padding: styling.spacing(5),
     },
     header: {
-      marginTop: styling.spacing(15),
+      marginTop: styling.spacing(9),
       marginBottom: styling.spacing(8),
       gap: styling.spacing(2),
     },
@@ -46,8 +46,8 @@ export default function SearchScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
-        <ThemedText type="title">Search Projects</ThemedText>
-        <ThemedText type="subtitle">
+        <ThemedText variant="title">Search Projects</ThemedText>
+        <ThemedText variant="subtitle">
           Find the perfect project for your client
         </ThemedText>
       </ThemedView>
