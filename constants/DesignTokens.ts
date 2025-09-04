@@ -391,10 +391,96 @@ export const ThemeMappings = {
       },
     },
   },
+
+  blue: {
+    colors: {
+      // Background colors - Blue-tinted theme
+      background: {
+        primary: "#f0f9ff", // Very light blue
+        secondary: "#e0f2fe", // Light blue
+        tertiary: "#bae6fd", // Medium light blue
+        accent: "#7dd3fc", // Medium blue
+        card: "#ffffff", // White cards for contrast
+        section: "#f0f9ff", // Light blue sections
+        separator: "#bae6fd", // Blue separators
+        elevated: "#ffffff", // White elevated elements
+        overlay: "rgba(14, 116, 144, 0.5)", // Blue overlay
+      },
+
+      // Text colors - Dark blue tones
+      text: {
+        primary: "#0c4a6e", // Dark blue
+        secondary: "#075985", // Medium dark blue
+        tertiary: "#0369a1", // Medium blue
+        inverse: "#ffffff", // White inverse
+        accent: "#0284c7", // Bright blue accent
+        disabled: "#7dd3fc", // Light blue disabled
+        placeholder: "#bae6fd", // Light blue placeholder
+      },
+
+      // Border colors
+      border: {
+        primary: "#bae6fd", // Light blue
+        secondary: "#7dd3fc", // Medium blue
+        accent: "#0284c7", // Bright blue
+        error: "#dc2626", // Red for errors
+        success: "#059669", // Green for success
+        warning: "#d97706", // Orange for warnings
+        info: "#0284c7", // Blue for info
+      },
+
+      // Interactive colors
+      interactive: {
+        primary: "#0284c7", // Bright blue
+        primaryHover: "#0369a1", // Darker blue on hover
+        primaryPressed: "#075985", // Even darker on press
+        secondary: "#0369a1", // Medium blue
+        secondaryHover: "#075985", // Darker on hover
+        secondaryPressed: "#0c4a6e", // Darkest on press
+        disabled: "#bae6fd", // Light blue disabled
+        disabledText: "#7dd3fc", // Light blue disabled text
+      },
+
+      // Status colors
+      status: {
+        success: "#059669", // Green
+        successLight: "#d1fae5", // Light green
+        warning: "#d97706", // Orange
+        warningLight: "#fef3c7", // Light orange
+        error: "#dc2626", // Red
+        errorLight: "#fee2e2", // Light red
+        info: "#0284c7", // Blue
+        infoLight: "#dbeafe", // Light blue
+      },
+
+      // Component-specific colors
+      components: {
+        button: {
+          primary: "#0284c7", // Bright blue
+          primaryHover: "#0369a1", // Darker blue
+          secondary: "#0369a1", // Medium blue
+          secondaryHover: "#075985", // Darker blue
+          outline: "transparent", // Transparent outline
+          outlineBorder: "#bae6fd", // Light blue border
+        },
+        card: {
+          background: "#ffffff", // White cards
+          border: "#bae6fd", // Light blue border
+          shadow: "#0c4a6e", // Dark blue shadow
+        },
+        input: {
+          background: "#ffffff", // White background
+          border: "#bae6fd", // Light blue border
+          borderFocus: "#0284c7", // Bright blue focus
+          placeholder: "#7dd3fc", // Medium blue placeholder
+        },
+      },
+    },
+  },
 } as const;
 
 // Theme Types
-export type ThemeMode = "light" | "dark" | "auto";
+export type ThemeMode = "light" | "dark" | "blue" | "auto";
 export type ThemeVariant =
   | "primary"
   | "secondary"

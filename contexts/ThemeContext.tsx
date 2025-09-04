@@ -18,16 +18,17 @@ import {
 interface ThemeContextType {
   // Current theme state
   themeMode: ThemeMode;
-  currentTheme: "light" | "dark";
+  currentTheme: "light" | "dark" | "blue";
 
   // Theme switching
   setThemeMode: (mode: ThemeMode) => void;
   toggleTheme: () => void;
 
   // Theme data access
-  theme: typeof ThemeMappings.light;
+  theme: any;
   isDark: boolean;
   isLight: boolean;
+  isBlue: boolean;
 
   // Utility functions
   getThemeColor: (path: string) => string;
@@ -56,7 +57,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     if (themeMode === "auto") {
       return systemColorScheme || "light";
     }
-    return themeMode;
+    return themeMode as "light" | "dark" | "blue";
   }, [themeMode, systemColorScheme]);
 
   // Current theme data
@@ -67,6 +68,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   // Theme state helpers
   const isDark = currentTheme === "dark";
   const isLight = currentTheme === "light";
+  const isBlue = currentTheme === "blue";
 
   // Load theme mode from storage on mount
   useEffect(() => {
@@ -79,7 +81,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       const savedMode = await AsyncStorage.getItem(THEME_MODE_KEY);
       if (
         savedMode &&
-        (savedMode === "light" || savedMode === "dark" || savedMode === "auto")
+        (savedMode === "light" ||
+          savedMode === "dark" ||
+          savedMode === "blue" ||
+          savedMode === "auto")
       ) {
         setThemeModeState(savedMode as ThemeMode);
       }
@@ -105,9 +110,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     saveThemeMode(mode);
   };
 
-  // Toggle between light and dark themes
+  // Toggle between light, dark, and blue themes
   const toggleTheme = () => {
-    const newMode = currentTheme === "light" ? "dark" : "light";
+    const newMode =
+      currentTheme === "light"
+        ? "dark"
+        : currentTheme === "dark"
+        ? "blue"
+        : "light";
     setThemeMode(newMode);
   };
 
@@ -151,6 +161,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       theme,
       isDark,
       isLight,
+      isBlue,
       getThemeColor,
       getComponentColor,
     }),
@@ -162,6 +173,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       theme,
       isDark,
       isLight,
+      isBlue,
       getThemeColor,
       getComponentColor,
     ]
@@ -190,4 +202,3 @@ export function useTheme(): ThemeContextType {
 
 // Export the unified theme for direct access when needed
 export { UnifiedTheme };
-

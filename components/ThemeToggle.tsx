@@ -5,97 +5,126 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ThemedText } from "./ThemedText";
 
+type ThemeOption = "light" | "dark" | "blue" | "auto";
+
 export function ThemeToggle() {
-  const {
-    themeMode,
-    setThemeMode,
-    currentTheme,
-    isDark,
-    isLight,
-    getThemeColor,
-  } = useTheme();
+  const { themeMode, setThemeMode, currentTheme, getThemeColor } = useTheme();
 
-  const handleToggleTheme = () => {
-    // Cycle through: auto → light → dark → auto
-    if (themeMode === "auto") {
-      setThemeMode("light");
-    } else if (themeMode === "light") {
-      setThemeMode("dark");
-    } else {
-      setThemeMode("auto");
-    }
+  const themeOptions: { key: ThemeOption; label: string; icon: string }[] = [
+    { key: "light", label: "Light", icon: "light-mode" },
+    { key: "dark", label: "Dark", icon: "dark-mode" },
+    { key: "blue", label: "Blue", icon: "palette" },
+    { key: "auto", label: "Auto", icon: "auto-awesome" },
+  ];
+
+  const handleThemeSelect = (theme: ThemeOption) => {
+    setThemeMode(theme);
   };
 
-  const getThemeIcon = () => {
-    if (themeMode === "auto") {
-      return "auto-awesome";
-    } else if (themeMode === "light") {
-      return "light-mode";
-    } else {
-      return "dark-mode";
+  const isActive = (theme: ThemeOption) => {
+    if (theme === "auto") {
+      return themeMode === "auto";
     }
-  };
-
-  const getThemeLabel = () => {
-    if (themeMode === "auto") {
-      return `Auto (${currentTheme})`;
-    }
-    return currentTheme === "dark" ? "Dark" : "Light";
+    return themeMode === theme;
   };
 
   const dynamicStyles = StyleSheet.create({
     container: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: 16,
-      paddingVertical: 12,
       backgroundColor: getThemeColor("background.secondary"),
       borderRadius: 8,
       marginVertical: 8,
       borderWidth: 1,
       borderColor: getThemeColor("border.primary"),
+      padding: 16,
     },
-    button: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: getThemeColor("background.card"),
+    title: {
+      marginBottom: 12,
+    },
+    buttonRow: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      alignItems: "center",
+      paddingHorizontal: 24,
+    },
+    themeButton: {
+      width: 60,
+      height: 60,
       alignItems: "center",
       justifyContent: "center",
-      borderWidth: 1,
+      borderRadius: 30,
+      borderWidth: 2,
       borderColor: getThemeColor("border.primary"),
+      backgroundColor: getThemeColor("background.card"),
     },
     activeButton: {
       backgroundColor: getThemeColor("interactive.primary"),
       borderColor: getThemeColor("interactive.primary"),
     },
+    buttonIcon: {
+      // No margin needed for circular buttons
+    },
+    buttonContainer: {
+      alignItems: "center",
+      gap: 6,
+    },
   });
 
   return (
     <View style={dynamicStyles.container}>
-      <ThemedText variant="caption" style={styles.label}>
-        Theme: {getThemeLabel()}
+      <ThemedText variant="subtitle" style={dynamicStyles.title}>
+        Theme
       </ThemedText>
 
-      <TouchableOpacity
-        style={dynamicStyles.button}
-        onPress={handleToggleTheme}
-        activeOpacity={0.7}
-      >
-        <MaterialIcons
-          name={getThemeIcon()}
-          size={24}
-          color={getThemeColor("text.primary")}
-        />
-      </TouchableOpacity>
+      <View style={dynamicStyles.buttonRow}>
+        {themeOptions.map((option) => {
+          const active = isActive(option.key);
+          return (
+            <View key={option.key} style={dynamicStyles.buttonContainer}>
+              <TouchableOpacity
+                style={[
+                  dynamicStyles.themeButton,
+                  active && dynamicStyles.activeButton,
+                ]}
+                onPress={() => handleThemeSelect(option.key)}
+                activeOpacity={0.7}
+                disabled={active}
+              >
+                <MaterialIcons
+                  name={option.icon as any}
+                  size={24}
+                  color={
+                    active
+                      ? getThemeColor("text.inverse")
+                      : getThemeColor("text.primary")
+                  }
+                  style={dynamicStyles.buttonIcon}
+                />
+              </TouchableOpacity>
+              <ThemedText
+                variant="caption"
+                style={[
+                  styles.buttonLabel,
+                  {
+                    color: active
+                      ? getThemeColor("interactive.primary")
+                      : getThemeColor("text.secondary"),
+                  },
+                ]}
+              >
+                {option.label}
+              </ThemedText>
+            </View>
+          );
+        })}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  label: {
-    flex: 1,
-    marginRight: 16,
+  buttonLabel: {
+    fontSize: 11,
+    fontWeight: "500",
+    textAlign: "center",
   },
 });
