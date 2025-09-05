@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -105,13 +106,13 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   };
 
   // Set theme mode and save to storage
-  const setThemeMode = (mode: ThemeMode) => {
+  const setThemeMode = useCallback((mode: ThemeMode) => {
     setThemeModeState(mode);
     saveThemeMode(mode);
-  };
+  }, []);
 
   // Toggle between light, dark, and blue themes
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     const newMode =
       currentTheme === "light"
         ? "dark"
@@ -119,37 +120,43 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         ? "blue"
         : "light";
     setThemeMode(newMode);
-  };
+  }, [currentTheme, setThemeMode]);
 
   // Get theme color by path (e.g., "background.primary", "text.secondary")
-  const getThemeColor = (path: string): string => {
-    const keys = path.split(".");
-    let value: any = theme.colors;
+  const getThemeColor = useCallback(
+    (path: string): string => {
+      const keys = path.split(".");
+      let value: any = theme.colors;
 
-    for (const key of keys) {
-      if (value && typeof value === "object" && key in value) {
-        value = value[key];
-      } else {
-        console.warn(`Theme color path not found: ${path}`);
-        return theme.colors.text.primary; // Fallback
+      for (const key of keys) {
+        if (value && typeof value === "object" && key in value) {
+          value = value[key];
+        } else {
+          console.warn(`Theme color path not found: ${path}`);
+          return theme.colors.text.primary; // Fallback
+        }
       }
-    }
 
-    return value || theme.colors.text.primary;
-  };
+      return value || theme.colors.text.primary;
+    },
+    [theme]
+  );
 
   // Get component-specific color
-  const getComponentColor = (component: string, property: string): string => {
-    const componentColors =
-      theme.colors.components[
-        component as keyof typeof theme.colors.components
-      ];
-    if (componentColors && property in componentColors) {
-      return componentColors[property as keyof typeof componentColors];
-    }
-    console.warn(`Component color not found: ${component}.${property}`);
-    return theme.colors.text.primary; // Fallback
-  };
+  const getComponentColor = useCallback(
+    (component: string, property: string): string => {
+      const componentColors =
+        theme.colors.components[
+          component as keyof typeof theme.colors.components
+        ];
+      if (componentColors && property in componentColors) {
+        return componentColors[property as keyof typeof componentColors];
+      }
+      console.warn(`Component color not found: ${component}.${property}`);
+      return theme.colors.text.primary; // Fallback
+    },
+    [theme]
+  );
 
   // Context value
   const contextValue = useMemo(
