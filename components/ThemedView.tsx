@@ -17,7 +17,7 @@ export function ThemedView({
   outlined = false,
   ...otherProps
 }: ThemedViewProps) {
-  const { theme, getThemeColor, getComponentColor } = useTheme();
+  const { getThemeColor } = useTheme();
 
   // Generate theme-aware styles based on variant and props
   const themedStyles = useMemo(() => {

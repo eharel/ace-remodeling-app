@@ -33,8 +33,8 @@ export default function KitchensScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
-        <ThemedText type="title">Kitchen Projects</ThemedText>
-        <ThemedText type="subtitle">
+        <ThemedText variant="title">Kitchen Projects</ThemedText>
+        <ThemedText variant="subtitle">
           Transform your kitchen with our expert remodeling services
         </ThemedText>
       </ThemedView>

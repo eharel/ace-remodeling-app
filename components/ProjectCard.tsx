@@ -134,7 +134,7 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
 
         {/* Project Info */}
         <View style={styles.content}>
-          <ThemedText type="defaultSemiBold" style={styles.title}>
+          <ThemedText variant="body" style={styles.title}>
             {project.name}
           </ThemedText>
 

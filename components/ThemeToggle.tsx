@@ -8,7 +8,7 @@ import { ThemedText } from "./ThemedText";
 type ThemeOption = "light" | "dark" | "blue" | "auto";
 
 export function ThemeToggle() {
-  const { themeMode, setThemeMode, currentTheme, getThemeColor } = useTheme();
+  const { themeMode, setThemeMode, getThemeColor } = useTheme();
 
   const themeOptions: { key: ThemeOption; label: string; icon: string }[] = [
     { key: "light", label: "Light", icon: "light-mode" },

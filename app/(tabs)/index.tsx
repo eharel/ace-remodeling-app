@@ -192,10 +192,7 @@ export default function HomeScreen() {
               color={getThemeColor("interactive.primary")}
               style={styles.categoryIcon}
             />
-            <ThemedText
-              type="defaultSemiBold"
-              style={styles.categoryButtonText}
-            >
+            <ThemedText variant="body" style={styles.categoryButtonText}>
               Kitchen
             </ThemedText>
             <ThemedText style={styles.categoryDescription}>
@@ -219,10 +216,7 @@ export default function HomeScreen() {
               color={getThemeColor("interactive.primary")}
               style={styles.categoryIcon}
             />
-            <ThemedText
-              type="defaultSemiBold"
-              style={styles.categoryButtonText}
-            >
+            <ThemedText variant="body" style={styles.categoryButtonText}>
               Bathroom
             </ThemedText>
             <ThemedText style={styles.categoryDescription}>
