@@ -9,7 +9,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { styling } from "@/utils/styling";
 
 export default function HomeScreen() {
-  const { getThemeColor } = useTheme();
+  const { getThemeColor, isDark } = useTheme();
 
   const handleKitchenPress = () => {
     router.push("/(tabs)/kitchens");
@@ -54,7 +54,7 @@ export default function HomeScreen() {
     welcomeSection: {
       alignItems: "center",
       paddingHorizontal: styling.spacing(6),
-      paddingBottom: styling.spacing(8),
+      paddingBottom: styling.spacing(2),
     },
     welcomeText: {
       fontSize: styling.fontSize("xl"),
@@ -68,14 +68,18 @@ export default function HomeScreen() {
       textAlign: "center",
       color: getThemeColor("text.secondary"),
       lineHeight: styling.lineHeight("relaxed"),
+      marginTop: styling.spacing(4),
+      paddingVertical: styling.spacing(6),
+      minHeight: 80, // Ensure proper height for text visibility
     },
     categoriesSection: {
-      flex: 1,
       paddingHorizontal: styling.spacing(6),
       paddingVertical: styling.spacing(6),
       backgroundColor: getThemeColor("background.primary"),
       borderRadius: styling.borderRadius("lg"),
       marginHorizontal: styling.spacing(4),
+      marginTop: styling.spacing(4),
+      marginBottom: styling.spacing(8),
       ...styling.shadow("sm"),
     },
     categoriesTitle: {
@@ -139,7 +143,11 @@ export default function HomeScreen() {
       {/* Header Section */}
       <View style={styles.header}>
         <Image
-          source={require("@/assets/images/ace-logo-full-black.png")}
+          source={
+            isDark
+              ? require("@/assets/images/ace-logo-full-white.png")
+              : require("@/assets/images/ace-logo-full-black.png")
+          }
           style={styles.logo}
           contentFit="contain"
         />
