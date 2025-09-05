@@ -2,31 +2,31 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { ThemeMode } from "@/constants/DesignTokens";
+import { ThemeSetting } from "@/constants/DesignTokens";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ThemedText } from "./ThemedText";
 
-type ThemeOption = ThemeMode;
+type ThemeOption = ThemeSetting;
 
 export function ThemeToggle() {
-  const { themeMode, setThemeMode, getThemeColor } = useTheme();
+  const { themeSetting, setThemeSetting, getThemeColor } = useTheme();
 
   const themeOptions: { key: ThemeOption; label: string; icon: string }[] = [
     { key: "light", label: "Light", icon: "light-mode" },
     { key: "dark", label: "Dark", icon: "dark-mode" },
     { key: "blue", label: "Blue", icon: "palette" },
-    { key: "auto", label: "Auto", icon: "auto-awesome" },
+    { key: "system", label: "System", icon: "auto-awesome" },
   ];
 
   const handleThemeSelect = (theme: ThemeOption) => {
-    setThemeMode(theme);
+    setThemeSetting(theme);
   };
 
   const isActive = (theme: ThemeOption) => {
-    if (theme === "auto") {
-      return themeMode === "auto";
+    if (theme === "system") {
+      return themeSetting === "system";
     }
-    return themeMode === theme;
+    return themeSetting === theme;
   };
 
   const dynamicStyles = StyleSheet.create({

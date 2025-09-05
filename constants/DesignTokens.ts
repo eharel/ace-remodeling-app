@@ -218,8 +218,8 @@ export const DesignTokens = {
   },
 } as const;
 
-// Theme Mappings - Maps semantic tokens to actual colors for light/dark
-export const ThemeMappings = {
+// Theme definitions - Maps semantic tokens to actual colors for each theme
+export const themes = {
   light: {
     colors: {
       // Background colors
@@ -480,8 +480,8 @@ export const ThemeMappings = {
 } as const;
 
 // Theme Types - Derived from implementation
-export type ConcreteTheme = keyof typeof ThemeMappings;
-export type ThemeMode = ConcreteTheme | "auto";
+export type ThemeName = keyof typeof themes;
+export type ThemeSetting = ThemeName | "system";
 export type ThemeVariant =
   | "primary"
   | "secondary"
@@ -494,7 +494,7 @@ export type ThemeVariant =
 // Export the unified theme system
 export const UnifiedTheme = {
   tokens: DesignTokens,
-  mappings: ThemeMappings,
+  themes: themes,
 } as const;
 
 // Type-safe access to design tokens

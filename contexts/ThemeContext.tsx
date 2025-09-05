@@ -10,20 +10,20 @@ import React, {
 import { useColorScheme } from "react-native";
 
 import {
-  ConcreteTheme,
-  ThemeMappings,
-  ThemeMode,
+  ThemeName,
+  themes,
+  ThemeSetting,
   UnifiedTheme,
 } from "@/constants/DesignTokens";
 
 // Theme Context Types
 interface ThemeContextType {
   // Current theme state
-  themeMode: ThemeMode;
-  currentTheme: ConcreteTheme;
+  themeSetting: ThemeSetting;
+  currentTheme: ThemeName;
 
   // Theme switching
-  setThemeMode: (mode: ThemeMode) => void;
+  setThemeSetting: (setting: ThemeSetting) => void;
   toggleTheme: () => void;
 
   // Theme data access
@@ -41,12 +41,10 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Theme Storage Keys
-const THEME_MODE_KEY = "@theme_mode";
+const THEME_SETTING_KEY = "@theme_setting";
 
-// Available themes (excluding "auto") - derived from ThemeMappings
-const AVAILABLE_THEMES: ConcreteTheme[] = Object.keys(
-  ThemeMappings
-) as ConcreteTheme[];
+// Available themes (excluding "system") - derived from themes
+const AVAILABLE_THEMES: ThemeName[] = Object.keys(themes) as ThemeName[];
 
 // Theme Provider Props
 interface ThemeProviderProps {
@@ -56,20 +54,20 @@ interface ThemeProviderProps {
 // Theme Provider Component
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const systemColorScheme = useColorScheme();
-  const [themeMode, setThemeModeState] = useState<ThemeMode>("auto");
+  const [themeSetting, setThemeSettingState] = useState<ThemeSetting>("system");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Determine current theme based on mode and system preference
+  // Determine current theme based on setting and system preference
   const currentTheme = useMemo(() => {
-    if (themeMode === "auto") {
+    if (themeSetting === "system") {
       return systemColorScheme || "light";
     }
-    return themeMode;
-  }, [themeMode, systemColorScheme]);
+    return themeSetting;
+  }, [themeSetting, systemColorScheme]);
 
   // Current theme data
   const theme = useMemo(() => {
-    return ThemeMappings[currentTheme];
+    return themes[currentTheme];
   }, [currentTheme]);
 
   // Theme state helpers
@@ -77,23 +75,23 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const isLight = currentTheme === "light";
   const isBlue = currentTheme === "blue";
 
-  // Load theme mode from storage on mount
+  // Load theme setting from storage on mount
   useEffect(() => {
-    loadThemeMode();
+    loadThemeSetting();
   }, []);
 
-  // Load saved theme mode
-  const loadThemeMode = async () => {
+  // Load saved theme setting
+  const loadThemeSetting = async () => {
     try {
-      const savedMode = await AsyncStorage.getItem(THEME_MODE_KEY);
+      const savedSetting = await AsyncStorage.getItem(THEME_SETTING_KEY);
       if (
-        savedMode &&
-        (savedMode === "light" ||
-          savedMode === "dark" ||
-          savedMode === "blue" ||
-          savedMode === "auto")
+        savedSetting &&
+        (savedSetting === "light" ||
+          savedSetting === "dark" ||
+          savedSetting === "blue" ||
+          savedSetting === "system")
       ) {
-        setThemeModeState(savedMode as ThemeMode);
+        setThemeSettingState(savedSetting as ThemeSetting);
       }
     } catch (error) {
       console.warn("Failed to load theme mode:", error);
@@ -102,27 +100,27 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     }
   };
 
-  // Save theme mode to storage
-  const saveThemeMode = async (mode: ThemeMode) => {
+  // Save theme setting to storage
+  const saveThemeSetting = async (setting: ThemeSetting) => {
     try {
-      await AsyncStorage.setItem(THEME_MODE_KEY, mode);
+      await AsyncStorage.setItem(THEME_SETTING_KEY, setting);
     } catch (error) {
-      console.warn("Failed to save theme mode:", error);
+      console.warn("Failed to save theme setting:", error);
     }
   };
 
-  // Set theme mode and save to storage
-  const setThemeMode = useCallback((mode: ThemeMode) => {
-    setThemeModeState(mode);
-    saveThemeMode(mode);
+  // Set theme setting and save to storage
+  const setThemeSetting = useCallback((setting: ThemeSetting) => {
+    setThemeSettingState(setting);
+    saveThemeSetting(setting);
   }, []);
 
-  // Toggle between available themes (cycles through all themes except "auto")
+  // Toggle between available themes (cycles through all themes except "system")
   const toggleTheme = useCallback(() => {
     const currentIndex = AVAILABLE_THEMES.indexOf(currentTheme);
     const nextIndex = (currentIndex + 1) % AVAILABLE_THEMES.length;
-    setThemeMode(AVAILABLE_THEMES[nextIndex]);
-  }, [currentTheme, setThemeMode]);
+    setThemeSetting(AVAILABLE_THEMES[nextIndex]);
+  }, [currentTheme, setThemeSetting]);
 
   // Get theme color by path (e.g., "background.primary", "text.secondary")
   const getThemeColor = useCallback(
@@ -163,9 +161,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   // Context value
   const contextValue = useMemo(
     () => ({
-      themeMode,
+      themeSetting,
       currentTheme,
-      setThemeMode,
+      setThemeSetting,
       toggleTheme,
       theme,
       isDark,
@@ -175,9 +173,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       getComponentColor,
     }),
     [
-      themeMode,
+      themeSetting,
       currentTheme,
-      setThemeMode,
+      setThemeSetting,
       toggleTheme,
       theme,
       isDark,
