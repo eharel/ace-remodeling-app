@@ -10,6 +10,7 @@ import React, {
 import { useColorScheme } from "react-native";
 
 import {
+  ConcreteTheme,
   ThemeMappings,
   ThemeMode,
   UnifiedTheme,
@@ -19,7 +20,7 @@ import {
 interface ThemeContextType {
   // Current theme state
   themeMode: ThemeMode;
-  currentTheme: "light" | "dark" | "blue";
+  currentTheme: ConcreteTheme;
 
   // Theme switching
   setThemeMode: (mode: ThemeMode) => void;
@@ -42,6 +43,9 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 // Theme Storage Keys
 const THEME_MODE_KEY = "@theme_mode";
 
+// Available themes (excluding "auto")
+const AVAILABLE_THEMES: ConcreteTheme[] = ["light", "dark", "blue"];
+
 // Theme Provider Props
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -58,7 +62,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     if (themeMode === "auto") {
       return systemColorScheme || "light";
     }
-    return themeMode as "light" | "dark" | "blue";
+    return themeMode;
   }, [themeMode, systemColorScheme]);
 
   // Current theme data
@@ -111,15 +115,11 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     saveThemeMode(mode);
   }, []);
 
-  // Toggle between light, dark, and blue themes
+  // Toggle between available themes (cycles through all themes except "auto")
   const toggleTheme = useCallback(() => {
-    const newMode =
-      currentTheme === "light"
-        ? "dark"
-        : currentTheme === "dark"
-        ? "blue"
-        : "light";
-    setThemeMode(newMode);
+    const currentIndex = AVAILABLE_THEMES.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % AVAILABLE_THEMES.length;
+    setThemeMode(AVAILABLE_THEMES[nextIndex]);
   }, [currentTheme, setThemeMode]);
 
   // Get theme color by path (e.g., "background.primary", "text.secondary")

@@ -481,6 +481,7 @@ export const ThemeMappings = {
 
 // Theme Types
 export type ThemeMode = "light" | "dark" | "blue" | "auto";
+export type ConcreteTheme = Exclude<ThemeMode, "auto">;
 export type ThemeVariant =
   | "primary"
   | "secondary"
