@@ -22,8 +22,8 @@ export default function BathroomsScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
-        <ThemedText type="title">Bathroom Projects</ThemedText>
-        <ThemedText type="subtitle">
+        <ThemedText variant="title">Bathroom Projects</ThemedText>
+        <ThemedText variant="subtitle">
           Transform your bathroom with our expert remodeling services
         </ThemedText>
       </ThemedView>

@@ -1,58 +1,70 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { useTheme } from "@/contexts/ThemeContext";
+import { styling } from "@/utils/styling";
 
 export default function SearchScreen() {
+  const { getThemeColor } = useTheme();
+
   console.log("🔍 Search page loaded");
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: styling.spacing(5),
+    },
+    header: {
+      marginTop: styling.spacing(9),
+      marginBottom: styling.spacing(8),
+      gap: styling.spacing(2),
+    },
+    content: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: styling.spacing(4),
+    },
+    placeholderText: {
+      fontSize: styling.fontSize("2xl"),
+      textAlign: "center",
+      opacity: 0.8,
+    },
+    descriptionText: {
+      fontSize: styling.fontSize("base"),
+      textAlign: "center",
+      opacity: 0.6,
+      maxWidth: 300,
+    },
+    placeholderIcon: {
+      marginBottom: styling.spacing(4),
+    },
+  });
 
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
-        <ThemedText type="title">Search Projects</ThemedText>
-        <ThemedText type="subtitle">
-          Find specific projects and services
+        <ThemedText variant="title">Search Projects</ThemedText>
+        <ThemedText variant="subtitle">
+          Find the perfect project for your client
         </ThemedText>
       </ThemedView>
-
       <ThemedView style={styles.content}>
+        <MaterialIcons
+          name="search"
+          size={64}
+          color={getThemeColor("text.tertiary")}
+          style={styles.placeholderIcon}
+        />
         <ThemedText style={styles.placeholderText}>
-          🔍 Search functionality coming soon!
+          Search functionality will appear here
         </ThemedText>
         <ThemedText style={styles.descriptionText}>
-          This feature will allow PMs to quickly find specific projects, filter
-          by location, style, or project type.
+          This is where PMs can search and filter projects by various criteria.
         </ThemedText>
       </ThemedView>
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  header: {
-    marginTop: 60,
-    marginBottom: 30,
-    gap: 8,
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-  },
-  placeholderText: {
-    fontSize: 24,
-    textAlign: "center",
-    opacity: 0.8,
-  },
-  descriptionText: {
-    fontSize: 16,
-    textAlign: "center",
-    opacity: 0.6,
-    maxWidth: 300,
-  },
-});

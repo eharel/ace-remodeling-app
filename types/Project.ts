@@ -2,6 +2,7 @@ import { ProjectCategory } from "./Category";
 import { Document } from "./Document";
 import { Log } from "./Log";
 import { Picture } from "./Picture";
+import { ProjectStatus } from "./Status";
 
 export interface Project {
   id: string;
@@ -29,7 +30,7 @@ export interface Project {
     completionDate?: Date;
     estimatedCompletion?: Date;
   };
-  status: "planning" | "in-progress" | "completed" | "on-hold";
+  status: ProjectStatus;
 
   // Metadata
   createdAt: Date;

@@ -1,11 +1,16 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { useTheme } from "@/contexts/ThemeContext";
+import { styling } from "@/utils/styling";
 
 export default function HomeScreen() {
+  const { getThemeColor, isDark } = useTheme();
+
   const handleKitchenPress = () => {
     router.push("/(tabs)/kitchens");
   };
@@ -14,54 +19,181 @@ export default function HomeScreen() {
     router.push("/(tabs)/bathrooms");
   };
 
-  console.log("🏠 Home page loaded");
+  console.log("Home page loaded");
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: getThemeColor("background.secondary"),
+    },
+    header: {
+      alignItems: "center",
+      paddingTop: styling.spacing(20),
+      paddingBottom: styling.spacing(8),
+      paddingHorizontal: styling.spacing(6),
+    },
+    logo: {
+      width: 200,
+      height: 80,
+      marginBottom: styling.spacing(6),
+    },
+    companyName: {
+      fontSize: styling.fontSize("4xl"),
+      textAlign: "center",
+      fontWeight: styling.fontWeight("bold"),
+      color: getThemeColor("text.primary"),
+      lineHeight: styling.lineHeight("tight"),
+      marginBottom: styling.spacing(2),
+    },
+    tagline: {
+      fontSize: styling.fontSize("lg"),
+      textAlign: "center",
+      color: getThemeColor("text.secondary"),
+      fontWeight: styling.fontWeight("medium"),
+    },
+    welcomeSection: {
+      alignItems: "center",
+      paddingHorizontal: styling.spacing(6),
+      paddingBottom: styling.spacing(2),
+    },
+    welcomeText: {
+      fontSize: styling.fontSize("xl"),
+      textAlign: "center",
+      color: getThemeColor("text.primary"),
+      fontFamily: styling.fontFamily("semibold"),
+      marginBottom: styling.spacing(2),
+    },
+    instructionText: {
+      fontSize: styling.fontSize("base"),
+      textAlign: "center",
+      color: getThemeColor("text.secondary"),
+      lineHeight: styling.lineHeight("relaxed"),
+      marginTop: styling.spacing(4),
+      paddingVertical: styling.spacing(6),
+      minHeight: 80, // Ensure proper height for text visibility
+    },
+    categoriesSection: {
+      paddingHorizontal: styling.spacing(6),
+      paddingVertical: styling.spacing(6),
+      backgroundColor: getThemeColor("background.primary"),
+      borderRadius: styling.borderRadius("lg"),
+      marginHorizontal: styling.spacing(4),
+      marginTop: styling.spacing(4),
+      marginBottom: styling.spacing(8),
+      ...styling.shadow("sm"),
+    },
+    categoriesTitle: {
+      fontSize: styling.fontSize("xl"),
+      textAlign: "center",
+      marginBottom: styling.spacing(6),
+      color: getThemeColor("text.primary"),
+      fontFamily: styling.fontFamily("bold"),
+    },
+    categoryButtons: {
+      gap: styling.spacing(4),
+      width: "85%",
+      alignSelf: "center",
+    },
+    categoryButton: {
+      backgroundColor: getThemeColor("background.card"),
+      padding: styling.spacing(6),
+      borderRadius: styling.borderRadius("lg"),
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: getThemeColor("border.primary"),
+      ...styling.shadow("base"),
+      minHeight: 120,
+    },
+    categoryButtonPressed: {
+      backgroundColor: getThemeColor("background.secondary"),
+      transform: [{ scale: 0.98 }],
+      ...styling.shadow("sm"),
+    },
+    categoryButtonText: {
+      fontSize: styling.fontSize("lg"),
+      marginBottom: styling.spacing(1),
+      color: getThemeColor("text.primary"),
+      fontWeight: styling.fontWeight("semibold"),
+    },
+    categoryDescription: {
+      fontSize: styling.fontSize("sm"),
+      color: getThemeColor("text.secondary"),
+      textAlign: "center",
+      lineHeight: styling.lineHeight("relaxed"),
+    },
+    categoryIcon: {
+      marginBottom: styling.spacing(3),
+    },
+    footer: {
+      alignItems: "center",
+      paddingVertical: styling.spacing(6),
+      paddingHorizontal: styling.spacing(6),
+      borderTopWidth: 1,
+      borderTopColor: getThemeColor("border.primary"),
+    },
+    footerText: {
+      fontSize: styling.fontSize("sm"),
+      color: getThemeColor("text.tertiary"),
+      textAlign: "center",
+    },
+  });
 
   return (
     <ThemedView style={styles.container}>
       {/* Header Section */}
-      <ThemedView style={styles.header}>
+      <View style={styles.header}>
         <Image
-          source={require("@/assets/images/ace-logo-full-black.png")}
+          source={
+            isDark
+              ? require("@/assets/images/ace-logo-full-white.png")
+              : require("@/assets/images/ace-logo-full-black.png")
+          }
           style={styles.logo}
           contentFit="contain"
         />
-        <ThemedText type="title" style={styles.companyName}>
+        <ThemedText variant="title" style={styles.companyName}>
           ACE Remodeling
         </ThemedText>
-        <ThemedText type="subtitle" style={styles.tagline}>
+        <ThemedText variant="subtitle" style={styles.tagline}>
           Transforming Austin Homes
         </ThemedText>
-      </ThemedView>
+      </View>
 
       {/* Welcome Message */}
-      <ThemedView style={styles.welcomeSection}>
-        <ThemedText type="defaultSemiBold" style={styles.welcomeText}>
+      <View style={styles.welcomeSection}>
+        <ThemedText variant="body" style={styles.welcomeText}>
           Ready to showcase our work!
         </ThemedText>
-        <ThemedText style={styles.instructionText}>
+        <ThemedText variant="body" style={styles.instructionText}>
           Select a category below to view our featured projects
         </ThemedText>
-      </ThemedView>
+      </View>
 
       {/* Category Navigation */}
-      <ThemedView style={styles.categoriesSection}>
-        <ThemedText type="subtitle" style={styles.categoriesTitle}>
+      <View style={styles.categoriesSection}>
+        <ThemedText variant="subtitle" style={styles.categoriesTitle}>
           Our Services
         </ThemedText>
 
-        <ThemedView style={styles.categoryButtons}>
+        <View style={styles.categoryButtons}>
           <Pressable
             style={({ pressed }) => [
               styles.categoryButton,
               pressed && styles.categoryButtonPressed,
             ]}
             onPress={handleKitchenPress}
+            android_ripple={{
+              color: getThemeColor("interactive.primaryLight"),
+            }}
           >
-            <ThemedText
-              type="defaultSemiBold"
-              style={styles.categoryButtonText}
-            >
-              🏠 Kitchen
+            <MaterialIcons
+              name="kitchen"
+              size={32}
+              color={getThemeColor("interactive.primary")}
+              style={styles.categoryIcon}
+            />
+            <ThemedText variant="body" style={styles.categoryButtonText}>
+              Kitchen
             </ThemedText>
             <ThemedText style={styles.categoryDescription}>
               Kitchen remodeling and renovations
@@ -74,113 +206,32 @@ export default function HomeScreen() {
               pressed && styles.categoryButtonPressed,
             ]}
             onPress={handleBathroomPress}
+            android_ripple={{
+              color: getThemeColor("interactive.primaryLight"),
+            }}
           >
-            <ThemedText
-              type="defaultSemiBold"
-              style={styles.categoryButtonText}
-            >
-              🚿 Bathroom
+            <MaterialIcons
+              name="bathroom"
+              size={32}
+              color={getThemeColor("interactive.primary")}
+              style={styles.categoryIcon}
+            />
+            <ThemedText variant="body" style={styles.categoryButtonText}>
+              Bathroom
             </ThemedText>
             <ThemedText style={styles.categoryDescription}>
               Bathroom transformations
             </ThemedText>
           </Pressable>
-        </ThemedView>
-      </ThemedView>
+        </View>
+      </View>
 
       {/* Footer */}
-      <ThemedView style={styles.footer}>
+      <View style={styles.footer}>
         <ThemedText style={styles.footerText}>
           Professional remodeling services in Austin, TX
         </ThemedText>
-      </ThemedView>
+      </View>
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  header: {
-    alignItems: "center",
-    marginTop: 60,
-    marginBottom: 40,
-    gap: 12,
-  },
-  logo: {
-    width: 250,
-    height: 100,
-    marginBottom: 16,
-  },
-  companyName: {
-    fontSize: 32,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  tagline: {
-    fontSize: 20,
-    textAlign: "center",
-    opacity: 0.8,
-  },
-  welcomeSection: {
-    alignItems: "center",
-    marginBottom: 40,
-    gap: 8,
-  },
-  welcomeText: {
-    fontSize: 22,
-    textAlign: "center",
-  },
-  instructionText: {
-    fontSize: 16,
-    textAlign: "center",
-    opacity: 0.7,
-  },
-  categoriesSection: {
-    flex: 1,
-    gap: 20,
-  },
-  categoriesTitle: {
-    fontSize: 24,
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  categoryButtons: {
-    gap: 16,
-  },
-  categoryButton: {
-    backgroundColor: "#f0f0f0",
-    padding: 24,
-    borderRadius: 12,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  categoryButtonPressed: {
-    backgroundColor: "#e0e0e0",
-    transform: [{ scale: 0.98 }],
-  },
-  categoryButtonText: {
-    fontSize: 20,
-    marginBottom: 8,
-  },
-  categoryDescription: {
-    fontSize: 14,
-    opacity: 0.7,
-    textAlign: "center",
-  },
-  footer: {
-    alignItems: "center",
-    marginTop: 20,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
-  },
-  footerText: {
-    fontSize: 14,
-    opacity: 0.6,
-    textAlign: "center",
-  },
-});

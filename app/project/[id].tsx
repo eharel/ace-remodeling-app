@@ -5,12 +5,15 @@ import { FlatList, ScrollView, StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { useTheme } from "@/contexts/ThemeContext";
 import { mockProjects } from "@/data/mockProjects";
 import { Project } from "@/types";
+import { styling } from "@/utils/styling";
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [project, setProject] = useState<Project | null>(null);
+  const { getThemeColor } = useTheme();
 
   useEffect(() => {
     if (id) {
@@ -18,6 +21,180 @@ export default function ProjectDetailScreen() {
       setProject(foundProject || null);
     }
   }, [id]);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: getThemeColor("background.secondary"),
+    },
+    errorState: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: styling.spacing(10),
+    },
+    errorText: {
+      fontSize: styling.fontSize("lg"),
+      opacity: 0.6,
+    },
+    heroImage: {
+      width: "100%",
+      height: 300,
+    },
+    header: {
+      padding: styling.spacing(5),
+      backgroundColor: getThemeColor("background.card"),
+      marginBottom: styling.spacing(4),
+      borderRadius: styling.borderRadius("lg"),
+      borderWidth: 1,
+      borderColor: getThemeColor("border.primary"),
+      ...styling.shadow("sm"),
+    },
+    projectName: {
+      fontSize: styling.fontSize("3xl"),
+      marginBottom: styling.spacing(3),
+      lineHeight: 34,
+    },
+    projectDescription: {
+      fontSize: styling.fontSize("base"),
+      lineHeight: 22,
+      opacity: 0.7,
+      marginBottom: styling.spacing(5),
+    },
+    metaGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: styling.spacing(4),
+    },
+    metaItem: {
+      flex: 1,
+      minWidth: "45%",
+    },
+    metaLabel: {
+      fontSize: styling.fontSize("xs"),
+      opacity: 0.6,
+      marginBottom: styling.spacing(1),
+      textTransform: "uppercase",
+      fontWeight: "600",
+    },
+    metaValue: {
+      fontSize: styling.fontSize("base"),
+      fontWeight: "600",
+    },
+    section: {
+      backgroundColor: getThemeColor("background.card"),
+      marginBottom: styling.spacing(4),
+      padding: styling.spacing(5),
+      borderRadius: styling.borderRadius("lg"),
+      borderWidth: 1,
+      borderColor: getThemeColor("border.primary"),
+      ...styling.shadow("sm"),
+    },
+    sectionTitle: {
+      fontSize: styling.fontSize("xl"),
+      marginBottom: styling.spacing(4),
+    },
+    picturesList: {
+      paddingRight: styling.spacing(5),
+    },
+    pictureContainer: {
+      width: 280,
+      marginRight: styling.spacing(4),
+      backgroundColor: getThemeColor("background.secondary"),
+      borderRadius: styling.borderRadius("lg"),
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: getThemeColor("border.primary"),
+    },
+    picture: {
+      width: "100%",
+      height: 200,
+    },
+    pictureInfo: {
+      padding: styling.spacing(4),
+    },
+    pictureType: {
+      fontSize: styling.fontSize("sm"),
+      fontWeight: "600",
+      marginBottom: styling.spacing(1),
+      textTransform: "capitalize",
+    },
+    pictureDescription: {
+      fontSize: styling.fontSize("sm"),
+      opacity: 0.7,
+    },
+    documentsList: {
+      paddingRight: styling.spacing(5),
+    },
+    documentContainer: {
+      width: 250,
+      marginRight: styling.spacing(4),
+      padding: styling.spacing(4),
+      backgroundColor: getThemeColor("background.secondary"),
+      borderRadius: styling.borderRadius("lg"),
+      borderLeftWidth: 4,
+      borderLeftColor: getThemeColor("interactive.primary"),
+      borderWidth: 1,
+      borderColor: getThemeColor("border.primary"),
+    },
+    documentName: {
+      fontSize: styling.fontSize("base"),
+      fontWeight: "600",
+      marginBottom: styling.spacing(2),
+    },
+    documentType: {
+      fontSize: styling.fontSize("xs"),
+      opacity: 0.6,
+      textTransform: "capitalize",
+      marginBottom: styling.spacing(2),
+    },
+    documentDescription: {
+      fontSize: styling.fontSize("sm"),
+      opacity: 0.7,
+    },
+    logsList: {
+      paddingRight: styling.spacing(5),
+    },
+    logContainer: {
+      width: 280,
+      marginRight: styling.spacing(4),
+      padding: styling.spacing(4),
+      backgroundColor: getThemeColor("background.secondary"),
+      borderRadius: styling.borderRadius("lg"),
+      borderWidth: 1,
+      borderColor: getThemeColor("border.primary"),
+    },
+    logDate: {
+      fontSize: styling.fontSize("xs"),
+      opacity: 0.6,
+      marginBottom: styling.spacing(1),
+    },
+    logDescription: {
+      fontSize: styling.fontSize("sm"),
+      lineHeight: 20,
+    },
+    clientInfo: {
+      backgroundColor: getThemeColor("background.secondary"),
+      padding: styling.spacing(4),
+      borderRadius: styling.borderRadius("lg"),
+      borderWidth: 1,
+      borderColor: getThemeColor("border.primary"),
+    },
+    clientName: {
+      fontSize: styling.fontSize("lg"),
+      fontWeight: "600",
+      marginBottom: styling.spacing(2),
+    },
+    clientDetails: {
+      fontSize: styling.fontSize("sm"),
+      opacity: 0.7,
+      lineHeight: 20,
+    },
+    clientContact: {
+      fontSize: styling.fontSize("sm"),
+      opacity: 0.7,
+    },
+  });
 
   if (!project) {
     return (
@@ -45,9 +222,7 @@ export default function ProjectDetailScreen() {
         contentFit="cover"
       />
       <ThemedView style={styles.pictureInfo}>
-        <ThemedText style={styles.pictureType}>
-          {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-        </ThemedText>
+        <ThemedText style={styles.pictureType}>{item.type}</ThemedText>
         <ThemedText style={styles.pictureDescription}>
           {item.description}
         </ThemedText>
@@ -67,12 +242,10 @@ export default function ProjectDetailScreen() {
 
   const renderLog = ({ item }: { item: any }) => (
     <ThemedView style={styles.logContainer}>
-      <ThemedText style={styles.logTitle}>{item.title}</ThemedText>
-      <ThemedText style={styles.logDescription}>{item.description}</ThemedText>
       <ThemedText style={styles.logDate}>
-        {item.date.toLocaleDateString()}
+        {item.date instanceof Date ? item.date.toLocaleDateString() : item.date}
       </ThemedText>
-      <ThemedText style={styles.logAuthor}>By {item.author}</ThemedText>
+      <ThemedText style={styles.logDescription}>{item.description}</ThemedText>
     </ThemedView>
   );
 
@@ -84,7 +257,7 @@ export default function ProjectDetailScreen() {
           headerBackTitle: "Back",
         }}
       />
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.container}>
         {/* Hero Image */}
         <Image
           source={{ uri: project.thumbnail }}
@@ -94,9 +267,7 @@ export default function ProjectDetailScreen() {
 
         {/* Project Header */}
         <ThemedView style={styles.header}>
-          <ThemedText type="title" style={styles.projectName}>
-            {project.name}
-          </ThemedText>
+          <ThemedText style={styles.projectName}>{project.name}</ThemedText>
           <ThemedText style={styles.projectDescription}>
             {project.longDescription}
           </ThemedText>
@@ -109,7 +280,6 @@ export default function ProjectDetailScreen() {
                 {project.status.replace("-", " ").toUpperCase()}
               </ThemedText>
             </ThemedView>
-
             <ThemedView style={styles.metaItem}>
               <ThemedText style={styles.metaLabel}>Category</ThemedText>
               <ThemedText style={styles.metaValue}>
@@ -117,33 +287,31 @@ export default function ProjectDetailScreen() {
                   project.category.slice(1)}
               </ThemedText>
             </ThemedView>
-
             <ThemedView style={styles.metaItem}>
               <ThemedText style={styles.metaLabel}>Location</ThemedText>
               <ThemedText style={styles.metaValue}>
                 {project.location}
               </ThemedText>
             </ThemedView>
-
             <ThemedView style={styles.metaItem}>
-              <ThemedText style={styles.metaLabel}>Cost</ThemedText>
+              <ThemedText style={styles.metaLabel}>Estimated Cost</ThemedText>
               <ThemedText style={styles.metaValue}>
-                ${project.estimatedCost?.toLocaleString()}
+                ${project.estimatedCost?.toLocaleString() || "N/A"}
               </ThemedText>
             </ThemedView>
           </ThemedView>
         </ThemedView>
 
-        {/* Before/After Pictures */}
-        {project.pictures.length > 0 && (
+        {/* Pictures Section */}
+        {project.pictures && project.pictures.length > 0 && (
           <ThemedView style={styles.section}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Project Photos
+            <ThemedText style={styles.sectionTitle}>
+              Project Pictures
             </ThemedText>
             <FlatList
               data={project.pictures}
               renderItem={renderPicture}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item, index) => `picture-${index}`}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.picturesList}
@@ -151,16 +319,14 @@ export default function ProjectDetailScreen() {
           </ThemedView>
         )}
 
-        {/* Documents */}
-        {project.documents.length > 0 && (
+        {/* Documents Section */}
+        {project.documents && project.documents.length > 0 && (
           <ThemedView style={styles.section}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Documents
-            </ThemedText>
+            <ThemedText style={styles.sectionTitle}>Documents</ThemedText>
             <FlatList
               data={project.documents}
               renderItem={renderDocument}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item, index) => `document-${index}`}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.documentsList}
@@ -168,16 +334,14 @@ export default function ProjectDetailScreen() {
           </ThemedView>
         )}
 
-        {/* Project Logs */}
-        {project.logs.length > 0 && (
+        {/* Logs Section */}
+        {project.logs && project.logs.length > 0 && (
           <ThemedView style={styles.section}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Project Timeline
-            </ThemedText>
+            <ThemedText style={styles.sectionTitle}>Project Logs</ThemedText>
             <FlatList
               data={project.logs}
               renderItem={renderLog}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item, index) => `log-${index}`}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.logsList}
@@ -185,17 +349,17 @@ export default function ProjectDetailScreen() {
           </ThemedView>
         )}
 
-        {/* Client Info */}
+        {/* Client Information */}
         {project.clientInfo && (
           <ThemedView style={styles.section}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
+            <ThemedText style={styles.sectionTitle}>
               Client Information
             </ThemedText>
             <ThemedView style={styles.clientInfo}>
               <ThemedText style={styles.clientName}>
                 {project.clientInfo.name}
               </ThemedText>
-              <ThemedText style={styles.clientAddress}>
+              <ThemedText style={styles.clientDetails}>
                 {project.clientInfo.address}
               </ThemedText>
               {project.clientInfo.phone && (
@@ -215,170 +379,3 @@ export default function ProjectDetailScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f8f9fa",
-  },
-  errorState: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 40,
-  },
-  errorText: {
-    fontSize: 18,
-    opacity: 0.6,
-  },
-  heroImage: {
-    width: "100%",
-    height: 300,
-  },
-  header: {
-    padding: 20,
-    backgroundColor: "#fff",
-    marginBottom: 16,
-  },
-  projectName: {
-    fontSize: 28,
-    marginBottom: 12,
-    lineHeight: 34,
-  },
-  projectDescription: {
-    fontSize: 16,
-    lineHeight: 22,
-    opacity: 0.7,
-    marginBottom: 20,
-  },
-  metaGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 16,
-  },
-  metaItem: {
-    flex: 1,
-    minWidth: "45%",
-  },
-  metaLabel: {
-    fontSize: 12,
-    opacity: 0.6,
-    marginBottom: 4,
-    textTransform: "uppercase",
-    fontWeight: "600",
-  },
-  metaValue: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  section: {
-    backgroundColor: "#fff",
-    marginBottom: 16,
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    marginBottom: 16,
-  },
-  picturesList: {
-    paddingRight: 20,
-  },
-  pictureContainer: {
-    width: 280,
-    marginRight: 16,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  picture: {
-    width: "100%",
-    height: 200,
-  },
-  pictureInfo: {
-    padding: 16,
-  },
-  pictureType: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 4,
-    textTransform: "capitalize",
-  },
-  pictureDescription: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
-  documentsList: {
-    paddingRight: 20,
-  },
-  documentContainer: {
-    width: 250,
-    marginRight: 16,
-    padding: 16,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: "#007bff",
-  },
-  documentName: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  documentType: {
-    fontSize: 12,
-    opacity: 0.6,
-    textTransform: "capitalize",
-    marginBottom: 8,
-  },
-  documentDescription: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
-  logsList: {
-    paddingRight: 20,
-  },
-  logContainer: {
-    width: 280,
-    marginRight: 16,
-    padding: 16,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: "#28a745",
-  },
-  logTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  logDescription: {
-    fontSize: 14,
-    opacity: 0.7,
-    marginBottom: 12,
-  },
-  logDate: {
-    fontSize: 12,
-    opacity: 0.6,
-    marginBottom: 4,
-  },
-  logAuthor: {
-    fontSize: 12,
-    opacity: 0.6,
-    fontStyle: "italic",
-  },
-  clientInfo: {
-    gap: 8,
-  },
-  clientName: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  clientAddress: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
-  clientContact: {
-    fontSize: 14,
-    opacity: 0.7,
-  },
-});

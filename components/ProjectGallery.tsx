@@ -1,7 +1,10 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { FlatList, StyleSheet, useWindowDimensions } from "react-native";
 
+import { useTheme } from "@/contexts/ThemeContext";
 import { ProjectSummary } from "@/types";
+import { styling } from "@/utils/styling";
 import { ProjectCard } from "./ProjectCard";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
@@ -20,6 +23,7 @@ export function ProjectGallery({
   onProjectPress,
 }: ProjectGalleryProps) {
   const { width } = useWindowDimensions();
+  const { getThemeColor } = useTheme();
 
   // Calculate number of columns based on screen width
   const getColumnCount = () => {
@@ -29,7 +33,67 @@ export function ProjectGallery({
   };
 
   const columnCount = getColumnCount();
-  const itemWidth = (width - 40 - (columnCount - 1) * 16) / columnCount; // 40 for padding, 16 for gaps
+  const itemWidth =
+    (width - styling.spacing(10) - (columnCount - 1) * styling.spacing(4)) /
+    columnCount;
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    header: {
+      marginBottom: styling.spacing(6),
+      paddingHorizontal: styling.spacing(5),
+      gap: styling.spacing(2),
+    },
+    title: {
+      fontSize: styling.fontSize("2xl"),
+      color: getThemeColor("text.primary"),
+      fontWeight: styling.fontWeight("bold"),
+      lineHeight: styling.lineHeight("tight"),
+    },
+    subtitle: {
+      fontSize: styling.fontSize("lg"),
+      color: getThemeColor("text.secondary"),
+      lineHeight: styling.lineHeight("relaxed"),
+    },
+    listContent: {
+      paddingHorizontal: styling.spacing(5),
+      paddingBottom: styling.spacing(5),
+    },
+    emptyState: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: styling.spacing(10),
+      gap: styling.spacing(4),
+    },
+    emptyIcon: {
+      marginBottom: styling.spacing(4),
+      opacity: 0.3,
+    },
+    emptyText: {
+      fontSize: styling.fontSize("xl"),
+      color: getThemeColor("text.secondary"),
+      fontWeight: styling.fontWeight("semibold"),
+      textAlign: "center",
+    },
+    emptySubtext: {
+      fontSize: styling.fontSize("base"),
+      color: getThemeColor("text.tertiary"),
+      textAlign: "center",
+      lineHeight: styling.lineHeight("relaxed"),
+      maxWidth: 300,
+    },
+    row: {
+      justifyContent: "space-between",
+      marginBottom: styling.spacing(4),
+    },
+    rowCentered: {
+      justifyContent: "center",
+      gap: styling.spacing(4),
+    },
+  });
 
   const renderProject = ({ item }: { item: ProjectSummary }) => (
     <ProjectCard
@@ -42,6 +106,12 @@ export function ProjectGallery({
   if (projects.length === 0) {
     return (
       <ThemedView style={styles.emptyState}>
+        <MaterialIcons
+          name="folder-open"
+          size={64}
+          color={getThemeColor("text.tertiary")}
+          style={styles.emptyIcon}
+        />
         <ThemedText style={styles.emptyText}>No projects found</ThemedText>
         <ThemedText style={styles.emptySubtext}>
           Projects will appear here once they&apos;re added
@@ -56,12 +126,14 @@ export function ProjectGallery({
       {(title || subtitle) && (
         <ThemedView style={styles.header}>
           {title && (
-            <ThemedText type="subtitle" style={styles.title}>
+            <ThemedText variant="subtitle" style={styles.title}>
               {title}
             </ThemedText>
           )}
           {subtitle && (
-            <ThemedText style={styles.subtitle}>{subtitle}</ThemedText>
+            <ThemedText variant="body" style={styles.subtitle}>
+              {subtitle}
+            </ThemedText>
           )}
         </ThemedView>
       )}
@@ -83,49 +155,3 @@ export function ProjectGallery({
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    marginBottom: 20,
-    paddingHorizontal: 20,
-    gap: 4,
-  },
-  title: {
-    fontSize: 24,
-  },
-  subtitle: {
-    fontSize: 16,
-    opacity: 0.7,
-  },
-  listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  emptyState: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 40,
-  },
-  emptyText: {
-    fontSize: 18,
-    opacity: 0.6,
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    opacity: 0.4,
-    textAlign: "center",
-  },
-  row: {
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  rowCentered: {
-    justifyContent: "center",
-    gap: 16, // Add spacing between centered items
-  },
-});
