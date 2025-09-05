@@ -2,10 +2,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
+import { ThemeMode } from "@/constants/DesignTokens";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ThemedText } from "./ThemedText";
 
-type ThemeOption = "light" | "dark" | "blue" | "auto";
+type ThemeOption = ThemeMode;
 
 export function ThemeToggle() {
   const { themeMode, setThemeMode, getThemeColor } = useTheme();

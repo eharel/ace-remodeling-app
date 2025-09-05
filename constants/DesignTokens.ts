@@ -479,9 +479,9 @@ export const ThemeMappings = {
   },
 } as const;
 
-// Theme Types
-export type ThemeMode = "light" | "dark" | "blue" | "auto";
-export type ConcreteTheme = Exclude<ThemeMode, "auto">;
+// Theme Types - Derived from implementation
+export type ConcreteTheme = keyof typeof ThemeMappings;
+export type ThemeMode = ConcreteTheme | "auto";
 export type ThemeVariant =
   | "primary"
   | "secondary"

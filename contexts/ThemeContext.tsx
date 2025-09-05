@@ -43,8 +43,10 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 // Theme Storage Keys
 const THEME_MODE_KEY = "@theme_mode";
 
-// Available themes (excluding "auto")
-const AVAILABLE_THEMES: ConcreteTheme[] = ["light", "dark", "blue"];
+// Available themes (excluding "auto") - derived from ThemeMappings
+const AVAILABLE_THEMES: ConcreteTheme[] = Object.keys(
+  ThemeMappings
+) as ConcreteTheme[];
 
 // Theme Provider Props
 interface ThemeProviderProps {
