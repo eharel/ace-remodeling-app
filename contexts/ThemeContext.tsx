@@ -16,6 +16,15 @@ import {
   UnifiedTheme,
 } from "@/constants/DesignTokens";
 
+// Theme constants for validation
+const THEME_NAMES: ThemeName[] = ["light", "dark", "blue"];
+const LIGHT_THEME: ThemeName = "light";
+const DARK_THEME: ThemeName = "dark";
+const BLUE_THEME: ThemeName = "blue";
+const SYSTEM_THEME = "system" as const;
+const DEFAULT_THEME: ThemeName = LIGHT_THEME;
+const DEFAULT_SETTING: ThemeSetting = SYSTEM_THEME;
+
 // Theme Context Types
 interface ThemeContextType {
   // Current theme state
@@ -54,13 +63,14 @@ interface ThemeProviderProps {
 // Theme Provider Component
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const systemColorScheme = useColorScheme();
-  const [themeSetting, setThemeSettingState] = useState<ThemeSetting>("system");
+  const [themeSetting, setThemeSettingState] =
+    useState<ThemeSetting>(DEFAULT_SETTING);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Determine current theme based on setting and system preference
   const currentTheme = useMemo(() => {
-    if (themeSetting === "system") {
-      return systemColorScheme || "light";
+    if (themeSetting === SYSTEM_THEME) {
+      return systemColorScheme || DEFAULT_THEME;
     }
     return themeSetting;
   }, [themeSetting, systemColorScheme]);
@@ -71,9 +81,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, [currentTheme]);
 
   // Theme state helpers
-  const isDark = currentTheme === "dark";
-  const isLight = currentTheme === "light";
-  const isBlue = currentTheme === "blue";
+  const isDark = currentTheme === DARK_THEME;
+  const isLight = currentTheme === LIGHT_THEME;
+  const isBlue = currentTheme === BLUE_THEME;
 
   // Load theme setting from storage on mount
   useEffect(() => {
@@ -86,10 +96,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       const savedSetting = await AsyncStorage.getItem(THEME_SETTING_KEY);
       if (
         savedSetting &&
-        (savedSetting === "light" ||
-          savedSetting === "dark" ||
-          savedSetting === "blue" ||
-          savedSetting === "system")
+        (THEME_NAMES.includes(savedSetting as ThemeName) ||
+          savedSetting === SYSTEM_THEME)
       ) {
         setThemeSettingState(savedSetting as ThemeSetting);
       }
