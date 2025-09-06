@@ -8,6 +8,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
+import { FloatingChecklistButton } from "@/components/FloatingChecklistButton";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 
 // Navigation component that can use theme context
@@ -44,6 +45,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <Navigation />
+      <FloatingChecklistButton />
     </ThemeProvider>
   );
 }

@@ -10,19 +10,29 @@ import React, {
 import { useColorScheme } from "react-native";
 
 import {
-  ThemeMappings,
-  ThemeMode,
+  ThemeName,
+  themes,
+  ThemeSetting,
   UnifiedTheme,
 } from "@/constants/DesignTokens";
+
+// Theme constants for validation
+const THEME_NAMES: ThemeName[] = ["light", "dark", "blue"];
+const LIGHT_THEME: ThemeName = "light";
+const DARK_THEME: ThemeName = "dark";
+const BLUE_THEME: ThemeName = "blue";
+const SYSTEM_THEME = "system" as const;
+const DEFAULT_THEME: ThemeName = LIGHT_THEME;
+const DEFAULT_SETTING: ThemeSetting = SYSTEM_THEME;
 
 // Theme Context Types
 interface ThemeContextType {
   // Current theme state
-  themeMode: ThemeMode;
-  currentTheme: "light" | "dark" | "blue";
+  themeSetting: ThemeSetting;
+  currentTheme: ThemeName;
 
   // Theme switching
-  setThemeMode: (mode: ThemeMode) => void;
+  setThemeSetting: (setting: ThemeSetting) => void;
   toggleTheme: () => void;
 
   // Theme data access
@@ -40,7 +50,10 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Theme Storage Keys
-const THEME_MODE_KEY = "@theme_mode";
+const THEME_SETTING_KEY = "@theme_setting";
+
+// Available themes (excluding "system") - derived from themes
+const AVAILABLE_THEMES: ThemeName[] = Object.keys(themes) as ThemeName[];
 
 // Theme Provider Props
 interface ThemeProviderProps {
@@ -50,44 +63,43 @@ interface ThemeProviderProps {
 // Theme Provider Component
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const systemColorScheme = useColorScheme();
-  const [themeMode, setThemeModeState] = useState<ThemeMode>("auto");
+  const [themeSetting, setThemeSettingState] =
+    useState<ThemeSetting>(DEFAULT_SETTING);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Determine current theme based on mode and system preference
+  // Determine current theme based on setting and system preference
   const currentTheme = useMemo(() => {
-    if (themeMode === "auto") {
-      return systemColorScheme || "light";
+    if (themeSetting === SYSTEM_THEME) {
+      return systemColorScheme || DEFAULT_THEME;
     }
-    return themeMode as "light" | "dark" | "blue";
-  }, [themeMode, systemColorScheme]);
+    return themeSetting;
+  }, [themeSetting, systemColorScheme]);
 
   // Current theme data
   const theme = useMemo(() => {
-    return ThemeMappings[currentTheme];
+    return themes[currentTheme];
   }, [currentTheme]);
 
   // Theme state helpers
-  const isDark = currentTheme === "dark";
-  const isLight = currentTheme === "light";
-  const isBlue = currentTheme === "blue";
+  const isDark = currentTheme === DARK_THEME;
+  const isLight = currentTheme === LIGHT_THEME;
+  const isBlue = currentTheme === BLUE_THEME;
 
-  // Load theme mode from storage on mount
+  // Load theme setting from storage on mount
   useEffect(() => {
-    loadThemeMode();
+    loadThemeSetting();
   }, []);
 
-  // Load saved theme mode
-  const loadThemeMode = async () => {
+  // Load saved theme setting
+  const loadThemeSetting = async () => {
     try {
-      const savedMode = await AsyncStorage.getItem(THEME_MODE_KEY);
+      const savedSetting = await AsyncStorage.getItem(THEME_SETTING_KEY);
       if (
-        savedMode &&
-        (savedMode === "light" ||
-          savedMode === "dark" ||
-          savedMode === "blue" ||
-          savedMode === "auto")
+        savedSetting &&
+        (THEME_NAMES.includes(savedSetting as ThemeName) ||
+          savedSetting === SYSTEM_THEME)
       ) {
-        setThemeModeState(savedMode as ThemeMode);
+        setThemeSettingState(savedSetting as ThemeSetting);
       }
     } catch (error) {
       console.warn("Failed to load theme mode:", error);
@@ -96,31 +108,27 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     }
   };
 
-  // Save theme mode to storage
-  const saveThemeMode = async (mode: ThemeMode) => {
+  // Save theme setting to storage
+  const saveThemeSetting = async (setting: ThemeSetting) => {
     try {
-      await AsyncStorage.setItem(THEME_MODE_KEY, mode);
+      await AsyncStorage.setItem(THEME_SETTING_KEY, setting);
     } catch (error) {
-      console.warn("Failed to save theme mode:", error);
+      console.warn("Failed to save theme setting:", error);
     }
   };
 
-  // Set theme mode and save to storage
-  const setThemeMode = useCallback((mode: ThemeMode) => {
-    setThemeModeState(mode);
-    saveThemeMode(mode);
+  // Set theme setting and save to storage
+  const setThemeSetting = useCallback((setting: ThemeSetting) => {
+    setThemeSettingState(setting);
+    saveThemeSetting(setting);
   }, []);
 
-  // Toggle between light, dark, and blue themes
+  // Toggle between available themes (cycles through all themes except "system")
   const toggleTheme = useCallback(() => {
-    const newMode =
-      currentTheme === "light"
-        ? "dark"
-        : currentTheme === "dark"
-        ? "blue"
-        : "light";
-    setThemeMode(newMode);
-  }, [currentTheme, setThemeMode]);
+    const currentIndex = AVAILABLE_THEMES.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % AVAILABLE_THEMES.length;
+    setThemeSetting(AVAILABLE_THEMES[nextIndex]);
+  }, [currentTheme, setThemeSetting]);
 
   // Get theme color by path (e.g., "background.primary", "text.secondary")
   const getThemeColor = useCallback(
@@ -161,9 +169,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   // Context value
   const contextValue = useMemo(
     () => ({
-      themeMode,
+      themeSetting,
       currentTheme,
-      setThemeMode,
+      setThemeSetting,
       toggleTheme,
       theme,
       isDark,
@@ -173,9 +181,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       getComponentColor,
     }),
     [
-      themeMode,
+      themeSetting,
       currentTheme,
-      setThemeMode,
+      setThemeSetting,
       toggleTheme,
       theme,
       isDark,

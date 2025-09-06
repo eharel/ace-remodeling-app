@@ -1,4 +1,4 @@
-import { DesignTokens, ThemeMappings } from "@/constants/DesignTokens";
+import { DesignTokens, ThemeName, themes } from "@/constants/DesignTokens";
 import { useTheme } from "@/contexts/ThemeContext";
 
 // Legacy styling utilities (for backward compatibility)
@@ -51,14 +51,8 @@ export const styling = {
 
 // NEW: Theme-aware styling utilities
 export const useThemeStyling = () => {
-  const {
-    theme,
-    getThemeColor,
-    getComponentColor,
-    currentTheme,
-    isDark,
-    isLight,
-  } = useTheme();
+  const { getThemeColor, getComponentColor, currentTheme, isDark, isLight } =
+    useTheme();
 
   return {
     // Theme-aware color utilities
@@ -73,7 +67,7 @@ export const useThemeStyling = () => {
 
     // Theme-aware design tokens
     tokens: DesignTokens,
-    mappings: ThemeMappings,
+    themes: themes,
 
     // Legacy utilities (for backward compatibility)
     ...styling,
@@ -81,8 +75,8 @@ export const useThemeStyling = () => {
 };
 
 // NEW: Theme-aware style generators
-export const createThemeStyles = (theme: "light" | "dark") => {
-  const themeColors = ThemeMappings[theme].colors;
+export const createThemeStyles = (theme: ThemeName) => {
+  const themeColors = themes[theme].colors;
 
   return {
     // Background styles
@@ -239,8 +233,8 @@ export const statusStyles = {
 } as const;
 
 // NEW: Theme-aware status styles
-export const createThemeStatusStyles = (theme: "light" | "dark") => {
-  const themeColors = ThemeMappings[theme].colors;
+export const createThemeStatusStyles = (theme: ThemeName) => {
+  const themeColors = themes[theme].colors;
 
   return {
     completed: {
