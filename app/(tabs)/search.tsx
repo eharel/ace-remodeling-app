@@ -10,7 +10,7 @@ import { styling } from "@/utils/styling";
 import { useEffect, useState } from "react";
 
 export default function SearchScreen() {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Project[]>([]);
 
@@ -87,7 +87,7 @@ export default function SearchScreen() {
           <MaterialIcons
             name="search"
             size={64}
-            color={getThemeColor("text.tertiary")}
+            color={theme.colors.text.tertiary}
             style={styles.placeholderIcon}
           />
           <ThemedText style={styles.placeholderText}>

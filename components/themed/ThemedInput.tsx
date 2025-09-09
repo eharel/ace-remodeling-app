@@ -23,14 +23,14 @@ export function ThemedInput({
   disabled,
   loading,
 }: ThemedInputProps) {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
   const styles = StyleSheet.create({
     input: {
       // Use theme colors
-      backgroundColor: getThemeColor("components.input.background"),
+      backgroundColor: theme.colors.components.input.background,
       borderColor: error
-        ? getThemeColor("status.error")
-        : getThemeColor("components.input.border"),
+        ? theme.colors.status.error
+        : theme.colors.components.input.border,
       borderWidth: 1,
       borderRadius: styling.borderRadius("md"),
       paddingHorizontal: styling.spacing(4),
@@ -39,7 +39,7 @@ export function ThemedInput({
       // Typography from design tokens
       fontSize: styling.fontSize("base"),
       fontFamily: styling.fontFamily("regular"),
-      color: getThemeColor("text.primary"),
+      color: theme.colors.text.primary,
 
       // States
       opacity: disabled ? styling.interaction("disabledOpacity") : 1,
@@ -52,7 +52,7 @@ export function ThemedInput({
       value={value}
       onChangeText={onChangeText}
       style={styles.input}
-      placeholderTextColor={getThemeColor("components.input.placeholder")}
+      placeholderTextColor={theme.colors.components.input.placeholder}
       editable={!disabled}
     />
   );

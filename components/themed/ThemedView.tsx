@@ -17,7 +17,7 @@ export function ThemedView({
   outlined = false,
   ...otherProps
 }: ThemedViewProps) {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   // Generate theme-aware styles based on variant and props
   const themedStyles = useMemo(() => {
@@ -26,52 +26,52 @@ export function ThemedView({
     // Apply variant-based styling
     switch (variant) {
       case "primary":
-        baseStyles.backgroundColor = getThemeColor("background.primary");
+        baseStyles.backgroundColor = theme.colors.background.primary;
         break;
       case "secondary":
-        baseStyles.backgroundColor = getThemeColor("background.secondary");
+        baseStyles.backgroundColor = theme.colors.background.secondary;
         break;
       case "card":
-        baseStyles.backgroundColor = getThemeColor("background.card");
-        baseStyles.borderColor = getThemeColor("border.primary");
+        baseStyles.backgroundColor = theme.colors.background.card;
+        baseStyles.borderColor = theme.colors.border.primary;
         baseStyles.borderWidth = 1;
         break;
       case "elevated":
-        baseStyles.backgroundColor = getThemeColor("background.elevated");
-        baseStyles.shadowColor = getThemeColor("components.card.shadow");
+        baseStyles.backgroundColor = theme.colors.background.elevated;
+        baseStyles.shadowColor = theme.colors.components.card.shadow;
         baseStyles.shadowOffset = DesignTokens.shadows.base.shadowOffset;
-        baseStyles.shadowOpacity = getThemeColor("shadows.base.shadowOpacity");
+        baseStyles.shadowOpacity = theme.colors.shadows.base.shadowOpacity;
         baseStyles.shadowRadius = DesignTokens.shadows.base.shadowRadius;
         baseStyles.elevation = DesignTokens.shadows.base.elevation;
         break;
       case "outlined":
         baseStyles.backgroundColor = "transparent";
-        baseStyles.borderColor = getThemeColor("border.primary");
+        baseStyles.borderColor = theme.colors.border.primary;
         baseStyles.borderWidth = 1;
         break;
       case "ghost":
         baseStyles.backgroundColor = "transparent";
         break;
       default:
-        baseStyles.backgroundColor = getThemeColor("background.primary");
+        baseStyles.backgroundColor = theme.colors.background.primary;
     }
 
     // Apply additional props
     if (elevated) {
-      baseStyles.shadowColor = getThemeColor("components.card.shadow");
+      baseStyles.shadowColor = theme.colors.components.card.shadow;
       baseStyles.shadowOffset = DesignTokens.shadows.base.shadowOffset;
-      baseStyles.shadowOpacity = getThemeColor("shadows.base.shadowOpacity");
+      baseStyles.shadowOpacity = theme.colors.shadows.base.shadowOpacity;
       baseStyles.shadowRadius = DesignTokens.shadows.base.shadowRadius;
       baseStyles.elevation = DesignTokens.shadows.base.elevation;
     }
 
     if (outlined) {
-      baseStyles.borderColor = getThemeColor("border.primary");
+      baseStyles.borderColor = theme.colors.border.primary;
       baseStyles.borderWidth = 1;
     }
 
     return baseStyles;
-  }, [variant, elevated, outlined, getThemeColor]);
+  }, [variant, elevated, outlined, theme]);
 
   return <View style={[themedStyles, style]} {...otherProps} />;
 }

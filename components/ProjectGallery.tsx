@@ -20,7 +20,7 @@ export function ProjectGallery({
   style,
 }: ProjectGalleryProps) {
   const { width } = useWindowDimensions();
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   // Calculate number of columns based on screen width
   const getColumnCount = () => {
@@ -55,13 +55,13 @@ export function ProjectGallery({
     },
     emptyText: {
       fontSize: styling.fontSize("xl"),
-      color: getThemeColor("text.secondary"),
+      color: theme.colors.text.secondary,
       fontWeight: styling.fontWeight("semibold"),
       textAlign: "center",
     },
     emptySubtext: {
       fontSize: styling.fontSize("base"),
-      color: getThemeColor("text.tertiary"),
+      color: theme.colors.text.tertiary,
       textAlign: "center",
       lineHeight: styling.lineHeight("relaxed"),
       maxWidth: 300,
@@ -90,7 +90,7 @@ export function ProjectGallery({
         <MaterialIcons
           name="folder-open"
           size={64}
-          color={getThemeColor("text.tertiary")}
+          color={theme.colors.text.tertiary}
           style={styles.emptyIcon}
         />
         <ThemedText style={styles.emptyText}>No projects found</ThemedText>

@@ -40,7 +40,7 @@ export function ChecklistItem({
   accessibilityHint,
   accessibilityState,
 }: ChecklistItemProps) {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   return (
     <TouchableOpacity
@@ -57,8 +57,8 @@ export function ChecklistItem({
         size={24}
         color={
           isChecked
-            ? getThemeColor("interactive.primary")
-            : getThemeColor("text.tertiary")
+            ? theme.colors.interactive.primary
+            : theme.colors.text.tertiary
         }
         accessibilityElementsHidden={true}
       />
@@ -66,7 +66,7 @@ export function ChecklistItem({
         style={[
           styles.checklistText,
           {
-            color: getThemeColor("text.primary"),
+            color: theme.colors.text.primary,
             textDecorationLine: isChecked ? "line-through" : "none",
             opacity: isChecked ? styling.interaction("disabledOpacity") : 1,
           },

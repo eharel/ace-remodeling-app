@@ -9,7 +9,7 @@ import { ThemedText } from "./themed";
 type ThemeOption = ThemeSetting;
 
 export function ThemeToggle() {
-  const { themeSetting, setThemeSetting, getThemeColor } = useTheme();
+  const { themeSetting, setThemeSetting, theme } = useTheme();
 
   const themeOptions: { key: ThemeOption; label: string; icon: string }[] = [
     { key: "light", label: "Light", icon: "light-mode" },
@@ -31,11 +31,11 @@ export function ThemeToggle() {
 
   const dynamicStyles = StyleSheet.create({
     container: {
-      backgroundColor: getThemeColor("background.secondary"),
+      backgroundColor: theme.colors.background.secondary,
       borderRadius: 8,
       marginVertical: 8,
       borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
+      borderColor: theme.colors.border.primary,
       padding: 16,
     },
     title: {
@@ -54,12 +54,12 @@ export function ThemeToggle() {
       justifyContent: "center",
       borderRadius: 30,
       borderWidth: 2,
-      borderColor: getThemeColor("border.primary"),
-      backgroundColor: getThemeColor("background.card"),
+      borderColor: theme.colors.border.primary,
+      backgroundColor: theme.colors.background.card,
     },
     activeButton: {
-      backgroundColor: getThemeColor("interactive.primary"),
-      borderColor: getThemeColor("interactive.primary"),
+      backgroundColor: theme.colors.interactive.primary,
+      borderColor: theme.colors.interactive.primary,
     },
     buttonIcon: {
       // No margin needed for circular buttons
@@ -95,8 +95,8 @@ export function ThemeToggle() {
                   size={24}
                   color={
                     active
-                      ? getThemeColor("text.inverse")
-                      : getThemeColor("text.primary")
+                      ? theme.colors.text.inverse
+                      : theme.colors.text.primary
                   }
                   style={dynamicStyles.buttonIcon}
                 />
@@ -107,8 +107,8 @@ export function ThemeToggle() {
                   styles.buttonLabel,
                   {
                     color: active
-                      ? getThemeColor("interactive.primary")
-                      : getThemeColor("text.secondary"),
+                      ? theme.colors.interactive.primary
+                      : theme.colors.text.secondary,
                   },
                 ]}
               >

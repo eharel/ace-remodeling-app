@@ -26,24 +26,21 @@ export function ChecklistHeader({
   onReset,
   onClose,
 }: ChecklistHeaderProps) {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   return (
     <View
       style={[
         styles.header,
-        { borderBottomColor: getThemeColor("border.primary") },
+        { borderBottomColor: theme.colors.border.primary },
       ]}
     >
       <View style={styles.headerContent}>
-        <Text style={[styles.title, { color: getThemeColor("text.primary") }]}>
+        <Text style={[styles.title, { color: theme.colors.text.primary }]}>
           Meeting Checklist
         </Text>
         <Text
-          style={[
-            styles.progressText,
-            { color: getThemeColor("text.secondary") },
-          ]}
+          style={[styles.progressText, { color: theme.colors.text.secondary }]}
         >
           {progress.completed}/{progress.total} completed
         </Text>
@@ -59,7 +56,7 @@ export function ChecklistHeader({
           <MaterialIcons
             name="refresh"
             size={20}
-            color={getThemeColor("text.secondary")}
+            color={theme.colors.text.secondary}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -71,7 +68,7 @@ export function ChecklistHeader({
           <MaterialIcons
             name="close"
             size={24}
-            color={getThemeColor("text.secondary")}
+            color={theme.colors.text.secondary}
           />
         </TouchableOpacity>
       </View>

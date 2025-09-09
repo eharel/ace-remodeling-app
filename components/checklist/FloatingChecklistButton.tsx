@@ -11,7 +11,7 @@ import { styling } from "@/utils/styling";
  * Provides a floating button that opens a modal with interactive checklist items
  */
 export function FloatingChecklistButton() {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
   // Use the custom hook for checklist state management
@@ -28,8 +28,8 @@ export function FloatingChecklistButton() {
         style={[
           styles.fab,
           {
-            backgroundColor: getThemeColor("interactive.primary"),
-            shadowColor: getThemeColor("text.primary"),
+            backgroundColor: theme.colors.interactive.primary,
+            shadowColor: theme.colors.text.primary,
           },
         ]}
         onPress={openModal}
@@ -42,7 +42,7 @@ export function FloatingChecklistButton() {
         <MaterialIcons
           name="checklist"
           size={24}
-          color={getThemeColor("text.inverse")}
+          color={theme.colors.text.inverse}
           accessibilityElementsHidden={true}
         />
       </TouchableOpacity>

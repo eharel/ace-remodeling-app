@@ -59,14 +59,43 @@ export const styling = {
 
 // NEW: Theme-aware styling utilities
 export const useThemeStyling = () => {
-  const { getThemeColor, getComponentColor, currentTheme, isDark, isLight } =
-    useTheme();
+  const { theme, currentTheme, isDark, isLight } = useTheme();
 
   return {
     // Theme-aware color utilities
-    themeColor: (path: string) => getThemeColor(path),
-    componentColor: (component: string, property: string) =>
-      getComponentColor(component, property),
+    themeColor: (path: string) => {
+      console.warn(
+        `themeColor("${path}") is deprecated. Use direct theme object access: theme.colors.${path.replace(
+          /\./g,
+          "."
+        )}`
+      );
+      const keys = path.split(".");
+      let value: any = theme.colors;
+      for (const key of keys) {
+        if (value && typeof value === "object" && key in value) {
+          value = value[key];
+        } else {
+          console.warn(`Theme color path not found: ${path}`);
+          return theme.colors.text.primary;
+        }
+      }
+      return value || theme.colors.text.primary;
+    },
+    componentColor: (component: string, property: string) => {
+      console.warn(
+        `componentColor("${component}", "${property}") is deprecated. Use direct theme object access: theme.colors.components.${component}.${property}`
+      );
+      const componentColors =
+        theme.colors.components[
+          component as keyof typeof theme.colors.components
+        ];
+      if (componentColors && property in componentColors) {
+        return componentColors[property as keyof typeof componentColors];
+      }
+      console.warn(`Component color not found: ${component}.${property}`);
+      return theme.colors.text.primary;
+    },
 
     // Theme state helpers
     theme: currentTheme,

@@ -15,7 +15,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   const handlePress = () => {
     onPress?.(project);
@@ -50,9 +50,9 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
       marginBottom: styling.spacing(4),
     },
     card: {
-      backgroundColor: getThemeColor("background.card"),
+      backgroundColor: theme.colors.background.card,
       borderRadius: styling.borderRadius("lg"),
-      shadowColor: getThemeColor("components.card.shadow"),
+      shadowColor: theme.colors.components.card.shadow,
       shadowOffset: {
         width: 0,
         height: 2,
@@ -62,7 +62,7 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
       elevation: 4,
       overflow: "hidden",
       borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
+      borderColor: theme.colors.border.primary,
     },
     thumbnail: {
       width: "100%",
@@ -93,21 +93,21 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
       borderRadius: styling.borderRadius("lg"),
     },
     status_completed: {
-      backgroundColor: getThemeColor("status.successLight"),
+      backgroundColor: theme.colors.status.successLight,
     },
     status_in_progress: {
-      backgroundColor: getThemeColor("status.warningLight"),
+      backgroundColor: theme.colors.status.warningLight,
     },
     status_planning: {
-      backgroundColor: getThemeColor("status.infoLight"),
+      backgroundColor: theme.colors.status.infoLight,
     },
     status_on_hold: {
-      backgroundColor: getThemeColor("status.errorLight"),
+      backgroundColor: theme.colors.status.errorLight,
     },
     statusText: {
       fontSize: 10,
       fontWeight: "600",
-      color: getThemeColor("text.secondary"),
+      color: theme.colors.text.secondary,
     },
     category: {
       fontSize: styling.fontSize("xs"),

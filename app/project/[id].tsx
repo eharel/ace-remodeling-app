@@ -12,7 +12,7 @@ import { styling } from "@/utils/styling";
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [project, setProject] = useState<Project | null>(null);
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (id) {
@@ -24,7 +24,7 @@ export default function ProjectDetailScreen() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: getThemeColor("background.secondary"),
+      backgroundColor: theme.colors.background.secondary,
     },
     errorState: {
       flex: 1,
@@ -42,11 +42,11 @@ export default function ProjectDetailScreen() {
     },
     header: {
       padding: styling.spacing(5),
-      backgroundColor: getThemeColor("background.card"),
+      backgroundColor: theme.colors.background.card,
       marginBottom: styling.spacing(4),
       borderRadius: styling.borderRadius("lg"),
       borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
+      borderColor: theme.colors.border.primary,
       ...styling.shadow("sm"),
     },
     projectName: {
@@ -81,12 +81,12 @@ export default function ProjectDetailScreen() {
       fontWeight: "600",
     },
     section: {
-      backgroundColor: getThemeColor("background.card"),
+      backgroundColor: theme.colors.background.card,
       marginBottom: styling.spacing(4),
       padding: styling.spacing(5),
       borderRadius: styling.borderRadius("lg"),
       borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
+      borderColor: theme.colors.border.primary,
       ...styling.shadow("sm"),
     },
     sectionTitle: {
@@ -99,11 +99,11 @@ export default function ProjectDetailScreen() {
     pictureContainer: {
       width: 280,
       marginRight: styling.spacing(4),
-      backgroundColor: getThemeColor("background.secondary"),
+      backgroundColor: theme.colors.background.secondary,
       borderRadius: styling.borderRadius("lg"),
       overflow: "hidden",
       borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
+      borderColor: theme.colors.border.primary,
     },
     picture: {
       width: "100%",
@@ -129,12 +129,12 @@ export default function ProjectDetailScreen() {
       width: 250,
       marginRight: styling.spacing(4),
       padding: styling.spacing(4),
-      backgroundColor: getThemeColor("background.secondary"),
+      backgroundColor: theme.colors.background.secondary,
       borderRadius: styling.borderRadius("lg"),
       borderLeftWidth: 4,
-      borderLeftColor: getThemeColor("interactive.primary"),
+      borderLeftColor: theme.colors.interactive.primary,
       borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
+      borderColor: theme.colors.border.primary,
     },
     documentName: {
       fontSize: styling.fontSize("base"),
@@ -158,10 +158,10 @@ export default function ProjectDetailScreen() {
       width: 280,
       marginRight: styling.spacing(4),
       padding: styling.spacing(4),
-      backgroundColor: getThemeColor("background.secondary"),
+      backgroundColor: theme.colors.background.secondary,
       borderRadius: styling.borderRadius("lg"),
       borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
+      borderColor: theme.colors.border.primary,
     },
     logDate: {
       fontSize: styling.fontSize("xs"),
@@ -173,11 +173,11 @@ export default function ProjectDetailScreen() {
       lineHeight: 20,
     },
     clientInfo: {
-      backgroundColor: getThemeColor("background.secondary"),
+      backgroundColor: theme.colors.background.secondary,
       padding: styling.spacing(4),
       borderRadius: styling.borderRadius("lg"),
       borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
+      borderColor: theme.colors.border.primary,
     },
     clientName: {
       fontSize: styling.fontSize("lg"),

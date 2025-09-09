@@ -32,10 +32,6 @@ interface ThemeContextType {
   isDark: boolean;
   isLight: boolean;
   isBlue: boolean;
-
-  // Utility functions
-  getThemeColor: (path: string) => string;
-  getComponentColor: (component: string, property: string) => string;
 }
 
 // Theme Context
@@ -122,42 +118,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setThemeSetting(AVAILABLE_THEMES[nextIndex]);
   }, [currentTheme, setThemeSetting]);
 
-  // Get theme color by path (e.g., "background.primary", "text.secondary")
-  const getThemeColor = useCallback(
-    (path: string): string => {
-      const keys = path.split(".");
-      let value: any = theme.colors;
-
-      for (const key of keys) {
-        if (value && typeof value === "object" && key in value) {
-          value = value[key];
-        } else {
-          console.warn(`Theme color path not found: ${path}`);
-          return theme.colors.text.primary; // Fallback
-        }
-      }
-
-      return value || theme.colors.text.primary;
-    },
-    [theme]
-  );
-
-  // Get component-specific color
-  const getComponentColor = useCallback(
-    (component: string, property: string): string => {
-      const componentColors =
-        theme.colors.components[
-          component as keyof typeof theme.colors.components
-        ];
-      if (componentColors && property in componentColors) {
-        return componentColors[property as keyof typeof componentColors];
-      }
-      console.warn(`Component color not found: ${component}.${property}`);
-      return theme.colors.text.primary; // Fallback
-    },
-    [theme]
-  );
-
   // Context value
   const contextValue = useMemo(
     () => ({
@@ -169,8 +129,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       isDark,
       isLight,
       isBlue,
-      getThemeColor,
-      getComponentColor,
     }),
     [
       themeSetting,
@@ -181,8 +139,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       isDark,
       isLight,
       isBlue,
-      getThemeColor,
-      getComponentColor,
     ]
   );
 

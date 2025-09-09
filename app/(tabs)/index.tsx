@@ -8,7 +8,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { styling } from "@/utils/styling";
 
 export default function HomeScreen() {
-  const { getThemeColor, isDark } = useTheme();
+  const { theme, isDark } = useTheme();
 
   const handleKitchenPress = () => {
     router.push("/(tabs)/kitchens");
@@ -23,7 +23,7 @@ export default function HomeScreen() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: getThemeColor("background.secondary"),
+      backgroundColor: theme.colors.background.secondary,
     },
     header: {
       alignItems: "center",
@@ -40,14 +40,14 @@ export default function HomeScreen() {
       fontSize: styling.fontSize("4xl"),
       textAlign: "center",
       fontWeight: styling.fontWeight("bold"),
-      color: getThemeColor("text.primary"),
+      color: theme.colors.text.primary,
       lineHeight: styling.lineHeight("tight"),
       marginBottom: styling.spacing(2),
     },
     tagline: {
       fontSize: styling.fontSize("lg"),
       textAlign: "center",
-      color: getThemeColor("text.secondary"),
+      color: theme.colors.text.secondary,
       fontWeight: styling.fontWeight("medium"),
     },
     welcomeSection: {
@@ -58,14 +58,14 @@ export default function HomeScreen() {
     welcomeText: {
       fontSize: styling.fontSize("xl"),
       textAlign: "center",
-      color: getThemeColor("text.primary"),
+      color: theme.colors.text.primary,
       fontFamily: styling.fontFamily("semibold"),
       marginBottom: styling.spacing(2),
     },
     instructionText: {
       fontSize: styling.fontSize("base"),
       textAlign: "center",
-      color: getThemeColor("text.secondary"),
+      color: theme.colors.text.secondary,
       lineHeight: styling.lineHeight("relaxed"),
       marginTop: styling.spacing(4),
       paddingVertical: styling.spacing(6),
@@ -74,7 +74,7 @@ export default function HomeScreen() {
     categoriesSection: {
       paddingHorizontal: styling.spacing(6),
       paddingVertical: styling.spacing(6),
-      backgroundColor: getThemeColor("background.primary"),
+      backgroundColor: theme.colors.background.primary,
       borderRadius: styling.borderRadius("lg"),
       marginHorizontal: styling.spacing(4),
       marginTop: styling.spacing(4),
@@ -85,7 +85,7 @@ export default function HomeScreen() {
       fontSize: styling.fontSize("xl"),
       textAlign: "center",
       marginBottom: styling.spacing(6),
-      color: getThemeColor("text.primary"),
+      color: theme.colors.text.primary,
       fontFamily: styling.fontFamily("bold"),
     },
     categoryButtons: {
@@ -94,29 +94,29 @@ export default function HomeScreen() {
       alignSelf: "center",
     },
     categoryButton: {
-      backgroundColor: getThemeColor("background.card"),
+      backgroundColor: theme.colors.background.card,
       padding: styling.spacing(6),
       borderRadius: styling.borderRadius("lg"),
       alignItems: "center",
       borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
+      borderColor: theme.colors.border.primary,
       ...styling.shadow("base"),
       minHeight: 120,
     },
     categoryButtonPressed: {
-      backgroundColor: getThemeColor("background.secondary"),
+      backgroundColor: theme.colors.background.secondary,
       transform: [{ scale: 0.98 }],
       ...styling.shadow("sm"),
     },
     categoryButtonText: {
       fontSize: styling.fontSize("lg"),
       marginBottom: styling.spacing(1),
-      color: getThemeColor("text.primary"),
+      color: theme.colors.text.primary,
       fontWeight: styling.fontWeight("semibold"),
     },
     categoryDescription: {
       fontSize: styling.fontSize("sm"),
-      color: getThemeColor("text.secondary"),
+      color: theme.colors.text.secondary,
       textAlign: "center",
       lineHeight: styling.lineHeight("relaxed"),
     },
@@ -128,11 +128,11 @@ export default function HomeScreen() {
       paddingVertical: styling.spacing(6),
       paddingHorizontal: styling.spacing(6),
       borderTopWidth: 1,
-      borderTopColor: getThemeColor("border.primary"),
+      borderTopColor: theme.colors.border.primary,
     },
     footerText: {
       fontSize: styling.fontSize("sm"),
-      color: getThemeColor("text.tertiary"),
+      color: theme.colors.text.tertiary,
       textAlign: "center",
     },
   });
@@ -182,13 +182,13 @@ export default function HomeScreen() {
             ]}
             onPress={handleKitchenPress}
             android_ripple={{
-              color: getThemeColor("interactive.primaryLight"),
+              color: theme.colors.interactive.primaryLight,
             }}
           >
             <MaterialIcons
               name="kitchen"
               size={32}
-              color={getThemeColor("interactive.primary")}
+              color={theme.colors.interactive.primary}
               style={styles.categoryIcon}
             />
             <ThemedText variant="body" style={styles.categoryButtonText}>
@@ -206,13 +206,13 @@ export default function HomeScreen() {
             ]}
             onPress={handleBathroomPress}
             android_ripple={{
-              color: getThemeColor("interactive.primaryLight"),
+              color: theme.colors.interactive.primaryLight,
             }}
           >
             <MaterialIcons
               name="bathroom"
               size={32}
-              color={getThemeColor("interactive.primary")}
+              color={theme.colors.interactive.primary}
               style={styles.categoryIcon}
             />
             <ThemedText variant="body" style={styles.categoryButtonText}>

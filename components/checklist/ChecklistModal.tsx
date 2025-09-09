@@ -30,7 +30,7 @@ export function ChecklistModal({
   onReset,
   onClose,
 }: ChecklistModalProps) {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   const progress = {
     completed: checkedStates.filter(Boolean).length,
@@ -58,8 +58,8 @@ export function ChecklistModal({
           style={[
             styles.modalContent,
             {
-              backgroundColor: getThemeColor("background.card"),
-              borderColor: getThemeColor("border.primary"),
+              backgroundColor: theme.colors.background.card,
+              borderColor: theme.colors.border.primary,
             },
           ]}
           activeOpacity={1}

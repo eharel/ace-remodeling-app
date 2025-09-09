@@ -8,12 +8,12 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { styling } from "@/utils/styling";
 
 export default function SettingsScreen() {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: getThemeColor("background.secondary"),
+      backgroundColor: theme.colors.background.secondary,
     },
     scrollView: {
       flex: 1,
@@ -33,12 +33,12 @@ export default function SettingsScreen() {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      backgroundColor: getThemeColor("background.card"),
+      backgroundColor: theme.colors.background.card,
       padding: styling.spacing(4),
       marginBottom: styling.spacing(2),
       borderRadius: styling.borderRadius("md"),
       borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
+      borderColor: theme.colors.border.primary,
       ...styling.shadow("sm"),
     },
     settingItemContent: {
@@ -65,7 +65,7 @@ export default function SettingsScreen() {
       marginTop: styling.spacing(4),
       paddingTop: styling.spacing(4),
       borderTopWidth: 1,
-      borderTopColor: getThemeColor("border.primary"),
+      borderTopColor: theme.colors.border.primary,
     },
     versionInfo: {
       textAlign: "center",
@@ -98,7 +98,7 @@ export default function SettingsScreen() {
       <MaterialIcons
         name={icon as any}
         size={24}
-        color={getThemeColor("text.secondary")}
+        color={theme.colors.text.secondary}
         style={styles.settingItemIcon}
       />
       <View style={styles.settingItemContent}>
@@ -116,7 +116,7 @@ export default function SettingsScreen() {
           <MaterialIcons
             name="chevron-right"
             size={20}
-            color={getThemeColor("text.tertiary")}
+            color={theme.colors.text.tertiary}
           />
         )}
       </View>
@@ -139,7 +139,7 @@ export default function SettingsScreen() {
             <MaterialIcons
               name="palette"
               size={24}
-              color={getThemeColor("text.secondary")}
+              color={theme.colors.text.secondary}
               style={styles.settingItemIcon}
             />
             <View style={styles.settingItemContent}>
