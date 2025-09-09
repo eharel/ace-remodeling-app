@@ -1,32 +1,66 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  AccessibilityState,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 
+import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
 import { useTheme } from "@/contexts/ThemeContext";
 
+/**
+ * Props for the ChecklistItem component
+ */
 interface ChecklistItemProps {
+  /** The text content to display */
   text: string;
+  /** Whether the item is checked */
   isChecked?: boolean;
+  /** Callback when the item is pressed */
   onPress?: () => void;
+  /** Accessibility label for screen readers */
+  accessibilityLabel?: string;
+  /** Accessibility hint for screen readers */
+  accessibilityHint?: string;
+  /** Accessibility state for screen readers */
+  accessibilityState?: AccessibilityState;
 }
 
+/**
+ * Individual checklist item component
+ * Displays a checkbox with text and handles user interaction
+ */
 export function ChecklistItem({
   text,
   isChecked = false,
   onPress,
+  accessibilityLabel,
+  accessibilityHint,
+  accessibilityState,
 }: ChecklistItemProps) {
   const { getThemeColor } = useTheme();
 
   return (
-    <View style={styles.checklistItem}>
+    <TouchableOpacity
+      style={styles.checklistItem}
+      onPress={onPress}
+      activeOpacity={CHECKLIST_CONFIG.ITEM.ACTIVE_OPACITY}
+      accessibilityRole="checkbox"
+      accessibilityLabel={accessibilityLabel || text}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={accessibilityState || { checked: isChecked }}
+    >
       <MaterialIcons
         name={isChecked ? "check-box" : "check-box-outline-blank"}
-        size={24}
+        size={CHECKLIST_CONFIG.ITEM.ICON_SIZE}
         color={
           isChecked
             ? getThemeColor("interactive.primary")
             : getThemeColor("text.tertiary")
         }
+        accessibilityElementsHidden={true}
       />
       <Text
         style={[
@@ -34,13 +68,14 @@ export function ChecklistItem({
           {
             color: getThemeColor("text.primary"),
             textDecorationLine: isChecked ? "line-through" : "none",
-            opacity: isChecked ? 0.6 : 1,
+            opacity: isChecked ? CHECKLIST_CONFIG.ITEM.CHECKED_OPACITY : 1,
           },
         ]}
+        accessibilityElementsHidden={true}
       >
         {text}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -48,12 +83,12 @@ const styles = StyleSheet.create({
   checklistItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 4,
+    paddingVertical: CHECKLIST_CONFIG.ITEM.PADDING_VERTICAL,
+    paddingHorizontal: CHECKLIST_CONFIG.ITEM.PADDING_HORIZONTAL,
   },
   checklistText: {
-    fontSize: 16,
-    marginLeft: 12,
+    fontSize: CHECKLIST_CONFIG.ITEM.TEXT_FONT_SIZE,
+    marginLeft: CHECKLIST_CONFIG.ITEM.TEXT_MARGIN_LEFT,
     flex: 1,
   },
 });
