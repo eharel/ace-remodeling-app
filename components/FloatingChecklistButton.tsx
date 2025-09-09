@@ -1,24 +1,27 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useState } from "react";
-import {
-  Dimensions,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useCallback, useState } from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
+import { ChecklistModal } from "@/components/checklist";
+import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useChecklist } from "@/hooks/useChecklist";
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
-
+/**
+ * Floating Action Button component for the meeting checklist
+ * Provides a floating button that opens a modal with interactive checklist items
+ */
 export function FloatingChecklistButton() {
   const { getThemeColor } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const openModal = () => setModalVisible(true);
-  const closeModal = () => setModalVisible(false);
+  // Use the custom hook for checklist state management
+  const { checkedItems, toggleItem, resetItemsWithConfirmation } =
+    useChecklist();
+
+  // Modal control functions with useCallback for performance
+  const openModal = useCallback(() => setModalVisible(true), []);
+  const closeModal = useCallback(() => setModalVisible(false), []);
 
   return (
     <>
@@ -32,70 +35,28 @@ export function FloatingChecklistButton() {
           },
         ]}
         onPress={openModal}
-        activeOpacity={0.8}
+        activeOpacity={CHECKLIST_CONFIG.TOUCH.FAB_ACTIVE_OPACITY}
+        accessibilityRole="button"
+        accessibilityLabel="Open meeting checklist"
+        accessibilityHint="Opens a modal with meeting checklist items"
+        accessibilityState={{ expanded: modalVisible }}
       >
         <MaterialIcons
           name="checklist"
-          size={24}
+          size={CHECKLIST_CONFIG.FAB.ICON_SIZE}
           color={getThemeColor("text.inverse")}
+          accessibilityElementsHidden={true}
         />
       </TouchableOpacity>
 
-      {/* Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
+      {/* Checklist Modal */}
+      <ChecklistModal
         visible={modalVisible}
-        onRequestClose={closeModal}
-      >
-        <View style={styles.modalOverlay}>
-          <View
-            style={[
-              styles.modalContent,
-              {
-                backgroundColor: getThemeColor("background.card"),
-                borderColor: getThemeColor("border.primary"),
-              },
-            ]}
-          >
-            {/* Modal Header */}
-            <View
-              style={[
-                styles.modalHeader,
-                { borderBottomColor: getThemeColor("border.primary") },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.modalTitle,
-                  { color: getThemeColor("text.primary") },
-                ]}
-              >
-                Meeting Checklist
-              </Text>
-              <TouchableOpacity onPress={closeModal}>
-                <MaterialIcons
-                  name="close"
-                  size={24}
-                  color={getThemeColor("text.secondary")}
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Modal Body */}
-            <View style={styles.modalBody}>
-              <Text
-                style={[
-                  styles.placeholder,
-                  { color: getThemeColor("text.secondary") },
-                ]}
-              >
-                Checklist coming soon...
-              </Text>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        checkedItems={checkedItems}
+        onToggleItem={toggleItem}
+        onReset={resetItemsWithConfirmation}
+        onClose={closeModal}
+      />
     </>
   );
 }
@@ -103,54 +64,17 @@ export function FloatingChecklistButton() {
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    bottom: 100, // Position above the tab bar
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    bottom: CHECKLIST_CONFIG.FAB.BOTTOM_OFFSET,
+    right: CHECKLIST_CONFIG.FAB.RIGHT_OFFSET,
+    width: CHECKLIST_CONFIG.FAB.SIZE,
+    height: CHECKLIST_CONFIG.FAB.SIZE,
+    borderRadius: CHECKLIST_CONFIG.FAB.BORDER_RADIUS,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 8,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    zIndex: 1000,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  modalContent: {
-    width: "100%",
-    maxWidth: 500,
-    maxHeight: "80%",
-    borderRadius: 12,
-    borderWidth: 1,
-    overflow: "hidden",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    borderBottomWidth: 1,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-  },
-  modalBody: {
-    padding: 20,
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  placeholder: {
-    fontSize: 16,
-    textAlign: "center",
-    fontStyle: "italic",
+    elevation: CHECKLIST_CONFIG.FAB.ELEVATION,
+    shadowOffset: CHECKLIST_CONFIG.FAB.SHADOW_OFFSET,
+    shadowOpacity: CHECKLIST_CONFIG.FAB.SHADOW_OPACITY,
+    shadowRadius: CHECKLIST_CONFIG.FAB.SHADOW_RADIUS,
+    zIndex: CHECKLIST_CONFIG.FAB.Z_INDEX,
   },
 });
