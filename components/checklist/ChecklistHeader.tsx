@@ -58,7 +58,7 @@ export function ChecklistHeader({
         >
           <MaterialIcons
             name="refresh"
-            size={styling.componentSize("header").resetIconSize}
+            size={20}
             color={getThemeColor("text.secondary")}
           />
         </TouchableOpacity>
@@ -70,7 +70,7 @@ export function ChecklistHeader({
         >
           <MaterialIcons
             name="close"
-            size={styling.componentSize("header").closeIconSize}
+            size={24}
             color={getThemeColor("text.secondary")}
           />
         </TouchableOpacity>
@@ -91,20 +91,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: styling.componentSize("header").titleFontSize,
-    fontWeight: styling.componentSize("header").titleFontWeight,
-    marginBottom: styling.componentSize("header").titleMarginBottom,
+    fontSize: styling.fontSize("xl"),
+    fontWeight: "600",
+    marginBottom: styling.spacing(1),
   },
   progressText: {
-    fontSize: styling.componentSize("header").progressFontSize,
-    fontWeight: styling.componentSize("header").progressFontWeight,
+    fontSize: styling.fontSize("sm"),
+    fontWeight: "500",
   },
   headerActions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: styling.componentSize("header").actionsGap,
+    gap: styling.spacing(3),
   },
   resetButton: {
-    padding: styling.componentSize("header").resetButtonPadding,
+    padding: styling.spacing(1),
   },
 });

@@ -10,16 +10,14 @@ import { ThemedText, ThemedView } from "./themed";
 
 interface ProjectGalleryProps {
   projects: ProjectSummary[];
-  title?: string;
-  subtitle?: string;
   onProjectPress?: (project: ProjectSummary) => void;
+  style?: any; // Allow custom styling
 }
 
 export function ProjectGallery({
   projects,
-  title,
-  subtitle,
   onProjectPress,
+  style,
 }: ProjectGalleryProps) {
   const { width } = useWindowDimensions();
   const { getThemeColor } = useTheme();
@@ -39,22 +37,6 @@ export function ProjectGallery({
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-    },
-    header: {
-      marginBottom: styling.spacing(6),
-      paddingHorizontal: styling.spacing(5),
-      gap: styling.spacing(2),
-    },
-    title: {
-      fontSize: styling.fontSize("2xl"),
-      color: getThemeColor("text.primary"),
-      fontWeight: styling.fontWeight("bold"),
-      lineHeight: styling.lineHeight("tight"),
-    },
-    subtitle: {
-      fontSize: styling.fontSize("lg"),
-      color: getThemeColor("text.secondary"),
-      lineHeight: styling.lineHeight("relaxed"),
     },
     listContent: {
       paddingHorizontal: styling.spacing(5),
@@ -120,23 +102,7 @@ export function ProjectGallery({
   }
 
   return (
-    <ThemedView style={styles.container}>
-      {/* Header */}
-      {(title || subtitle) && (
-        <ThemedView style={styles.header}>
-          {title && (
-            <ThemedText variant="subtitle" style={styles.title}>
-              {title}
-            </ThemedText>
-          )}
-          {subtitle && (
-            <ThemedText variant="body" style={styles.subtitle}>
-              {subtitle}
-            </ThemedText>
-          )}
-        </ThemedView>
-      )}
-
+    <ThemedView style={[styles.container, style]}>
       {/* Project Grid */}
       <FlatList
         data={projects}

@@ -11,13 +11,10 @@ import { useColorScheme } from "react-native";
 
 import { ThemeName, themes, ThemeSetting } from "@/themes";
 
-// Theme constants for validation
-const THEME_NAMES: ThemeName[] = ["light", "dark", "blue"];
-const LIGHT_THEME: ThemeName = "light";
-const DARK_THEME: ThemeName = "dark";
-const BLUE_THEME: ThemeName = "blue";
+// Theme constants - derived from themes system (single source of truth)
+const THEME_NAMES: ThemeName[] = Object.keys(themes) as ThemeName[];
 const SYSTEM_THEME = "system" as const;
-const DEFAULT_THEME: ThemeName = LIGHT_THEME;
+const DEFAULT_THEME: ThemeName = "light"; // Design decision: light as default
 const DEFAULT_SETTING: ThemeSetting = SYSTEM_THEME;
 
 // Theme Context Types
@@ -47,8 +44,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 // Theme Storage Keys
 const THEME_SETTING_KEY = "@theme_setting";
 
-// Available themes (excluding "system") - derived from themes
-const AVAILABLE_THEMES: ThemeName[] = Object.keys(themes) as ThemeName[];
+// Available themes (excluding "system") - same as THEME_NAMES
+const AVAILABLE_THEMES: ThemeName[] = THEME_NAMES;
 
 // Theme Provider Props
 interface ThemeProviderProps {
@@ -76,9 +73,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, [currentTheme]);
 
   // Theme state helpers
-  const isDark = currentTheme === DARK_THEME;
-  const isLight = currentTheme === LIGHT_THEME;
-  const isBlue = currentTheme === BLUE_THEME;
+  const isDark = currentTheme === "dark";
+  const isLight = currentTheme === "light";
+  const isBlue = currentTheme === "blue";
 
   // Load theme setting from storage on mount
   useEffect(() => {

@@ -215,22 +215,16 @@ export const DesignTokens = {
       minHeight: 500,
     },
 
-    // Header
+    // Header - only universal dimensions
     header: {
-      titleFontSize: 20,
-      titleMarginBottom: 4,
-      progressFontSize: 14,
-      actionsGap: 12,
-      resetButtonPadding: 4,
-      resetIconSize: 20,
-      closeIconSize: 24,
+      // Only keep truly universal dimensions here
+      // Font sizes, weights, and spacing should be in theme files
     },
 
-    // Checklist Item
+    // Checklist Item - only universal dimensions
     checklistItem: {
-      iconSize: 24,
-      textFontSize: 16,
-      textMarginLeft: 12,
+      // Only keep truly universal dimensions here
+      // Font sizes and spacing should be in theme files
     },
   },
 } as const;

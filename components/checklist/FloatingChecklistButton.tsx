@@ -41,7 +41,7 @@ export function FloatingChecklistButton() {
       >
         <MaterialIcons
           name="checklist"
-          size={styling.componentSize("fab").iconSize}
+          size={24}
           color={getThemeColor("text.inverse")}
           accessibilityElementsHidden={true}
         />
@@ -64,15 +64,15 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 100, // Position above tab bar
     right: 20,
-    width: styling.componentSize("fab").size,
-    height: styling.componentSize("fab").size,
-    borderRadius: styling.componentSize("fab").borderRadius,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
     elevation: 8,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    zIndex: styling.zIndex("fab"),
+    zIndex: 1000,
   },
 });

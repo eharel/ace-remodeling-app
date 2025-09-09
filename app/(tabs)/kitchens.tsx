@@ -39,10 +39,17 @@ export default function KitchensScreen() {
         </ThemedText>
       </ThemedView>
 
+      <ThemedView style={styles.galleryHeader}>
+        <ThemedText variant="subtitle" style={styles.galleryTitle}>
+          Featured Kitchen Renovations
+        </ThemedText>
+        <ThemedText variant="body" style={styles.gallerySubtitle}>
+          See our latest kitchen transformation projects
+        </ThemedText>
+      </ThemedView>
+
       <ProjectGallery
         projects={kitchenProjects}
-        title="Featured Kitchen Renovations"
-        subtitle="See our latest kitchen transformation projects"
         onProjectPress={handleProjectPress}
       />
     </ThemedView>
@@ -58,5 +65,19 @@ const styles = StyleSheet.create({
     marginBottom: DesignTokens.spacing[8],
     paddingHorizontal: DesignTokens.spacing[5],
     gap: 8,
+  },
+  galleryHeader: {
+    marginBottom: DesignTokens.spacing[6],
+    paddingHorizontal: DesignTokens.spacing[5],
+    gap: DesignTokens.spacing[2],
+  },
+  galleryTitle: {
+    fontSize: DesignTokens.typography.fontSize["2xl"],
+    fontWeight: DesignTokens.typography.fontWeight.bold,
+    lineHeight: DesignTokens.typography.lineHeight.tight,
+  },
+  gallerySubtitle: {
+    fontSize: DesignTokens.typography.fontSize.lg,
+    lineHeight: DesignTokens.typography.lineHeight.relaxed,
   },
 });

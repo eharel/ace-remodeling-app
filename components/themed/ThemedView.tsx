@@ -40,7 +40,7 @@ export function ThemedView({
         baseStyles.backgroundColor = getThemeColor("background.elevated");
         baseStyles.shadowColor = getThemeColor("components.card.shadow");
         baseStyles.shadowOffset = DesignTokens.shadows.base.shadowOffset;
-        baseStyles.shadowOpacity = DesignTokens.shadows.base.shadowOpacity;
+        baseStyles.shadowOpacity = getThemeColor("shadows.base.shadowOpacity");
         baseStyles.shadowRadius = DesignTokens.shadows.base.shadowRadius;
         baseStyles.elevation = DesignTokens.shadows.base.elevation;
         break;
@@ -60,7 +60,7 @@ export function ThemedView({
     if (elevated) {
       baseStyles.shadowColor = getThemeColor("components.card.shadow");
       baseStyles.shadowOffset = DesignTokens.shadows.base.shadowOffset;
-      baseStyles.shadowOpacity = DesignTokens.shadows.base.shadowOpacity;
+      baseStyles.shadowOpacity = getThemeColor("shadows.base.shadowOpacity");
       baseStyles.shadowRadius = DesignTokens.shadows.base.shadowRadius;
       baseStyles.elevation = DesignTokens.shadows.base.elevation;
     }

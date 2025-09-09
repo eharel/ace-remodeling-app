@@ -54,7 +54,7 @@ export function ChecklistItem({
     >
       <MaterialIcons
         name={isChecked ? "check-box" : "check-box-outline-blank"}
-        size={styling.componentSize("checklistItem").iconSize}
+        size={24}
         color={
           isChecked
             ? getThemeColor("interactive.primary")
@@ -87,8 +87,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: styling.spacing(1), // 4px
   },
   checklistText: {
-    fontSize: styling.componentSize("checklistItem").textFontSize,
-    marginLeft: styling.componentSize("checklistItem").textMarginLeft,
+    fontSize: styling.fontSize("base"),
+    marginLeft: styling.spacing(3),
     flex: 1,
   },
 });

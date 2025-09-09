@@ -3,6 +3,7 @@
 // Core themed components
 export { ThemedText, ThemedTextVariants } from "./ThemedText";
 export { ThemedView, ThemedViewVariants } from "./ThemedView";
+export { ThemedInput } from "./ThemedInput";
 
 // Theme context and utilities
 export {

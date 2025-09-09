@@ -91,9 +91,9 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "100%",
-    maxWidth: styling.componentSize("modal").maxWidth,
-    maxHeight: `${styling.componentSize("modal").maxHeightPercent}%`,
-    minHeight: styling.componentSize("modal").minHeight,
+    maxWidth: 500,
+    maxHeight: "70%",
+    minHeight: 500,
     borderRadius: styling.borderRadius("md"), // 12px
     borderWidth: 1,
     overflow: "hidden",
