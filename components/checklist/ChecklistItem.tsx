@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 import { useTheme } from "@/contexts/ThemeContext";
-import { CHECKLIST_CONFIG } from "../../constants/ChecklistConfig";
+import { styling } from "@/utils/styling";
 
 /**
  * Props for the ChecklistItem component
@@ -46,7 +46,7 @@ export function ChecklistItem({
     <TouchableOpacity
       style={styles.checklistItem}
       onPress={onPress}
-      activeOpacity={CHECKLIST_CONFIG.ITEM.ACTIVE_OPACITY}
+      activeOpacity={styling.interaction("activeOpacity")}
       accessibilityRole="checkbox"
       accessibilityLabel={accessibilityLabel || text}
       accessibilityHint={accessibilityHint}
@@ -54,7 +54,7 @@ export function ChecklistItem({
     >
       <MaterialIcons
         name={isChecked ? "check-box" : "check-box-outline-blank"}
-        size={CHECKLIST_CONFIG.ITEM.ICON_SIZE}
+        size={styling.componentSize("checklistItem").iconSize}
         color={
           isChecked
             ? getThemeColor("interactive.primary")
@@ -68,7 +68,7 @@ export function ChecklistItem({
           {
             color: getThemeColor("text.primary"),
             textDecorationLine: isChecked ? "line-through" : "none",
-            opacity: isChecked ? CHECKLIST_CONFIG.ITEM.CHECKED_OPACITY : 1,
+            opacity: isChecked ? styling.interaction("disabledOpacity") : 1,
           },
         ]}
         accessibilityElementsHidden={true}
@@ -83,12 +83,12 @@ const styles = StyleSheet.create({
   checklistItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: CHECKLIST_CONFIG.ITEM.PADDING_VERTICAL,
-    paddingHorizontal: CHECKLIST_CONFIG.ITEM.PADDING_HORIZONTAL,
+    paddingVertical: styling.spacing(3), // 12px
+    paddingHorizontal: styling.spacing(1), // 4px
   },
   checklistText: {
-    fontSize: CHECKLIST_CONFIG.ITEM.TEXT_FONT_SIZE,
-    marginLeft: CHECKLIST_CONFIG.ITEM.TEXT_MARGIN_LEFT,
+    fontSize: styling.componentSize("checklistItem").textFontSize,
+    marginLeft: styling.componentSize("checklistItem").textMarginLeft,
     flex: 1,
   },
 });

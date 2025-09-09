@@ -1,11 +1,13 @@
 /**
- * Design Tokens - Theme-agnostic design values
- * These are the base design tokens used across all themes
- */
-
-/**
- * Base design tokens for consistent spacing, typography, and effects
- * These values are theme-agnostic and used by all themes
+ * Universal Design Tokens - Theme-agnostic design values
+ *
+ * This file contains only universal, theme-agnostic design tokens.
+ * Colors here are reference palettes, not theme colors.
+ * Component styling (colors, shadows) belongs in theme files.
+ * Only dimensions, spacing, typography belong here.
+ *
+ * The result is a tokens file that could work with ANY theme system,
+ * not just our specific light/dark/blue themes.
  */
 export const DesignTokens = {
   // Color Palette - Base colors (semantic names)
@@ -58,41 +60,12 @@ export const DesignTokens = {
     error: "#ef4444",
     info: "#3b82f6",
 
-    // Status Colors
+    // Status Colors - Reference colors for themes to use
     status: {
       completed: "#10b981",
       "in-progress": "#f59e0b",
       planning: "#3b82f6",
       "on-hold": "#ef4444",
-    },
-
-    // Background Colors
-    background: {
-      primary: "#ffffff",
-      secondary: "#f8fafc", // Light gray for main background
-      tertiary: "#f1f5f9", // Darker gray for contrast
-      accent: "#e2e8f0", // Medium gray for separators
-      card: "#ffffff", // White for cards
-      section: "#ffffff", // White for sections
-      separator: "#e2e8f0", // Gray for borders
-    },
-
-    // Text Colors
-    text: {
-      primary: "#0f172a",
-      secondary: "#475569",
-      tertiary: "#64748b",
-      inverse: "#ffffff",
-      accent: "#3b82f6",
-    },
-
-    // Accent Colors for Visual Interest
-    accent: {
-      primary: "#3b82f6",
-      secondary: "#22c55e",
-      subtle: "#dbeafe",
-      border: "#cbd5e1",
-      highlight: "#fef3c7",
     },
   },
 
@@ -169,33 +142,25 @@ export const DesignTokens = {
     full: 9999,
   },
 
-  // Shadows
+  // Shadows - Universal shadow structures (themes provide shadowColor and shadowOpacity)
   shadows: {
     sm: {
-      shadowColor: "#000000",
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
       shadowRadius: 2,
       elevation: 1,
     },
     base: {
-      shadowColor: "#000000",
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 2,
     },
     md: {
-      shadowColor: "#000000",
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
       shadowRadius: 8,
       elevation: 4,
     },
     lg: {
-      shadowColor: "#000000",
       shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.2,
       shadowRadius: 16,
       elevation: 8,
     },
@@ -206,6 +171,14 @@ export const DesignTokens = {
     fast: 150,
     normal: 250,
     slow: 350,
+  },
+
+  // Universal Interaction Constants
+  interactions: {
+    activeOpacity: 0.7, // Standard press opacity
+    pressScale: 0.95, // Scale on press
+    hoverScale: 1.02, // Scale on hover (web)
+    disabledOpacity: 0.5, // Disabled state opacity
   },
 
   // Z-Index Scale
@@ -223,6 +196,42 @@ export const DesignTokens = {
     skipLink: 1600,
     toast: 1700,
     tooltip: 1800,
+    fab: 1000, // Floating Action Button
+  },
+
+  // Component Size Constants - Universal dimensions only
+  componentSizes: {
+    // Floating Action Button (FAB)
+    fab: {
+      size: 56,
+      iconSize: 24,
+      borderRadius: 28, // Half of size for perfect circle
+    },
+
+    // Modal
+    modal: {
+      maxWidth: 500,
+      maxHeightPercent: 70,
+      minHeight: 500,
+    },
+
+    // Header
+    header: {
+      titleFontSize: 20,
+      titleMarginBottom: 4,
+      progressFontSize: 14,
+      actionsGap: 12,
+      resetButtonPadding: 4,
+      resetIconSize: 20,
+      closeIconSize: 24,
+    },
+
+    // Checklist Item
+    checklistItem: {
+      iconSize: 24,
+      textFontSize: 16,
+      textMarginLeft: 12,
+    },
   },
 } as const;
 
@@ -231,3 +240,5 @@ export type DesignToken = typeof DesignTokens;
 export type ColorToken = keyof typeof DesignTokens.colors;
 export type SpacingToken = keyof typeof DesignTokens.spacing;
 export type TypographyToken = keyof typeof DesignTokens.typography;
+export type ComponentSizeToken = keyof typeof DesignTokens.componentSizes;
+export type InteractionToken = keyof typeof DesignTokens.interactions;

@@ -2,8 +2,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
 import { useTheme } from "@/contexts/ThemeContext";
+import { styling } from "@/utils/styling";
 
 interface ChecklistHeaderProps {
   /** Progress information for the checklist */
@@ -58,7 +58,7 @@ export function ChecklistHeader({
         >
           <MaterialIcons
             name="refresh"
-            size={CHECKLIST_CONFIG.HEADER.RESET_ICON_SIZE}
+            size={styling.componentSize("header").resetIconSize}
             color={getThemeColor("text.secondary")}
           />
         </TouchableOpacity>
@@ -70,7 +70,7 @@ export function ChecklistHeader({
         >
           <MaterialIcons
             name="close"
-            size={CHECKLIST_CONFIG.HEADER.CLOSE_ICON_SIZE}
+            size={styling.componentSize("header").closeIconSize}
             color={getThemeColor("text.secondary")}
           />
         </TouchableOpacity>
@@ -84,27 +84,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: CHECKLIST_CONFIG.HEADER.PADDING,
-    borderBottomWidth: CHECKLIST_CONFIG.HEADER.BORDER_BOTTOM_WIDTH,
+    padding: styling.spacing(5), // 20px padding
+    borderBottomWidth: 1,
   },
   headerContent: {
     flex: 1,
   },
   title: {
-    fontSize: CHECKLIST_CONFIG.HEADER.TITLE_FONT_SIZE,
-    fontWeight: CHECKLIST_CONFIG.HEADER.TITLE_FONT_WEIGHT,
-    marginBottom: CHECKLIST_CONFIG.HEADER.TITLE_MARGIN_BOTTOM,
+    fontSize: styling.componentSize("header").titleFontSize,
+    fontWeight: styling.componentSize("header").titleFontWeight,
+    marginBottom: styling.componentSize("header").titleMarginBottom,
   },
   progressText: {
-    fontSize: CHECKLIST_CONFIG.HEADER.PROGRESS_FONT_SIZE,
-    fontWeight: CHECKLIST_CONFIG.HEADER.PROGRESS_FONT_WEIGHT,
+    fontSize: styling.componentSize("header").progressFontSize,
+    fontWeight: styling.componentSize("header").progressFontWeight,
   },
   headerActions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: CHECKLIST_CONFIG.HEADER.ACTIONS_GAP,
+    gap: styling.componentSize("header").actionsGap,
   },
   resetButton: {
-    padding: CHECKLIST_CONFIG.HEADER.RESET_BUTTON_PADDING,
+    padding: styling.componentSize("header").resetButtonPadding,
   },
 });
