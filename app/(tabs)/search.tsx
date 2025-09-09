@@ -2,7 +2,12 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 
 import { ProjectGallery } from "@/components/ProjectGallery";
-import { ThemedInput, ThemedText, ThemedView } from "@/components/themed";
+import {
+  DesignTokens,
+  ThemedInput,
+  ThemedText,
+  ThemedView,
+} from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { mockProjects } from "@/data/mockProjects";
 import { Project } from "@/types/Project";
@@ -26,17 +31,23 @@ export default function SearchScreen() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      padding: styling.spacing(5),
+      // Remove padding from here since ProjectGallery has its own
     },
     header: {
-      marginTop: styling.spacing(9),
-      marginBottom: styling.spacing(8),
+      marginTop: DesignTokens.spacing[16], // Match other category pages
+      marginBottom: DesignTokens.spacing[8],
       gap: styling.spacing(2),
+      // Add padding only to the header
+      paddingHorizontal: styling.spacing(5),
     },
-    content: {
+    resultsContainer: {
+      flex: 1,
+    },
+    placeholderContainer: {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
+      paddingHorizontal: styling.spacing(5),
       gap: styling.spacing(4),
     },
     placeholderText: {
@@ -74,16 +85,16 @@ export default function SearchScreen() {
         />
       </ThemedView>
       {searchResults.length > 0 ? (
-        <>
+        <ThemedView style={styles.resultsContainer}>
           <ThemedView style={styles.resultsHeader}>
             <ThemedText variant="body" style={styles.resultsSubtitle}>
               {searchResults.length} projects found
             </ThemedText>
           </ThemedView>
           <ProjectGallery projects={searchResults} />
-        </>
+        </ThemedView>
       ) : (
-        <>
+        <ThemedView style={styles.placeholderContainer}>
           <MaterialIcons
             name="search"
             size={64}
@@ -97,7 +108,7 @@ export default function SearchScreen() {
             This is where PMs can search and filter projects by various
             criteria.
           </ThemedText>
-        </>
+        </ThemedView>
       )}
     </ThemedView>
   );

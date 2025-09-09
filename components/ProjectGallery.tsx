@@ -37,6 +37,7 @@ export function ProjectGallery({
   const styles = StyleSheet.create({
     container: {
       flex: 1,
+      backgroundColor: "red", // DEBUG: Red background to see ProjectGallery boundaries
     },
     listContent: {
       paddingHorizontal: styling.spacing(5),
