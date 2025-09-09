@@ -15,13 +15,24 @@ export function useChecklist(itemCount: number = CHECKLIST_CONFIG.ITEM_COUNT) {
   /**
    * Toggle the checked state of a specific item
    */
-  const toggleItem = useCallback((index: number) => {
-    setCheckedItems((prev) => {
-      const newState = [...prev];
-      newState[index] = !newState[index];
-      return newState;
-    });
-  }, []);
+  const toggleItem = useCallback(
+    (index: number) => {
+      // Bounds checking to prevent array index errors
+      if (index < 0 || index >= itemCount) {
+        console.warn(
+          `toggleItem: Index ${index} is out of bounds (0-${itemCount - 1})`
+        );
+        return;
+      }
+
+      setCheckedItems((prev) => {
+        const newState = [...prev];
+        newState[index] = !newState[index];
+        return newState;
+      });
+    },
+    [itemCount]
+  );
 
   /**
    * Reset all items to unchecked state
@@ -85,20 +96,39 @@ export function useChecklist(itemCount: number = CHECKLIST_CONFIG.ITEM_COUNT) {
    * Get the checked state of a specific item
    */
   const isItemChecked = useCallback(
-    (index: number) => checkedItems[index] || false,
-    [checkedItems]
+    (index: number) => {
+      if (index < 0 || index >= itemCount) {
+        console.warn(
+          `isItemChecked: Index ${index} is out of bounds (0-${itemCount - 1})`
+        );
+        return false;
+      }
+      return checkedItems[index] || false;
+    },
+    [checkedItems, itemCount]
   );
 
   /**
    * Set the checked state of a specific item
    */
-  const setItemChecked = useCallback((index: number, checked: boolean) => {
-    setCheckedItems((prev) => {
-      const newState = [...prev];
-      newState[index] = checked;
-      return newState;
-    });
-  }, []);
+  const setItemChecked = useCallback(
+    (index: number, checked: boolean) => {
+      // Bounds checking to prevent array index errors
+      if (index < 0 || index >= itemCount) {
+        console.warn(
+          `setItemChecked: Index ${index} is out of bounds (0-${itemCount - 1})`
+        );
+        return;
+      }
+
+      setCheckedItems((prev) => {
+        const newState = [...prev];
+        newState[index] = checked;
+        return newState;
+      });
+    },
+    [itemCount]
+  );
 
   return {
     // State

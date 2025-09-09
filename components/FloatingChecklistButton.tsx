@@ -35,7 +35,7 @@ export function FloatingChecklistButton() {
           },
         ]}
         onPress={openModal}
-        activeOpacity={0.8}
+        activeOpacity={CHECKLIST_CONFIG.TOUCH.FAB_ACTIVE_OPACITY}
         accessibilityRole="button"
         accessibilityLabel="Open meeting checklist"
         accessibilityHint="Opens a modal with meeting checklist items"

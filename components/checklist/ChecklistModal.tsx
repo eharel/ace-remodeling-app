@@ -48,7 +48,7 @@ export function ChecklistModal({
     >
       <TouchableOpacity
         style={styles.overlay}
-        activeOpacity={1}
+        activeOpacity={CHECKLIST_CONFIG.TOUCH.MODAL_ACTIVE_OPACITY}
         onPress={onClose}
         accessibilityRole="button"
         accessibilityLabel="Close modal"
@@ -62,7 +62,7 @@ export function ChecklistModal({
               borderColor: getThemeColor("border.primary"),
             },
           ]}
-          activeOpacity={1}
+          activeOpacity={CHECKLIST_CONFIG.TOUCH.MODAL_ACTIVE_OPACITY}
           onPress={(e) => e.stopPropagation()}
           accessibilityRole="none"
         >

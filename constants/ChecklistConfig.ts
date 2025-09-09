@@ -72,6 +72,12 @@ export const CHECKLIST_CONFIG = {
     ACTIVE_OPACITY: 0.7,
   },
 
+  // Touch interaction configuration
+  TOUCH: {
+    FAB_ACTIVE_OPACITY: 0.8,
+    MODAL_ACTIVE_OPACITY: 1,
+  },
+
   // Alert configuration
   ALERT: {
     TITLE: "Reset Checklist",
