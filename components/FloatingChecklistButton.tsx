@@ -1,17 +1,9 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {
-  Dimensions,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { ChecklistItem } from "@/components/ChecklistItem";
 import { useTheme } from "@/contexts/ThemeContext";
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 export function FloatingChecklistButton() {
   const { getThemeColor } = useTheme();
@@ -48,8 +40,12 @@ export function FloatingChecklistButton() {
         visible={modalVisible}
         onRequestClose={closeModal}
       >
-        <View style={styles.modalOverlay}>
-          <View
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={closeModal}
+        >
+          <TouchableOpacity
             style={[
               styles.modalContent,
               {
@@ -57,6 +53,8 @@ export function FloatingChecklistButton() {
                 borderColor: getThemeColor("border.primary"),
               },
             ]}
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <View
@@ -84,17 +82,18 @@ export function FloatingChecklistButton() {
 
             {/* Modal Body */}
             <View style={styles.modalBody}>
-              <Text
-                style={[
-                  styles.placeholder,
-                  { color: getThemeColor("text.secondary") },
-                ]}
-              >
-                Checklist coming soon...
-              </Text>
+              <View style={styles.checklistContainer}>
+                <ChecklistItem text="Introduce company overview" />
+                <ChecklistItem text="Show similar past projects" />
+                <ChecklistItem text="Discuss timeline & budget" />
+                <ChecklistItem text="Review material options" />
+                <ChecklistItem text="Address client concerns" />
+                <ChecklistItem text="Explain next steps" />
+                <ChecklistItem text="Schedule follow-up" />
+              </View>
             </View>
-          </View>
-        </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
     </>
   );
@@ -126,7 +125,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "100%",
     maxWidth: 500,
-    maxHeight: "80%",
+    height: "80%",
     borderRadius: 12,
     borderWidth: 1,
     overflow: "hidden",
@@ -145,12 +144,8 @@ const styles = StyleSheet.create({
   modalBody: {
     padding: 20,
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
-  placeholder: {
-    fontSize: 16,
-    textAlign: "center",
-    fontStyle: "italic",
+  checklistContainer: {
+    flex: 1,
   },
 });
