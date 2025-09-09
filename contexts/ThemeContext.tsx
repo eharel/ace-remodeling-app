@@ -9,12 +9,7 @@ import React, {
 } from "react";
 import { useColorScheme } from "react-native";
 
-import {
-  ThemeName,
-  themes,
-  ThemeSetting,
-  UnifiedTheme,
-} from "@/constants/DesignTokens";
+import { ThemeName, themes, ThemeSetting } from "@/themes";
 
 // Theme constants for validation
 const THEME_NAMES: ThemeName[] = ["light", "dark", "blue"];
@@ -216,4 +211,4 @@ export function useTheme(): ThemeContextType {
 }
 
 // Export the unified theme for direct access when needed
-export { UnifiedTheme };
+export { themes as UnifiedTheme };

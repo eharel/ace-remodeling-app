@@ -2,8 +2,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { ThemeSetting } from "@/constants/DesignTokens";
 import { useTheme } from "@/contexts/ThemeContext";
+import { ThemeSetting } from "@/themes";
 import { ThemedText } from "./ThemedText";
 
 type ThemeOption = ThemeSetting;

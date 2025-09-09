@@ -2,10 +2,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useCallback, useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-import { ChecklistModal } from "@/components/checklist";
+import { ChecklistModal, useChecklist } from "@/components/checklist";
 import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useChecklist } from "@/hooks/useChecklist";
 
 /**
  * Floating Action Button component for the meeting checklist
@@ -16,7 +15,7 @@ export function FloatingChecklistButton() {
   const [modalVisible, setModalVisible] = useState(false);
 
   // Use the custom hook for checklist state management
-  const { checkedItems, toggleItem, resetItemsWithConfirmation } =
+  const { checkedStates, toggleItem, resetItemsWithConfirmation } =
     useChecklist();
 
   // Modal control functions with useCallback for performance
@@ -52,7 +51,7 @@ export function FloatingChecklistButton() {
       {/* Checklist Modal */}
       <ChecklistModal
         visible={modalVisible}
-        checkedItems={checkedItems}
+        checkedStates={checkedStates}
         onToggleItem={toggleItem}
         onReset={resetItemsWithConfirmation}
         onClose={closeModal}

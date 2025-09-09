@@ -5,7 +5,6 @@
 
 export const CHECKLIST_CONFIG = {
   // Checklist content
-  ITEM_COUNT: 7,
   ITEMS: [
     "Introduce company overview",
     "Show similar past projects",

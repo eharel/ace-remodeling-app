@@ -7,8 +7,10 @@ import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
  * Custom hook for managing checklist state and operations
  * Provides reusable logic for checklist functionality
  */
-export function useChecklist(itemCount: number = CHECKLIST_CONFIG.ITEM_COUNT) {
-  const [checkedItems, setCheckedItems] = useState<boolean[]>(
+export function useChecklist(
+  itemCount: number = CHECKLIST_CONFIG.ITEMS.length
+) {
+  const [checkedStates, setCheckedStates] = useState<boolean[]>(
     new Array(itemCount).fill(false)
   );
 
@@ -25,7 +27,7 @@ export function useChecklist(itemCount: number = CHECKLIST_CONFIG.ITEM_COUNT) {
         return;
       }
 
-      setCheckedItems((prev) => {
+      setCheckedStates((prev) => {
         const newState = [...prev];
         newState[index] = !newState[index];
         return newState;
@@ -38,7 +40,7 @@ export function useChecklist(itemCount: number = CHECKLIST_CONFIG.ITEM_COUNT) {
    * Reset all items to unchecked state
    */
   const resetItems = useCallback(() => {
-    setCheckedItems(new Array(itemCount).fill(false));
+    setCheckedStates(new Array(itemCount).fill(false));
   }, [itemCount]);
 
   /**
@@ -79,8 +81,8 @@ export function useChecklist(itemCount: number = CHECKLIST_CONFIG.ITEM_COUNT) {
    * Calculate progress statistics
    */
   const progress = useMemo(() => {
-    const completed = checkedItems.filter(Boolean).length;
-    const total = checkedItems.length;
+    const completed = checkedStates.filter(Boolean).length;
+    const total = checkedStates.length;
     const percentage = total > 0 ? (completed / total) * 100 : 0;
 
     return {
@@ -90,7 +92,7 @@ export function useChecklist(itemCount: number = CHECKLIST_CONFIG.ITEM_COUNT) {
       isComplete: completed === total,
       isEmpty: completed === 0,
     };
-  }, [checkedItems]);
+  }, [checkedStates]);
 
   /**
    * Get the checked state of a specific item
@@ -103,9 +105,9 @@ export function useChecklist(itemCount: number = CHECKLIST_CONFIG.ITEM_COUNT) {
         );
         return false;
       }
-      return checkedItems[index] || false;
+      return checkedStates[index] || false;
     },
-    [checkedItems, itemCount]
+    [checkedStates, itemCount]
   );
 
   /**
@@ -121,7 +123,7 @@ export function useChecklist(itemCount: number = CHECKLIST_CONFIG.ITEM_COUNT) {
         return;
       }
 
-      setCheckedItems((prev) => {
+      setCheckedStates((prev) => {
         const newState = [...prev];
         newState[index] = checked;
         return newState;
@@ -132,7 +134,7 @@ export function useChecklist(itemCount: number = CHECKLIST_CONFIG.ITEM_COUNT) {
 
   return {
     // State
-    checkedItems,
+    checkedStates,
 
     // Actions
     toggleItem,

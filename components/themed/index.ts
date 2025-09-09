@@ -16,11 +16,5 @@ export {
   useTheme,
 } from "../../contexts/ThemeContext";
 
-// Design tokens
-export {
-  DesignTokens,
-  ThemeMappings,
-  ThemeMode,
-  ThemeVariant,
-} from "../../constants/DesignTokens";
-
+// Design tokens and types
+export { DesignTokens, ThemeVariant } from "../../themes";

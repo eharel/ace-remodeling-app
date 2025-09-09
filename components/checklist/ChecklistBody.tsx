@@ -6,7 +6,7 @@ import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
 
 interface ChecklistBodyProps {
   /** Array of checked states for each item */
-  checkedItems: boolean[];
+  checkedStates: boolean[];
   /** Callback when an item is toggled */
   onToggleItem: (index: number) => void;
 }
@@ -16,7 +16,7 @@ interface ChecklistBodyProps {
  * Renders the list of checklist items
  */
 export function ChecklistBody({
-  checkedItems,
+  checkedStates,
   onToggleItem,
 }: ChecklistBodyProps) {
   return (
@@ -26,16 +26,16 @@ export function ChecklistBody({
           <ChecklistItemComponent
             key={`checklist-item-${index}`}
             text={item}
-            isChecked={checkedItems[index] || false}
+            isChecked={checkedStates[index] || false}
             onPress={() => onToggleItem(index)}
             accessibilityLabel={`${item} checklist item`}
             accessibilityHint={
-              checkedItems[index]
+              checkedStates[index]
                 ? "Tap to uncheck this item"
                 : "Tap to check this item"
             }
             accessibilityState={{
-              checked: checkedItems[index] || false,
+              checked: checkedStates[index] || false,
             }}
           />
         ))}

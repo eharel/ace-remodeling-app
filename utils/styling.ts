@@ -1,5 +1,5 @@
-import { DesignTokens, ThemeName, themes } from "@/constants/DesignTokens";
 import { useTheme } from "@/contexts/ThemeContext";
+import { DesignTokens, ThemeName, themes } from "@/themes";
 
 // Legacy styling utilities (for backward compatibility)
 export const styling = {

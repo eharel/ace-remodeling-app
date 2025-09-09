@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { Pressable, Text, ViewStyle, type PressableProps } from "react-native";
 
-import { ThemeVariant } from "@/constants/DesignTokens";
 import { useTheme } from "@/contexts/ThemeContext";
+import { ThemeVariant } from "@/themes";
 
 export type ThemedButtonProps = PressableProps & {
   variant?: ThemeVariant;
@@ -215,4 +215,3 @@ export const ThemedButtonVariants = {
     size: "md" as const,
   },
 } as const;
-

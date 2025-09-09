@@ -10,7 +10,7 @@ interface ChecklistModalProps {
   /** Whether the modal is visible */
   visible: boolean;
   /** Array of checked states for each item */
-  checkedItems: boolean[];
+  checkedStates: boolean[];
   /** Callback when an item is toggled */
   onToggleItem: (index: number) => void;
   /** Callback when reset button is pressed */
@@ -25,7 +25,7 @@ interface ChecklistModalProps {
  */
 export function ChecklistModal({
   visible,
-  checkedItems,
+  checkedStates,
   onToggleItem,
   onReset,
   onClose,
@@ -33,8 +33,8 @@ export function ChecklistModal({
   const { getThemeColor } = useTheme();
 
   const progress = {
-    completed: checkedItems.filter(Boolean).length,
-    total: checkedItems.length,
+    completed: checkedStates.filter(Boolean).length,
+    total: checkedStates.length,
   };
 
   return (
@@ -72,7 +72,7 @@ export function ChecklistModal({
             onClose={onClose}
           />
           <ChecklistBody
-            checkedItems={checkedItems}
+            checkedStates={checkedStates}
             onToggleItem={onToggleItem}
           />
         </TouchableOpacity>
