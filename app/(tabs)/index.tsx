@@ -3,8 +3,7 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { styling } from "@/utils/styling";
 

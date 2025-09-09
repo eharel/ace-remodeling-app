@@ -2,8 +2,7 @@ import { Image } from "expo-image";
 import React from "react";
 import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
 
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ProjectSummary } from "@/types";
 import { getStatusDisplayText, getStatusStyleKey } from "@/utils/statusUtils";

@@ -3,8 +3,7 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList, ScrollView, StyleSheet } from "react-native";
 
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { mockProjects } from "@/data/mockProjects";
 import { Project } from "@/types";

@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { useTheme } from "@/contexts/ThemeContext";
 import { ThemeSetting } from "@/themes";
-import { ThemedText } from "./ThemedText";
+import { ThemedText } from "./themed";
 
 type ThemeOption = ThemeSetting;
 

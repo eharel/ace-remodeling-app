@@ -6,8 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { ProjectSummary } from "@/types";
 import { styling } from "@/utils/styling";
 import { ProjectCard } from "./ProjectCard";
-import { ThemedText } from "./ThemedText";
-import { ThemedView } from "./ThemedView";
+import { ThemedText, ThemedView } from "./themed";
 
 interface ProjectGalleryProps {
   projects: ProjectSummary[];

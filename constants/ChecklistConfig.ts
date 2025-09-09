@@ -76,15 +76,6 @@ export const CHECKLIST_CONFIG = {
     FAB_ACTIVE_OPACITY: 0.8,
     MODAL_ACTIVE_OPACITY: 1,
   },
-
-  // Alert configuration
-  ALERT: {
-    TITLE: "Reset Checklist",
-    MESSAGE: "Reset checklist for new meeting?",
-    CANCEL_TEXT: "Cancel",
-    RESET_TEXT: "Reset",
-    CANCELABLE: true,
-  },
 } as const;
 
 // Type exports for better TypeScript support

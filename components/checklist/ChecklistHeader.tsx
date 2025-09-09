@@ -54,7 +54,7 @@ export function ChecklistHeader({
           style={styles.resetButton}
           accessibilityRole="button"
           accessibilityLabel="Reset checklist"
-          accessibilityHint="Resets all checklist items to unchecked state"
+          accessibilityHint="Immediately resets all checklist items to unchecked state"
         >
           <MaterialIcons
             name="refresh"

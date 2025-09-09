@@ -15,8 +15,7 @@ export function FloatingChecklistButton() {
   const [modalVisible, setModalVisible] = useState(false);
 
   // Use the custom hook for checklist state management
-  const { checkedStates, toggleItem, resetItemsWithConfirmation } =
-    useChecklist();
+  const { checkedStates, toggleItem, resetItems } = useChecklist();
 
   // Modal control functions with useCallback for performance
   const openModal = useCallback(() => setModalVisible(true), []);
@@ -53,7 +52,7 @@ export function FloatingChecklistButton() {
         visible={modalVisible}
         checkedStates={checkedStates}
         onToggleItem={toggleItem}
-        onReset={resetItemsWithConfirmation}
+        onReset={resetItems}
         onClose={closeModal}
       />
     </>

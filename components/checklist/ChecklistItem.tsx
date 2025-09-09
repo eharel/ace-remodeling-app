@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
 import { useTheme } from "@/contexts/ThemeContext";
+import { CHECKLIST_CONFIG } from "../../constants/ChecklistConfig";
 
 /**
  * Props for the ChecklistItem component

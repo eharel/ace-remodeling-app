@@ -2,9 +2,9 @@ import { router } from "expo-router";
 import { StyleSheet } from "react-native";
 
 import { ProjectGallery } from "@/components/ProjectGallery";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { ThemedText, ThemedView } from "@/components/themed";
 import { getProjectSummariesByCategory } from "@/data/mockProjects";
+import { DesignTokens } from "@/themes";
 
 export default function KitchensScreen() {
   const kitchenProjects = getProjectSummariesByCategory("kitchen");
@@ -54,9 +54,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    marginTop: 60,
-    marginBottom: 30,
-    paddingHorizontal: 20,
+    marginTop: DesignTokens.spacing[16],
+    marginBottom: DesignTokens.spacing[8],
+    paddingHorizontal: DesignTokens.spacing[5],
     gap: 8,
   },
 });

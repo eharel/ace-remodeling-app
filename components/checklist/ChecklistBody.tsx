@@ -1,8 +1,8 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-import { ChecklistItem as ChecklistItemComponent } from "@/components/ChecklistItem";
 import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
+import { ChecklistItem as ChecklistItemComponent } from "./ChecklistItem";
 
 interface ChecklistBodyProps {
   /** Array of checked states for each item */

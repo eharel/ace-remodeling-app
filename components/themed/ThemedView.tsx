@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { View, type ViewProps } from "react-native";
 
 import { useTheme } from "@/contexts/ThemeContext";
-import { ThemeVariant } from "@/themes";
+import { DesignTokens, ThemeVariant } from "@/themes";
 
 export type ThemedViewProps = ViewProps & {
   variant?: ThemeVariant;
@@ -39,10 +39,10 @@ export function ThemedView({
       case "elevated":
         baseStyles.backgroundColor = getThemeColor("background.elevated");
         baseStyles.shadowColor = getThemeColor("components.card.shadow");
-        baseStyles.shadowOffset = { width: 0, height: 2 };
-        baseStyles.shadowOpacity = 0.1;
-        baseStyles.shadowRadius = 4;
-        baseStyles.elevation = 2;
+        baseStyles.shadowOffset = DesignTokens.shadows.base.shadowOffset;
+        baseStyles.shadowOpacity = DesignTokens.shadows.base.shadowOpacity;
+        baseStyles.shadowRadius = DesignTokens.shadows.base.shadowRadius;
+        baseStyles.elevation = DesignTokens.shadows.base.elevation;
         break;
       case "outlined":
         baseStyles.backgroundColor = "transparent";
@@ -59,10 +59,10 @@ export function ThemedView({
     // Apply additional props
     if (elevated) {
       baseStyles.shadowColor = getThemeColor("components.card.shadow");
-      baseStyles.shadowOffset = { width: 0, height: 2 };
-      baseStyles.shadowOpacity = 0.1;
-      baseStyles.shadowRadius = 4;
-      baseStyles.elevation = 2;
+      baseStyles.shadowOffset = DesignTokens.shadows.base.shadowOffset;
+      baseStyles.shadowOpacity = DesignTokens.shadows.base.shadowOpacity;
+      baseStyles.shadowRadius = DesignTokens.shadows.base.shadowRadius;
+      baseStyles.elevation = DesignTokens.shadows.base.elevation;
     }
 
     if (outlined) {

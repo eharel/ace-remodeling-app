@@ -1,8 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { styling } from "@/utils/styling";
 
