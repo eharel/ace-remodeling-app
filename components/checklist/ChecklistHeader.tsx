@@ -2,8 +2,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
 import { useTheme } from "@/contexts/ThemeContext";
+import { DesignTokens } from "@/themes";
 
 interface ChecklistHeaderProps {
   /** Progress information for the checklist */
@@ -26,24 +26,21 @@ export function ChecklistHeader({
   onReset,
   onClose,
 }: ChecklistHeaderProps) {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   return (
     <View
       style={[
         styles.header,
-        { borderBottomColor: getThemeColor("border.primary") },
+        { borderBottomColor: theme.colors.border.primary },
       ]}
     >
       <View style={styles.headerContent}>
-        <Text style={[styles.title, { color: getThemeColor("text.primary") }]}>
+        <Text style={[styles.title, { color: theme.colors.text.primary }]}>
           Meeting Checklist
         </Text>
         <Text
-          style={[
-            styles.progressText,
-            { color: getThemeColor("text.secondary") },
-          ]}
+          style={[styles.progressText, { color: theme.colors.text.secondary }]}
         >
           {progress.completed}/{progress.total} completed
         </Text>
@@ -54,12 +51,12 @@ export function ChecklistHeader({
           style={styles.resetButton}
           accessibilityRole="button"
           accessibilityLabel="Reset checklist"
-          accessibilityHint="Resets all checklist items to unchecked state"
+          accessibilityHint="Immediately resets all checklist items to unchecked state"
         >
           <MaterialIcons
             name="refresh"
-            size={CHECKLIST_CONFIG.HEADER.RESET_ICON_SIZE}
-            color={getThemeColor("text.secondary")}
+            size={20}
+            color={theme.colors.text.secondary}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -70,8 +67,8 @@ export function ChecklistHeader({
         >
           <MaterialIcons
             name="close"
-            size={CHECKLIST_CONFIG.HEADER.CLOSE_ICON_SIZE}
-            color={getThemeColor("text.secondary")}
+            size={24}
+            color={theme.colors.text.secondary}
           />
         </TouchableOpacity>
       </View>
@@ -84,27 +81,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: CHECKLIST_CONFIG.HEADER.PADDING,
-    borderBottomWidth: CHECKLIST_CONFIG.HEADER.BORDER_BOTTOM_WIDTH,
+    padding: DesignTokens.spacing[5], // 20px padding
+    borderBottomWidth: 1,
   },
   headerContent: {
     flex: 1,
   },
   title: {
-    fontSize: CHECKLIST_CONFIG.HEADER.TITLE_FONT_SIZE,
-    fontWeight: CHECKLIST_CONFIG.HEADER.TITLE_FONT_WEIGHT,
-    marginBottom: CHECKLIST_CONFIG.HEADER.TITLE_MARGIN_BOTTOM,
+    fontSize: DesignTokens.typography.fontSize.xl,
+    fontWeight: DesignTokens.typography.fontWeight.semibold,
+    marginBottom: DesignTokens.spacing[1],
   },
   progressText: {
-    fontSize: CHECKLIST_CONFIG.HEADER.PROGRESS_FONT_SIZE,
-    fontWeight: CHECKLIST_CONFIG.HEADER.PROGRESS_FONT_WEIGHT,
+    fontSize: DesignTokens.typography.fontSize.sm,
+    fontWeight: DesignTokens.typography.fontWeight.medium,
   },
   headerActions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: CHECKLIST_CONFIG.HEADER.ACTIONS_GAP,
+    gap: DesignTokens.spacing[3],
   },
   resetButton: {
-    padding: CHECKLIST_CONFIG.HEADER.RESET_BUTTON_PADDING,
+    padding: DesignTokens.spacing[1],
   },
 });

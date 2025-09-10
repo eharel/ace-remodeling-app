@@ -11,13 +11,10 @@ import { useColorScheme } from "react-native";
 
 import { ThemeName, themes, ThemeSetting } from "@/themes";
 
-// Theme constants for validation
-const THEME_NAMES: ThemeName[] = ["light", "dark", "blue"];
-const LIGHT_THEME: ThemeName = "light";
-const DARK_THEME: ThemeName = "dark";
-const BLUE_THEME: ThemeName = "blue";
+// Theme constants - derived from themes system (single source of truth)
+const THEME_NAMES: ThemeName[] = Object.keys(themes) as ThemeName[];
 const SYSTEM_THEME = "system" as const;
-const DEFAULT_THEME: ThemeName = LIGHT_THEME;
+const DEFAULT_THEME: ThemeName = "light"; // Design decision: light as default
 const DEFAULT_SETTING: ThemeSetting = SYSTEM_THEME;
 
 // Theme Context Types
@@ -35,10 +32,6 @@ interface ThemeContextType {
   isDark: boolean;
   isLight: boolean;
   isBlue: boolean;
-
-  // Utility functions
-  getThemeColor: (path: string) => string;
-  getComponentColor: (component: string, property: string) => string;
 }
 
 // Theme Context
@@ -47,8 +40,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 // Theme Storage Keys
 const THEME_SETTING_KEY = "@theme_setting";
 
-// Available themes (excluding "system") - derived from themes
-const AVAILABLE_THEMES: ThemeName[] = Object.keys(themes) as ThemeName[];
+// Available themes (excluding "system") - same as THEME_NAMES
+const AVAILABLE_THEMES: ThemeName[] = THEME_NAMES;
 
 // Theme Provider Props
 interface ThemeProviderProps {
@@ -76,9 +69,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, [currentTheme]);
 
   // Theme state helpers
-  const isDark = currentTheme === DARK_THEME;
-  const isLight = currentTheme === LIGHT_THEME;
-  const isBlue = currentTheme === BLUE_THEME;
+  const isDark = currentTheme === "dark";
+  const isLight = currentTheme === "light";
+  const isBlue = currentTheme === "blue";
 
   // Load theme setting from storage on mount
   useEffect(() => {
@@ -125,42 +118,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setThemeSetting(AVAILABLE_THEMES[nextIndex]);
   }, [currentTheme, setThemeSetting]);
 
-  // Get theme color by path (e.g., "background.primary", "text.secondary")
-  const getThemeColor = useCallback(
-    (path: string): string => {
-      const keys = path.split(".");
-      let value: any = theme.colors;
-
-      for (const key of keys) {
-        if (value && typeof value === "object" && key in value) {
-          value = value[key];
-        } else {
-          console.warn(`Theme color path not found: ${path}`);
-          return theme.colors.text.primary; // Fallback
-        }
-      }
-
-      return value || theme.colors.text.primary;
-    },
-    [theme]
-  );
-
-  // Get component-specific color
-  const getComponentColor = useCallback(
-    (component: string, property: string): string => {
-      const componentColors =
-        theme.colors.components[
-          component as keyof typeof theme.colors.components
-        ];
-      if (componentColors && property in componentColors) {
-        return componentColors[property as keyof typeof componentColors];
-      }
-      console.warn(`Component color not found: ${component}.${property}`);
-      return theme.colors.text.primary; // Fallback
-    },
-    [theme]
-  );
-
   // Context value
   const contextValue = useMemo(
     () => ({
@@ -172,8 +129,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       isDark,
       isLight,
       isBlue,
-      getThemeColor,
-      getComponentColor,
     }),
     [
       themeSetting,
@@ -184,8 +139,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       isDark,
       isLight,
       isBlue,
-      getThemeColor,
-      getComponentColor,
     ]
   );
 

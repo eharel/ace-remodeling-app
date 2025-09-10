@@ -1,8 +1,8 @@
 import React from "react";
 import { Modal, StyleSheet, TouchableOpacity } from "react-native";
 
-import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
 import { useTheme } from "@/contexts/ThemeContext";
+import { DesignTokens } from "@/themes";
 import { ChecklistBody } from "./ChecklistBody";
 import { ChecklistHeader } from "./ChecklistHeader";
 
@@ -30,7 +30,7 @@ export function ChecklistModal({
   onReset,
   onClose,
 }: ChecklistModalProps) {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   const progress = {
     completed: checkedStates.filter(Boolean).length,
@@ -39,7 +39,7 @@ export function ChecklistModal({
 
   return (
     <Modal
-      animationType={CHECKLIST_CONFIG.MODAL.ANIMATION_TYPE}
+      animationType="slide"
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
@@ -48,7 +48,7 @@ export function ChecklistModal({
     >
       <TouchableOpacity
         style={styles.overlay}
-        activeOpacity={CHECKLIST_CONFIG.TOUCH.MODAL_ACTIVE_OPACITY}
+        activeOpacity={1}
         onPress={onClose}
         accessibilityRole="button"
         accessibilityLabel="Close modal"
@@ -58,11 +58,11 @@ export function ChecklistModal({
           style={[
             styles.modalContent,
             {
-              backgroundColor: getThemeColor("background.card"),
-              borderColor: getThemeColor("border.primary"),
+              backgroundColor: theme.colors.background.card,
+              borderColor: theme.colors.border.primary,
             },
           ]}
-          activeOpacity={CHECKLIST_CONFIG.TOUCH.MODAL_ACTIVE_OPACITY}
+          activeOpacity={1}
           onPress={(e) => e.stopPropagation()}
           accessibilityRole="none"
         >
@@ -84,18 +84,18 @@ export function ChecklistModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: `rgba(0, 0, 0, ${CHECKLIST_CONFIG.MODAL.OVERLAY_OPACITY})`,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
-    padding: CHECKLIST_CONFIG.HEADER.PADDING,
+    padding: DesignTokens.spacing[5], // 20px padding
   },
   modalContent: {
     width: "100%",
-    maxWidth: CHECKLIST_CONFIG.MODAL.MAX_WIDTH,
-    maxHeight: `${CHECKLIST_CONFIG.MODAL.MAX_HEIGHT_PERCENT}%`,
-    minHeight: CHECKLIST_CONFIG.MODAL.MIN_HEIGHT,
-    borderRadius: CHECKLIST_CONFIG.MODAL.BORDER_RADIUS,
-    borderWidth: CHECKLIST_CONFIG.MODAL.BORDER_WIDTH,
+    maxWidth: 500,
+    maxHeight: "70%",
+    minHeight: 500,
+    borderRadius: DesignTokens.borderRadius.md, // 12px
+    borderWidth: 1,
     overflow: "hidden",
   },
 });

@@ -26,7 +26,7 @@ export function ThemedText({
   color,
   ...rest
 }: ThemedTextProps) {
-  const { theme, getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   // Generate theme-aware styles based on variant
   const themedStyles = useMemo(() => {
@@ -39,61 +39,61 @@ export function ThemedText({
         baseStyles.fontWeight = "bold";
         baseStyles.lineHeight = 32;
         baseStyles.fontFamily = "Inter-Bold";
-        baseStyles.color = color || getThemeColor("text.primary");
+        baseStyles.color = color || theme.colors.text.primary;
         break;
       case "subtitle":
         baseStyles.fontSize = 20;
         baseStyles.fontWeight = "bold";
         baseStyles.fontFamily = "Inter-Bold";
-        baseStyles.color = color || getThemeColor("text.primary");
+        baseStyles.color = color || theme.colors.text.primary;
         break;
       case "body":
         baseStyles.fontSize = 16;
         baseStyles.lineHeight = 24;
         baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || getThemeColor("text.secondary");
+        baseStyles.color = color || theme.colors.text.secondary;
         break;
       case "caption":
         baseStyles.fontSize = 14;
         baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || getThemeColor("text.tertiary");
+        baseStyles.color = color || theme.colors.text.tertiary;
         break;
       case "link":
         baseStyles.fontSize = 16;
         baseStyles.lineHeight = 30;
         baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || getThemeColor("text.accent");
+        baseStyles.color = color || theme.colors.text.accent;
         break;
       case "error":
         baseStyles.fontSize = 16;
         baseStyles.lineHeight = 24;
         baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || getThemeColor("status.error");
+        baseStyles.color = color || theme.colors.status.error;
         break;
       case "success":
         baseStyles.fontSize = 16;
         baseStyles.lineHeight = 24;
         baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || getThemeColor("status.success");
+        baseStyles.color = color || theme.colors.status.success;
         break;
       case "warning":
         baseStyles.fontSize = 16;
         baseStyles.lineHeight = 24;
         baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || getThemeColor("status.warning");
+        baseStyles.color = color || theme.colors.status.warning;
         break;
       case "info":
         baseStyles.fontSize = 16;
         baseStyles.lineHeight = 24;
         baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || getThemeColor("status.info");
+        baseStyles.color = color || theme.colors.status.info;
         break;
       case "default":
       default:
         baseStyles.fontSize = 16;
         baseStyles.lineHeight = 24;
         baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || getThemeColor("text.primary");
+        baseStyles.color = color || theme.colors.text.primary;
         break;
     }
 
@@ -104,7 +104,7 @@ export function ThemedText({
     }
 
     return baseStyles;
-  }, [variant, type, color, getThemeColor]);
+  }, [variant, type, color, theme]);
 
   return <Text style={[themedStyles, style]} {...rest} />;
 }

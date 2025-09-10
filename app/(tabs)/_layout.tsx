@@ -6,16 +6,16 @@ import { Platform } from "react-native";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function TabLayout() {
-  const { getThemeColor, currentTheme } = useTheme();
+  const { theme, currentTheme } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: getThemeColor("interactive.primary"),
-        tabBarInactiveTintColor: getThemeColor("text.tertiary"),
+        tabBarActiveTintColor: theme.colors.interactive.primary,
+        tabBarInactiveTintColor: theme.colors.text.tertiary,
         tabBarStyle: {
-          backgroundColor: getThemeColor("background.card"),
-          borderTopColor: getThemeColor("border.primary"),
+          backgroundColor: theme.colors.background.card,
+          borderTopColor: theme.colors.border.primary,
           ...Platform.select({
             ios: {
               position: "absolute",

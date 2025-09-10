@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
 import { useTheme } from "@/contexts/ThemeContext";
+import { DesignTokens } from "@/themes";
 
 /**
  * Props for the ChecklistItem component
@@ -40,13 +40,13 @@ export function ChecklistItem({
   accessibilityHint,
   accessibilityState,
 }: ChecklistItemProps) {
-  const { getThemeColor } = useTheme();
+  const { theme } = useTheme();
 
   return (
     <TouchableOpacity
       style={styles.checklistItem}
       onPress={onPress}
-      activeOpacity={CHECKLIST_CONFIG.ITEM.ACTIVE_OPACITY}
+      activeOpacity={DesignTokens.interactions.activeOpacity}
       accessibilityRole="checkbox"
       accessibilityLabel={accessibilityLabel || text}
       accessibilityHint={accessibilityHint}
@@ -54,11 +54,11 @@ export function ChecklistItem({
     >
       <MaterialIcons
         name={isChecked ? "check-box" : "check-box-outline-blank"}
-        size={CHECKLIST_CONFIG.ITEM.ICON_SIZE}
+        size={24}
         color={
           isChecked
-            ? getThemeColor("interactive.primary")
-            : getThemeColor("text.tertiary")
+            ? theme.colors.interactive.primary
+            : theme.colors.text.tertiary
         }
         accessibilityElementsHidden={true}
       />
@@ -66,9 +66,9 @@ export function ChecklistItem({
         style={[
           styles.checklistText,
           {
-            color: getThemeColor("text.primary"),
+            color: theme.colors.text.primary,
             textDecorationLine: isChecked ? "line-through" : "none",
-            opacity: isChecked ? CHECKLIST_CONFIG.ITEM.CHECKED_OPACITY : 1,
+            opacity: isChecked ? DesignTokens.interactions.disabledOpacity : 1,
           },
         ]}
         accessibilityElementsHidden={true}
@@ -83,12 +83,12 @@ const styles = StyleSheet.create({
   checklistItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: CHECKLIST_CONFIG.ITEM.PADDING_VERTICAL,
-    paddingHorizontal: CHECKLIST_CONFIG.ITEM.PADDING_HORIZONTAL,
+    paddingVertical: DesignTokens.spacing[3], // 12px
+    paddingHorizontal: DesignTokens.spacing[1], // 4px
   },
   checklistText: {
-    fontSize: CHECKLIST_CONFIG.ITEM.TEXT_FONT_SIZE,
-    marginLeft: CHECKLIST_CONFIG.ITEM.TEXT_MARGIN_LEFT,
+    fontSize: DesignTokens.typography.fontSize.base,
+    marginLeft: DesignTokens.spacing[3],
     flex: 1,
   },
 });

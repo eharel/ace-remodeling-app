@@ -1,15 +1,15 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { useTheme } from "@/contexts/ThemeContext";
-import { ThemeSetting } from "@/themes";
-import { ThemedText } from "./ThemedText";
+import { DesignTokens, ThemeSetting } from "@/themes";
+import { ThemedText } from "./themed";
 
 type ThemeOption = ThemeSetting;
 
 export function ThemeToggle() {
-  const { themeSetting, setThemeSetting, getThemeColor } = useTheme();
+  const { themeSetting, setThemeSetting, theme } = useTheme();
 
   const themeOptions: { key: ThemeOption; label: string; icon: string }[] = [
     { key: "light", label: "Light", icon: "light-mode" },
@@ -29,46 +29,50 @@ export function ThemeToggle() {
     return themeSetting === theme;
   };
 
-  const dynamicStyles = StyleSheet.create({
-    container: {
-      backgroundColor: getThemeColor("background.secondary"),
-      borderRadius: 8,
-      marginVertical: 8,
-      borderWidth: 1,
-      borderColor: getThemeColor("border.primary"),
-      padding: 16,
-    },
-    title: {
-      marginBottom: 12,
-    },
-    buttonRow: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      alignItems: "center",
-      paddingHorizontal: 24,
-    },
-    themeButton: {
-      width: 60,
-      height: 60,
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: 30,
-      borderWidth: 2,
-      borderColor: getThemeColor("border.primary"),
-      backgroundColor: getThemeColor("background.card"),
-    },
-    activeButton: {
-      backgroundColor: getThemeColor("interactive.primary"),
-      borderColor: getThemeColor("interactive.primary"),
-    },
-    buttonIcon: {
-      // No margin needed for circular buttons
-    },
-    buttonContainer: {
-      alignItems: "center",
-      gap: 6,
-    },
-  });
+  const dynamicStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          backgroundColor: theme.colors.background.secondary,
+          borderRadius: DesignTokens.borderRadius.md,
+          marginVertical: DesignTokens.spacing[2],
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          padding: DesignTokens.spacing[4],
+        },
+        title: {
+          marginBottom: DesignTokens.spacing[3],
+        },
+        buttonRow: {
+          flexDirection: "row",
+          justifyContent: "space-around",
+          alignItems: "center",
+          paddingHorizontal: DesignTokens.spacing[6],
+        },
+        themeButton: {
+          width: 60,
+          height: 60,
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 30,
+          borderWidth: 2,
+          borderColor: theme.colors.border.primary,
+          backgroundColor: theme.colors.background.card,
+        },
+        activeButton: {
+          backgroundColor: theme.colors.interactive.primary,
+          borderColor: theme.colors.interactive.primary,
+        },
+        buttonIcon: {
+          // No margin needed for circular buttons
+        },
+        buttonContainer: {
+          alignItems: "center",
+          gap: DesignTokens.spacing[1],
+        },
+      }),
+    [theme]
+  );
 
   return (
     <View style={dynamicStyles.container}>
@@ -95,8 +99,8 @@ export function ThemeToggle() {
                   size={24}
                   color={
                     active
-                      ? getThemeColor("text.inverse")
-                      : getThemeColor("text.primary")
+                      ? theme.colors.text.inverse
+                      : theme.colors.text.primary
                   }
                   style={dynamicStyles.buttonIcon}
                 />
@@ -107,8 +111,8 @@ export function ThemeToggle() {
                   styles.buttonLabel,
                   {
                     color: active
-                      ? getThemeColor("interactive.primary")
-                      : getThemeColor("text.secondary"),
+                      ? theme.colors.interactive.primary
+                      : theme.colors.text.secondary,
                   },
                 ]}
               >
@@ -124,8 +128,8 @@ export function ThemeToggle() {
 
 const styles = StyleSheet.create({
   buttonLabel: {
-    fontSize: 11,
-    fontWeight: "500",
+    fontSize: DesignTokens.typography.fontSize.xs,
+    fontWeight: DesignTokens.typography.fontWeight.medium,
     textAlign: "center",
   },
 });

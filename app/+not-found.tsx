@@ -1,8 +1,8 @@
 import { Link, Stack } from "expo-router";
 import { StyleSheet } from "react-native";
 
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { ThemedText, ThemedView } from "@/components/themed";
+import { DesignTokens } from "@/themes";
 
 export default function NotFoundScreen() {
   return (
@@ -23,10 +23,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    padding: DesignTokens.spacing[5],
   },
   link: {
-    marginTop: 15,
-    paddingVertical: 15,
+    marginTop: DesignTokens.spacing[4],
+    paddingVertical: DesignTokens.spacing[4],
   },
 });

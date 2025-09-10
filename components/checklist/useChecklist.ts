@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from "react";
-import { Alert } from "react-native";
 
 import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
 
@@ -42,40 +41,6 @@ export function useChecklist(
   const resetItems = useCallback(() => {
     setCheckedStates(new Array(itemCount).fill(false));
   }, [itemCount]);
-
-  /**
-   * Reset all items with confirmation dialog
-   */
-  const resetItemsWithConfirmation = useCallback(() => {
-    try {
-      Alert.alert(
-        CHECKLIST_CONFIG.ALERT.TITLE,
-        CHECKLIST_CONFIG.ALERT.MESSAGE,
-        [
-          {
-            text: CHECKLIST_CONFIG.ALERT.CANCEL_TEXT,
-            style: "cancel",
-          },
-          {
-            text: CHECKLIST_CONFIG.ALERT.RESET_TEXT,
-            style: "destructive",
-            onPress: resetItems,
-          },
-        ],
-        {
-          cancelable: CHECKLIST_CONFIG.ALERT.CANCELABLE,
-          onDismiss: () => {
-            // Handles when alert is dismissed by tapping outside or back button
-            // No action needed - just dismisses the alert
-          },
-        }
-      );
-    } catch (error) {
-      // Fallback: direct reset without confirmation if alert fails
-      console.warn("Alert failed, resetting directly:", error);
-      resetItems();
-    }
-  }, [resetItems]);
 
   /**
    * Calculate progress statistics
@@ -139,7 +104,6 @@ export function useChecklist(
     // Actions
     toggleItem,
     resetItems,
-    resetItemsWithConfirmation,
     setItemChecked,
 
     // Computed values

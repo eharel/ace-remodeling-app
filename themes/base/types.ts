@@ -136,11 +136,80 @@ export interface StatusColors {
 }
 
 /**
- * Component-specific color structure
- * Defines colors for specific UI components
+ * Component styles interface
+ * Defines ALL styling properties (colors, dimensions, effects) for UI components
+ * This ensures TypeScript enforces complete component styling in all themes
  */
-export interface ComponentColors {
-  /** Button component colors */
+export interface ComponentStyles {
+  /** Floating Action Button component */
+  fab: {
+    /** Background color */
+    backgroundColor: string;
+    /** Shadow color */
+    shadowColor: string;
+    /** Shadow opacity */
+    shadowOpacity: number;
+    /** Active opacity for touch interactions */
+    activeOpacity: number;
+  };
+
+  /** Modal component */
+  modal: {
+    /** Background color */
+    backgroundColor: string;
+    /** Border color */
+    borderColor: string;
+    /** Border radius */
+    borderRadius: number;
+    /** Border width */
+    borderWidth: number;
+    /** Overlay opacity */
+    overlayOpacity: number;
+  };
+
+  /** Header component */
+  header: {
+    /** Background color */
+    backgroundColor: string;
+    /** Border color */
+    borderColor: string;
+    /** Title font weight */
+    titleFontWeight: string;
+    /** Progress text font weight */
+    progressFontWeight: string;
+    /** Border bottom width */
+    borderBottomWidth: number;
+    /** Padding */
+    padding: number;
+  };
+
+  /** Checklist item component */
+  checklistItem: {
+    /** Background color (optional) */
+    backgroundColor?: string;
+    /** Text color (optional) */
+    textColor?: string;
+    /** Vertical padding */
+    paddingVertical: number;
+    /** Horizontal padding */
+    paddingHorizontal: number;
+    /** Opacity when checked */
+    checkedOpacity: number;
+    /** Active opacity for touch interactions */
+    activeOpacity: number;
+  };
+
+  /** Card component */
+  card: {
+    /** Card background color */
+    background: string;
+    /** Card border color */
+    border: string;
+    /** Card shadow color */
+    shadow: string;
+  };
+
+  /** Button component */
   button: {
     /** Primary button color */
     primary: string;
@@ -155,16 +224,8 @@ export interface ComponentColors {
     /** Outline button border color */
     outlineBorder: string;
   };
-  /** Card component colors */
-  card: {
-    /** Card background color */
-    background: string;
-    /** Card border color */
-    border: string;
-    /** Card shadow color */
-    shadow: string;
-  };
-  /** Input component colors */
+
+  /** Input component */
   input: {
     /** Input background color */
     background: string;
@@ -192,8 +253,15 @@ export interface ThemeColors {
   interactive: InteractiveColors;
   /** Status colors */
   status: StatusColors;
-  /** Component-specific colors */
-  components: ComponentColors;
+  /** Component-specific styles */
+  components: ComponentStyles;
+  /** Shadow definitions with theme-specific colors and opacity */
+  shadows: {
+    sm: { shadowColor: string; shadowOpacity: number };
+    base: { shadowColor: string; shadowOpacity: number };
+    md: { shadowColor: string; shadowOpacity: number };
+    lg: { shadowColor: string; shadowOpacity: number };
+  };
 }
 
 /**

@@ -89,6 +89,60 @@ export const lightTheme: Theme = {
         borderFocus: "#3b82f6", // Blue border for focused inputs
         placeholder: "#9ca3af", // Light gray for placeholder text
       },
+      // Floating Action Button component
+      fab: {
+        backgroundColor: "#3b82f6", // Blue background
+        shadowColor: "#000000", // Black shadow for FAB
+        shadowOpacity: 0.2, // Lighter shadow for light theme
+        activeOpacity: 0.7, // Standard active opacity
+      },
+
+      // Modal component
+      modal: {
+        backgroundColor: "#ffffff", // White background
+        borderColor: "#e2e8f0", // Light gray border
+        borderRadius: 12, // Standard border radius
+        borderWidth: 1, // Standard border width
+        overlayOpacity: 0.5, // Lighter overlay for light theme
+      },
+
+      // Header component
+      header: {
+        backgroundColor: "#ffffff", // White background
+        borderColor: "#e2e8f0", // Light gray border
+        titleFontWeight: "600", // Bold title for light theme
+        progressFontWeight: "500", // Medium weight for progress text
+        borderBottomWidth: 1, // Standard border width
+        padding: 20, // Standard padding
+      },
+
+      // Checklist item component
+      checklistItem: {
+        paddingVertical: 12, // Standard vertical padding
+        paddingHorizontal: 4, // Standard horizontal padding
+        checkedOpacity: 0.6, // Opacity when checked
+        activeOpacity: 0.7, // Standard active opacity
+      },
+    },
+
+    // Shadow definitions with theme-specific colors and opacity
+    shadows: {
+      sm: {
+        shadowColor: "#000000",
+        shadowOpacity: 0.05,
+      },
+      base: {
+        shadowColor: "#000000",
+        shadowOpacity: 0.1,
+      },
+      md: {
+        shadowColor: "#000000",
+        shadowOpacity: 0.15,
+      },
+      lg: {
+        shadowColor: "#000000",
+        shadowOpacity: 0.2,
+      },
     },
   },
 };

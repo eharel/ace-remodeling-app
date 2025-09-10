@@ -1,8 +1,9 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-import { ChecklistItem as ChecklistItemComponent } from "@/components/ChecklistItem";
 import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
+import { DesignTokens } from "@/themes";
+import { ChecklistItem as ChecklistItemComponent } from "./ChecklistItem";
 
 interface ChecklistBodyProps {
   /** Array of checked states for each item */
@@ -46,7 +47,7 @@ export function ChecklistBody({
 
 const styles = StyleSheet.create({
   body: {
-    padding: CHECKLIST_CONFIG.BODY.PADDING,
+    padding: DesignTokens.spacing[5], // 20px padding
     flex: 1,
   },
   checklistContainer: {

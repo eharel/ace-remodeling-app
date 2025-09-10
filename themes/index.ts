@@ -22,7 +22,7 @@ export type {
   BackgroundColors,
   BorderColors,
   CompleteTheme,
-  ComponentColors,
+  ComponentStyles,
   InteractiveColors,
   StatusColors,
   TextColors,
@@ -50,7 +50,9 @@ export {
 export { DesignTokens } from "./base/tokens";
 export type {
   ColorToken,
+  ComponentSizeToken,
   DesignToken,
+  InteractionToken,
   SpacingToken,
   TypographyToken,
 } from "./base/tokens";

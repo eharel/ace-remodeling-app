@@ -1,51 +1,25 @@
 import { router } from "expo-router";
-import { StyleSheet } from "react-native";
 
-import { ProjectGallery } from "@/components/ProjectGallery";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { CategoryPage } from "@/components/CategoryPage";
 import { getProjectSummariesByCategory } from "@/data/mockProjects";
+import { ProjectSummary } from "@/types";
 
 export default function BathroomsScreen() {
   const bathroomProjects = getProjectSummariesByCategory("bathroom");
 
-  const handleProjectPress = (project: any) => {
+  const handleProjectPress = (project: ProjectSummary) => {
     router.push(`/project/${project.id}`);
   };
 
-  console.log(
-    "🚿 Bathrooms page loaded - Found",
-    bathroomProjects.length,
-    "projects"
-  );
-
   return (
-    <ThemedView style={styles.container}>
-      <ThemedView style={styles.header}>
-        <ThemedText variant="title">Bathroom Projects</ThemedText>
-        <ThemedText variant="subtitle">
-          Transform your bathroom with our expert remodeling services
-        </ThemedText>
-      </ThemedView>
-
-      <ProjectGallery
-        projects={bathroomProjects}
-        title="Featured Bathroom Renovations"
-        subtitle="See our latest bathroom transformation projects"
-        onProjectPress={handleProjectPress}
-      />
-    </ThemedView>
+    <CategoryPage
+      category="bathroom"
+      title="Bathroom Projects"
+      subtitle="Transform your bathroom with our expert remodeling services"
+      galleryTitle="Featured Bathroom Renovations"
+      gallerySubtitle="See our latest bathroom transformation projects"
+      projects={bathroomProjects}
+      onProjectPress={handleProjectPress}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    marginTop: 60,
-    marginBottom: 30,
-    paddingHorizontal: 20,
-    gap: 8,
-  },
-});
