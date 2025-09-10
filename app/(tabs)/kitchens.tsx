@@ -8,7 +8,15 @@ export default function KitchensScreen() {
   const kitchenProjects = getProjectSummariesByCategory("kitchen");
 
   const handleProjectPress = (project: ProjectSummary) => {
-    router.push(`/project/${project.id}`);
+    try {
+      if (!project?.id) {
+        throw new Error("Invalid project data");
+      }
+      router.push(`/project/${project.id}`);
+    } catch (error) {
+      console.error("Navigation error:", error);
+      // In a real app, you might show a toast or alert here
+    }
   };
 
   return (

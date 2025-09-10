@@ -8,6 +8,7 @@ import { StyleSheet } from "react-native";
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesignTokens } from "@/themes";
+import { logError } from "@/utils/errorLogger";
 
 // Error fallback component with theming integration
 function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
@@ -61,6 +62,16 @@ export function ErrorBoundary({ children }: { children: React.ReactNode }) {
   const handleError = (error: Error, errorInfo: ErrorInfo) => {
     console.error("🚨 ErrorBoundary caught an error:", error);
     console.error("🚨 Error Info:", errorInfo);
+
+    // Log to our error logging system
+    logError(
+      `ErrorBoundary caught an error: ${error.message}`,
+      {
+        componentStack: errorInfo.componentStack,
+        errorBoundary: true,
+      },
+      error.stack
+    );
   };
 
   return (

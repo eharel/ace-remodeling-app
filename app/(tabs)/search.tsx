@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
 import { ProjectGallery } from "@/components/ProjectGallery";
+import { ErrorState } from "@/components/error-states";
 import {
   DesignTokens,
   ThemedInput,
@@ -14,6 +15,7 @@ import {
 import { useTheme } from "@/contexts/ThemeContext";
 import { mockProjects } from "@/data/mockProjects";
 import { Project, ProjectSummary } from "@/types/Project";
+import { logError, logWarning } from "@/utils/errorLogger";
 
 // Constants
 const SEARCH_DEBOUNCE_MS = 500;
@@ -70,6 +72,7 @@ export default function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<ProjectSummary[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [debouncedSearchQuery] = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
 
   // Memoized function to create searchable text from a project
@@ -87,59 +90,95 @@ export default function SearchScreen() {
       .toLowerCase();
   }, []);
 
-  // Memoized search function
+  // Memoized search function with error handling
   const searchProjects = useCallback(
     (query: string) => {
-      if (query.trim() === "") return [];
+      try {
+        if (query.trim() === "") return [];
 
-      const searchTerms = query
-        .toLowerCase()
-        .trim()
-        .split(/\s+/)
-        .filter((term) => term.length > 0);
+        const searchTerms = query
+          .toLowerCase()
+          .trim()
+          .split(/\s+/)
+          .filter((term) => term.length > 0);
 
-      return mockProjects
-        .filter((project) => {
-          const searchableText = createSearchableText(project);
-          return searchTerms.every((term) => searchableText.includes(term));
-        })
-        .map((project) => ({
-          id: project.id,
-          name: project.name,
-          category: project.category,
-          briefDescription: project.briefDescription,
-          thumbnail: project.thumbnail,
-          status: project.status,
-        }));
+        if (!Array.isArray(mockProjects)) {
+          throw new Error("Project data is not available");
+        }
+
+        return mockProjects
+          .filter((project) => {
+            try {
+              const searchableText = createSearchableText(project);
+              return searchTerms.every((term) => searchableText.includes(term));
+            } catch (error) {
+              logWarning(`Error processing project ${project.id}`, {
+                projectId: project.id,
+                error: error,
+              });
+              return false;
+            }
+          })
+          .map((project) => ({
+            id: project.id,
+            name: project.name,
+            category: project.category,
+            briefDescription: project.briefDescription,
+            thumbnail: project.thumbnail,
+            status: project.status,
+          }));
+      } catch (error) {
+        logError("Search operation failed", { query, error: error });
+        throw error;
+      }
     },
     [createSearchableText]
   );
 
   useEffect(() => {
     setIsSearching(true);
+    setSearchError(null);
 
-    const results = searchProjects(debouncedSearchQuery);
-    setSearchResults(results);
-
-    setIsSearching(false);
+    try {
+      const results = searchProjects(debouncedSearchQuery);
+      setSearchResults(results);
+    } catch (error) {
+      logError("Search operation failed in useEffect", {
+        query: debouncedSearchQuery,
+        error: error,
+      });
+      setSearchError(error instanceof Error ? error.message : "Search failed");
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
   }, [debouncedSearchQuery, searchProjects]);
 
   // Announce search results to screen readers
   useEffect(() => {
     if (debouncedSearchQuery.trim() !== "" && !isSearching) {
       const resultCount = searchResults.length;
-      const announcement =
-        resultCount === 0
-          ? "No projects found"
-          : `${resultCount} project${resultCount === 1 ? "" : "s"} found`;
-
       // This would typically use AccessibilityInfo.announceForAccessibility
       // but for now we'll rely on the existing accessibility labels
+      console.log(
+        `Search results: ${resultCount} project${
+          resultCount === 1 ? "" : "s"
+        } found`
+      );
     }
   }, [searchResults, debouncedSearchQuery, isSearching]);
 
   const handleProjectPress = (project: ProjectSummary) => {
-    router.push(`/project/${project.id}`);
+    try {
+      if (!project?.id) {
+        throw new Error("Invalid project data");
+      }
+      router.push(`/project/${project.id}`);
+    } catch (error) {
+      console.error("Navigation error:", error);
+      // In a real app, you might show a toast or alert here
+      // For now, we'll just log the error
+    }
   };
 
   return (
@@ -185,6 +224,27 @@ export default function SearchScreen() {
             Please wait while we search for your projects
           </ThemedText>
         </ThemedView>
+      ) : searchError ? (
+        <ErrorState
+          title="Search Error"
+          message={searchError}
+          icon="search-off"
+          onRetry={() => {
+            setSearchError(null);
+            // Retry the search
+            try {
+              const results = searchProjects(debouncedSearchQuery);
+              setSearchResults(results);
+            } catch (error) {
+              console.error("Retry search failed:", error);
+              setSearchError(
+                error instanceof Error ? error.message : "Search failed"
+              );
+            }
+          }}
+          retryText="Try again"
+          testID="search-error-state"
+        />
       ) : searchResults.length > 0 ? (
         <ThemedView
           style={styles.resultsContainer}

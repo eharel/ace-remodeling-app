@@ -1,11 +1,18 @@
 import { Image } from "expo-image";
-import React, { useMemo } from "react";
-import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
+import React, { useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesignTokens } from "@/themes";
 import { ProjectSummary } from "@/types";
+import { logError } from "@/utils/errorLogger";
 import { getStatusDisplayText, getStatusStyleKey } from "@/utils/statusUtils";
 
 interface ProjectCardProps {
@@ -16,6 +23,10 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
   const { theme } = useTheme();
+
+  // Image loading state
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
   const handlePress = () => {
     onPress?.(project);
@@ -29,14 +40,29 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
     console.log(
       `Project ID: ${project.id}, Thumbnail URL: ${project.thumbnail}`
     );
+
+    // Log to error logging system
+    logError(`Failed to load image for project "${project.name}"`, {
+      projectId: project.id,
+      projectName: project.name,
+      thumbnailUrl: project.thumbnail,
+      error: error,
+    });
+
+    setImageLoading(false);
+    setImageError(true);
   };
 
   const handleImageLoad = () => {
     console.log(`✅ Successfully loaded image for project "${project.name}"`);
+    setImageLoading(false);
+    setImageError(false);
   };
 
   const handleImageLoadStart = () => {
     console.log(`🔄 Starting to load image for project "${project.name}"`);
+    setImageLoading(true);
+    setImageError(false);
   };
 
   const styles = useMemo(
@@ -110,6 +136,39 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
           opacity: 0.6,
           textTransform: "capitalize",
         },
+        // Image loading and error states
+        imageContainer: {
+          position: "relative",
+          width: "100%",
+          height: 200,
+        },
+        loadingOverlay: {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: theme.colors.background.secondary,
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        errorOverlay: {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: theme.colors.background.secondary,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: DesignTokens.spacing[4],
+        },
+        errorText: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          color: theme.colors.text.secondary,
+          textAlign: "center",
+          opacity: 0.7,
+        },
       }),
     [theme]
   );
@@ -118,16 +177,37 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
     <Pressable onPress={handlePress} style={[styles.container, style]}>
       <ThemedView style={styles.card}>
         {/* Project Image */}
-        <Image
-          source={{ uri: project.thumbnail }}
-          style={styles.thumbnail}
-          contentFit="cover"
-          onError={handleImageError}
-          onLoad={handleImageLoad}
-          onLoadStart={handleImageLoadStart}
-          placeholder="Loading..."
-          transition={200}
-        />
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: project.thumbnail }}
+            style={styles.thumbnail}
+            contentFit="cover"
+            onError={handleImageError}
+            onLoad={handleImageLoad}
+            onLoadStart={handleImageLoadStart}
+            placeholder="Loading..."
+            transition={200}
+          />
+
+          {/* Loading Overlay */}
+          {imageLoading && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator
+                size="large"
+                color={theme.colors.interactive.primary}
+              />
+            </View>
+          )}
+
+          {/* Error Overlay */}
+          {imageError && (
+            <View style={styles.errorOverlay}>
+              <ThemedText style={styles.errorText}>
+                Failed to load image
+              </ThemedText>
+            </View>
+          )}
+        </View>
 
         {/* Project Info */}
         <View style={styles.content}>
