@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
@@ -13,7 +13,10 @@ import {
 } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { mockProjects } from "@/data/mockProjects";
-import { ProjectSummary } from "@/types/Project";
+import { Project, ProjectSummary } from "@/types/Project";
+
+// Constants
+const SEARCH_DEBOUNCE_MS = 500;
 
 const styles = StyleSheet.create({
   container: {
@@ -66,50 +69,77 @@ export default function SearchScreen() {
   const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<ProjectSummary[]>([]);
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
+  const [isSearching, setIsSearching] = useState(false);
+  const [debouncedSearchQuery] = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
 
-  console.log("🔍 Search page loaded");
+  // Memoized function to create searchable text from a project
+  const createSearchableText = useCallback((project: Project) => {
+    return [
+      project.name,
+      project.briefDescription,
+      project.longDescription || "",
+      project.location || "",
+      ...(project.tags || []),
+      project.clientInfo?.name || "",
+      project.clientInfo?.address || "",
+    ]
+      .join(" ")
+      .toLowerCase();
+  }, []);
+
+  // Memoized search function
+  const searchProjects = useCallback(
+    (query: string) => {
+      if (query.trim() === "") return [];
+
+      const searchTerms = query
+        .toLowerCase()
+        .trim()
+        .split(/\s+/)
+        .filter((term) => term.length > 0);
+
+      return mockProjects
+        .filter((project) => {
+          const searchableText = createSearchableText(project);
+          return searchTerms.every((term) => searchableText.includes(term));
+        })
+        .map((project) => ({
+          id: project.id,
+          name: project.name,
+          category: project.category,
+          briefDescription: project.briefDescription,
+          thumbnail: project.thumbnail,
+          status: project.status,
+        }));
+    },
+    [createSearchableText]
+  );
 
   useEffect(() => {
-    console.log("🔍 Search query:", debouncedSearchQuery);
+    setIsSearching(true);
 
-    if (debouncedSearchQuery.trim() === "") {
-      setSearchResults([]);
-      return;
+    const results = searchProjects(debouncedSearchQuery);
+    setSearchResults(results);
+
+    setIsSearching(false);
+  }, [debouncedSearchQuery, searchProjects]);
+
+  // Announce search results to screen readers
+  useEffect(() => {
+    if (debouncedSearchQuery.trim() !== "" && !isSearching) {
+      const resultCount = searchResults.length;
+      const announcement =
+        resultCount === 0
+          ? "No projects found"
+          : `${resultCount} project${resultCount === 1 ? "" : "s"} found`;
+
+      // This would typically use AccessibilityInfo.announceForAccessibility
+      // but for now we'll rely on the existing accessibility labels
     }
-
-    const filteredProjects = mockProjects.filter((project) => {
-      const query = debouncedSearchQuery.toLowerCase().trim();
-      const searchTerms = query.split(/\s+/).filter((term) => term.length > 0);
-
-      // If no search terms, return no results
-      if (searchTerms.length === 0) {
-        return false;
-      }
-
-      // Combine all searchable text from the project
-      const searchableText = [
-        project.name,
-        project.briefDescription,
-        project.longDescription || "",
-        project.location || "",
-        ...(project.tags || []),
-        project.clientInfo?.name || "",
-        project.clientInfo?.address || "",
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      // Check if ALL search terms are found in the combined text
-      return searchTerms.every((term) => searchableText.includes(term));
-    });
-
-    setSearchResults(filteredProjects);
-  }, [debouncedSearchQuery]);
+  }, [searchResults, debouncedSearchQuery, isSearching]);
 
   const handleProjectPress = (project: ProjectSummary) => {
     router.push(`/project/${project.id}`);
-    console.log("🔍 Project pressed:", project.name);
   };
 
   return (
@@ -122,14 +152,40 @@ export default function SearchScreen() {
           Search Projects
         </ThemedText>
         <ThemedInput
-          placeholder="Search projects"
+          placeholder={isSearching ? "Searching..." : "Search projects"}
           value={searchQuery}
           onChangeText={setSearchQuery}
+          disabled={isSearching}
           accessibilityLabel="Search projects input"
           accessibilityHint="Type to search for projects by name, description, location, client, or tags"
         />
       </ThemedView>
-      {searchResults.length > 0 ? (
+      {isSearching ? (
+        <ThemedView
+          style={styles.placeholderContainer}
+          accessibilityLabel="Searching for projects"
+        >
+          <MaterialIcons
+            name="search"
+            size={64}
+            color={theme.colors.text.tertiary}
+            style={styles.placeholderIcon}
+            accessibilityLabel="Searching icon"
+          />
+          <ThemedText
+            style={styles.placeholderText}
+            accessibilityLabel="Searching for projects"
+          >
+            Searching...
+          </ThemedText>
+          <ThemedText
+            style={styles.descriptionText}
+            accessibilityLabel="Please wait while we search for your projects"
+          >
+            Please wait while we search for your projects
+          </ThemedText>
+        </ThemedView>
+      ) : searchResults.length > 0 ? (
         <ThemedView
           style={styles.resultsContainer}
           accessibilityLabel="Search results"
