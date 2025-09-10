@@ -1,78 +1,82 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React from "react";
+import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/contexts/ThemeContext";
-import { styling } from "@/utils/styling";
+import { DesignTokens } from "@/themes";
 
 export default function SettingsScreen() {
   const { theme } = useTheme();
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background.secondary,
-    },
-    scrollView: {
-      flex: 1,
-    },
-    content: {
-      padding: styling.spacing(4),
-      paddingTop: styling.spacing(10),
-    },
-    section: {
-      marginBottom: styling.spacing(6),
-    },
-    sectionTitle: {
-      marginBottom: styling.spacing(3),
-      paddingHorizontal: styling.spacing(2),
-    },
-    settingItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      backgroundColor: theme.colors.background.card,
-      padding: styling.spacing(4),
-      marginBottom: styling.spacing(2),
-      borderRadius: styling.borderRadius("md"),
-      borderWidth: 1,
-      borderColor: theme.colors.border.primary,
-      ...styling.shadow("sm"),
-    },
-    settingItemContent: {
-      flex: 1,
-      marginRight: styling.spacing(3),
-    },
-    settingItemTitle: {
-      marginBottom: styling.spacing(1),
-    },
-    settingItemDescription: {
-      opacity: 0.7,
-    },
-    settingItemIcon: {
-      marginRight: styling.spacing(3),
-    },
-    settingItemAction: {
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    comingSoon: {
-      opacity: 0.5,
-    },
-    aboutSection: {
-      marginTop: styling.spacing(4),
-      paddingTop: styling.spacing(4),
-      borderTopWidth: 1,
-      borderTopColor: theme.colors.border.primary,
-    },
-    versionInfo: {
-      textAlign: "center",
-      opacity: 0.6,
-      marginTop: styling.spacing(2),
-    },
-  });
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: theme.colors.background.secondary,
+        },
+        scrollView: {
+          flex: 1,
+        },
+        content: {
+          padding: DesignTokens.spacing[4],
+          paddingTop: DesignTokens.spacing[10],
+        },
+        section: {
+          marginBottom: DesignTokens.spacing[6],
+        },
+        sectionTitle: {
+          marginBottom: DesignTokens.spacing[3],
+          paddingHorizontal: DesignTokens.spacing[2],
+        },
+        settingItem: {
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          backgroundColor: theme.colors.background.card,
+          padding: DesignTokens.spacing[4],
+          marginBottom: DesignTokens.spacing[2],
+          borderRadius: DesignTokens.borderRadius.md,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          ...DesignTokens.shadows.sm,
+        },
+        settingItemContent: {
+          flex: 1,
+          marginRight: DesignTokens.spacing[3],
+        },
+        settingItemTitle: {
+          marginBottom: DesignTokens.spacing[1],
+        },
+        settingItemDescription: {
+          opacity: 0.7,
+        },
+        settingItemIcon: {
+          marginRight: DesignTokens.spacing[3],
+        },
+        settingItemAction: {
+          alignItems: "center",
+          justifyContent: "center",
+        },
+        comingSoon: {
+          opacity: 0.5,
+        },
+        aboutSection: {
+          marginTop: DesignTokens.spacing[4],
+          paddingTop: DesignTokens.spacing[4],
+          borderTopWidth: 1,
+          borderTopColor: theme.colors.border.primary,
+        },
+        versionInfo: {
+          textAlign: "center",
+          opacity: 0.6,
+          marginTop: DesignTokens.spacing[2],
+        },
+      }),
+    [theme]
+  );
 
   const SettingItem = ({
     icon,

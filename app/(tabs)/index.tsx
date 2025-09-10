@@ -1,11 +1,12 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
+import { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
-import { styling } from "@/utils/styling";
+import { DesignTokens } from "@/themes";
 
 export default function HomeScreen() {
   const { theme, isDark } = useTheme();
@@ -20,122 +21,126 @@ export default function HomeScreen() {
 
   console.log("Home page loaded");
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background.secondary,
-    },
-    header: {
-      alignItems: "center",
-      paddingTop: styling.spacing(20),
-      paddingBottom: styling.spacing(8),
-      paddingHorizontal: styling.spacing(6),
-    },
-    logo: {
-      width: 200,
-      height: 80,
-      marginBottom: styling.spacing(6),
-    },
-    companyName: {
-      fontSize: styling.fontSize("4xl"),
-      textAlign: "center",
-      fontWeight: styling.fontWeight("bold"),
-      color: theme.colors.text.primary,
-      lineHeight: styling.lineHeight("tight"),
-      marginBottom: styling.spacing(2),
-    },
-    tagline: {
-      fontSize: styling.fontSize("lg"),
-      textAlign: "center",
-      color: theme.colors.text.secondary,
-      fontWeight: styling.fontWeight("medium"),
-    },
-    welcomeSection: {
-      alignItems: "center",
-      paddingHorizontal: styling.spacing(6),
-      paddingBottom: styling.spacing(2),
-    },
-    welcomeText: {
-      fontSize: styling.fontSize("xl"),
-      textAlign: "center",
-      color: theme.colors.text.primary,
-      fontFamily: styling.fontFamily("semibold"),
-      marginBottom: styling.spacing(2),
-    },
-    instructionText: {
-      fontSize: styling.fontSize("base"),
-      textAlign: "center",
-      color: theme.colors.text.secondary,
-      lineHeight: styling.lineHeight("relaxed"),
-      marginTop: styling.spacing(4),
-      paddingVertical: styling.spacing(6),
-      minHeight: 80, // Ensure proper height for text visibility
-    },
-    categoriesSection: {
-      paddingHorizontal: styling.spacing(6),
-      paddingVertical: styling.spacing(6),
-      backgroundColor: theme.colors.background.primary,
-      borderRadius: styling.borderRadius("lg"),
-      marginHorizontal: styling.spacing(4),
-      marginTop: styling.spacing(4),
-      marginBottom: styling.spacing(8),
-      ...styling.shadow("sm"),
-    },
-    categoriesTitle: {
-      fontSize: styling.fontSize("xl"),
-      textAlign: "center",
-      marginBottom: styling.spacing(6),
-      color: theme.colors.text.primary,
-      fontFamily: styling.fontFamily("bold"),
-    },
-    categoryButtons: {
-      gap: styling.spacing(4),
-      width: "85%",
-      alignSelf: "center",
-    },
-    categoryButton: {
-      backgroundColor: theme.colors.background.card,
-      padding: styling.spacing(6),
-      borderRadius: styling.borderRadius("lg"),
-      alignItems: "center",
-      borderWidth: 1,
-      borderColor: theme.colors.border.primary,
-      ...styling.shadow("base"),
-      minHeight: 120,
-    },
-    categoryButtonPressed: {
-      backgroundColor: theme.colors.background.secondary,
-      transform: [{ scale: 0.98 }],
-      ...styling.shadow("sm"),
-    },
-    categoryButtonText: {
-      fontSize: styling.fontSize("lg"),
-      marginBottom: styling.spacing(1),
-      color: theme.colors.text.primary,
-      fontWeight: styling.fontWeight("semibold"),
-    },
-    categoryDescription: {
-      fontSize: styling.fontSize("sm"),
-      color: theme.colors.text.secondary,
-      textAlign: "center",
-      lineHeight: styling.lineHeight("relaxed"),
-    },
-    categoryIcon: {
-      marginBottom: styling.spacing(3),
-    },
-    footer: {
-      alignItems: "center",
-      paddingVertical: styling.spacing(6),
-      paddingHorizontal: styling.spacing(6),
-      borderTopWidth: 1,
-      borderTopColor: theme.colors.border.primary,
-    },
-    footerText: {
-      fontSize: styling.fontSize("sm"),
-      color: theme.colors.text.tertiary,
-      textAlign: "center",
-    },
-  });
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: theme.colors.background.secondary,
+        },
+        header: {
+          alignItems: "center",
+          paddingTop: DesignTokens.spacing[20],
+          paddingBottom: DesignTokens.spacing[8],
+          paddingHorizontal: DesignTokens.spacing[6],
+        },
+        logo: {
+          width: 200,
+          height: 80,
+          marginBottom: DesignTokens.spacing[6],
+        },
+        companyName: {
+          fontSize: DesignTokens.typography.fontSize["4xl"],
+          textAlign: "center",
+          fontWeight: DesignTokens.typography.fontWeight.bold,
+          color: theme.colors.text.primary,
+          lineHeight: DesignTokens.typography.lineHeight.tight,
+          marginBottom: DesignTokens.spacing[2],
+        },
+        tagline: {
+          fontSize: DesignTokens.typography.fontSize.lg,
+          textAlign: "center",
+          color: theme.colors.text.secondary,
+          fontWeight: DesignTokens.typography.fontWeight.medium,
+        },
+        welcomeSection: {
+          alignItems: "center",
+          paddingHorizontal: DesignTokens.spacing[6],
+          paddingBottom: DesignTokens.spacing[2],
+        },
+        welcomeText: {
+          fontSize: DesignTokens.typography.fontSize.xl,
+          textAlign: "center",
+          color: theme.colors.text.primary,
+          fontFamily: DesignTokens.typography.fontFamily.semibold,
+          marginBottom: DesignTokens.spacing[2],
+        },
+        instructionText: {
+          fontSize: DesignTokens.typography.fontSize.base,
+          textAlign: "center",
+          color: theme.colors.text.secondary,
+          lineHeight: DesignTokens.typography.lineHeight.relaxed,
+          marginTop: DesignTokens.spacing[4],
+          paddingVertical: DesignTokens.spacing[6],
+          minHeight: 80, // Ensure proper height for text visibility
+        },
+        categoriesSection: {
+          paddingHorizontal: DesignTokens.spacing[6],
+          paddingVertical: DesignTokens.spacing[6],
+          backgroundColor: theme.colors.background.primary,
+          borderRadius: DesignTokens.borderRadius.lg,
+          marginHorizontal: DesignTokens.spacing[4],
+          marginTop: DesignTokens.spacing[4],
+          marginBottom: DesignTokens.spacing[8],
+          ...DesignTokens.shadows.sm,
+        },
+        categoriesTitle: {
+          fontSize: DesignTokens.typography.fontSize.xl,
+          textAlign: "center",
+          marginBottom: DesignTokens.spacing[6],
+          color: theme.colors.text.primary,
+          fontFamily: DesignTokens.typography.fontFamily.bold,
+        },
+        categoryButtons: {
+          gap: DesignTokens.spacing[4],
+          width: "85%",
+          alignSelf: "center",
+        },
+        categoryButton: {
+          backgroundColor: theme.colors.background.card,
+          padding: DesignTokens.spacing[6],
+          borderRadius: DesignTokens.borderRadius.lg,
+          alignItems: "center",
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          ...DesignTokens.shadows.base,
+          minHeight: 120,
+        },
+        categoryButtonPressed: {
+          backgroundColor: theme.colors.background.secondary,
+          transform: [{ scale: 0.98 }],
+          ...DesignTokens.shadows.sm,
+        },
+        categoryButtonText: {
+          fontSize: DesignTokens.typography.fontSize.lg,
+          marginBottom: DesignTokens.spacing[1],
+          color: theme.colors.text.primary,
+          fontWeight: DesignTokens.typography.fontWeight.semibold,
+        },
+        categoryDescription: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          color: theme.colors.text.secondary,
+          textAlign: "center",
+          lineHeight: DesignTokens.typography.lineHeight.relaxed,
+        },
+        categoryIcon: {
+          marginBottom: DesignTokens.spacing[3],
+        },
+        footer: {
+          alignItems: "center",
+          paddingVertical: DesignTokens.spacing[6],
+          paddingHorizontal: DesignTokens.spacing[6],
+          borderTopWidth: 1,
+          borderTopColor: theme.colors.border.primary,
+        },
+        footerText: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          color: theme.colors.text.tertiary,
+          textAlign: "center",
+        },
+      }),
+    [theme]
+  );
 
   return (
     <ThemedView style={styles.container}>

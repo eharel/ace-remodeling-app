@@ -1,5 +1,6 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { styling } from "@/utils/styling";
+import { DesignTokens } from "@/themes";
+import { useMemo } from "react";
 import { StyleSheet, TextInput } from "react-native";
 
 interface ThemedInputProps {
@@ -24,27 +25,31 @@ export function ThemedInput({
   loading,
 }: ThemedInputProps) {
   const { theme } = useTheme();
-  const styles = StyleSheet.create({
-    input: {
-      // Use theme colors
-      backgroundColor: theme.colors.components.input.background,
-      borderColor: error
-        ? theme.colors.status.error
-        : theme.colors.components.input.border,
-      borderWidth: 1,
-      borderRadius: styling.borderRadius("md"),
-      paddingHorizontal: styling.spacing(4),
-      paddingVertical: styling.spacing(3),
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        input: {
+          // Use theme colors
+          backgroundColor: theme.colors.components.input.background,
+          borderColor: error
+            ? theme.colors.status.error
+            : theme.colors.components.input.border,
+          borderWidth: 1,
+          borderRadius: DesignTokens.borderRadius.md,
+          paddingHorizontal: DesignTokens.spacing[4],
+          paddingVertical: DesignTokens.spacing[3],
 
-      // Typography from design tokens
-      fontSize: styling.fontSize("base"),
-      fontFamily: styling.fontFamily("regular"),
-      color: theme.colors.text.primary,
+          // Typography from design tokens
+          fontSize: DesignTokens.typography.fontSize.base,
+          fontFamily: DesignTokens.typography.fontFamily.regular,
+          color: theme.colors.text.primary,
 
-      // States
-      opacity: disabled ? styling.interaction("disabledOpacity") : 1,
-    },
-  });
+          // States
+          opacity: disabled ? DesignTokens.interactions.disabledOpacity : 1,
+        },
+      }),
+    [theme, error, disabled]
+  );
 
   return (
     <TextInput

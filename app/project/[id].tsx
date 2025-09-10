@@ -1,13 +1,13 @@
 import { Image } from "expo-image";
 import { Stack, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FlatList, ScrollView, StyleSheet } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { mockProjects } from "@/data/mockProjects";
+import { DesignTokens } from "@/themes";
 import { Project } from "@/types";
-import { styling } from "@/utils/styling";
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -21,179 +21,183 @@ export default function ProjectDetailScreen() {
     }
   }, [id]);
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background.secondary,
-    },
-    errorState: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      padding: styling.spacing(10),
-    },
-    errorText: {
-      fontSize: styling.fontSize("lg"),
-      opacity: 0.6,
-    },
-    heroImage: {
-      width: "100%",
-      height: 300,
-    },
-    header: {
-      padding: styling.spacing(5),
-      backgroundColor: theme.colors.background.card,
-      marginBottom: styling.spacing(4),
-      borderRadius: styling.borderRadius("lg"),
-      borderWidth: 1,
-      borderColor: theme.colors.border.primary,
-      ...styling.shadow("sm"),
-    },
-    projectName: {
-      fontSize: styling.fontSize("3xl"),
-      marginBottom: styling.spacing(3),
-      lineHeight: 34,
-    },
-    projectDescription: {
-      fontSize: styling.fontSize("base"),
-      lineHeight: 22,
-      opacity: 0.7,
-      marginBottom: styling.spacing(5),
-    },
-    metaGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: styling.spacing(4),
-    },
-    metaItem: {
-      flex: 1,
-      minWidth: "45%",
-    },
-    metaLabel: {
-      fontSize: styling.fontSize("xs"),
-      opacity: 0.6,
-      marginBottom: styling.spacing(1),
-      textTransform: "uppercase",
-      fontWeight: "600",
-    },
-    metaValue: {
-      fontSize: styling.fontSize("base"),
-      fontWeight: "600",
-    },
-    section: {
-      backgroundColor: theme.colors.background.card,
-      marginBottom: styling.spacing(4),
-      padding: styling.spacing(5),
-      borderRadius: styling.borderRadius("lg"),
-      borderWidth: 1,
-      borderColor: theme.colors.border.primary,
-      ...styling.shadow("sm"),
-    },
-    sectionTitle: {
-      fontSize: styling.fontSize("xl"),
-      marginBottom: styling.spacing(4),
-    },
-    picturesList: {
-      paddingRight: styling.spacing(5),
-    },
-    pictureContainer: {
-      width: 280,
-      marginRight: styling.spacing(4),
-      backgroundColor: theme.colors.background.secondary,
-      borderRadius: styling.borderRadius("lg"),
-      overflow: "hidden",
-      borderWidth: 1,
-      borderColor: theme.colors.border.primary,
-    },
-    picture: {
-      width: "100%",
-      height: 200,
-    },
-    pictureInfo: {
-      padding: styling.spacing(4),
-    },
-    pictureType: {
-      fontSize: styling.fontSize("sm"),
-      fontWeight: "600",
-      marginBottom: styling.spacing(1),
-      textTransform: "capitalize",
-    },
-    pictureDescription: {
-      fontSize: styling.fontSize("sm"),
-      opacity: 0.7,
-    },
-    documentsList: {
-      paddingRight: styling.spacing(5),
-    },
-    documentContainer: {
-      width: 250,
-      marginRight: styling.spacing(4),
-      padding: styling.spacing(4),
-      backgroundColor: theme.colors.background.secondary,
-      borderRadius: styling.borderRadius("lg"),
-      borderLeftWidth: 4,
-      borderLeftColor: theme.colors.interactive.primary,
-      borderWidth: 1,
-      borderColor: theme.colors.border.primary,
-    },
-    documentName: {
-      fontSize: styling.fontSize("base"),
-      fontWeight: "600",
-      marginBottom: styling.spacing(2),
-    },
-    documentType: {
-      fontSize: styling.fontSize("xs"),
-      opacity: 0.6,
-      textTransform: "capitalize",
-      marginBottom: styling.spacing(2),
-    },
-    documentDescription: {
-      fontSize: styling.fontSize("sm"),
-      opacity: 0.7,
-    },
-    logsList: {
-      paddingRight: styling.spacing(5),
-    },
-    logContainer: {
-      width: 280,
-      marginRight: styling.spacing(4),
-      padding: styling.spacing(4),
-      backgroundColor: theme.colors.background.secondary,
-      borderRadius: styling.borderRadius("lg"),
-      borderWidth: 1,
-      borderColor: theme.colors.border.primary,
-    },
-    logDate: {
-      fontSize: styling.fontSize("xs"),
-      opacity: 0.6,
-      marginBottom: styling.spacing(1),
-    },
-    logDescription: {
-      fontSize: styling.fontSize("sm"),
-      lineHeight: 20,
-    },
-    clientInfo: {
-      backgroundColor: theme.colors.background.secondary,
-      padding: styling.spacing(4),
-      borderRadius: styling.borderRadius("lg"),
-      borderWidth: 1,
-      borderColor: theme.colors.border.primary,
-    },
-    clientName: {
-      fontSize: styling.fontSize("lg"),
-      fontWeight: "600",
-      marginBottom: styling.spacing(2),
-    },
-    clientDetails: {
-      fontSize: styling.fontSize("sm"),
-      opacity: 0.7,
-      lineHeight: 20,
-    },
-    clientContact: {
-      fontSize: styling.fontSize("sm"),
-      opacity: 0.7,
-    },
-  });
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: theme.colors.background.secondary,
+        },
+        errorState: {
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          padding: DesignTokens.spacing[10],
+        },
+        errorText: {
+          fontSize: DesignTokens.typography.fontSize.lg,
+          opacity: 0.6,
+        },
+        heroImage: {
+          width: "100%",
+          height: 300,
+        },
+        header: {
+          padding: DesignTokens.spacing[5],
+          backgroundColor: theme.colors.background.card,
+          marginBottom: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.lg,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          ...DesignTokens.shadows.sm,
+        },
+        projectName: {
+          fontSize: DesignTokens.typography.fontSize["3xl"],
+          marginBottom: DesignTokens.spacing[3],
+          lineHeight: 34,
+        },
+        projectDescription: {
+          fontSize: DesignTokens.typography.fontSize.base,
+          lineHeight: 22,
+          opacity: 0.7,
+          marginBottom: DesignTokens.spacing[5],
+        },
+        metaGrid: {
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: DesignTokens.spacing[4],
+        },
+        metaItem: {
+          flex: 1,
+          minWidth: "45%",
+        },
+        metaLabel: {
+          fontSize: DesignTokens.typography.fontSize.xs,
+          opacity: 0.6,
+          marginBottom: DesignTokens.spacing[1],
+          textTransform: "uppercase",
+          fontWeight: "600",
+        },
+        metaValue: {
+          fontSize: DesignTokens.typography.fontSize.base,
+          fontWeight: "600",
+        },
+        section: {
+          backgroundColor: theme.colors.background.card,
+          marginBottom: DesignTokens.spacing[4],
+          padding: DesignTokens.spacing[5],
+          borderRadius: DesignTokens.borderRadius.lg,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          ...DesignTokens.shadows.sm,
+        },
+        sectionTitle: {
+          fontSize: DesignTokens.typography.fontSize.xl,
+          marginBottom: DesignTokens.spacing[4],
+        },
+        picturesList: {
+          paddingRight: DesignTokens.spacing[5],
+        },
+        pictureContainer: {
+          width: 280,
+          marginRight: DesignTokens.spacing[4],
+          backgroundColor: theme.colors.background.secondary,
+          borderRadius: DesignTokens.borderRadius.lg,
+          overflow: "hidden",
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+        },
+        picture: {
+          width: "100%",
+          height: 200,
+        },
+        pictureInfo: {
+          padding: DesignTokens.spacing[4],
+        },
+        pictureType: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          fontWeight: "600",
+          marginBottom: DesignTokens.spacing[1],
+          textTransform: "capitalize",
+        },
+        pictureDescription: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          opacity: 0.7,
+        },
+        documentsList: {
+          paddingRight: DesignTokens.spacing[5],
+        },
+        documentContainer: {
+          width: 250,
+          marginRight: DesignTokens.spacing[4],
+          padding: DesignTokens.spacing[4],
+          backgroundColor: theme.colors.background.secondary,
+          borderRadius: DesignTokens.borderRadius.lg,
+          borderLeftWidth: 4,
+          borderLeftColor: theme.colors.interactive.primary,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+        },
+        documentName: {
+          fontSize: DesignTokens.typography.fontSize.base,
+          fontWeight: "600",
+          marginBottom: DesignTokens.spacing[2],
+        },
+        documentType: {
+          fontSize: DesignTokens.typography.fontSize.xs,
+          opacity: 0.6,
+          textTransform: "capitalize",
+          marginBottom: DesignTokens.spacing[2],
+        },
+        documentDescription: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          opacity: 0.7,
+        },
+        logsList: {
+          paddingRight: DesignTokens.spacing[5],
+        },
+        logContainer: {
+          width: 280,
+          marginRight: DesignTokens.spacing[4],
+          padding: DesignTokens.spacing[4],
+          backgroundColor: theme.colors.background.secondary,
+          borderRadius: DesignTokens.borderRadius.lg,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+        },
+        logDate: {
+          fontSize: DesignTokens.typography.fontSize.xs,
+          opacity: 0.6,
+          marginBottom: DesignTokens.spacing[1],
+        },
+        logDescription: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          lineHeight: 20,
+        },
+        clientInfo: {
+          backgroundColor: theme.colors.background.secondary,
+          padding: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.lg,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+        },
+        clientName: {
+          fontSize: DesignTokens.typography.fontSize.lg,
+          fontWeight: "600",
+          marginBottom: DesignTokens.spacing[2],
+        },
+        clientDetails: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          opacity: 0.7,
+          lineHeight: 20,
+        },
+        clientContact: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          opacity: 0.7,
+        },
+      }),
+    [theme]
+  );
 
   if (!project) {
     return (

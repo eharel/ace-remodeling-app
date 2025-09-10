@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { ChecklistModal, useChecklist } from "@/components/checklist";
 import { useTheme } from "@/contexts/ThemeContext";
-import { styling } from "@/utils/styling";
+import { DesignTokens } from "@/themes";
 
 /**
  * Floating Action Button component for the meeting checklist
@@ -33,7 +33,7 @@ export function FloatingChecklistButton() {
           },
         ]}
         onPress={openModal}
-        activeOpacity={styling.interaction("activeOpacity")}
+        activeOpacity={DesignTokens.interactions.activeOpacity}
         accessibilityRole="button"
         accessibilityLabel="Open meeting checklist"
         accessibilityHint="Opens a modal with meeting checklist items"

@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, StyleSheet, TouchableOpacity } from "react-native";
 
 import { useTheme } from "@/contexts/ThemeContext";
-import { styling } from "@/utils/styling";
+import { DesignTokens } from "@/themes";
 import { ChecklistBody } from "./ChecklistBody";
 import { ChecklistHeader } from "./ChecklistHeader";
 
@@ -87,14 +87,14 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
-    padding: styling.spacing(5), // 20px padding
+    padding: DesignTokens.spacing[5], // 20px padding
   },
   modalContent: {
     width: "100%",
     maxWidth: 500,
     maxHeight: "70%",
     minHeight: 500,
-    borderRadius: styling.borderRadius("md"), // 12px
+    borderRadius: DesignTokens.borderRadius.md, // 12px
     borderWidth: 1,
     overflow: "hidden",
   },

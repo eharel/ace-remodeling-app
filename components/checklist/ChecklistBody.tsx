@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 
 import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
-import { styling } from "@/utils/styling";
+import { DesignTokens } from "@/themes";
 import { ChecklistItem as ChecklistItemComponent } from "./ChecklistItem";
 
 interface ChecklistBodyProps {
@@ -47,7 +47,7 @@ export function ChecklistBody({
 
 const styles = StyleSheet.create({
   body: {
-    padding: styling.spacing(5), // 20px padding
+    padding: DesignTokens.spacing[5], // 20px padding
     flex: 1,
   },
   checklistContainer: {

@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 import { useTheme } from "@/contexts/ThemeContext";
-import { styling } from "@/utils/styling";
+import { DesignTokens } from "@/themes";
 
 /**
  * Props for the ChecklistItem component
@@ -46,7 +46,7 @@ export function ChecklistItem({
     <TouchableOpacity
       style={styles.checklistItem}
       onPress={onPress}
-      activeOpacity={styling.interaction("activeOpacity")}
+      activeOpacity={DesignTokens.interactions.activeOpacity}
       accessibilityRole="checkbox"
       accessibilityLabel={accessibilityLabel || text}
       accessibilityHint={accessibilityHint}
@@ -68,7 +68,7 @@ export function ChecklistItem({
           {
             color: theme.colors.text.primary,
             textDecorationLine: isChecked ? "line-through" : "none",
-            opacity: isChecked ? styling.interaction("disabledOpacity") : 1,
+            opacity: isChecked ? DesignTokens.interactions.disabledOpacity : 1,
           },
         ]}
         accessibilityElementsHidden={true}
@@ -83,12 +83,12 @@ const styles = StyleSheet.create({
   checklistItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: styling.spacing(3), // 12px
-    paddingHorizontal: styling.spacing(1), // 4px
+    paddingVertical: DesignTokens.spacing[3], // 12px
+    paddingHorizontal: DesignTokens.spacing[1], // 4px
   },
   checklistText: {
-    fontSize: styling.fontSize("base"),
-    marginLeft: styling.spacing(3),
+    fontSize: DesignTokens.typography.fontSize.base,
+    marginLeft: DesignTokens.spacing[3],
     flex: 1,
   },
 });

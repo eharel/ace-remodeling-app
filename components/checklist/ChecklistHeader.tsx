@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useTheme } from "@/contexts/ThemeContext";
-import { styling } from "@/utils/styling";
+import { DesignTokens } from "@/themes";
 
 interface ChecklistHeaderProps {
   /** Progress information for the checklist */
@@ -81,27 +81,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: styling.spacing(5), // 20px padding
+    padding: DesignTokens.spacing[5], // 20px padding
     borderBottomWidth: 1,
   },
   headerContent: {
     flex: 1,
   },
   title: {
-    fontSize: styling.fontSize("xl"),
-    fontWeight: "600",
-    marginBottom: styling.spacing(1),
+    fontSize: DesignTokens.typography.fontSize.xl,
+    fontWeight: DesignTokens.typography.fontWeight.semibold,
+    marginBottom: DesignTokens.spacing[1],
   },
   progressText: {
-    fontSize: styling.fontSize("sm"),
-    fontWeight: "500",
+    fontSize: DesignTokens.typography.fontSize.sm,
+    fontWeight: DesignTokens.typography.fontWeight.medium,
   },
   headerActions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: styling.spacing(3),
+    gap: DesignTokens.spacing[3],
   },
   resetButton: {
-    padding: styling.spacing(1),
+    padding: DesignTokens.spacing[1],
   },
 });
