@@ -42,6 +42,10 @@ interface ThemedInputProps {
   error?: string;
   disabled?: boolean;
   loading?: boolean;
+
+  // Accessibility props
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 export function ThemedInput({
@@ -51,6 +55,8 @@ export function ThemedInput({
   error,
   disabled,
   loading,
+  accessibilityLabel,
+  accessibilityHint,
 }: ThemedInputProps) {
   const { theme } = useTheme();
   const [inputValue, setInputValue] = useState(value);
@@ -96,6 +102,9 @@ export function ThemedInput({
         ]}
         placeholderTextColor={theme.colors.components.input.placeholder}
         editable={!disabled}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
+        accessibilityRole="search"
       />
       {inputValue.length > 0 && (
         <TouchableOpacity
