@@ -1,8 +1,16 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { FlatList, ScrollView, StyleSheet } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 
+import { ImageGalleryModal } from "@/components/ImageGalleryModal";
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { mockProjects } from "@/data/mockProjects";
@@ -12,6 +20,8 @@ import { Project } from "@/types";
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [project, setProject] = useState<Project | null>(null);
+  const [galleryVisible, setGalleryVisible] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -20,6 +30,15 @@ export default function ProjectDetailScreen() {
       setProject(foundProject || null);
     }
   }, [id]);
+
+  const openGallery = (index: number) => {
+    setSelectedImageIndex(index);
+    setGalleryVisible(true);
+  };
+
+  const closeGallery = () => {
+    setGalleryVisible(false);
+  };
 
   const styles = useMemo(
     () =>
@@ -110,6 +129,28 @@ export default function ProjectDetailScreen() {
         picture: {
           width: "100%",
           height: 200,
+        },
+        pictureOverlay: {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.3)",
+          justifyContent: "center",
+          alignItems: "center",
+          opacity: 0,
+        },
+        pictureOverlayVisible: {
+          opacity: 1,
+        },
+        zoomIcon: {
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          borderRadius: 20,
+          width: 40,
+          height: 40,
+          justifyContent: "center",
+          alignItems: "center",
         },
         pictureInfo: {
           padding: DesignTokens.spacing[4],
@@ -217,13 +258,20 @@ export default function ProjectDetailScreen() {
     );
   }
 
-  const renderPicture = ({ item }: { item: any }) => (
+  const renderPicture = ({ item, index }: { item: any; index: number }) => (
     <ThemedView style={styles.pictureContainer}>
-      <Image
-        source={{ uri: item.url }}
-        style={styles.picture}
-        contentFit="cover"
-      />
+      <Pressable onPress={() => openGallery(index)}>
+        <Image
+          source={{ uri: item.url }}
+          style={styles.picture}
+          contentFit="cover"
+        />
+        <View style={styles.pictureOverlay}>
+          <View style={styles.zoomIcon}>
+            <MaterialIcons name="zoom-in" size={20} color="#333" />
+          </View>
+        </View>
+      </Pressable>
       <ThemedView style={styles.pictureInfo}>
         <ThemedText style={styles.pictureType}>{item.type}</ThemedText>
         <ThemedText style={styles.pictureDescription}>
@@ -379,6 +427,16 @@ export default function ProjectDetailScreen() {
           </ThemedView>
         )}
       </ScrollView>
+
+      {/* Image Gallery Modal */}
+      {project && project.pictures && project.pictures.length > 0 && (
+        <ImageGalleryModal
+          visible={galleryVisible}
+          images={project.pictures}
+          initialIndex={selectedImageIndex}
+          onClose={closeGallery}
+        />
+      )}
     </>
   );
 }

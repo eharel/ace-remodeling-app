@@ -149,10 +149,12 @@ export function ProjectGallery({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         numColumns={columnCount}
-        columnWrapperStyle={[
-          styles.row,
-          safeProjects.length < columnCount && styles.rowCentered,
-        ]}
+        {...(columnCount > 1 && {
+          columnWrapperStyle: [
+            styles.row,
+            safeProjects.length < columnCount && styles.rowCentered,
+          ],
+        })}
         key={columnCount} // Force re-render when column count changes
         removeClippedSubviews={true} // Performance optimization for large lists
         maxToRenderPerBatch={10} // Render 10 items per batch
