@@ -1,7 +1,35 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesignTokens } from "@/themes";
-import { useMemo } from "react";
-import { StyleSheet, TextInput } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useEffect, useMemo, useState } from "react";
+import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+
+// Static styles that don't depend on theme or props
+const staticStyles = StyleSheet.create({
+  container: {
+    position: "relative",
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: DesignTokens.borderRadius.md,
+    paddingHorizontal: DesignTokens.spacing[4],
+    paddingVertical: DesignTokens.spacing[3],
+    paddingRight: DesignTokens.spacing[4],
+    fontSize: DesignTokens.typography.fontSize.base,
+    fontFamily: DesignTokens.typography.fontFamily.regular,
+  },
+  inputWithClearButton: {
+    paddingRight: 48, // 20px icon + 8px padding + 12px margin + 8px extra
+  },
+  clearButton: {
+    position: "absolute",
+    right: DesignTokens.spacing[3], // 12px from edge
+    top: "50%",
+    transform: [{ translateY: -18 }], // Center the button (20px icon + 16px padding = 36px total, so -18px)
+    padding: DesignTokens.spacing[2], // 8px padding for better touch target
+    borderRadius: DesignTokens.borderRadius.sm, // Rounded touch area
+  },
+});
 
 interface ThemedInputProps {
   placeholder: string;
@@ -25,40 +53,65 @@ export function ThemedInput({
   loading,
 }: ThemedInputProps) {
   const { theme } = useTheme();
-  const styles = useMemo(
-    () =>
-      StyleSheet.create({
-        input: {
-          // Use theme colors
-          backgroundColor: theme.colors.components.input.background,
-          borderColor: error
-            ? theme.colors.status.error
-            : theme.colors.components.input.border,
-          borderWidth: 1,
-          borderRadius: DesignTokens.borderRadius.md,
-          paddingHorizontal: DesignTokens.spacing[4],
-          paddingVertical: DesignTokens.spacing[3],
+  const [inputValue, setInputValue] = useState(value);
 
-          // Typography from design tokens
-          fontSize: DesignTokens.typography.fontSize.base,
-          fontFamily: DesignTokens.typography.fontFamily.regular,
-          color: theme.colors.text.primary,
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
 
-          // States
-          opacity: disabled ? DesignTokens.interactions.disabledOpacity : 1,
-        },
-      }),
+  // Dynamic styles that depend on theme or props
+  const dynamicStyles = useMemo(
+    () => ({
+      input: {
+        backgroundColor: theme.colors.components.input.background,
+        borderColor: error
+          ? theme.colors.status.error
+          : theme.colors.components.input.border,
+        color: theme.colors.text.primary,
+        opacity: disabled ? DesignTokens.interactions.disabledOpacity : 1,
+      },
+    }),
     [theme, error, disabled]
   );
 
+  const handleChangeText = (text: string) => {
+    setInputValue(text);
+    onChangeText(text);
+  };
+  const handleClearInput = () => {
+    setInputValue("");
+    onChangeText("");
+  };
+
   return (
-    <TextInput
-      placeholder={placeholder}
-      value={value}
-      onChangeText={onChangeText}
-      style={styles.input}
-      placeholderTextColor={theme.colors.components.input.placeholder}
-      editable={!disabled}
-    />
+    <View style={staticStyles.container}>
+      <TextInput
+        placeholder={placeholder}
+        value={inputValue}
+        onChangeText={handleChangeText}
+        style={[
+          staticStyles.input,
+          dynamicStyles.input,
+          inputValue.length > 0 && staticStyles.inputWithClearButton,
+        ]}
+        placeholderTextColor={theme.colors.components.input.placeholder}
+        editable={!disabled}
+      />
+      {inputValue.length > 0 && (
+        <TouchableOpacity
+          style={staticStyles.clearButton}
+          onPress={handleClearInput}
+          accessibilityLabel="Clear input"
+          accessibilityRole="button"
+          activeOpacity={DesignTokens.interactions.activeOpacity}
+        >
+          <MaterialIcons
+            name="close"
+            size={20}
+            color={theme.colors.text.secondary}
+          />
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
