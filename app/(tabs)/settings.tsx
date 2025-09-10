@@ -2,6 +2,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
+import { ErrorTestComponent } from "@/components/dev/ErrorTestComponent";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemedText, ThemedView } from "@/components/themed";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -202,6 +204,17 @@ export default function SettingsScreen() {
             description="Manage offline capabilities"
             disabled={true}
           />
+        </View>
+
+        {/* Development Section */}
+        <View style={styles.section}>
+          <ThemedText variant="subtitle" style={styles.sectionTitle}>
+            Development
+          </ThemedText>
+
+          <ErrorBoundary>
+            <ErrorTestComponent />
+          </ErrorBoundary>
         </View>
 
         {/* About Section */}

@@ -8,23 +8,36 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
+// Disable development error overlay to test ErrorBoundary
+import { LogBox } from "react-native";
+
 import { FloatingChecklistButton } from "@/components/checklist";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+LogBox.ignoreAllLogs(true);
+
+// Disable error overlay in development
+if (__DEV__) {
+  // @ts-ignore
+  global.ErrorUtils?.setGlobalHandler(() => {});
+}
 
 // Navigation component that can use theme context
 function Navigation() {
   const { currentTheme } = useTheme();
 
   return (
-    <NavigationThemeProvider
-      value={currentTheme === "dark" ? DarkTheme : DefaultTheme}
-    >
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </NavigationThemeProvider>
+    <ErrorBoundary>
+      <NavigationThemeProvider
+        value={currentTheme === "dark" ? DarkTheme : DefaultTheme}
+      >
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </NavigationThemeProvider>
+    </ErrorBoundary>
   );
 }
 
