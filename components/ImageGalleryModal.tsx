@@ -1,8 +1,15 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
-import React, { useEffect, useMemo, useState } from "react";
-import { Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  AccessibilityInfo,
+  Dimensions,
+  Modal,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
@@ -66,10 +73,19 @@ const Thumbnail = React.memo<{
   return (
     <Pressable
       onPress={handlePress}
-      accessibilityLabel={`View image ${index + 1}`}
-      accessibilityHint="Double tap to view this image"
-      accessibilityRole="button"
+      accessibilityLabel={`View image ${index + 1}${
+        image.description ? `: ${image.type}` : ""
+      }`}
+      accessibilityHint={
+        isActive ? "Currently selected image" : "Double tap to view this image"
+      }
+      accessibilityRole="tab"
       accessibilityState={{ selected: isActive }}
+      style={[
+        styles.thumbnail,
+        isActive && styles.thumbnailActive,
+        { minWidth: 44, minHeight: 44 }, // Ensure minimum touch target size
+      ]}
     >
       <Image
         source={{ uri: image.thumbnailUrl || image.url }}
@@ -88,6 +104,8 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
     const { theme } = useTheme();
     const insets = useSafeAreaInsets();
     const [currentIndex, setCurrentIndex] = useState(initialIndex);
+    const modalRef = useRef<View>(null);
+    const closeButtonRef = useRef<View>(null);
 
     // Single animated value for the entire carousel
     const translateX = useSharedValue(0);
@@ -108,6 +126,38 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
     }, [initialIndex, images.length, translateX]);
 
     const currentImage = images[currentIndex];
+
+    // Focus management and accessibility announcements
+    useEffect(() => {
+      if (visible) {
+        // Focus the modal when it opens
+        setTimeout(() => {
+          modalRef.current?.focus();
+        }, 100);
+
+        // Announce modal opening
+        AccessibilityInfo.announceForAccessibility(
+          `Image gallery opened. Showing image ${currentIndex + 1} of ${
+            images.length
+          }. Swipe left or right to navigate, or tap thumbnails below.`
+        );
+      }
+    }, [visible, currentIndex, images.length]);
+
+    // Announce image changes for screen readers
+    useEffect(() => {
+      if (visible && currentImage) {
+        const announcement = currentImage.description
+          ? `Image ${currentIndex + 1} of ${images.length}: ${
+              currentImage.type
+            }. ${currentImage.description}`
+          : `Image ${currentIndex + 1} of ${images.length}: ${
+              currentImage.type
+            }`;
+
+        AccessibilityInfo.announceForAccessibility(announcement);
+      }
+    }, [currentIndex, visible, currentImage, images.length]);
 
     const styles = useMemo(
       () =>
@@ -223,6 +273,9 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
       setCurrentIndex(newIndex);
     }, []);
 
+    // Note: Keyboard navigation would require a different approach in React Native
+    // For now, we rely on gesture navigation and touch interactions
+
     const handleGestureEvent = (event: any) => {
       "worklet";
       const velocity = event.velocityX;
@@ -307,11 +360,28 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
         transparent
         animationType="fade"
         onRequestClose={onClose}
+        accessibilityViewIsModal={true}
+        accessibilityLabel="Image Gallery"
+        accessibilityRole="none"
+        accessibilityHint="Image gallery with swipe navigation and thumbnail controls"
       >
-        <View style={styles.modal}>
+        <View
+          style={styles.modal}
+          ref={modalRef}
+          accessible={true}
+          accessibilityRole="none"
+          accessibilityLabel="Image Gallery"
+        >
           {/* Header */}
           <View style={styles.header}>
-            <Pressable style={styles.closeButton} onPress={onClose}>
+            <Pressable
+              style={styles.closeButton}
+              onPress={onClose}
+              ref={closeButtonRef}
+              accessibilityLabel="Close image gallery"
+              accessibilityHint="Double tap to close the image gallery"
+              accessibilityRole="button"
+            >
               <MaterialIcons
                 name="close"
                 size={DesignTokens.typography.fontSize.lg}
@@ -319,7 +389,13 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
               />
             </Pressable>
 
-            <View style={styles.imageCounter}>
+            <View
+              style={styles.imageCounter}
+              accessibilityLabel={`Image ${currentIndex + 1} of ${
+                images.length
+              }`}
+              accessibilityRole="text"
+            >
               <ThemedText
                 style={{
                   color: theme.colors.text.inverse,
@@ -340,14 +416,41 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
                 activeOffsetX={[-10, 10]}
                 failOffsetY={[-20, 20]}
               >
-                <Animated.View style={[styles.carousel, carouselStyle]}>
-                  {visibleImages.map((image) => (
-                    <View key={image.id} style={styles.imageContainer}>
+                <Animated.View
+                  style={[styles.carousel, carouselStyle]}
+                  accessible={true}
+                  accessibilityLabel={`Image carousel. Swipe left or right to navigate. Currently showing image ${
+                    currentIndex + 1
+                  } of ${images.length}`}
+                  accessibilityRole="scrollbar"
+                >
+                  {visibleImages.map((image, index) => (
+                    <View
+                      key={image.id}
+                      style={styles.imageContainer}
+                      accessible={index === currentIndex}
+                      accessibilityLabel={
+                        image.description
+                          ? `Image ${index + 1} of ${images.length}: ${
+                              image.type
+                            }. ${image.description}`
+                          : `Image ${index + 1} of ${images.length}: ${
+                              image.type
+                            }`
+                      }
+                      accessibilityRole="image"
+                      accessibilityHint={
+                        index === currentIndex
+                          ? "Currently displayed image"
+                          : "Tap to view this image"
+                      }
+                    >
                       <Image
                         source={{ uri: image.url }}
                         style={styles.image}
                         contentFit="contain"
                         transition={200}
+                        accessibilityIgnoresInvertColors={true}
                       />
                     </View>
                   ))}
@@ -357,9 +460,23 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
           </View>
 
           {/* Footer */}
-          <View style={styles.footer}>
+          <View
+            style={styles.footer}
+            accessible={true}
+            accessibilityLabel="Image information and navigation controls"
+            accessibilityRole="toolbar"
+          >
             {/* Image Info */}
-            <View style={styles.imageInfo}>
+            <View
+              style={styles.imageInfo}
+              accessible={true}
+              accessibilityLabel={
+                currentImage.description
+                  ? `Image type: ${currentImage.type}. Description: ${currentImage.description}`
+                  : `Image type: ${currentImage.type}`
+              }
+              accessibilityRole="text"
+            >
               <ThemedText style={styles.imageType}>
                 {currentImage.type}
               </ThemedText>
@@ -371,7 +488,12 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
             </View>
 
             {/* Thumbnails */}
-            <View style={styles.thumbnailContainer}>
+            <View
+              style={styles.thumbnailContainer}
+              accessible={true}
+              accessibilityLabel="Image thumbnails for navigation"
+              accessibilityRole="tablist"
+            >
               {images
                 .slice(
                   Math.max(0, currentIndex - 2),
