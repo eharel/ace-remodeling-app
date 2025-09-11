@@ -10,6 +10,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -32,6 +33,7 @@ export function ImageGalleryModal({
   onClose,
 }: ImageGalleryModalProps) {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
 
   // Single animated value for the entire carousel
@@ -75,7 +77,7 @@ export function ImageGalleryModal({
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingTop: DesignTokens.spacing[12] + DesignTokens.spacing[2], // 50px equivalent
+          paddingTop: insets.top + DesignTokens.spacing[4],
           paddingHorizontal: DesignTokens.spacing[4],
           paddingBottom: DesignTokens.spacing[4],
         },
@@ -120,6 +122,7 @@ export function ImageGalleryModal({
           right: 0,
           backgroundColor: theme.colors.background.overlay,
           padding: DesignTokens.spacing[4],
+          paddingBottom: insets.bottom + DesignTokens.spacing[4],
         },
         imageInfo: {
           alignItems: "center",
@@ -158,7 +161,7 @@ export function ImageGalleryModal({
           borderColor: theme.colors.interactive.primary,
         },
       }),
-    [theme]
+    [theme, insets]
   );
 
   const goToImage = (index: number) => {
