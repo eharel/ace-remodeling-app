@@ -35,9 +35,8 @@ export function ImageGalleryModal({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isSwipeActive, setIsSwipeActive] = useState(false);
 
-  // Animated values
+  // Single animated value for the entire carousel
   const translateX = useSharedValue(0);
-  const opacity = useSharedValue(1);
 
   // Update currentIndex when initialIndex changes
   useEffect(() => {
@@ -46,13 +45,13 @@ export function ImageGalleryModal({
     );
     if (initialIndex >= 0 && initialIndex < images.length) {
       setCurrentIndex(initialIndex);
-      translateX.value = 0;
-      opacity.value = 1;
+      translateX.value = -initialIndex * screenWidth;
     } else {
       console.log(`⚠️ Invalid initialIndex: ${initialIndex}, setting to 0`);
       setCurrentIndex(0);
+      translateX.value = 0;
     }
-  }, [initialIndex, images.length, translateX, opacity]);
+  }, [initialIndex, images.length, translateX]);
 
   const currentImage = images[currentIndex];
 
@@ -95,35 +94,25 @@ export function ImageGalleryModal({
           paddingVertical: DesignTokens.spacing[2],
           borderRadius: DesignTokens.borderRadius.md,
         },
-        imageContainer: {
+        carouselContainer: {
           width: screenWidth,
           height: screenHeight * 0.7,
+          overflow: "hidden",
+        },
+        carousel: {
+          flexDirection: "row",
+          height: "100%",
+        },
+        imageContainer: {
+          width: screenWidth,
+          height: "100%",
           justifyContent: "center",
           alignItems: "center",
+          paddingHorizontal: 10, // Add 10px spacing on each side
         },
         image: {
           width: "100%",
           height: "100%",
-        },
-        imageContainerActive: {
-          opacity: 0.8,
-        },
-        swipeIndicator: {
-          position: "absolute",
-          top: "50%",
-          transform: [{ translateY: -20 }],
-          backgroundColor: "rgba(255, 255, 255, 0.3)",
-          borderRadius: 20,
-          width: 40,
-          height: 40,
-          justifyContent: "center",
-          alignItems: "center",
-        },
-        swipeIndicatorLeft: {
-          left: 20,
-        },
-        swipeIndicatorRight: {
-          right: 20,
         },
         footer: {
           position: "absolute",
@@ -150,23 +139,6 @@ export function ImageGalleryModal({
           textAlign: "center",
           lineHeight: 22,
         },
-        navigationContainer: {
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        },
-        navButton: {
-          backgroundColor: "rgba(255, 255, 255, 0.2)",
-          borderRadius: 25,
-          width: 50,
-          height: 50,
-          justifyContent: "center",
-          alignItems: "center",
-        },
-        navButtonDisabled: {
-          backgroundColor: "rgba(255, 255, 255, 0.1)",
-          opacity: 0.5,
-        },
         thumbnailContainer: {
           flexDirection: "row",
           justifyContent: "center",
@@ -188,95 +160,71 @@ export function ImageGalleryModal({
     [theme]
   );
 
-  const goToPrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
-
-  const goToNext = () => {
-    if (currentIndex < images.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
-  };
-
   const goToImage = (index: number) => {
+    const targetX = -index * screenWidth;
     setCurrentIndex(index);
+    translateX.value = withSpring(targetX, {
+      damping: 20,
+      stiffness: 300,
+    });
   };
 
-  const goToPreviousAnimated = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      translateX.value = 0;
-      opacity.value = 1;
-    }
-  };
-
-  const goToNextAnimated = () => {
-    if (currentIndex < images.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      translateX.value = 0;
-      opacity.value = 1;
-    }
+  const updateCurrentIndex = (newIndex: number) => {
+    setCurrentIndex(newIndex);
   };
 
   const animatedGestureHandler = useAnimatedGestureHandler({
-    onStart: () => {
+    onStart: (_, context: { startX: number }) => {
       runOnJS(setIsSwipeActive)(true);
+      // Store the starting position
+      context.startX = translateX.value;
     },
-    onActive: (event) => {
-      translateX.value = event.translationX;
-      // Reduce opacity as user swipes further
-      opacity.value = Math.max(0.3, 1 - Math.abs(event.translationX) / 200);
+    onActive: (event, context: { startX: number }) => {
+      // Move the carousel based on gesture
+      translateX.value = context.startX + event.translationX;
     },
     onEnd: (event) => {
-      const swipeThreshold = 50;
+      const swipeThreshold = screenWidth * 0.2; // 20% of screen width
       const velocity = event.velocityX;
+      const translation = event.translationX;
 
-      if (event.translationX > swipeThreshold || velocity > 500) {
+      // Calculate which image we should snap to
+      let targetIndex = currentIndex;
+
+      if (translation > swipeThreshold || velocity > 500) {
         // Swipe right - go to previous image
         if (currentIndex > 0) {
-          translateX.value = withSpring(screenWidth, {
-            damping: 20,
-            stiffness: 300,
-          });
-          opacity.value = withSpring(0, { damping: 20, stiffness: 300 }, () => {
-            runOnJS(goToPreviousAnimated)();
-          });
-        } else {
-          // Bounce back if at first image
-          translateX.value = withSpring(0, { damping: 15, stiffness: 200 });
-          opacity.value = withSpring(1, { damping: 15, stiffness: 200 });
+          targetIndex = currentIndex - 1;
         }
-      } else if (event.translationX < -swipeThreshold || velocity < -500) {
+      } else if (translation < -swipeThreshold || velocity < -500) {
         // Swipe left - go to next image
         if (currentIndex < images.length - 1) {
-          translateX.value = withSpring(-screenWidth, {
-            damping: 20,
-            stiffness: 300,
-          });
-          opacity.value = withSpring(0, { damping: 20, stiffness: 300 }, () => {
-            runOnJS(goToNextAnimated)();
-          });
-        } else {
-          // Bounce back if at last image
-          translateX.value = withSpring(0, { damping: 15, stiffness: 200 });
-          opacity.value = withSpring(1, { damping: 15, stiffness: 200 });
+          targetIndex = currentIndex + 1;
         }
-      } else {
-        // Return to center if swipe wasn't far enough
-        translateX.value = withSpring(0, { damping: 15, stiffness: 200 });
-        opacity.value = withSpring(1, { damping: 15, stiffness: 200 });
       }
+
+      // Animate to the target position
+      const targetX = -targetIndex * screenWidth;
+      translateX.value = withSpring(
+        targetX,
+        {
+          damping: 20,
+          stiffness: 300,
+        },
+        () => {
+          if (targetIndex !== currentIndex) {
+            runOnJS(updateCurrentIndex)(targetIndex);
+          }
+        }
+      );
 
       runOnJS(setIsSwipeActive)(false);
     },
   });
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const carouselStyle = useAnimatedStyle(() => {
     return {
       transform: [{ translateX: translateX.value }],
-      opacity: opacity.value,
     };
   });
 
@@ -290,6 +238,15 @@ export function ImageGalleryModal({
   console.log(
     `✅ ImageGalleryModal rendering - visible: ${visible}, currentIndex: ${currentIndex}, images.length: ${images.length}`
   );
+
+  // Render images around the current index for smooth scrolling
+  const visibleImages = [];
+  const startIndex = Math.max(0, currentIndex - 1);
+  const endIndex = Math.min(images.length - 1, currentIndex + 1);
+
+  for (let i = startIndex; i <= endIndex; i++) {
+    visibleImages.push({ ...images[i], index: i });
+  }
 
   return (
     <Modal
@@ -312,28 +269,28 @@ export function ImageGalleryModal({
           </View>
         </View>
 
-        {/* Main Image */}
+        {/* Carousel Container */}
         <View style={styles.container}>
-          <PanGestureHandler
-            onGestureEvent={animatedGestureHandler}
-            activeOffsetX={[-10, 10]}
-            failOffsetY={[-20, 20]}
-          >
-            <Animated.View
-              style={[
-                styles.imageContainer,
-                isSwipeActive && styles.imageContainerActive,
-                animatedStyle,
-              ]}
+          <View style={styles.carouselContainer}>
+            <PanGestureHandler
+              onGestureEvent={animatedGestureHandler}
+              activeOffsetX={[-10, 10]}
+              failOffsetY={[-20, 20]}
             >
-              <Image
-                source={{ uri: currentImage.url }}
-                style={styles.image}
-                contentFit="contain"
-                transition={200}
-              />
-            </Animated.View>
-          </PanGestureHandler>
+              <Animated.View style={[styles.carousel, carouselStyle]}>
+                {images.map((image, index) => (
+                  <View key={image.id} style={styles.imageContainer}>
+                    <Image
+                      source={{ uri: image.url }}
+                      style={styles.image}
+                      contentFit="contain"
+                      transition={200}
+                    />
+                  </View>
+                ))}
+              </Animated.View>
+            </PanGestureHandler>
+          </View>
         </View>
 
         {/* Footer */}
