@@ -33,7 +33,6 @@ export function ImageGalleryModal({
 }: ImageGalleryModalProps) {
   const { theme } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [isSwipeActive, setIsSwipeActive] = useState(false);
 
   // Single animated value for the entire carousel
   const translateX = useSharedValue(0);
@@ -60,7 +59,7 @@ export function ImageGalleryModal({
       StyleSheet.create({
         modal: {
           flex: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.95)",
+          backgroundColor: theme.colors.background.overlay,
         },
         container: {
           flex: 1,
@@ -76,20 +75,20 @@ export function ImageGalleryModal({
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          paddingTop: 50,
+          paddingTop: DesignTokens.spacing[12] + DesignTokens.spacing[2], // 50px equivalent
           paddingHorizontal: DesignTokens.spacing[4],
           paddingBottom: DesignTokens.spacing[4],
         },
         closeButton: {
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          borderRadius: 20,
-          width: 40,
-          height: 40,
+          backgroundColor: theme.colors.background.overlay,
+          borderRadius: DesignTokens.borderRadius.full,
+          width: DesignTokens.componentSizes.iconButton,
+          height: DesignTokens.componentSizes.iconButton,
           justifyContent: "center",
           alignItems: "center",
         },
         imageCounter: {
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          backgroundColor: theme.colors.background.overlay,
           paddingHorizontal: DesignTokens.spacing[3],
           paddingVertical: DesignTokens.spacing[2],
           borderRadius: DesignTokens.borderRadius.md,
@@ -108,7 +107,7 @@ export function ImageGalleryModal({
           height: "100%",
           justifyContent: "center",
           alignItems: "center",
-          paddingHorizontal: 10, // Add 10px spacing on each side
+          paddingHorizontal: DesignTokens.spacing[2],
         },
         image: {
           width: "100%",
@@ -119,7 +118,7 @@ export function ImageGalleryModal({
           bottom: 0,
           left: 0,
           right: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          backgroundColor: theme.colors.background.overlay,
           padding: DesignTokens.spacing[4],
         },
         imageInfo: {
@@ -129,15 +128,17 @@ export function ImageGalleryModal({
         imageType: {
           fontSize: DesignTokens.typography.fontSize.lg,
           fontWeight: DesignTokens.typography.fontWeight.bold,
-          color: "white",
+          color: theme.colors.text.inverse,
           textTransform: "capitalize",
           marginBottom: DesignTokens.spacing[2],
         },
         imageDescription: {
           fontSize: DesignTokens.typography.fontSize.base,
-          color: "rgba(255, 255, 255, 0.8)",
+          color: theme.colors.text.inverse,
           textAlign: "center",
-          lineHeight: 22,
+          lineHeight:
+            DesignTokens.typography.lineHeight.normal *
+            DesignTokens.typography.fontSize.base,
         },
         thumbnailContainer: {
           flexDirection: "row",
@@ -147,8 +148,8 @@ export function ImageGalleryModal({
           paddingHorizontal: DesignTokens.spacing[4],
         },
         thumbnail: {
-          width: 40,
-          height: 40,
+          width: DesignTokens.componentSizes.thumbnail,
+          height: DesignTokens.componentSizes.thumbnail,
           borderRadius: DesignTokens.borderRadius.sm,
           borderWidth: 2,
           borderColor: "transparent",
@@ -175,7 +176,6 @@ export function ImageGalleryModal({
 
   const animatedGestureHandler = useAnimatedGestureHandler({
     onStart: (_, context: { startX: number }) => {
-      runOnJS(setIsSwipeActive)(true);
       // Store the starting position
       context.startX = translateX.value;
     },
@@ -203,22 +203,17 @@ export function ImageGalleryModal({
         }
       }
 
+      // Update the index immediately for instant text updates
+      if (targetIndex !== currentIndex) {
+        runOnJS(updateCurrentIndex)(targetIndex);
+      }
+
       // Animate to the target position
       const targetX = -targetIndex * screenWidth;
-      translateX.value = withSpring(
-        targetX,
-        {
-          damping: 20,
-          stiffness: 300,
-        },
-        () => {
-          if (targetIndex !== currentIndex) {
-            runOnJS(updateCurrentIndex)(targetIndex);
-          }
-        }
-      );
-
-      runOnJS(setIsSwipeActive)(false);
+      translateX.value = withSpring(targetX, {
+        damping: 20,
+        stiffness: 300,
+      });
     },
   });
 
@@ -259,11 +254,20 @@ export function ImageGalleryModal({
         {/* Header */}
         <View style={styles.header}>
           <Pressable style={styles.closeButton} onPress={onClose}>
-            <MaterialIcons name="close" size={24} color="white" />
+            <MaterialIcons
+              name="close"
+              size={DesignTokens.typography.fontSize.lg}
+              color={theme.colors.text.inverse}
+            />
           </Pressable>
 
           <View style={styles.imageCounter}>
-            <ThemedText style={{ color: "white", fontWeight: "600" }}>
+            <ThemedText
+              style={{
+                color: theme.colors.text.inverse,
+                fontWeight: DesignTokens.typography.fontWeight.semibold,
+              }}
+            >
               {currentIndex + 1} of {images.length}
             </ThemedText>
           </View>
