@@ -1,11 +1,11 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import React, { useEffect, useMemo, useState } from "react";
 import { Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
-  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -25,6 +25,14 @@ interface ImageGalleryModalProps {
 }
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+
+// Gesture constants
+const SWIPE_THRESHOLD = screenWidth * 0.2; // 20% of screen width
+const VELOCITY_THRESHOLD = 500;
+const ANIMATION_CONFIG = {
+  damping: 20,
+  stiffness: 300,
+} as const;
 
 // Thumbnail Component - extracted for better performance
 const Thumbnail = React.memo<{
@@ -203,10 +211,10 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
       (index: number) => {
         const targetX = -index * screenWidth;
         setCurrentIndex(index);
-        translateX.value = withSpring(targetX, {
-          damping: 20,
-          stiffness: 300,
-        });
+        translateX.value = withSpring(targetX, ANIMATION_CONFIG);
+
+        // Haptic feedback for thumbnail clicks
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       },
       [translateX]
     );
@@ -215,48 +223,58 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
       setCurrentIndex(newIndex);
     }, []);
 
-    const animatedGestureHandler = useAnimatedGestureHandler({
-      onStart: (_, context: { startX: number }) => {
-        // Store the starting position
-        context.startX = translateX.value;
-      },
-      onActive: (event, context: { startX: number }) => {
-        // Move the carousel based on gesture
-        translateX.value = context.startX + event.translationX;
-      },
-      onEnd: (event) => {
-        const swipeThreshold = screenWidth * 0.2; // 20% of screen width
-        const velocity = event.velocityX;
-        const translation = event.translationX;
+    const handleGestureEvent = (event: any) => {
+      "worklet";
+      const velocity = event.velocityX;
+      const translation = event.translationX;
 
-        // Calculate which image we should snap to
-        let targetIndex = currentIndex;
+      // Calculate which image we should snap to
+      let targetIndex = currentIndex;
 
-        if (translation > swipeThreshold || velocity > 500) {
-          // Swipe right - go to previous image
-          if (currentIndex > 0) {
-            targetIndex = currentIndex - 1;
-          }
-        } else if (translation < -swipeThreshold || velocity < -500) {
-          // Swipe left - go to next image
-          if (currentIndex < images.length - 1) {
-            targetIndex = currentIndex + 1;
-          }
+      if (translation > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
+        // Swipe right - go to previous image
+        if (currentIndex > 0) {
+          targetIndex = currentIndex - 1;
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+        } else {
+          // Edge bounce effect - at first image
+          runOnJS(Haptics.notificationAsync)(
+            Haptics.NotificationFeedbackType.Warning
+          );
         }
-
-        // Update the index immediately for instant text updates
-        if (targetIndex !== currentIndex) {
-          runOnJS(updateCurrentIndex)(targetIndex);
+      } else if (
+        translation < -SWIPE_THRESHOLD ||
+        velocity < -VELOCITY_THRESHOLD
+      ) {
+        // Swipe left - go to next image
+        if (currentIndex < images.length - 1) {
+          targetIndex = currentIndex + 1;
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+        } else {
+          // Edge bounce effect - at last image
+          runOnJS(Haptics.notificationAsync)(
+            Haptics.NotificationFeedbackType.Warning
+          );
         }
+      }
 
-        // Animate to the target position
-        const targetX = -targetIndex * screenWidth;
-        translateX.value = withSpring(targetX, {
-          damping: 20,
-          stiffness: 300,
-        });
-      },
-    });
+      // Update the index immediately for instant text updates
+      if (targetIndex !== currentIndex) {
+        runOnJS(updateCurrentIndex)(targetIndex);
+      }
+
+      // Animate to the target position
+      const targetX = -targetIndex * screenWidth;
+      translateX.value = withSpring(targetX, ANIMATION_CONFIG);
+    };
+
+    const handleGestureStateChange = (event: any) => {
+      "worklet";
+      if (event.state === 5) {
+        // END state
+        handleGestureEvent(event);
+      }
+    };
 
     const carouselStyle = useAnimatedStyle(() => {
       return {
@@ -317,7 +335,8 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
           <View style={styles.container}>
             <View style={styles.carouselContainer}>
               <PanGestureHandler
-                onGestureEvent={animatedGestureHandler}
+                onGestureEvent={handleGestureEvent}
+                onHandlerStateChange={handleGestureStateChange}
                 activeOffsetX={[-10, 10]}
                 failOffsetY={[-20, 20]}
               >
