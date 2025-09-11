@@ -1,7 +1,15 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
+import { PanGestureHandler } from "react-native-gesture-handler";
+import Animated, {
+  runOnJS,
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 import { ThemedText } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -25,6 +33,26 @@ export function ImageGalleryModal({
 }: ImageGalleryModalProps) {
   const { theme } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [isSwipeActive, setIsSwipeActive] = useState(false);
+
+  // Animated values
+  const translateX = useSharedValue(0);
+  const opacity = useSharedValue(1);
+
+  // Update currentIndex when initialIndex changes
+  useEffect(() => {
+    console.log(
+      `🔄 ImageGalleryModal: initialIndex changed to ${initialIndex}, images.length: ${images.length}`
+    );
+    if (initialIndex >= 0 && initialIndex < images.length) {
+      setCurrentIndex(initialIndex);
+      translateX.value = 0;
+      opacity.value = 1;
+    } else {
+      console.log(`⚠️ Invalid initialIndex: ${initialIndex}, setting to 0`);
+      setCurrentIndex(0);
+    }
+  }, [initialIndex, images.length, translateX, opacity]);
 
   const currentImage = images[currentIndex];
 
@@ -77,6 +105,26 @@ export function ImageGalleryModal({
           width: "100%",
           height: "100%",
         },
+        imageContainerActive: {
+          opacity: 0.8,
+        },
+        swipeIndicator: {
+          position: "absolute",
+          top: "50%",
+          transform: [{ translateY: -20 }],
+          backgroundColor: "rgba(255, 255, 255, 0.3)",
+          borderRadius: 20,
+          width: 40,
+          height: 40,
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        swipeIndicatorLeft: {
+          left: 20,
+        },
+        swipeIndicatorRight: {
+          right: 20,
+        },
         footer: {
           position: "absolute",
           bottom: 0,
@@ -124,6 +172,7 @@ export function ImageGalleryModal({
           justifyContent: "center",
           alignItems: "center",
           gap: DesignTokens.spacing[2],
+          paddingHorizontal: DesignTokens.spacing[4],
         },
         thumbnail: {
           width: 40,
@@ -155,9 +204,92 @@ export function ImageGalleryModal({
     setCurrentIndex(index);
   };
 
+  const goToPreviousAnimated = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+      translateX.value = 0;
+      opacity.value = 1;
+    }
+  };
+
+  const goToNextAnimated = () => {
+    if (currentIndex < images.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      translateX.value = 0;
+      opacity.value = 1;
+    }
+  };
+
+  const animatedGestureHandler = useAnimatedGestureHandler({
+    onStart: () => {
+      runOnJS(setIsSwipeActive)(true);
+    },
+    onActive: (event) => {
+      translateX.value = event.translationX;
+      // Reduce opacity as user swipes further
+      opacity.value = Math.max(0.3, 1 - Math.abs(event.translationX) / 200);
+    },
+    onEnd: (event) => {
+      const swipeThreshold = 50;
+      const velocity = event.velocityX;
+
+      if (event.translationX > swipeThreshold || velocity > 500) {
+        // Swipe right - go to previous image
+        if (currentIndex > 0) {
+          translateX.value = withSpring(screenWidth, {
+            damping: 20,
+            stiffness: 300,
+          });
+          opacity.value = withSpring(0, { damping: 20, stiffness: 300 }, () => {
+            runOnJS(goToPreviousAnimated)();
+          });
+        } else {
+          // Bounce back if at first image
+          translateX.value = withSpring(0, { damping: 15, stiffness: 200 });
+          opacity.value = withSpring(1, { damping: 15, stiffness: 200 });
+        }
+      } else if (event.translationX < -swipeThreshold || velocity < -500) {
+        // Swipe left - go to next image
+        if (currentIndex < images.length - 1) {
+          translateX.value = withSpring(-screenWidth, {
+            damping: 20,
+            stiffness: 300,
+          });
+          opacity.value = withSpring(0, { damping: 20, stiffness: 300 }, () => {
+            runOnJS(goToNextAnimated)();
+          });
+        } else {
+          // Bounce back if at last image
+          translateX.value = withSpring(0, { damping: 15, stiffness: 200 });
+          opacity.value = withSpring(1, { damping: 15, stiffness: 200 });
+        }
+      } else {
+        // Return to center if swipe wasn't far enough
+        translateX.value = withSpring(0, { damping: 15, stiffness: 200 });
+        opacity.value = withSpring(1, { damping: 15, stiffness: 200 });
+      }
+
+      runOnJS(setIsSwipeActive)(false);
+    },
+  });
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: translateX.value }],
+      opacity: opacity.value,
+    };
+  });
+
   if (!visible || !currentImage) {
+    console.log(
+      `🚫 ImageGalleryModal not rendering - visible: ${visible}, currentImage: ${!!currentImage}`
+    );
     return null;
   }
+
+  console.log(
+    `✅ ImageGalleryModal rendering - visible: ${visible}, currentIndex: ${currentIndex}, images.length: ${images.length}`
+  );
 
   return (
     <Modal
@@ -182,14 +314,26 @@ export function ImageGalleryModal({
 
         {/* Main Image */}
         <View style={styles.container}>
-          <View style={styles.imageContainer}>
-            <Image
-              source={{ uri: currentImage.url }}
-              style={styles.image}
-              contentFit="contain"
-              transition={200}
-            />
-          </View>
+          <PanGestureHandler
+            onGestureEvent={animatedGestureHandler}
+            activeOffsetX={[-10, 10]}
+            failOffsetY={[-20, 20]}
+          >
+            <Animated.View
+              style={[
+                styles.imageContainer,
+                isSwipeActive && styles.imageContainerActive,
+                animatedStyle,
+              ]}
+            >
+              <Image
+                source={{ uri: currentImage.url }}
+                style={styles.image}
+                contentFit="contain"
+                transition={200}
+              />
+            </Animated.View>
+          </PanGestureHandler>
         </View>
 
         {/* Footer */}
@@ -206,71 +350,31 @@ export function ImageGalleryModal({
             )}
           </View>
 
-          {/* Navigation */}
-          <View style={styles.navigationContainer}>
-            <Pressable
-              style={[
-                styles.navButton,
-                currentIndex === 0 && styles.navButtonDisabled,
-              ]}
-              onPress={goToPrevious}
-              disabled={currentIndex === 0}
-            >
-              <MaterialIcons
-                name="chevron-left"
-                size={24}
-                color={
-                  currentIndex === 0 ? "rgba(255, 255, 255, 0.3)" : "white"
-                }
-              />
-            </Pressable>
-
-            {/* Thumbnails */}
-            <View style={styles.thumbnailContainer}>
-              {images
-                .slice(
-                  Math.max(0, currentIndex - 2),
-                  Math.min(images.length, currentIndex + 3)
-                )
-                .map((image, index) => {
-                  const actualIndex = Math.max(0, currentIndex - 2) + index;
-                  return (
-                    <Pressable
-                      key={image.id}
-                      onPress={() => goToImage(actualIndex)}
-                    >
-                      <Image
-                        source={{ uri: image.thumbnailUrl || image.url }}
-                        style={[
-                          styles.thumbnail,
-                          actualIndex === currentIndex &&
-                            styles.thumbnailActive,
-                        ]}
-                        contentFit="cover"
-                      />
-                    </Pressable>
-                  );
-                })}
-            </View>
-
-            <Pressable
-              style={[
-                styles.navButton,
-                currentIndex === images.length - 1 && styles.navButtonDisabled,
-              ]}
-              onPress={goToNext}
-              disabled={currentIndex === images.length - 1}
-            >
-              <MaterialIcons
-                name="chevron-right"
-                size={24}
-                color={
-                  currentIndex === images.length - 1
-                    ? "rgba(255, 255, 255, 0.3)"
-                    : "white"
-                }
-              />
-            </Pressable>
+          {/* Thumbnails */}
+          <View style={styles.thumbnailContainer}>
+            {images
+              .slice(
+                Math.max(0, currentIndex - 2),
+                Math.min(images.length, currentIndex + 3)
+              )
+              .map((image, index) => {
+                const actualIndex = Math.max(0, currentIndex - 2) + index;
+                return (
+                  <Pressable
+                    key={image.id}
+                    onPress={() => goToImage(actualIndex)}
+                  >
+                    <Image
+                      source={{ uri: image.thumbnailUrl || image.url }}
+                      style={[
+                        styles.thumbnail,
+                        actualIndex === currentIndex && styles.thumbnailActive,
+                      ]}
+                      contentFit="cover"
+                    />
+                  </Pressable>
+                );
+              })}
           </View>
         </View>
       </View>

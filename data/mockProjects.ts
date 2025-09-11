@@ -26,17 +26,6 @@ export const mockProjects: Project[] = [
         createdAt: new Date("2024-01-15"),
       },
       {
-        id: "1-2",
-        url: "https://images.unsplash.com/photo-1584622786156-2c8c12c8a4b3?w=800&h=600&fit=crop",
-        thumbnailUrl:
-          "https://images.unsplash.com/photo-1584622786156-2c8c12c8a4b3?w=400&h=300&fit=crop",
-        altText: "After: Modern bathroom with walk-in shower",
-        type: "after",
-        description: "Completed renovation with walk-in shower",
-        order: 2,
-        createdAt: new Date("2024-01-15"),
-      },
-      {
         id: "1-3",
         url: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
         thumbnailUrl:
@@ -44,18 +33,7 @@ export const mockProjects: Project[] = [
         altText: "Before: Old vanity and mirror",
         type: "before",
         description: "Original vanity and mirror setup",
-        order: 3,
-        createdAt: new Date("2024-01-15"),
-      },
-      {
-        id: "1-4",
-        url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
-        thumbnailUrl:
-          "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-        altText: "After: New double vanity",
-        type: "after",
-        description: "New double vanity with quartz countertops",
-        order: 4,
+        order: 2,
         createdAt: new Date("2024-01-15"),
       },
       {
@@ -66,7 +44,7 @@ export const mockProjects: Project[] = [
         altText: "Before: Basic bathtub",
         type: "before",
         description: "Original basic bathtub",
-        order: 5,
+        order: 3,
         createdAt: new Date("2024-01-15"),
       },
       {
@@ -77,18 +55,7 @@ export const mockProjects: Project[] = [
         altText: "After: Freestanding soaking tub",
         type: "after",
         description: "New freestanding soaking tub",
-        order: 6,
-        createdAt: new Date("2024-01-15"),
-      },
-      {
-        id: "1-7",
-        url: "https://images.unsplash.com/photo-1584622786156-2c8c12c8a4b3?w=800&h=600&fit=crop",
-        thumbnailUrl:
-          "https://images.unsplash.com/photo-1584622786156-2c8c12c8a4b3?w=400&h=300&fit=crop",
-        altText: "Before: Old tile work",
-        type: "before",
-        description: "Original tile flooring and walls",
-        order: 7,
+        order: 4,
         createdAt: new Date("2024-01-15"),
       },
       {
@@ -99,18 +66,7 @@ export const mockProjects: Project[] = [
         altText: "After: New tile installation",
         type: "after",
         description: "New tile flooring and wall installation",
-        order: 8,
-        createdAt: new Date("2024-01-15"),
-      },
-      {
-        id: "1-9",
-        url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
-        thumbnailUrl:
-          "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-        altText: "Before: Basic lighting",
-        type: "before",
-        description: "Original basic lighting fixtures",
-        order: 9,
+        order: 5,
         createdAt: new Date("2024-01-15"),
       },
       {
@@ -121,7 +77,7 @@ export const mockProjects: Project[] = [
         altText: "After: Modern lighting",
         type: "after",
         description: "New modern lighting fixtures and dimmers",
-        order: 10,
+        order: 6,
         createdAt: new Date("2024-01-15"),
       },
     ],

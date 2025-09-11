@@ -32,6 +32,7 @@ export default function ProjectDetailScreen() {
   }, [id]);
 
   const openGallery = (index: number) => {
+    console.log(`🖼️ Opening gallery at index: ${index}`);
     setSelectedImageIndex(index);
     setGalleryVisible(true);
   };
