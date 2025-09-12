@@ -37,7 +37,7 @@ export function LoadingState({
           marginTop: DesignTokens.spacing[2],
         },
       }),
-    [theme]
+    []
   );
 
   return (

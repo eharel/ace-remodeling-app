@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 
-import { ImageGalleryModal } from "@/components/ImageGalleryModal";
+import { ImageGalleryModal } from "@/components/gallery";
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { mockProjects } from "@/data/mockProjects";
