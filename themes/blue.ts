@@ -19,7 +19,7 @@ export const blueTheme: Theme = {
       section: "#f0f9ff", // Very light blue for content sections
       separator: "#bae6fd", // Medium light blue for borders and dividers
       elevated: "#ffffff", // White for elevated elements
-      overlay: "rgba(14, 116, 144, 0.5)", // Blue-tinted overlay
+      overlay: "rgba(0, 0, 0, 0.95)", // Nearly opaque black for modal overlays
     },
 
     // Text colors - Dark blue tones for excellent readability

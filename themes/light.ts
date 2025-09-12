@@ -19,7 +19,7 @@ export const lightTheme: Theme = {
       section: "#ffffff", // White for content sections
       separator: "#e2e8f0", // Light gray for borders and dividers
       elevated: "#ffffff", // White for elevated elements
-      overlay: "rgba(0, 0, 0, 0.5)", // Semi-transparent black for overlays
+      overlay: "rgba(0, 0, 0, 0.95)", // Nearly opaque black for modal overlays
     },
 
     // Text colors - Dark text on light backgrounds

@@ -10,7 +10,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { PanGestureHandler } from "react-native-gesture-handler";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -202,17 +202,18 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
             width: screenWidth,
             height: screenHeight * 0.7,
             overflow: "hidden",
+            paddingHorizontal: DesignTokens.spacing[6],
           },
           carousel: {
             flexDirection: "row",
             height: "100%",
           },
           imageContainer: {
-            width: screenWidth,
+            width: screenWidth - DesignTokens.spacing[6] * 2,
             height: "100%",
             justifyContent: "center",
             alignItems: "center",
-            paddingHorizontal: DesignTokens.spacing[2],
+            paddingHorizontal: DesignTokens.spacing[4],
           },
           image: {
             width: "100%",
@@ -276,7 +277,7 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
     // Note: Keyboard navigation would require a different approach in React Native
     // For now, we rely on gesture navigation and touch interactions
 
-    const handleGestureEvent = (event: any) => {
+    const panGesture = Gesture.Pan().onEnd((event) => {
       "worklet";
       const velocity = event.velocityX;
       const translation = event.translationX;
@@ -319,15 +320,7 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
       // Animate to the target position
       const targetX = -targetIndex * screenWidth;
       translateX.value = withSpring(targetX, ANIMATION_CONFIG);
-    };
-
-    const handleGestureStateChange = (event: any) => {
-      "worklet";
-      if (event.state === 5) {
-        // END state
-        handleGestureEvent(event);
-      }
-    };
+    });
 
     const carouselStyle = useAnimatedStyle(() => {
       return {
@@ -410,12 +403,7 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
           {/* Carousel Container */}
           <View style={styles.container}>
             <View style={styles.carouselContainer}>
-              <PanGestureHandler
-                onGestureEvent={handleGestureEvent}
-                onHandlerStateChange={handleGestureStateChange}
-                activeOffsetX={[-10, 10]}
-                failOffsetY={[-20, 20]}
-              >
+              <GestureDetector gesture={panGesture}>
                 <Animated.View
                   style={[styles.carousel, carouselStyle]}
                   accessible={true}
@@ -455,7 +443,7 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
                     </View>
                   ))}
                 </Animated.View>
-              </PanGestureHandler>
+              </GestureDetector>
             </View>
           </View>
 
