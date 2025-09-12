@@ -202,18 +202,17 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
             width: screenWidth,
             height: screenHeight * 0.7,
             overflow: "hidden",
-            paddingHorizontal: DesignTokens.spacing[6],
           },
           carousel: {
             flexDirection: "row",
             height: "100%",
           },
           imageContainer: {
-            width: screenWidth - DesignTokens.spacing[6] * 2,
+            width: screenWidth,
             height: "100%",
             justifyContent: "center",
             alignItems: "center",
-            paddingHorizontal: DesignTokens.spacing[4],
+            paddingHorizontal: DesignTokens.spacing[6],
           },
           image: {
             width: "100%",
@@ -277,50 +276,73 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
     // Note: Keyboard navigation would require a different approach in React Native
     // For now, we rely on gesture navigation and touch interactions
 
-    const panGesture = Gesture.Pan().onEnd((event) => {
-      "worklet";
-      const velocity = event.velocityX;
-      const translation = event.translationX;
+    const panGesture = Gesture.Pan()
+      .onUpdate((event) => {
+        "worklet";
+        // Real-time dragging: move the carousel with finger movement
+        const baseX = -currentIndex * screenWidth;
+        const newX = baseX + event.translationX;
 
-      // Calculate which image we should snap to
-      let targetIndex = currentIndex;
+        // Apply bounds to prevent over-scrolling
+        const minX = -(images.length - 1) * screenWidth;
+        const maxX = 0;
 
-      if (translation > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-        // Swipe right - go to previous image
-        if (currentIndex > 0) {
-          targetIndex = currentIndex - 1;
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+        // Clamp the translation within bounds
+        if (newX > maxX) {
+          // At first image - apply resistance
+          translateX.value = maxX + event.translationX * 0.3;
+        } else if (newX < minX) {
+          // At last image - apply resistance
+          translateX.value = minX + (event.translationX - (minX - baseX)) * 0.3;
         } else {
-          // Edge bounce effect - at first image
-          runOnJS(Haptics.notificationAsync)(
-            Haptics.NotificationFeedbackType.Warning
-          );
+          // Normal dragging
+          translateX.value = newX;
         }
-      } else if (
-        translation < -SWIPE_THRESHOLD ||
-        velocity < -VELOCITY_THRESHOLD
-      ) {
-        // Swipe left - go to next image
-        if (currentIndex < images.length - 1) {
-          targetIndex = currentIndex + 1;
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
-        } else {
-          // Edge bounce effect - at last image
-          runOnJS(Haptics.notificationAsync)(
-            Haptics.NotificationFeedbackType.Warning
-          );
+      })
+      .onEnd((event) => {
+        "worklet";
+        const velocity = event.velocityX;
+        const translation = event.translationX;
+
+        // Calculate which image we should snap to
+        let targetIndex = currentIndex;
+
+        if (translation > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
+          // Swipe right - go to previous image
+          if (currentIndex > 0) {
+            targetIndex = currentIndex - 1;
+            runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          } else {
+            // Edge bounce effect - at first image
+            runOnJS(Haptics.notificationAsync)(
+              Haptics.NotificationFeedbackType.Warning
+            );
+          }
+        } else if (
+          translation < -SWIPE_THRESHOLD ||
+          velocity < -VELOCITY_THRESHOLD
+        ) {
+          // Swipe left - go to next image
+          if (currentIndex < images.length - 1) {
+            targetIndex = currentIndex + 1;
+            runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          } else {
+            // Edge bounce effect - at last image
+            runOnJS(Haptics.notificationAsync)(
+              Haptics.NotificationFeedbackType.Warning
+            );
+          }
         }
-      }
 
-      // Update the index immediately for instant text updates
-      if (targetIndex !== currentIndex) {
-        runOnJS(updateCurrentIndex)(targetIndex);
-      }
+        // Update the index immediately for instant text updates
+        if (targetIndex !== currentIndex) {
+          runOnJS(updateCurrentIndex)(targetIndex);
+        }
 
-      // Animate to the target position
-      const targetX = -targetIndex * screenWidth;
-      translateX.value = withSpring(targetX, ANIMATION_CONFIG);
-    });
+        // Animate to the target position
+        const targetX = -targetIndex * screenWidth;
+        translateX.value = withSpring(targetX, ANIMATION_CONFIG);
+      });
 
     const carouselStyle = useAnimatedStyle(() => {
       return {
