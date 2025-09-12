@@ -9,6 +9,10 @@ export { useAccessibilityAnnouncements } from "./hooks/useAccessibilityAnnouncem
 export { useImageGallery } from "./hooks/useImageGallery";
 export { useImageLoading } from "./hooks/useImageLoading";
 export { useImageNavigation } from "./hooks/useImageNavigation";
+export { useImagePreloading } from "./hooks/useImagePreloading";
+export { useLazyLoading } from "./hooks/useLazyLoading";
+export { useMemoryManagement } from "./hooks/useMemoryManagement";
+export { usePerformanceMonitoring } from "./hooks/usePerformanceMonitoring";
 
 export { accessibilityStrings } from "./constants/accessibilityStrings";
 export {

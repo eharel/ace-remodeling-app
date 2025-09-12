@@ -9,6 +9,8 @@ import { DesignTokens } from "@/themes";
 import { ImageErrorState } from "./ImageErrorState";
 import { accessibilityStrings } from "./constants/accessibilityStrings";
 import { useImageLoading } from "./hooks/useImageLoading";
+import { useImagePreloading } from "./hooks/useImagePreloading";
+import { useLazyLoading } from "./hooks/useLazyLoading";
 import { ImageGalleryCarouselProps } from "./types/gallery.types";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
@@ -17,6 +19,30 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
   ({ images, currentIndex, translateX, panGesture, theme }) => {
     const { isLoading, hasError, getImageError, onImageLoad, onImageError } =
       useImageLoading({ images });
+
+    // Performance optimizations - gradually re-enabling
+    const { isPreloaded, isPreloadFailed } = useImagePreloading({
+      images,
+      currentIndex,
+      preloadRadius: 2,
+    });
+
+    // Only use lazy loading for galleries with more than 10 images
+    const { shouldRenderImage, isImageLoaded } = useLazyLoading({
+      images,
+      currentIndex,
+      visibleRange: images.length > 10 ? 5 : images.length, // Render all images for small galleries
+      loadThreshold: 2,
+    });
+
+    // const {
+    //   startRenderTiming,
+    //   endRenderTiming,
+    //   startImageLoadTiming,
+    //   endImageLoadTiming,
+    //   startGestureTiming,
+    //   endGestureTiming,
+    // } = usePerformanceMonitoring();
 
     const styles = useMemo(
       () =>
@@ -77,6 +103,15 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
               const imageError = hasError(image.id);
               const errorMessage = getImageError(image.id);
 
+              // Performance optimizations - testing preloading + lazy loading
+              const shouldRender = shouldRenderImage(index);
+              const isPreloadedImage = isPreloaded(image.id);
+
+              // Don't render if not in visible range
+              if (!shouldRender) {
+                return null;
+              }
+
               return (
                 <View
                   key={image.id}
@@ -108,7 +143,7 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
                       source={{ uri: image.url }}
                       style={styles.image}
                       contentFit="contain"
-                      transition={200}
+                      transition={isPreloadedImage ? 0 : 200} // Faster transition for preloaded images
                       accessibilityIgnoresInvertColors={true}
                       onLoad={() => onImageLoad(image.id)}
                       onError={() =>

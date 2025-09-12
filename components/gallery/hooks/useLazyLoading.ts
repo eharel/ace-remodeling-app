@@ -1,0 +1,207 @@
+import { Picture } from "@/types";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+interface UseLazyLoadingProps {
+  images: Picture[];
+  currentIndex: number;
+  visibleRange?: number; // How many images to render around current index
+  loadThreshold?: number; // Distance from current index to start loading
+}
+
+interface LazyLoadState {
+  loadedIndices: Set<number>;
+  loadingIndices: Set<number>;
+  visibleIndices: Set<number>;
+}
+
+export const useLazyLoading = ({
+  images,
+  currentIndex,
+  visibleRange = 3, // Render 3 images around current (current + 1 on each side)
+  loadThreshold = 2, // Start loading when 2 images away
+}: UseLazyLoadingProps) => {
+  const [lazyState, setLazyState] = useState<LazyLoadState>({
+    loadedIndices: new Set(),
+    loadingIndices: new Set(),
+    visibleIndices: new Set(),
+  });
+
+  const loadTimeouts = useRef<Map<number, NodeJS.Timeout>>(new Map());
+
+  // Get indices that should be visible (rendered)
+  const getVisibleIndices = useCallback(() => {
+    if (!images || images.length === 0) {
+      return [];
+    }
+
+    const indices = new Set<number>();
+
+    for (let i = -visibleRange; i <= visibleRange; i++) {
+      const index = currentIndex + i;
+      if (index >= 0 && index < images.length) {
+        indices.add(index);
+      }
+    }
+
+    return Array.from(indices);
+  }, [currentIndex, images, visibleRange]);
+
+  // Get indices that should be loaded (but not necessarily visible)
+  const getLoadIndices = useCallback(() => {
+    if (!images || images.length === 0) {
+      return [];
+    }
+
+    const indices = new Set<number>();
+
+    for (let i = -loadThreshold; i <= loadThreshold; i++) {
+      const index = currentIndex + i;
+      if (index >= 0 && index < images.length) {
+        indices.add(index);
+      }
+    }
+
+    return Array.from(indices);
+  }, [currentIndex, images, loadThreshold]);
+
+  // Mark image as loaded
+  const markImageLoaded = useCallback((index: number) => {
+    setLazyState((prev) => ({
+      ...prev,
+      loadedIndices: new Set([...prev.loadedIndices, index]),
+      loadingIndices: new Set(
+        [...prev.loadingIndices].filter((i) => i !== index)
+      ),
+    }));
+  }, []);
+
+  // Mark image as loading
+  const markImageLoading = useCallback((index: number) => {
+    setLazyState((prev) => ({
+      ...prev,
+      loadingIndices: new Set([...prev.loadingIndices, index]),
+    }));
+  }, []);
+
+  // Load image with delay to avoid overwhelming the system
+  const loadImage = useCallback(
+    (index: number, delay: number = 0) => {
+      if (
+        lazyState.loadedIndices.has(index) ||
+        lazyState.loadingIndices.has(index)
+      ) {
+        return;
+      }
+
+      const timeout = setTimeout(() => {
+        markImageLoading(index);
+
+        // Simulate image loading - in real implementation, this would trigger actual loading
+        setTimeout(() => {
+          markImageLoaded(index);
+        }, 100);
+
+        loadTimeouts.current.delete(index);
+      }, delay);
+
+      loadTimeouts.current.set(index, timeout);
+    },
+    [lazyState, markImageLoading, markImageLoaded]
+  );
+
+  // Update visible indices
+  useEffect(() => {
+    const visibleIndices = getVisibleIndices();
+    setLazyState((prev) => ({
+      ...prev,
+      visibleIndices: new Set(visibleIndices),
+    }));
+  }, [getVisibleIndices]);
+
+  // Load images based on current position
+  useEffect(() => {
+    const loadIndices = getLoadIndices();
+
+    // Load images with staggered delays to avoid performance spikes
+    loadIndices.forEach((index, i) => {
+      const delay = i * 50; // 50ms delay between each image
+      loadImage(index, delay);
+    });
+  }, [getLoadIndices, loadImage]);
+
+  // Cleanup unused images
+  useEffect(() => {
+    const visibleIndices = new Set(getVisibleIndices());
+    const loadIndices = new Set(getLoadIndices());
+    const keepIndices = new Set([...visibleIndices, ...loadIndices]);
+
+    // Cancel loading for images that are no longer needed
+    loadTimeouts.current.forEach((timeout, index) => {
+      if (!keepIndices.has(index)) {
+        clearTimeout(timeout);
+        loadTimeouts.current.delete(index);
+      }
+    });
+
+    // Remove from state
+    setLazyState((prev) => ({
+      ...prev,
+      loadedIndices: new Set(
+        [...prev.loadedIndices].filter((i) => keepIndices.has(i))
+      ),
+      loadingIndices: new Set(
+        [...prev.loadingIndices].filter((i) => keepIndices.has(i))
+      ),
+    }));
+  }, [getVisibleIndices, getLoadIndices]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      loadTimeouts.current.forEach((timeout) => clearTimeout(timeout));
+      loadTimeouts.current.clear();
+    };
+  }, []);
+
+  // Check if image should be rendered
+  const shouldRenderImage = useCallback(
+    (index: number) => {
+      return lazyState.visibleIndices.has(index);
+    },
+    [lazyState.visibleIndices]
+  );
+
+  // Check if image is loaded
+  const isImageLoaded = useCallback(
+    (index: number) => {
+      return lazyState.loadedIndices.has(index);
+    },
+    [lazyState.loadedIndices]
+  );
+
+  // Check if image is loading
+  const isImageLoading = useCallback(
+    (index: number) => {
+      return lazyState.loadingIndices.has(index);
+    },
+    [lazyState.loadingIndices]
+  );
+
+  // Get loading statistics
+  const getLoadingStats = useCallback(() => {
+    return {
+      loaded: lazyState.loadedIndices.size,
+      loading: lazyState.loadingIndices.size,
+      visible: lazyState.visibleIndices.size,
+      total: images.length,
+    };
+  }, [lazyState, images.length]);
+
+  return {
+    shouldRenderImage,
+    isImageLoaded,
+    isImageLoading,
+    getLoadingStats,
+    lazyState,
+  };
+};
