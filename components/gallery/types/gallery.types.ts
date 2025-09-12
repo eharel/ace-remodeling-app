@@ -126,3 +126,20 @@ export interface AnimationConfig {
   damping: number;
   stiffness: number;
 }
+
+// Image loading states
+export type ImageLoadingState = "loading" | "loaded" | "error";
+
+// Image state for tracking loading/error states
+export interface ImageState {
+  id: string;
+  state: ImageLoadingState;
+  error?: string;
+}
+
+// Loading and error handling props
+export interface ImageLoadingProps {
+  imageStates: Map<string, ImageState>;
+  onImageLoad: (imageId: string) => void;
+  onImageError: (imageId: string, error: string) => void;
+}
