@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { Dimensions } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Dimensions, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ImageGalleryModalProps } from "../types/gallery.types";
+import {
+  ImageGalleryModalProps,
+  UseImageGalleryReturn,
+} from "../types/gallery.types";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -11,14 +14,17 @@ export const useImageGallery = ({
   visible,
   images,
   initialIndex,
-}: Pick<ImageGalleryModalProps, "visible" | "images" | "initialIndex">) => {
+}: Pick<
+  ImageGalleryModalProps,
+  "visible" | "images" | "initialIndex"
+>): UseImageGalleryReturn => {
   const insets = useSafeAreaInsets();
-  const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const modalRef = useRef<any>(null);
-  const closeButtonRef = useRef<any>(null);
+  const [currentIndex, setCurrentIndex] = useState<number>(initialIndex);
+  const modalRef = useRef<View>(null);
+  const closeButtonRef = useRef<View>(null);
 
   // Single animated value for the entire carousel
-  const translateX = useSharedValue(0);
+  const translateX = useSharedValue<number>(0);
 
   // Update currentIndex when initialIndex changes
   useEffect(() => {
@@ -35,15 +41,18 @@ export const useImageGallery = ({
     }
   }, [initialIndex, images.length, translateX]);
 
-  const goToImage = (index: number) => {
-    const targetX = -index * screenWidth;
-    setCurrentIndex(index);
-    translateX.value = targetX;
-  };
+  const goToImage = useCallback(
+    (index: number): void => {
+      const targetX = -index * screenWidth;
+      setCurrentIndex(index);
+      translateX.value = targetX;
+    },
+    [translateX]
+  );
 
-  const updateCurrentIndex = (newIndex: number) => {
+  const updateCurrentIndex = useCallback((newIndex: number): void => {
     setCurrentIndex(newIndex);
-  };
+  }, []);
 
   return {
     currentIndex,

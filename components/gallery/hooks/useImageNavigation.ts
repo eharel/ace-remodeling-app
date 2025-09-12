@@ -2,7 +2,7 @@ import * as Haptics from "expo-haptics";
 import { useCallback } from "react";
 import { Dimensions } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
-import { runOnJS, withSpring } from "react-native-reanimated";
+import { runOnJS, SharedValue, withSpring } from "react-native-reanimated";
 
 import {
   ANIMATION_CONFIG,
@@ -10,13 +10,14 @@ import {
   SWIPE_THRESHOLD,
   VELOCITY_THRESHOLD,
 } from "../constants/gestureConstants";
+import { GestureEvent, UseImageNavigationReturn } from "../types/gallery.types";
 
 const { width: screenWidth } = Dimensions.get("window");
 
 interface UseImageNavigationProps {
   currentIndex: number;
   imagesLength: number;
-  translateX: any;
+  translateX: SharedValue<number>;
   onIndexChange: (newIndex: number) => void;
 }
 
@@ -25,7 +26,7 @@ export const useImageNavigation = ({
   imagesLength,
   translateX,
   onIndexChange,
-}: UseImageNavigationProps) => {
+}: UseImageNavigationProps): UseImageNavigationReturn => {
   const goToImage = useCallback(
     (index: number) => {
       const targetX = -index * screenWidth;
@@ -39,7 +40,7 @@ export const useImageNavigation = ({
   );
 
   const panGesture = Gesture.Pan()
-    .onUpdate((event) => {
+    .onUpdate((event: GestureEvent) => {
       "worklet";
       // Real-time dragging: move the carousel with finger movement
       const baseX = -currentIndex * screenWidth;
@@ -62,7 +63,7 @@ export const useImageNavigation = ({
         translateX.value = newX;
       }
     })
-    .onEnd((event) => {
+    .onEnd((event: GestureEvent) => {
       "worklet";
       const velocity = event.velocityX;
       const translation = event.translationX;

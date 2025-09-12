@@ -16,9 +16,18 @@ export {
 } from "./constants/gestureConstants";
 
 export type {
+  AnimationConfig,
+  CarouselStyles,
+  FooterStyles,
+  GalleryStyles,
+  GestureEvent,
+  HeaderStyles,
   ImageGalleryCarouselProps,
   ImageGalleryFooterProps,
   ImageGalleryHeaderProps,
   ImageGalleryModalProps,
+  Theme,
   ThumbnailProps,
+  UseImageGalleryReturn,
+  UseImageNavigationReturn,
 } from "./types/gallery.types";

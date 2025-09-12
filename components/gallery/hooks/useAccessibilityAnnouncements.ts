@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { AccessibilityInfo } from "react-native";
+import { AccessibilityInfo, View } from "react-native";
 
 import { Picture } from "@/types";
 
@@ -8,7 +8,7 @@ interface UseAccessibilityAnnouncementsProps {
   currentIndex: number;
   images: Picture[];
   currentImage?: Picture;
-  modalRef: React.RefObject<any>;
+  modalRef: React.RefObject<View>;
 }
 
 export const useAccessibilityAnnouncements = ({

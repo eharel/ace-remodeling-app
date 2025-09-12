@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Dimensions, Modal, StyleSheet, View } from "react-native";
+import { Modal, StyleSheet, View } from "react-native";
 
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -10,24 +10,14 @@ import { useImageNavigation } from "./hooks/useImageNavigation";
 import { ImageGalleryCarousel } from "./ImageGalleryCarousel";
 import { ImageGalleryFooter } from "./ImageGalleryFooter";
 import { ImageGalleryHeader } from "./ImageGalleryHeader";
-import { ImageGalleryModalProps } from "./types/gallery.types";
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+import { GalleryStyles, ImageGalleryModalProps } from "./types/gallery.types";
 
 export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
   ({ visible, images, initialIndex, onClose }) => {
     const { theme } = useTheme();
 
-    const {
-      currentIndex,
-      setCurrentIndex,
-      translateX,
-      goToImage,
-      updateCurrentIndex,
-      modalRef,
-      closeButtonRef,
-      insets,
-    } = useImageGallery({ visible, images, initialIndex });
+    const { currentIndex, translateX, updateCurrentIndex, modalRef } =
+      useImageGallery({ visible, images, initialIndex });
 
     const currentImage = images[currentIndex];
 
@@ -47,7 +37,7 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
     });
 
     const styles = useMemo(
-      () =>
+      (): GalleryStyles =>
         StyleSheet.create({
           modal: {
             flex: 1,
