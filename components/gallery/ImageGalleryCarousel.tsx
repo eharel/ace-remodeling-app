@@ -1,11 +1,10 @@
-import { Image } from "expo-image";
 import React, { useMemo } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { DesignTokens } from "@/themes";
-
+import { Image } from "expo-image";
 import { ImageErrorState } from "./ImageErrorState";
 import { accessibilityStrings } from "./constants/accessibilityStrings";
 import { useImageLoading } from "./hooks/useImageLoading";
@@ -143,8 +142,16 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
                       source={{ uri: image.url }}
                       style={styles.image}
                       contentFit="contain"
-                      transition={isPreloadedImage ? 0 : 200} // Faster transition for preloaded images
-                      accessibilityIgnoresInvertColors={true}
+                      accessibilityLabel={accessibilityStrings.image.getLabel(
+                        index,
+                        images.length,
+                        image.type,
+                        image.description
+                      )}
+                      accessibilityHint={accessibilityStrings.image.getHint(
+                        isCurrentImage
+                      )}
+                      accessibilityRole="image"
                       onLoad={() => onImageLoad(image.id)}
                       onError={() =>
                         onImageError(image.id, "Failed to load image")
