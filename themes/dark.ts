@@ -19,7 +19,7 @@ export const darkTheme: Theme = {
       section: "#1e293b", // Dark gray for content sections
       separator: "#334155", // Medium dark gray for borders and dividers
       elevated: "#334155", // Medium dark gray for elevated elements
-      overlay: "rgba(0, 0, 0, 0.7)", // Semi-transparent black for overlays
+      overlay: "rgba(0, 0, 0, 0.95)", // Nearly opaque black for modal overlays
     },
 
     // Text colors - Light text on dark backgrounds

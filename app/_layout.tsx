@@ -6,6 +6,7 @@ import {
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 // Disable development error overlay to test ErrorBoundary
@@ -56,9 +57,11 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider>
-      <Navigation />
-      <FloatingChecklistButton />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <Navigation />
+        <FloatingChecklistButton />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

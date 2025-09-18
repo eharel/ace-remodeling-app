@@ -226,6 +226,12 @@ export const DesignTokens = {
       // Only keep truly universal dimensions here
       // Font sizes and spacing should be in theme files
     },
+
+    // Icon Button - universal dimensions
+    iconButton: 40,
+
+    // Thumbnail - universal dimensions
+    thumbnail: 40,
   },
 } as const;
 
