@@ -14,6 +14,41 @@ import { ImageGalleryCarouselProps } from "./types/gallery.types";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
+/**
+ * ImageGalleryCarousel - Main carousel component for displaying and navigating images
+ *
+ * This component renders the horizontal scrollable carousel of images with
+ * gesture-based navigation, loading states, and performance optimizations.
+ *
+ * Features:
+ * - Horizontal scrollable carousel with smooth animations
+ * - Gesture-based navigation (swipe, pan)
+ * - Loading states and error handling for individual images
+ * - Performance optimizations (preloading, lazy loading)
+ * - Accessibility support with screen reader announcements
+ * - Memory management and cleanup
+ *
+ * @component
+ * @param {ImageGalleryCarouselProps} props - The component props
+ * @param {Picture[]} props.images - Array of images to display
+ * @param {number} props.currentIndex - Current image index
+ * @param {SharedValue<number>} props.translateX - Shared value for carousel translation
+ * @param {PanGesture} props.panGesture - Pan gesture handler for navigation
+ * @param {Theme} props.theme - Current theme object
+ *
+ * @example
+ * ```tsx
+ * <ImageGalleryCarousel
+ *   images={projectImages}
+ *   currentIndex={2}
+ *   translateX={translateXValue}
+ *   panGesture={panGesture}
+ *   theme={currentTheme}
+ * />
+ * ```
+ *
+ * @returns {JSX.Element} The carousel component
+ */
 export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
   ({ images, currentIndex, translateX, panGesture, theme }) => {
     const { isLoading, hasError, getImageError, onImageLoad, onImageError } =

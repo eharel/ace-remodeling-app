@@ -9,6 +9,39 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { accessibilityStrings } from "./constants/accessibilityStrings";
 import { ImageGalleryHeaderProps } from "./types/gallery.types";
 
+/**
+ * ImageGalleryHeader - Header component for the image gallery modal
+ *
+ * This component displays the gallery header with image counter, close button,
+ * and proper safe area handling. It provides accessibility support and
+ * follows the app's design system.
+ *
+ * Features:
+ * - Image counter display (e.g., "1 of 5")
+ * - Close button with haptic feedback
+ * - Safe area handling for different devices
+ * - Accessibility support with screen reader labels
+ * - Theme-aware styling
+ *
+ * @component
+ * @param {ImageGalleryHeaderProps} props - The component props
+ * @param {number} props.currentIndex - Current image index (0-based)
+ * @param {number} props.totalImages - Total number of images
+ * @param {() => void} props.onClose - Callback function for close button
+ * @param {Theme} props.theme - Current theme object
+ *
+ * @example
+ * ```tsx
+ * <ImageGalleryHeader
+ *   currentIndex={2}
+ *   totalImages={10}
+ *   onClose={() => setIsModalVisible(false)}
+ *   theme={currentTheme}
+ * />
+ * ```
+ *
+ * @returns {JSX.Element} The header component
+ */
 export const ImageGalleryHeader = React.memo<ImageGalleryHeaderProps>(
   ({ currentIndex, totalImages, onClose, theme }) => {
     const insets = useSafeAreaInsets();

@@ -10,6 +10,36 @@ import {
 
 const { width: screenWidth } = Dimensions.get("window");
 
+/**
+ * useImageGallery - Custom hook for managing image gallery state and navigation
+ *
+ * This hook provides the core state management for the image gallery modal,
+ * including current image index, navigation functions, and shared values for animations.
+ *
+ * @param {Object} params - The hook parameters
+ * @param {boolean} params.visible - Whether the gallery modal is visible
+ * @param {Array<{uri: string}>} params.images - Array of image objects
+ * @param {number} params.initialIndex - Initial image index to display
+ *
+ * @returns {UseImageGalleryReturn} Object containing gallery state and functions
+ * @returns {number} returns.currentIndex - Current image index
+ * @returns {React.Dispatch<React.SetStateAction<number>>} returns.setCurrentIndex - Function to set current index
+ * @returns {SharedValue<number>} returns.translateX - Shared value for carousel translation
+ * @returns {(index: number) => void} returns.goToImage - Function to navigate to specific image
+ * @returns {(newIndex: number) => void} returns.updateCurrentIndex - Function to update current index
+ * @returns {React.RefObject<View>} returns.modalRef - Reference to modal container
+ * @returns {React.RefObject<View>} returns.closeButtonRef - Reference to close button
+ * @returns {EdgeInsets} returns.insets - Safe area insets
+ *
+ * @example
+ * ```tsx
+ * const { currentIndex, translateX, goToImage } = useImageGallery({
+ *   visible: isModalVisible,
+ *   images: projectImages,
+ *   initialIndex: 0
+ * });
+ * ```
+ */
 export const useImageGallery = ({
   visible,
   images,

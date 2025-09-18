@@ -11,6 +11,35 @@ interface ImageErrorStateProps {
   onRetry?: () => void;
 }
 
+/**
+ * ImageErrorState - Error state component for failed image loads
+ *
+ * This component displays an error message and retry button when an image
+ * fails to load. It provides a user-friendly way to handle image loading
+ * errors and follows the app's design system.
+ *
+ * Features:
+ * - Error message display with icon
+ * - Retry button with haptic feedback
+ * - Theme-aware styling
+ * - Accessibility support
+ * - Optimized with React.memo
+ *
+ * @component
+ * @param {ImageErrorStateProps} props - The component props
+ * @param {string} [props.error="Failed to load image"] - Error message to display
+ * @param {() => void} [props.onRetry] - Callback function for retry button
+ *
+ * @example
+ * ```tsx
+ * <ImageErrorState
+ *   error="Network connection failed"
+ *   onRetry={() => retryImageLoad()}
+ * />
+ * ```
+ *
+ * @returns {JSX.Element} The error state component
+ */
 export const ImageErrorState = React.memo<ImageErrorStateProps>(
   ({ error = "Failed to load image", onRetry }) => {
     const { theme } = useTheme();

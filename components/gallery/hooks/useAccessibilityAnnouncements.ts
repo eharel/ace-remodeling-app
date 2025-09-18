@@ -11,6 +11,37 @@ interface UseAccessibilityAnnouncementsProps {
   modalRef: React.RefObject<View>;
 }
 
+/**
+ * useAccessibilityAnnouncements - Custom hook for managing accessibility announcements
+ *
+ * This hook provides screen reader support for the image gallery by announcing
+ * modal state changes and image navigation events. It ensures the gallery is
+ * accessible to users with visual impairments.
+ *
+ * Features:
+ * - Announces modal opening with navigation instructions
+ * - Announces image changes with context information
+ * - Manages focus for screen readers
+ * - Provides descriptive announcements for image content
+ *
+ * @param {UseAccessibilityAnnouncementsProps} params - The hook parameters
+ * @param {boolean} params.visible - Whether the gallery modal is visible
+ * @param {number} params.currentIndex - Current image index
+ * @param {Picture[]} params.images - Array of images in the gallery
+ * @param {Picture} [params.currentImage] - Current image object
+ * @param {React.RefObject<View>} params.modalRef - Reference to modal container
+ *
+ * @example
+ * ```tsx
+ * useAccessibilityAnnouncements({
+ *   visible: isModalVisible,
+ *   currentIndex: 2,
+ *   images: projectImages,
+ *   currentImage: projectImages[2],
+ *   modalRef: modalRef
+ * });
+ * ```
+ */
 export const useAccessibilityAnnouncements = ({
   visible,
   currentIndex,

@@ -9,7 +9,22 @@ import { DesignTokens } from "@/themes";
 import { accessibilityStrings } from "./constants/accessibilityStrings";
 import { ImageGalleryFooterProps, ThumbnailProps } from "./types/gallery.types";
 
-// Thumbnail Component - extracted for better performance
+/**
+ * Thumbnail - Individual thumbnail component for the gallery footer
+ *
+ * This component renders a single thumbnail image with active state styling
+ * and accessibility support. It's optimized for performance with React.memo.
+ *
+ * @component
+ * @param {ThumbnailProps} props - The component props
+ * @param {Picture} props.image - Image object to display
+ * @param {number} props.index - Image index
+ * @param {boolean} props.isActive - Whether this thumbnail is currently active
+ * @param {(index: number) => void} props.onPress - Callback for thumbnail press
+ * @param {Theme} props.theme - Current theme object
+ *
+ * @returns {JSX.Element} The thumbnail component
+ */
 const Thumbnail = React.memo<ThumbnailProps>(
   ({ image, index, isActive, onPress, theme }) => {
     const handlePress = React.useCallback(() => {
@@ -62,6 +77,42 @@ const Thumbnail = React.memo<ThumbnailProps>(
 
 Thumbnail.displayName = "Thumbnail";
 
+/**
+ * ImageGalleryFooter - Footer component for the image gallery modal
+ *
+ * This component displays the gallery footer with image information, thumbnail
+ * navigation, and proper safe area handling. It provides accessibility support
+ * and follows the app's design system.
+ *
+ * Features:
+ * - Image type and description display
+ * - Thumbnail navigation strip
+ * - Active thumbnail highlighting
+ * - Safe area handling for different devices
+ * - Accessibility support with screen reader labels
+ * - Theme-aware styling
+ *
+ * @component
+ * @param {ImageGalleryFooterProps} props - The component props
+ * @param {Picture} props.currentImage - Current image object
+ * @param {Picture[]} props.images - Array of all images
+ * @param {number} props.currentIndex - Current image index
+ * @param {(index: number) => void} props.onImageSelect - Callback for thumbnail selection
+ * @param {Theme} props.theme - Current theme object
+ *
+ * @example
+ * ```tsx
+ * <ImageGalleryFooter
+ *   currentImage={projectImages[2]}
+ *   images={projectImages}
+ *   currentIndex={2}
+ *   onImageSelect={setCurrentIndex}
+ *   theme={currentTheme}
+ * />
+ * ```
+ *
+ * @returns {JSX.Element} The footer component
+ */
 export const ImageGalleryFooter = React.memo<ImageGalleryFooterProps>(
   ({ currentImage, images, currentIndex, onImageSelect, theme }) => {
     const insets = useSafeAreaInsets();

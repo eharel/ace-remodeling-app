@@ -6,6 +6,46 @@ interface UseImageLoadingProps {
   images: Picture[];
 }
 
+/**
+ * useImageLoading - Custom hook for managing image loading states
+ *
+ * This hook tracks the loading, loaded, and error states for individual images
+ * in the gallery. It provides utilities to check image states and handle
+ * loading events.
+ *
+ * Features:
+ * - Tracks loading states for individual images
+ * - Preserves loaded states when images change
+ * - Provides error handling and reporting
+ * - Optimized for performance with Map-based state storage
+ *
+ * @param {UseImageLoadingProps} params - The hook parameters
+ * @param {Picture[]} params.images - Array of image objects to track
+ *
+ * @returns {Object} Object containing loading state utilities
+ * @returns {Map<string, ImageState>} returns.imageStates - Map of image states
+ * @returns {(imageId: string) => void} returns.onImageLoad - Callback for successful image load
+ * @returns {(imageId: string, error: string) => void} returns.onImageError - Callback for image load errors
+ * @returns {(imageId: string) => ImageLoadingState} returns.getImageState - Get current state of an image
+ * @returns {(imageId: string) => string | undefined} returns.getImageError - Get error message for an image
+ * @returns {(imageId: string) => boolean} returns.isLoading - Check if image is loading
+ * @returns {(imageId: string) => boolean} returns.hasError - Check if image has error
+ * @returns {(imageId: string) => boolean} returns.isLoaded - Check if image is loaded
+ *
+ * @example
+ * ```tsx
+ * const { onImageLoad, onImageError, isLoading, hasError } = useImageLoading({
+ *   images: projectImages
+ * });
+ *
+ * // In your Image component
+ * <Image
+ *   source={{ uri: image.uri }}
+ *   onLoad={() => onImageLoad(image.id)}
+ *   onError={() => onImageError(image.id, "Failed to load")}
+ * />
+ * ```
+ */
 export const useImageLoading = ({ images }: UseImageLoadingProps) => {
   const [imageStates, setImageStates] = useState<Map<string, ImageState>>(
     new Map() // Start empty - only add states when needed

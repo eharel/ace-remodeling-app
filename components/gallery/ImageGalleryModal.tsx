@@ -12,6 +12,36 @@ import { ImageGalleryFooter } from "./ImageGalleryFooter";
 import { ImageGalleryHeader } from "./ImageGalleryHeader";
 import { GalleryStyles, ImageGalleryModalProps } from "./types/gallery.types";
 
+/**
+ * ImageGalleryModal - A full-screen modal for viewing and navigating through images
+ *
+ * Features:
+ * - Full-screen image viewing with swipe navigation
+ * - Thumbnail navigation in footer
+ * - Accessibility support with screen reader announcements
+ * - Smooth gesture-based navigation
+ * - Performance optimizations with lazy loading and preloading
+ * - Loading states and error handling
+ *
+ * @component
+ * @param {ImageGalleryModalProps} props - The component props
+ * @param {boolean} props.visible - Whether the modal is visible
+ * @param {Array<{uri: string}>} props.images - Array of image objects with uri property
+ * @param {number} props.initialIndex - Initial image index to display (default: 0)
+ * @param {() => void} props.onClose - Callback function called when modal is closed
+ *
+ * @example
+ * ```tsx
+ * <ImageGalleryModal
+ *   visible={isModalVisible}
+ *   images={projectImages}
+ *   initialIndex={selectedImageIndex}
+ *   onClose={() => setIsModalVisible(false)}
+ * />
+ * ```
+ *
+ * @returns {JSX.Element | null} The modal component or null if not visible
+ */
 export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
   ({ visible, images, initialIndex, onClose }) => {
     const { theme } = useTheme();

@@ -15,6 +15,30 @@ interface ImageLoadingSkeletonProps {
   message?: string;
 }
 
+/**
+ * ImageLoadingSkeleton - Loading skeleton component for images
+ *
+ * This component displays a pulsing loading animation while an image is loading.
+ * It provides visual feedback to users and follows the app's design system.
+ *
+ * Features:
+ * - Pulsing opacity animation for visual feedback
+ * - Customizable loading message
+ * - Theme-aware styling
+ * - Accessibility support
+ * - Optimized with React.memo
+ *
+ * @component
+ * @param {ImageLoadingSkeletonProps} props - The component props
+ * @param {string} [props.message="Loading image..."] - Loading message to display
+ *
+ * @example
+ * ```tsx
+ * <ImageLoadingSkeleton message="Loading project image..." />
+ * ```
+ *
+ * @returns {JSX.Element} The loading skeleton component
+ */
 export const ImageLoadingSkeleton = React.memo<ImageLoadingSkeletonProps>(
   ({ message = "Loading image..." }) => {
     const { theme } = useTheme();

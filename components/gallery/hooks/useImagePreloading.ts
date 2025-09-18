@@ -14,6 +14,43 @@ interface PreloadState {
   failed: Set<string>;
 }
 
+/**
+ * useImagePreloading - Custom hook for preloading adjacent images
+ *
+ * This hook preloads images around the current index to improve perceived
+ * loading times when users navigate through the gallery. It manages preload
+ * state and cleanup automatically.
+ *
+ * Features:
+ * - Preloads images within a configurable radius of current index
+ * - Tracks preload state (loaded, loading, failed)
+ * - Automatic cleanup of unused preloaded images
+ * - Timeout handling for failed preloads
+ * - Memory management with proper cleanup
+ *
+ * @param {UseImagePreloadingProps} params - The hook parameters
+ * @param {Picture[]} params.images - Array of images to preload
+ * @param {number} params.currentIndex - Current image index
+ * @param {number} [params.preloadRadius=2] - Number of images to preload on each side
+ *
+ * @returns {Object} Object containing preload utilities
+ * @returns {(imageId: string) => boolean} returns.isPreloaded - Check if image is preloaded
+ * @returns {(imageId: string) => boolean} returns.isPreloadFailed - Check if image failed to preload
+ * @returns {() => Object} returns.getPreloadStats - Get preload statistics
+ * @returns {PreloadState} returns.preloadState - Current preload state
+ *
+ * @example
+ * ```tsx
+ * const { isPreloaded, getPreloadStats } = useImagePreloading({
+ *   images: projectImages,
+ *   currentIndex: 2,
+ *   preloadRadius: 3
+ * });
+ *
+ * // Check if image is preloaded for faster display
+ * const shouldShowTransition = isPreloaded(image.id);
+ * ```
+ */
 export const useImagePreloading = ({
   images,
   currentIndex,

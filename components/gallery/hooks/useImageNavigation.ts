@@ -21,6 +21,39 @@ interface UseImageNavigationProps {
   onIndexChange: (newIndex: number) => void;
 }
 
+/**
+ * useImageNavigation - Custom hook for handling image navigation gestures and animations
+ *
+ * This hook provides gesture-based navigation for the image gallery, including
+ * pan gestures for swiping between images, haptic feedback, and smooth animations.
+ *
+ * Features:
+ * - Real-time dragging with visual feedback
+ * - Swipe threshold detection for navigation
+ * - Edge resistance when reaching first/last images
+ * - Haptic feedback for user interactions
+ * - Smooth spring animations
+ *
+ * @param {UseImageNavigationProps} params - The hook parameters
+ * @param {number} params.currentIndex - Current image index
+ * @param {number} params.imagesLength - Total number of images
+ * @param {SharedValue<number>} params.translateX - Shared value for carousel translation
+ * @param {(newIndex: number) => void} params.onIndexChange - Callback for index changes
+ *
+ * @returns {UseImageNavigationReturn} Object containing navigation functions and gestures
+ * @returns {(index: number) => void} returns.goToImage - Function to navigate to specific image
+ * @returns {PanGesture} returns.panGesture - Pan gesture handler for swiping
+ *
+ * @example
+ * ```tsx
+ * const { goToImage, panGesture } = useImageNavigation({
+ *   currentIndex: 0,
+ *   imagesLength: 5,
+ *   translateX: translateXValue,
+ *   onIndexChange: setCurrentIndex
+ * });
+ * ```
+ */
 export const useImageNavigation = ({
   currentIndex,
   imagesLength,

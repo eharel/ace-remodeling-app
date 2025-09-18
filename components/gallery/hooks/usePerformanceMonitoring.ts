@@ -19,6 +19,54 @@ interface PerformanceStats {
   performanceScore: number; // 0-100
 }
 
+/**
+ * usePerformanceMonitoring - Custom hook for monitoring gallery performance metrics
+ *
+ * This hook tracks various performance metrics for the image gallery including
+ * render times, image load times, frame rates, and gesture response times.
+ * It provides performance recommendations and scoring.
+ *
+ * Features:
+ * - Tracks render performance and timing
+ * - Monitors image loading performance
+ * - Measures frame rate and animation performance
+ * - Tracks gesture response times
+ * - Provides performance scoring (0-100)
+ * - Offers performance recommendations
+ * - Automatic cleanup and resource management
+ *
+ * @returns {Object} Object containing performance monitoring utilities
+ * @returns {PerformanceStats} returns.stats - Current performance statistics
+ * @returns {() => void} returns.startRenderTiming - Start timing a render operation
+ * @returns {() => void} returns.endRenderTiming - End timing a render operation
+ * @returns {() => void} returns.startImageLoadTiming - Start timing an image load
+ * @returns {() => void} returns.endImageLoadTiming - End timing an image load
+ * @returns {() => void} returns.startGestureTiming - Start timing a gesture response
+ * @returns {() => void} returns.endGestureTiming - End timing a gesture response
+ * @returns {() => string[]} returns.getPerformanceRecommendations - Get performance recommendations
+ * @returns {() => void} returns.resetMetrics - Reset all performance metrics
+ *
+ * @example
+ * ```tsx
+ * const {
+ *   stats,
+ *   startRenderTiming,
+ *   endRenderTiming,
+ *   getPerformanceRecommendations
+ * } = usePerformanceMonitoring();
+ *
+ * // Time a render operation
+ * startRenderTiming();
+ * // ... render logic ...
+ * endRenderTiming();
+ *
+ * // Check performance score
+ * if (stats.performanceScore < 70) {
+ *   const recommendations = getPerformanceRecommendations();
+ *   console.warn("Performance issues:", recommendations);
+ * }
+ * ```
+ */
 export const usePerformanceMonitoring = () => {
   const [metrics, setMetrics] = useState<PerformanceMetrics[]>([]);
   const [stats, setStats] = useState<PerformanceStats>({

@@ -1,3 +1,13 @@
+/**
+ * Accessibility Strings for Image Gallery
+ *
+ * This file contains all the accessibility strings used throughout the image gallery
+ * components. These strings provide screen reader support and ensure the gallery
+ * is accessible to users with visual impairments.
+ *
+ * All strings are designed to be descriptive and provide context about the current
+ * state and available actions in the gallery.
+ */
 export const accessibilityStrings = {
   modal: {
     label: "Image Gallery",

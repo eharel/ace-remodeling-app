@@ -14,6 +14,50 @@ interface MemoryStats {
   memoryPressure: "low" | "medium" | "high";
 }
 
+/**
+ * useMemoryManagement - Custom hook for monitoring and managing memory usage
+ *
+ * This hook provides memory monitoring capabilities for the image gallery,
+ * including memory pressure detection, app state management, and garbage
+ * collection utilities.
+ *
+ * Features:
+ * - Monitors memory usage and pressure levels
+ * - Handles app background/foreground state changes
+ * - Provides memory warning callbacks
+ * - Offers garbage collection utilities
+ * - Automatic cleanup and resource management
+ *
+ * @param {UseMemoryManagementProps} [params] - The hook parameters
+ * @param {() => void} [params.onMemoryWarning] - Callback for high memory pressure
+ * @param {() => void} [params.onAppBackground] - Callback when app goes to background
+ * @param {() => void} [params.onAppForeground] - Callback when app comes to foreground
+ *
+ * @returns {Object} Object containing memory management utilities
+ * @returns {() => MemoryStats} returns.getMemoryStats - Get current memory statistics
+ * @returns {() => boolean} returns.isMemoryPressureHigh - Check if memory pressure is high
+ * @returns {() => void} returns.forceGarbageCollection - Force garbage collection
+ * @returns {() => void} returns.checkMemoryUsage - Manually check memory usage
+ *
+ * @example
+ * ```tsx
+ * const { getMemoryStats, isMemoryPressureHigh } = useMemoryManagement({
+ *   onMemoryWarning: () => {
+ *     // Clear image cache or reduce quality
+ *     clearImageCache();
+ *   },
+ *   onAppBackground: () => {
+ *     // Pause image loading
+ *     pauseImageLoading();
+ *   }
+ * });
+ *
+ * // Check memory pressure
+ * if (isMemoryPressureHigh()) {
+ *   // Reduce image quality or clear cache
+ * }
+ * ```
+ */
 export const useMemoryManagement = ({
   onMemoryWarning,
   onAppBackground,

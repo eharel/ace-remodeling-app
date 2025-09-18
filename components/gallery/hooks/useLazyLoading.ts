@@ -14,6 +14,48 @@ interface LazyLoadState {
   visibleIndices: Set<number>;
 }
 
+/**
+ * useLazyLoading - Custom hook for lazy loading images in the gallery
+ *
+ * This hook optimizes rendering performance by only mounting images within
+ * a visible range around the current index. It manages loading states and
+ * cleanup automatically.
+ *
+ * Features:
+ * - Only renders images within a configurable visible range
+ * - Staggered loading to avoid performance spikes
+ * - Automatic cleanup of unused images
+ * - Loading state management
+ * - Memory optimization for large galleries
+ *
+ * @param {UseLazyLoadingProps} params - The hook parameters
+ * @param {Picture[]} params.images - Array of images to lazy load
+ * @param {number} params.currentIndex - Current image index
+ * @param {number} [params.visibleRange=3] - Number of images to render around current index
+ * @param {number} [params.loadThreshold=2] - Distance from current index to start loading
+ *
+ * @returns {Object} Object containing lazy loading utilities
+ * @returns {(index: number) => boolean} returns.shouldRenderImage - Check if image should be rendered
+ * @returns {(index: number) => boolean} returns.isImageLoaded - Check if image is loaded
+ * @returns {(index: number) => boolean} returns.isImageLoading - Check if image is loading
+ * @returns {() => Object} returns.getLoadingStats - Get loading statistics
+ * @returns {LazyLoadState} returns.lazyState - Current lazy loading state
+ *
+ * @example
+ * ```tsx
+ * const { shouldRenderImage, isImageLoaded } = useLazyLoading({
+ *   images: projectImages,
+ *   currentIndex: 5,
+ *   visibleRange: 5,
+ *   loadThreshold: 3
+ * });
+ *
+ * // Only render images that should be visible
+ * {shouldRenderImage(index) && (
+ *   <Image source={{ uri: images[index].url }} />
+ * )}
+ * ```
+ */
 export const useLazyLoading = ({
   images,
   currentIndex,
