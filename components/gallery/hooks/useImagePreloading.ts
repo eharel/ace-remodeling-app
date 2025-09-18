@@ -62,7 +62,6 @@ export const useImagePreloading = ({
     failed: new Set(),
   });
 
-  const preloadRefs = useRef<Map<string, Image>>(new Map());
   const preloadTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   // Get images that should be preloaded
@@ -85,7 +84,7 @@ export const useImagePreloading = ({
 
   // Preload a single image
   const preloadImage = useCallback(
-    (image: Picture) => {
+    async (image: Picture) => {
       if (
         preloadState.loaded.has(image.id) ||
         preloadState.loading.has(image.id) ||
@@ -99,38 +98,44 @@ export const useImagePreloading = ({
         loading: new Set([...prev.loading, image.id]),
       }));
 
-      // Create a hidden Image component for preloading
-      const imageRef = new Image();
-      preloadRefs.current.set(image.id, imageRef);
-
-      // Set up load handlers
-      const handleLoad = () => {
-        setPreloadState((prev) => ({
-          ...prev,
-          loaded: new Set([...prev.loaded, image.id]),
-          loading: new Set([...prev.loading].filter((id) => id !== image.id)),
-        }));
-      };
-
-      const handleError = () => {
+      // Set timeout for preload
+      const timeout = setTimeout(() => {
         setPreloadState((prev) => ({
           ...prev,
           failed: new Set([...prev.failed, image.id]),
           loading: new Set([...prev.loading].filter((id) => id !== image.id)),
         }));
-      };
-
-      // Set timeout for preload
-      const timeout = setTimeout(() => {
-        handleError();
       }, 10000); // 10 second timeout
 
-      preloadTimeouts.current.set(image.id, timeout);
+      preloadTimeouts.current.set(
+        image.id,
+        timeout as unknown as NodeJS.Timeout
+      );
 
-      // Start preloading
-      imageRef.source = { uri: image.url };
-      imageRef.onLoad = handleLoad;
-      imageRef.onError = handleError;
+      try {
+        // Use expo-image's prefetch method for React Native
+        await Image.prefetch(image.url);
+
+        // Clear timeout on success
+        clearTimeout(timeout);
+        preloadTimeouts.current.delete(image.id);
+
+        setPreloadState((prev) => ({
+          ...prev,
+          loaded: new Set([...prev.loaded, image.id]),
+          loading: new Set([...prev.loading].filter((id) => id !== image.id)),
+        }));
+      } catch {
+        // Clear timeout on error
+        clearTimeout(timeout);
+        preloadTimeouts.current.delete(image.id);
+
+        setPreloadState((prev) => ({
+          ...prev,
+          failed: new Set([...prev.failed, image.id]),
+          loading: new Set([...prev.loading].filter((id) => id !== image.id)),
+        }));
+      }
     },
     [preloadState]
   );
@@ -154,23 +159,16 @@ export const useImagePreloading = ({
       return;
     }
 
-    const currentIndicesSet = new Set(currentIndices);
     const imagesToKeep = new Set(
       currentIndices.map((index) => images[index]?.id).filter(Boolean)
     );
 
     // Clean up images that are no longer needed
-    preloadRefs.current.forEach((imageRef, imageId) => {
+    preloadTimeouts.current.forEach((timeout, imageId) => {
       if (!imagesToKeep.has(imageId)) {
         // Clear timeout
-        const timeout = preloadTimeouts.current.get(imageId);
-        if (timeout) {
-          clearTimeout(timeout);
-          preloadTimeouts.current.delete(imageId);
-        }
-
-        // Remove from refs
-        preloadRefs.current.delete(imageId);
+        clearTimeout(timeout);
+        preloadTimeouts.current.delete(imageId);
 
         // Update state
         setPreloadState((prev) => ({
@@ -185,13 +183,11 @@ export const useImagePreloading = ({
 
   // Cleanup on unmount
   useEffect(() => {
+    const timeouts = preloadTimeouts.current;
     return () => {
       // Clear all timeouts
-      preloadTimeouts.current.forEach((timeout) => clearTimeout(timeout));
-      preloadTimeouts.current.clear();
-
-      // Clear all refs
-      preloadRefs.current.clear();
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+      timeouts.clear();
     };
   }, []);
 
