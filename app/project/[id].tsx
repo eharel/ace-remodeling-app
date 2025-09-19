@@ -49,7 +49,7 @@ export default function ProjectDetailScreen() {
   };
 
   const handleMoreImagesPress = () => {
-    setSelectedImageIndex(5); // Start from 6th image (index 5)
+    setSelectedImageIndex(2); // Start from 3rd image (index 2)
     setGalleryVisible(true);
   };
 
@@ -228,7 +228,6 @@ export default function ProjectDetailScreen() {
         },
         picturesGrid: {
           flexDirection: "row",
-          flexWrap: "wrap",
           justifyContent: "space-between",
           marginTop: DesignTokens.spacing[4],
         },
@@ -506,7 +505,7 @@ export default function ProjectDetailScreen() {
           {isMoreCell && (
             <ThemedView style={styles.moreImagesOverlay}>
               <ThemedText style={styles.moreImagesText}>
-                +{project.pictures.length - 5} more photos
+                +{project.pictures.length - 2} more photos
               </ThemedText>
             </ThemedView>
           )}
@@ -691,10 +690,10 @@ export default function ProjectDetailScreen() {
           {project.pictures && project.pictures.length > 0 ? (
             <ThemedView style={styles.picturesGrid}>
               {project.pictures
-                .slice(0, 5)
+                .slice(0, 2)
                 .map((item, index) => renderGridImage(item, index))}
-              {project.pictures.length > 5 &&
-                renderGridImage(project.pictures[5], 5, true)}
+              {project.pictures.length > 2 &&
+                renderGridImage(project.pictures[2], 2, true)}
             </ThemedView>
           ) : (
             <ThemedView style={styles.emptyState}>

@@ -2,11 +2,10 @@ import * as Haptics from "expo-haptics";
 import { useCallback } from "react";
 import { Dimensions } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
-import { runOnJS, SharedValue, withSpring } from "react-native-reanimated";
+import { runOnJS, SharedValue, withTiming } from "react-native-reanimated";
 
 import {
-  ANIMATION_CONFIG,
-  EDGE_RESISTANCE,
+  MAX_EDGE_DRAG,
   SWIPE_THRESHOLD,
   VELOCITY_THRESHOLD,
 } from "../constants/gestureConstants";
@@ -64,7 +63,7 @@ export const useImageNavigation = ({
     (index: number) => {
       const targetX = -index * screenWidth;
       onIndexChange(index);
-      translateX.value = withSpring(targetX, ANIMATION_CONFIG);
+      translateX.value = withTiming(targetX, { duration: 300 });
 
       // Haptic feedback for thumbnail clicks
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -79,18 +78,22 @@ export const useImageNavigation = ({
       const baseX = -currentIndex * screenWidth;
       const newX = baseX + event.translationX;
 
-      // Apply bounds to prevent over-scrolling
+      // Apply bounds with subtle edge drag feedback
       const minX = -(imagesLength - 1) * screenWidth;
       const maxX = 0;
 
-      // Clamp the translation within bounds
+      // Subtle edge drag feedback with hard limits
       if (newX > maxX) {
-        // At first image - apply resistance
-        translateX.value = maxX + event.translationX * EDGE_RESISTANCE;
+        // At first image - allow small drag for visual feedback
+        const dragAmount = Math.min(event.translationX, MAX_EDGE_DRAG);
+        translateX.value = maxX + dragAmount;
       } else if (newX < minX) {
-        // At last image - apply resistance
-        translateX.value =
-          minX + (event.translationX - (minX - baseX)) * EDGE_RESISTANCE;
+        // At last image - allow small drag for visual feedback
+        const dragAmount = Math.max(
+          event.translationX - (minX - baseX),
+          -MAX_EDGE_DRAG
+        );
+        translateX.value = minX + dragAmount;
       } else {
         // Normal dragging
         translateX.value = newX;
@@ -136,9 +139,9 @@ export const useImageNavigation = ({
         runOnJS(onIndexChange)(targetIndex);
       }
 
-      // Animate to the target position
+      // Animate to the target position with linear animation
       const targetX = -targetIndex * screenWidth;
-      translateX.value = withSpring(targetX, ANIMATION_CONFIG);
+      translateX.value = withTiming(targetX, { duration: 300 });
     });
 
   return {

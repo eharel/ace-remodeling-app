@@ -16,14 +16,17 @@ export const SWIPE_THRESHOLD: number = screenWidth * 0.2;
 /** Minimum velocity (pixels per second) to trigger navigation */
 export const VELOCITY_THRESHOLD: number = 500;
 
-/** Spring animation configuration for smooth transitions */
+/** Smooth animation configuration - visible transitions without bouncing */
 export const ANIMATION_CONFIG: AnimationConfig = {
-  damping: 20,
-  stiffness: 300,
+  damping: 0.8,
+  stiffness: 150,
 } as const;
 
-/** Edge resistance factor for rubber band effect when reaching first/last images */
-export const EDGE_RESISTANCE: number = 0.3;
+/** Maximum number of pagination dots to show */
+export const MAX_PAGINATION_DOTS: number = 7;
+
+/** Maximum edge drag distance for visual feedback */
+export const MAX_EDGE_DRAG: number = 90;
 
 /** Screen width for layout calculations */
 export const SCREEN_WIDTH: number = screenWidth;

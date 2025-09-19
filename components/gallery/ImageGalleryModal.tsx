@@ -103,6 +103,7 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
         accessibilityLabel={accessibilityStrings.modal.label}
         accessibilityRole="none"
         accessibilityHint={accessibilityStrings.modal.hint}
+        statusBarTranslucent={true}
       >
         <View
           style={styles.modal}

@@ -7,6 +7,7 @@ import { ThemedText } from "@/components/themed";
 import { DesignTokens } from "@/themes";
 
 import { accessibilityStrings } from "./constants/accessibilityStrings";
+import { MAX_PAGINATION_DOTS } from "./constants/gestureConstants";
 import { ImageGalleryFooterProps, ThumbnailProps } from "./types/gallery.types";
 
 /**
@@ -117,6 +118,29 @@ export const ImageGalleryFooter = React.memo<ImageGalleryFooterProps>(
   ({ currentImage, images, currentIndex, onImageSelect, theme }) => {
     const insets = useSafeAreaInsets();
 
+    // Calculate pagination dots
+    const paginationDots = useMemo(() => {
+      const totalImages = images.length;
+      if (totalImages <= MAX_PAGINATION_DOTS) {
+        // Show all dots if we have few images
+        return Array.from({ length: totalImages }, (_, i) => i);
+      } else {
+        // Show subset of dots for many images
+        const startIndex = Math.max(
+          0,
+          currentIndex - Math.floor(MAX_PAGINATION_DOTS / 2)
+        );
+        const endIndex = Math.min(
+          totalImages,
+          startIndex + MAX_PAGINATION_DOTS
+        );
+        return Array.from(
+          { length: endIndex - startIndex },
+          (_, i) => startIndex + i
+        );
+      }
+    }, [images.length, currentIndex]);
+
     const styles = useMemo(
       () =>
         StyleSheet.create({
@@ -147,6 +171,23 @@ export const ImageGalleryFooter = React.memo<ImageGalleryFooterProps>(
             lineHeight:
               DesignTokens.typography.lineHeight.normal *
               DesignTokens.typography.fontSize.base,
+          },
+          paginationContainer: {
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: DesignTokens.spacing[4],
+            gap: 12,
+          },
+          paginationDot: {
+            width: 8,
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: "#ffffff",
+            opacity: 0.4,
+          },
+          paginationDotActive: {
+            opacity: 1,
           },
           thumbnailContainer: {
             flexDirection: "row",
@@ -183,6 +224,30 @@ export const ImageGalleryFooter = React.memo<ImageGalleryFooterProps>(
             </ThemedText>
           )}
         </View>
+
+        {/* Pagination Dots */}
+        {images.length > 1 && (
+          <View
+            style={styles.paginationContainer}
+            accessible={true}
+            accessibilityLabel={`Page ${currentIndex + 1} of ${images.length}`}
+            accessibilityRole="tablist"
+          >
+            {paginationDots.map((dotIndex) => (
+              <View
+                key={dotIndex}
+                style={[
+                  styles.paginationDot,
+                  dotIndex === currentIndex && styles.paginationDotActive,
+                ]}
+                accessible={true}
+                accessibilityLabel={`Page ${dotIndex + 1}`}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: dotIndex === currentIndex }}
+              />
+            ))}
+          </View>
+        )}
 
         {/* Thumbnails */}
         <View
