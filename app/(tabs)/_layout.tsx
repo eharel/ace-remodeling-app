@@ -14,7 +14,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: theme.colors.interactive.primary,
         tabBarInactiveTintColor: theme.colors.text.tertiary,
         tabBarStyle: {
-          backgroundColor: theme.colors.background.card,
+          backgroundColor: theme.colors.background.tertiary,
           borderTopColor: theme.colors.border.primary,
           ...Platform.select({
             ios: {

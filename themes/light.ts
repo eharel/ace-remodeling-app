@@ -11,12 +11,12 @@ export const lightTheme: Theme = {
   colors: {
     // Background colors - Light theme uses white and light grays
     background: {
-      primary: "#ffffff", // Pure white for main backgrounds
-      secondary: "#f8fafc", // Very light gray for secondary backgrounds
+      primary: "#f8fafc", // Very light gray for main backgrounds
+      secondary: "#f1f5f9", // Light gray for secondary backgrounds
       tertiary: "#f1f5f9", // Light gray for contrast areas
       accent: "#e2e8f0", // Medium light gray for separators
       card: "#ffffff", // White for cards and elevated elements
-      section: "#ffffff", // White for content sections
+      section: "#f8fafc", // Very light gray for content sections
       separator: "#e2e8f0", // Light gray for borders and dividers
       elevated: "#ffffff", // White for elevated elements
       overlay: "rgba(0, 0, 0, 0.95)", // Nearly opaque black for modal overlays

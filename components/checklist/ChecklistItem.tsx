@@ -58,7 +58,7 @@ export function ChecklistItem({
         color={
           isChecked
             ? theme.colors.interactive.primary
-            : theme.colors.text.tertiary
+            : theme.colors.text.secondary
         }
         accessibilityElementsHidden={true}
       />

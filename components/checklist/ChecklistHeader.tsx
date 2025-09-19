@@ -32,7 +32,10 @@ export function ChecklistHeader({
     <View
       style={[
         styles.header,
-        { borderBottomColor: theme.colors.border.primary },
+        {
+          backgroundColor: theme.colors.background.section,
+          borderBottomColor: theme.colors.border.primary,
+        },
       ]}
     >
       <View style={styles.headerContent}>
@@ -48,7 +51,10 @@ export function ChecklistHeader({
       <View style={styles.headerActions}>
         <TouchableOpacity
           onPress={onReset}
-          style={styles.resetButton}
+          style={[
+            styles.actionButton,
+            { backgroundColor: theme.colors.background.card },
+          ]}
           accessibilityRole="button"
           accessibilityLabel="Reset checklist"
           accessibilityHint="Immediately resets all checklist items to unchecked state"
@@ -61,13 +67,17 @@ export function ChecklistHeader({
         </TouchableOpacity>
         <TouchableOpacity
           onPress={onClose}
+          style={[
+            styles.actionButton,
+            { backgroundColor: theme.colors.background.card },
+          ]}
           accessibilityRole="button"
           accessibilityLabel="Close checklist"
           accessibilityHint="Closes the meeting checklist modal"
         >
           <MaterialIcons
             name="close"
-            size={24}
+            size={20}
             color={theme.colors.text.secondary}
           />
         </TouchableOpacity>
@@ -83,25 +93,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: DesignTokens.spacing[5], // 20px padding
     borderBottomWidth: 1,
+    ...DesignTokens.shadows.sm,
   },
   headerContent: {
     flex: 1,
   },
   title: {
     fontSize: DesignTokens.typography.fontSize.xl,
-    fontWeight: DesignTokens.typography.fontWeight.semibold,
+    fontWeight: DesignTokens.typography.fontWeight.bold,
     marginBottom: DesignTokens.spacing[1],
   },
   progressText: {
     fontSize: DesignTokens.typography.fontSize.sm,
     fontWeight: DesignTokens.typography.fontWeight.medium,
+    opacity: 0.8,
   },
   headerActions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: DesignTokens.spacing[3],
+    gap: DesignTokens.spacing[2],
   },
-  resetButton: {
-    padding: DesignTokens.spacing[1],
+  actionButton: {
+    padding: DesignTokens.spacing[2],
+    borderRadius: DesignTokens.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: "transparent",
+    ...DesignTokens.shadows.sm,
   },
 });

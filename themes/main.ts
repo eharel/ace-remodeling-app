@@ -28,7 +28,7 @@ export const mainTheme: Theme = {
     text: {
       primary: "#0f172a", // Very dark blue-gray for primary text
       secondary: "#475569", // Medium gray for secondary text
-      tertiary: "#64748b", // Lighter gray for tertiary text
+      tertiary: "#ffffff", // White for tertiary text (good contrast on dark backgrounds)
       inverse: "#ffffff", // White for text on dark backgrounds
       accent: "#BB9D67", // Warm gold for accent text
       disabled: "#94a3b8", // Light gray for disabled text
