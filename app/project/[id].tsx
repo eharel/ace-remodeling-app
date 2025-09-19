@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Dimensions,
@@ -95,6 +95,8 @@ export default function ProjectDetailScreen() {
         return "receipt";
       case "permit":
         return "verified-user";
+      case "specification":
+        return "engineering";
       case "photo":
         return "photo";
       case "plan":
@@ -331,44 +333,147 @@ export default function ProjectDetailScreen() {
         },
         documentsList: {
           flexDirection: "column",
+          backgroundColor: theme.colors.background.card,
+          borderRadius: DesignTokens.borderRadius.lg,
+          overflow: "hidden",
+          borderWidth: 1,
+          borderColor: theme.colors.border.subtle,
         },
         documentContainer: {
-          width: "100%",
-          marginBottom: DesignTokens.spacing[3],
-          padding: DesignTokens.spacing[4],
-          backgroundColor: theme.colors.background.secondary,
-          borderRadius: DesignTokens.borderRadius.lg,
-          borderLeftWidth: 4,
-          borderLeftColor: theme.colors.interactive.primary,
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
           flexDirection: "row",
-          alignItems: "flex-start",
+          alignItems: "center",
+          paddingVertical: DesignTokens.spacing[4],
+          paddingHorizontal: DesignTokens.spacing[5],
+          backgroundColor: theme.colors.background.card,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.colors.border.subtle,
+          minHeight: 72,
+        },
+        documentContainerLast: {
+          borderBottomWidth: 0,
         },
         documentIcon: {
-          marginRight: DesignTokens.spacing[3],
-          marginTop: DesignTokens.spacing[1],
+          width: 40,
+          height: 40,
+          borderRadius: DesignTokens.borderRadius.md,
+          backgroundColor: theme.colors.background.secondary,
+          justifyContent: "center",
+          alignItems: "center",
+          marginRight: DesignTokens.spacing[4],
         },
         documentContent: {
           flex: 1,
+          justifyContent: "center",
         },
-        documentContainerLast: {
-          marginBottom: 0,
+        documentHeader: {
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: DesignTokens.spacing[1],
         },
         documentName: {
           fontSize: DesignTokens.typography.fontSize.base,
           fontWeight: "600",
-          marginBottom: DesignTokens.spacing[2],
+          color: theme.colors.text.primary,
+          flex: 1,
+          marginRight: DesignTokens.spacing[2],
         },
         documentType: {
           fontSize: DesignTokens.typography.fontSize.xs,
-          opacity: 0.6,
-          textTransform: "capitalize",
-          marginBottom: DesignTokens.spacing[2],
+          fontWeight: "500",
+          color: theme.colors.text.secondary,
+          backgroundColor: theme.colors.background.secondary,
+          paddingHorizontal: DesignTokens.spacing[2],
+          paddingVertical: DesignTokens.spacing[1],
+          borderRadius: DesignTokens.borderRadius.sm,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
         },
         documentDescription: {
           fontSize: DesignTokens.typography.fontSize.sm,
-          opacity: 0.7,
+          color: theme.colors.text.secondary,
+          lineHeight: 20,
+          marginTop: DesignTokens.spacing[1],
+        },
+        documentAction: {
+          width: 32,
+          height: 32,
+          borderRadius: DesignTokens.borderRadius.sm,
+          backgroundColor: theme.colors.background.secondary,
+          justifyContent: "center",
+          alignItems: "center",
+          marginLeft: DesignTokens.spacing[2],
+        },
+        sectionHeader: {
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: DesignTokens.spacing[4],
+        },
+        viewAllButton: {
+          flexDirection: "row",
+          alignItems: "center",
+          paddingVertical: DesignTokens.spacing[2],
+          paddingHorizontal: DesignTokens.spacing[3],
+          backgroundColor: theme.colors.background.secondary,
+          borderRadius: DesignTokens.borderRadius.md,
+        },
+        viewAllButtonText: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          fontWeight: "600",
+          color: theme.colors.interactive.primary,
+          marginRight: DesignTokens.spacing[1],
+        },
+        documentsPreview: {
+          backgroundColor: theme.colors.background.card,
+          borderRadius: DesignTokens.borderRadius.lg,
+          padding: DesignTokens.spacing[4],
+          borderWidth: 1,
+          borderColor: theme.colors.border.subtle,
+        },
+        documentPreviewItem: {
+          flexDirection: "row",
+          alignItems: "center",
+          paddingVertical: DesignTokens.spacing[3],
+          paddingHorizontal: DesignTokens.spacing[3],
+          borderRadius: DesignTokens.borderRadius.md,
+          marginBottom: DesignTokens.spacing[2],
+        },
+        documentPreviewIcon: {
+          width: 32,
+          height: 32,
+          borderRadius: DesignTokens.borderRadius.sm,
+          backgroundColor: theme.colors.background.secondary,
+          justifyContent: "center",
+          alignItems: "center",
+          marginRight: DesignTokens.spacing[3],
+        },
+        documentPreviewContent: {
+          flex: 1,
+        },
+        documentPreviewName: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          fontWeight: "600",
+          color: theme.colors.text.primary,
+          marginBottom: DesignTokens.spacing[1],
+        },
+        documentPreviewType: {
+          fontSize: DesignTokens.typography.fontSize.xs,
+          color: theme.colors.text.secondary,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+        },
+        moreDocumentsButton: {
+          alignItems: "center",
+          paddingVertical: DesignTokens.spacing[3],
+          paddingHorizontal: DesignTokens.spacing[4],
+          backgroundColor: theme.colors.background.secondary,
+          borderRadius: DesignTokens.borderRadius.md,
+          marginTop: DesignTokens.spacing[2],
+        },
+        moreDocumentsText: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          fontWeight: "600",
+          color: theme.colors.interactive.primary,
         },
         logsList: {
           flexDirection: "column",
@@ -514,25 +619,33 @@ export default function ProjectDetailScreen() {
     );
   };
 
-  const renderDocument = (item: any, index: number, isLast: boolean) => (
-    <ThemedView
-      key={`document-${index}`}
-      style={[styles.documentContainer, isLast && styles.documentContainerLast]}
+  const renderDocumentPreview = (item: any, index: number) => (
+    <Pressable
+      key={`document-preview-${index}`}
+      style={({ pressed }) => [
+        styles.documentPreviewItem,
+        pressed && { backgroundColor: theme.colors.background.secondary },
+      ]}
+      onPress={() => router.push(`/project/${project.id}/documents`)}
+      accessible={true}
+      accessibilityLabel={`View ${item.name}, ${item.type} document`}
+      accessibilityHint="Double tap to view all documents"
+      accessibilityRole="button"
     >
-      <MaterialIcons
-        name={getDocumentIcon(item.type) as any}
-        size={24}
-        color={theme.colors.interactive.primary}
-        style={styles.documentIcon}
-      />
-      <ThemedView style={styles.documentContent}>
-        <ThemedText style={styles.documentName}>{item.name}</ThemedText>
-        <ThemedText style={styles.documentType}>{item.type}</ThemedText>
-        <ThemedText style={styles.documentDescription}>
-          {item.description}
+      <View style={styles.documentPreviewIcon}>
+        <MaterialIcons
+          name={getDocumentIcon(item.type) as any}
+          size={18}
+          color={theme.colors.interactive.primary}
+        />
+      </View>
+      <View style={styles.documentPreviewContent}>
+        <ThemedText style={styles.documentPreviewName} numberOfLines={1}>
+          {item.name}
         </ThemedText>
-      </ThemedView>
-    </ThemedView>
+        <ThemedText style={styles.documentPreviewType}>{item.type}</ThemedText>
+      </View>
+    </Pressable>
   );
 
   const renderLog = (item: any, index: number, isLast: boolean) => (
@@ -716,25 +829,61 @@ export default function ProjectDetailScreen() {
 
         {/* Documents Section */}
         <ThemedView style={styles.section}>
-          <ThemedText
-            style={[styles.sectionTitle, { color: theme.colors.text.primary }]}
-          >
-            Documents
-          </ThemedText>
+          <View style={styles.sectionHeader}>
+            <ThemedText
+              style={[
+                styles.sectionTitle,
+                { color: theme.colors.text.primary },
+              ]}
+            >
+              Documents
+            </ThemedText>
+            {project.documents && project.documents.length > 0 && (
+              <Pressable
+                style={styles.viewAllButton}
+                onPress={() => router.push(`/project/${project.id}/documents`)}
+                accessible={true}
+                accessibilityLabel="View all documents"
+                accessibilityRole="button"
+              >
+                <ThemedText style={styles.viewAllButtonText}>
+                  View All
+                </ThemedText>
+                <MaterialIcons
+                  name="chevron-right"
+                  size={16}
+                  color={theme.colors.interactive.primary}
+                />
+              </Pressable>
+            )}
+          </View>
           {project.documents && project.documents.length > 0 ? (
-            <ThemedView style={styles.documentsList}>
-              {project.documents.map((item, index) =>
-                renderDocument(
-                  item,
-                  index,
-                  index === project.documents.length - 1
-                )
+            <ThemedView style={styles.documentsPreview}>
+              {project.documents
+                .slice(0, 2)
+                .map((item, index) => renderDocumentPreview(item, index))}
+              {project.documents.length > 2 && (
+                <Pressable
+                  style={styles.moreDocumentsButton}
+                  onPress={() =>
+                    router.push(`/project/${project.id}/documents`)
+                  }
+                  accessible={true}
+                  accessibilityLabel={`View ${
+                    project.documents.length - 2
+                  } more documents`}
+                  accessibilityRole="button"
+                >
+                  <ThemedText style={styles.moreDocumentsText}>
+                    +{project.documents.length - 2} more
+                  </ThemedText>
+                </Pressable>
               )}
             </ThemedView>
           ) : (
-            <ThemedView style={styles.emptyState}>
+            <ThemedView style={[styles.emptyState, { marginTop: 0 }]}>
               <MaterialIcons
-                name="folder-open"
+                name="description"
                 size={48}
                 color={theme.colors.text.tertiary}
               />

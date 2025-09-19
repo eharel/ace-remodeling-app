@@ -91,6 +91,33 @@ export const mockProjects: Project[] = [
         description: "Project contract and specifications",
         uploadedAt: new Date("2024-01-10"),
       },
+      {
+        id: "doc-1b",
+        name: "Building Permit Application",
+        type: "permit",
+        url: "#",
+        fileType: "PDF",
+        description: "City building permit for plumbing and electrical work",
+        uploadedAt: new Date("2024-01-12"),
+      },
+      {
+        id: "doc-1c",
+        name: "Material Specifications",
+        type: "specification",
+        url: "#",
+        fileType: "PDF",
+        description: "Detailed material specifications and installation notes",
+        uploadedAt: new Date("2024-01-15"),
+      },
+      {
+        id: "doc-1d",
+        name: "Final Invoice",
+        type: "invoice",
+        url: "#",
+        fileType: "PDF",
+        description: "Final project invoice and payment details",
+        uploadedAt: new Date("2024-02-15"),
+      },
     ],
     logs: [
       {
