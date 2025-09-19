@@ -22,7 +22,7 @@ export default function ProjectDetailScreen() {
   const [project, setProject] = useState<Project | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { theme, isMain } = useTheme();
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (id) {
@@ -46,9 +46,7 @@ export default function ProjectDetailScreen() {
       StyleSheet.create({
         container: {
           flex: 1,
-          backgroundColor: isMain
-            ? theme.colors.background.primary
-            : theme.colors.background.secondary,
+          backgroundColor: theme.colors.background.primary,
         },
         errorState: {
           flex: 1,
@@ -66,9 +64,7 @@ export default function ProjectDetailScreen() {
         },
         header: {
           padding: DesignTokens.spacing[5],
-          backgroundColor: isMain
-            ? theme.colors.background.secondary
-            : theme.colors.background.card,
+          backgroundColor: theme.colors.background.card,
           marginBottom: DesignTokens.spacing[4],
           borderRadius: DesignTokens.borderRadius.lg,
           borderWidth: 1,
@@ -125,9 +121,7 @@ export default function ProjectDetailScreen() {
         pictureContainer: {
           width: 280,
           marginRight: DesignTokens.spacing[4],
-          backgroundColor: isMain
-            ? theme.colors.background.primary
-            : theme.colors.background.secondary,
+          backgroundColor: theme.colors.background.secondary,
           borderRadius: DesignTokens.borderRadius.lg,
           overflow: "hidden",
           borderWidth: 1,
@@ -179,9 +173,7 @@ export default function ProjectDetailScreen() {
           width: 250,
           marginRight: DesignTokens.spacing[4],
           padding: DesignTokens.spacing[4],
-          backgroundColor: isMain
-            ? theme.colors.background.card
-            : theme.colors.background.secondary,
+          backgroundColor: theme.colors.background.secondary,
           borderRadius: DesignTokens.borderRadius.lg,
           borderLeftWidth: 4,
           borderLeftColor: theme.colors.interactive.primary,
@@ -210,9 +202,7 @@ export default function ProjectDetailScreen() {
           width: 280,
           marginRight: DesignTokens.spacing[4],
           padding: DesignTokens.spacing[4],
-          backgroundColor: isMain
-            ? theme.colors.background.primary
-            : theme.colors.background.secondary,
+          backgroundColor: theme.colors.background.secondary,
           borderRadius: DesignTokens.borderRadius.lg,
           borderWidth: 1,
           borderColor: theme.colors.border.primary,
@@ -227,9 +217,7 @@ export default function ProjectDetailScreen() {
           lineHeight: 20,
         },
         clientInfo: {
-          backgroundColor: isMain
-            ? theme.colors.background.card
-            : theme.colors.background.secondary,
+          backgroundColor: theme.colors.background.secondary,
           padding: DesignTokens.spacing[4],
           borderRadius: DesignTokens.borderRadius.lg,
           borderWidth: 1,
@@ -250,7 +238,7 @@ export default function ProjectDetailScreen() {
           opacity: 0.7,
         },
       }),
-    [theme, isMain]
+    [theme]
   );
 
   if (!project) {

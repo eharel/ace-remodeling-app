@@ -8,16 +8,14 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { DesignTokens } from "@/themes";
 
 export default function SettingsScreen() {
-  const { theme, isMain } = useTheme();
+  const { theme } = useTheme();
 
   const styles = useMemo(
     () =>
       StyleSheet.create({
         container: {
           flex: 1,
-          backgroundColor: isMain
-            ? theme.colors.background.primary
-            : theme.colors.background.secondary,
+          backgroundColor: theme.colors.background.primary,
         },
         scrollView: {
           flex: 1,
@@ -69,9 +67,7 @@ export default function SettingsScreen() {
           marginTop: DesignTokens.spacing[2],
         },
         appearanceContainer: {
-          backgroundColor: isMain
-            ? theme.colors.background.secondary
-            : theme.colors.background.card,
+          backgroundColor: theme.colors.background.card,
           padding: DesignTokens.spacing[4],
           borderRadius: DesignTokens.borderRadius.md,
           borderWidth: 1,
@@ -79,9 +75,7 @@ export default function SettingsScreen() {
           ...DesignTokens.shadows.sm,
         },
         presentationContainer: {
-          backgroundColor: isMain
-            ? theme.colors.background.secondary
-            : theme.colors.background.card,
+          backgroundColor: theme.colors.background.card,
           padding: DesignTokens.spacing[4],
           borderRadius: DesignTokens.borderRadius.md,
           borderWidth: 1,
@@ -89,9 +83,7 @@ export default function SettingsScreen() {
           ...DesignTokens.shadows.sm,
         },
         dataContainer: {
-          backgroundColor: isMain
-            ? theme.colors.background.secondary
-            : theme.colors.background.card,
+          backgroundColor: theme.colors.background.card,
           padding: DesignTokens.spacing[4],
           borderRadius: DesignTokens.borderRadius.md,
           borderWidth: 1,
@@ -99,9 +91,7 @@ export default function SettingsScreen() {
           ...DesignTokens.shadows.sm,
         },
         aboutContainer: {
-          backgroundColor: isMain
-            ? theme.colors.background.secondary
-            : theme.colors.background.card,
+          backgroundColor: theme.colors.background.card,
           padding: DesignTokens.spacing[4],
           borderRadius: DesignTokens.borderRadius.md,
           borderWidth: 1,
@@ -109,7 +99,7 @@ export default function SettingsScreen() {
           ...DesignTokens.shadows.sm,
         },
       }),
-    [theme, isMain]
+    [theme]
   );
 
   const SettingItem = ({
