@@ -12,9 +12,9 @@ export function ThemeToggle() {
   const { themeSetting, setThemeSetting, theme } = useTheme();
 
   const themeOptions: { key: ThemeOption; label: string; icon: string }[] = [
+    { key: "main", label: "Main", icon: "business" },
     { key: "light", label: "Light", icon: "light-mode" },
     { key: "dark", label: "Dark", icon: "dark-mode" },
-    { key: "blue", label: "Blue", icon: "palette" },
     { key: "system", label: "System", icon: "auto-awesome" },
   ];
 
@@ -39,9 +39,6 @@ export function ThemeToggle() {
           borderWidth: 1,
           borderColor: theme.colors.border.primary,
           padding: DesignTokens.spacing[4],
-        },
-        title: {
-          marginBottom: DesignTokens.spacing[3],
         },
         buttonRow: {
           flexDirection: "row",
@@ -76,10 +73,6 @@ export function ThemeToggle() {
 
   return (
     <View style={dynamicStyles.container}>
-      <ThemedText variant="subtitle" style={dynamicStyles.title}>
-        Theme
-      </ThemedText>
-
       <View style={dynamicStyles.buttonRow}>
         {themeOptions.map((option) => {
           const active = isActive(option.key);

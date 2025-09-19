@@ -7,15 +7,15 @@
  */
 
 // Import theme definitions
-import { blueTheme } from "./blue";
 import { darkTheme } from "./dark";
 import { lightTheme } from "./light";
+import { mainTheme } from "./main";
 
 // Import types
 import type { Theme, ThemeName } from "./base/types";
 
 // Re-export theme definitions
-export { blueTheme, darkTheme, lightTheme };
+export { darkTheme, lightTheme, mainTheme };
 
 // Export base types and utilities
 export type {
@@ -61,9 +61,9 @@ export type {
  * Unified themes object
  */
 export const themes = {
+  main: mainTheme,
   light: lightTheme,
   dark: darkTheme,
-  blue: blueTheme,
 } as const;
 
 /**
@@ -71,12 +71,12 @@ export const themes = {
  */
 export function getTheme(name: ThemeName): Theme {
   switch (name) {
+    case "main":
+      return mainTheme;
     case "light":
       return lightTheme;
     case "dark":
       return darkTheme;
-    case "blue":
-      return blueTheme;
     default:
       throw new Error(`Theme '${name}' not found`);
   }
@@ -86,7 +86,7 @@ export function getTheme(name: ThemeName): Theme {
  * Get all available theme names
  */
 export function getAvailableThemes(): ThemeName[] {
-  return ["light", "dark", "blue"];
+  return ["main", "light", "dark"];
 }
 
 /**

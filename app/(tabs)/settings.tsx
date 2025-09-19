@@ -2,22 +2,22 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { ErrorTestComponent } from "@/components/dev/ErrorTestComponent";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemedText, ThemedView } from "@/components/themed";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesignTokens } from "@/themes";
 
 export default function SettingsScreen() {
-  const { theme } = useTheme();
+  const { theme, isMain } = useTheme();
 
   const styles = useMemo(
     () =>
       StyleSheet.create({
         container: {
           flex: 1,
-          backgroundColor: theme.colors.background.secondary,
+          backgroundColor: isMain
+            ? theme.colors.background.primary
+            : theme.colors.background.secondary,
         },
         scrollView: {
           flex: 1,
@@ -37,13 +37,11 @@ export default function SettingsScreen() {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          backgroundColor: theme.colors.background.card,
+          backgroundColor: "transparent",
           padding: DesignTokens.spacing[4],
           marginBottom: DesignTokens.spacing[2],
           borderRadius: DesignTokens.borderRadius.md,
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          ...DesignTokens.shadows.sm,
+          borderWidth: 0,
         },
         settingItemContent: {
           flex: 1,
@@ -65,19 +63,53 @@ export default function SettingsScreen() {
         comingSoon: {
           opacity: 0.5,
         },
-        aboutSection: {
-          marginTop: DesignTokens.spacing[4],
-          paddingTop: DesignTokens.spacing[4],
-          borderTopWidth: 1,
-          borderTopColor: theme.colors.border.primary,
-        },
         versionInfo: {
           textAlign: "center",
           opacity: 0.6,
           marginTop: DesignTokens.spacing[2],
         },
+        appearanceContainer: {
+          backgroundColor: isMain
+            ? theme.colors.background.secondary
+            : theme.colors.background.card,
+          padding: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.md,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          ...DesignTokens.shadows.sm,
+        },
+        presentationContainer: {
+          backgroundColor: isMain
+            ? theme.colors.background.secondary
+            : theme.colors.background.card,
+          padding: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.md,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          ...DesignTokens.shadows.sm,
+        },
+        dataContainer: {
+          backgroundColor: isMain
+            ? theme.colors.background.secondary
+            : theme.colors.background.card,
+          padding: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.md,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          ...DesignTokens.shadows.sm,
+        },
+        aboutContainer: {
+          backgroundColor: isMain
+            ? theme.colors.background.secondary
+            : theme.colors.background.card,
+          padding: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.md,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          ...DesignTokens.shadows.sm,
+        },
       }),
-    [theme]
+    [theme, isMain]
   );
 
   const SettingItem = ({
@@ -141,27 +173,9 @@ export default function SettingsScreen() {
             Appearance
           </ThemedText>
 
-          <ThemedView style={styles.settingItem}>
-            <MaterialIcons
-              name="palette"
-              size={24}
-              color={theme.colors.text.secondary}
-              style={styles.settingItemIcon}
-            />
-            <View style={styles.settingItemContent}>
-              <ThemedText variant="body" style={styles.settingItemTitle}>
-                Theme
-              </ThemedText>
-              <ThemedText
-                variant="caption"
-                style={styles.settingItemDescription}
-              >
-                Choose your preferred theme
-              </ThemedText>
-            </View>
+          <ThemedView style={styles.appearanceContainer}>
+            <ThemeToggle />
           </ThemedView>
-
-          <ThemeToggle />
         </View>
 
         {/* Presentation Section */}
@@ -170,19 +184,21 @@ export default function SettingsScreen() {
             Presentation
           </ThemedText>
 
-          <SettingItem
-            icon="view-module"
-            title="Default View"
-            description="Choose how projects are displayed"
-            disabled={true}
-          />
+          <ThemedView style={styles.presentationContainer}>
+            <SettingItem
+              icon="view-module"
+              title="Default View"
+              description="Choose how projects are displayed"
+              disabled={true}
+            />
 
-          <SettingItem
-            icon="image"
-            title="Image Quality"
-            description="Optimize for storage or quality"
-            disabled={true}
-          />
+            <SettingItem
+              icon="image"
+              title="Image Quality"
+              description="Optimize for storage or quality"
+              disabled={true}
+            />
+          </ThemedView>
         </View>
 
         {/* Data Section */}
@@ -191,55 +207,48 @@ export default function SettingsScreen() {
             Data & Sync
           </ThemedText>
 
-          <SettingItem
-            icon="sync"
-            title="Sync Preferences"
-            description="Configure automatic synchronization"
-            disabled={true}
-          />
+          <ThemedView style={styles.dataContainer}>
+            <SettingItem
+              icon="sync"
+              title="Sync Preferences"
+              description="Configure automatic synchronization"
+              disabled={true}
+            />
 
-          <SettingItem
-            icon="offline-bolt"
-            title="Offline Mode"
-            description="Manage offline capabilities"
-            disabled={true}
-          />
-        </View>
-
-        {/* Development Section */}
-        <View style={styles.section}>
-          <ThemedText variant="subtitle" style={styles.sectionTitle}>
-            Development
-          </ThemedText>
-
-          <ErrorBoundary>
-            <ErrorTestComponent />
-          </ErrorBoundary>
+            <SettingItem
+              icon="offline-bolt"
+              title="Offline Mode"
+              description="Manage offline capabilities"
+              disabled={true}
+            />
+          </ThemedView>
         </View>
 
         {/* About Section */}
-        <View style={styles.aboutSection}>
+        <View style={styles.section}>
           <ThemedText variant="subtitle" style={styles.sectionTitle}>
             About
           </ThemedText>
 
-          <SettingItem
-            icon="info"
-            title="App Version"
-            description="ACE Remodeling App v1.0.0"
-            disabled={true}
-          />
+          <ThemedView style={styles.aboutContainer}>
+            <SettingItem
+              icon="info"
+              title="App Version"
+              description="ACE Remodeling App v1.0.0"
+              disabled={true}
+            />
 
-          <SettingItem
-            icon="business"
-            title="Company Info"
-            description="About ACE Remodeling TX"
-            disabled={true}
-          />
+            <SettingItem
+              icon="business"
+              title="Company Info"
+              description="About ACE Remodeling TX"
+              disabled={true}
+            />
 
-          <ThemedText variant="caption" style={styles.versionInfo}>
-            Built for ACE Remodeling TX • Transforming Austin Homes
-          </ThemedText>
+            <ThemedText variant="caption" style={styles.versionInfo}>
+              Built for ACE Remodeling TX • Transforming Austin Homes
+            </ThemedText>
+          </ThemedView>
         </View>
       </ScrollView>
     </ThemedView>

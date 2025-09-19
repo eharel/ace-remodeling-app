@@ -14,7 +14,7 @@ import { ThemeName, themes, ThemeSetting } from "@/themes";
 // Theme constants - derived from themes system (single source of truth)
 const THEME_NAMES: ThemeName[] = Object.keys(themes) as ThemeName[];
 const SYSTEM_THEME = "system" as const;
-const DEFAULT_THEME: ThemeName = "light"; // Design decision: light as default
+const DEFAULT_THEME: ThemeName = "main"; // Design decision: main as default
 const DEFAULT_SETTING: ThemeSetting = SYSTEM_THEME;
 
 // Theme Context Types
@@ -31,7 +31,7 @@ interface ThemeContextType {
   theme: any;
   isDark: boolean;
   isLight: boolean;
-  isBlue: boolean;
+  isMain: boolean;
 }
 
 // Theme Context
@@ -71,7 +71,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   // Theme state helpers
   const isDark = currentTheme === "dark";
   const isLight = currentTheme === "light";
-  const isBlue = currentTheme === "blue";
+  const isMain = currentTheme === "main";
 
   // Load theme setting from storage on mount
   useEffect(() => {
@@ -128,7 +128,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       theme,
       isDark,
       isLight,
-      isBlue,
+      isMain,
     }),
     [
       themeSetting,
@@ -138,7 +138,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       theme,
       isDark,
       isLight,
-      isBlue,
+      isMain,
     ]
   );
 
