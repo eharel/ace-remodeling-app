@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  FlatList,
+  Dimensions,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -22,7 +22,15 @@ export default function ProjectDetailScreen() {
   const [project, setProject] = useState<Project | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [pressedImageIndex, setPressedImageIndex] = useState<number | null>(
+    null
+  );
   const { theme } = useTheme();
+
+  const screenWidth = Dimensions.get("window").width;
+  const gridPadding = DesignTokens.spacing[6] * 2; // left + right padding
+  const gridGap = DesignTokens.spacing[3];
+  const imageWidth = (screenWidth - gridPadding - gridGap * 2) / 3; // 3 columns with 2 gaps
 
   useEffect(() => {
     if (id) {
@@ -31,14 +39,18 @@ export default function ProjectDetailScreen() {
     }
   }, [id]);
 
-  const openGallery = (index: number) => {
-    console.log(`🖼️ Opening gallery at index: ${index}`);
+  const closeGallery = () => {
+    setGalleryVisible(false);
+  };
+
+  const handleImagePress = (index: number) => {
     setSelectedImageIndex(index);
     setGalleryVisible(true);
   };
 
-  const closeGallery = () => {
-    setGalleryVisible(false);
+  const handleMoreImagesPress = () => {
+    setSelectedImageIndex(5); // Start from 6th image (index 5)
+    setGalleryVisible(true);
   };
 
   const getStatusBadgeStyle = (status: string) => {
@@ -214,8 +226,50 @@ export default function ProjectDetailScreen() {
           fontWeight: "700",
           marginBottom: DesignTokens.spacing[6],
         },
-        picturesList: {
-          paddingRight: DesignTokens.spacing[5],
+        picturesGrid: {
+          flexDirection: "row",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          marginTop: DesignTokens.spacing[4],
+        },
+        gridImageContainer: {
+          aspectRatio: 4 / 3,
+          marginBottom: DesignTokens.spacing[3],
+          borderRadius: DesignTokens.borderRadius.lg,
+          overflow: "hidden",
+          backgroundColor: theme.colors.background.secondary,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          ...DesignTokens.shadows.sm,
+        },
+        gridImageContainerPressed: {
+          transform: [{ scale: 0.95 }],
+          ...DesignTokens.shadows.md,
+        },
+        gridImage: {
+          width: "100%",
+          height: "100%",
+        },
+        moreImagesOverlay: {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        moreImagesText: {
+          fontSize: DesignTokens.typography.fontSize.xl,
+          fontWeight: "bold",
+          color: "#ffffff",
+          textAlign: "center",
+        },
+        sectionSubtitle: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          marginTop: DesignTokens.spacing[1],
+          opacity: 0.7,
         },
         pictureContainer: {
           width: 280,
@@ -424,26 +478,42 @@ export default function ProjectDetailScreen() {
     );
   }
 
-  const renderPicture = ({ item, index }: { item: any; index: number }) => (
-    <ThemedView style={styles.pictureContainer}>
-      <Pressable
-        onPress={() => openGallery(index)}
-        style={({ pressed }) => [pressed && styles.pictureContainerPressed]}
+  const renderGridImage = (
+    item: any,
+    index: number,
+    isMoreCell: boolean = false
+  ) => {
+    const isPressed = pressedImageIndex === index;
+
+    return (
+      <ThemedView
+        key={`grid-image-${index}`}
+        style={[styles.gridImageContainer, { width: imageWidth }]}
       >
-        <Image
-          source={{ uri: item.url }}
-          style={styles.picture}
-          contentFit="cover"
-        />
-      </Pressable>
-      <ThemedView style={styles.pictureInfo}>
-        <ThemedText style={styles.pictureType}>{item.type}</ThemedText>
-        <ThemedText style={styles.pictureDescription}>
-          {item.description}
-        </ThemedText>
+        <Pressable
+          onPress={() =>
+            isMoreCell ? handleMoreImagesPress() : handleImagePress(index)
+          }
+          onPressIn={() => setPressedImageIndex(index)}
+          onPressOut={() => setPressedImageIndex(null)}
+          style={isPressed ? styles.gridImageContainerPressed : undefined}
+        >
+          <Image
+            source={{ uri: item.url }}
+            style={styles.gridImage}
+            contentFit="cover"
+          />
+          {isMoreCell && (
+            <ThemedView style={styles.moreImagesOverlay}>
+              <ThemedText style={styles.moreImagesText}>
+                +{project.pictures.length - 5} more photos
+              </ThemedText>
+            </ThemedView>
+          )}
+        </Pressable>
       </ThemedView>
-    </ThemedView>
-  );
+    );
+  };
 
   const renderDocument = (item: any, index: number, isLast: boolean) => (
     <ThemedView
@@ -607,28 +677,25 @@ export default function ProjectDetailScreen() {
           <ThemedText
             style={[styles.sectionTitle, { color: theme.colors.text.primary }]}
           >
-            Project Pictures
+            Project Photos ({project.pictures?.length || 0})
           </ThemedText>
+          <ThemedText
+            style={[
+              styles.sectionSubtitle,
+              { color: theme.colors.text.secondary },
+            ]}
+          >
+            Tap any photo to view gallery
+          </ThemedText>
+
           {project.pictures && project.pictures.length > 0 ? (
-            <>
-              <FlatList
-                data={project.pictures}
-                renderItem={renderPicture}
-                keyExtractor={(item, index) => `picture-${index}`}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.picturesList}
-              />
-              <ThemedText
-                style={[
-                  styles.imageCounter,
-                  { color: theme.colors.text.secondary },
-                ]}
-              >
-                {project.pictures.length} image
-                {project.pictures.length !== 1 ? "s" : ""}
-              </ThemedText>
-            </>
+            <ThemedView style={styles.picturesGrid}>
+              {project.pictures
+                .slice(0, 5)
+                .map((item, index) => renderGridImage(item, index))}
+              {project.pictures.length > 5 &&
+                renderGridImage(project.pictures[5], 5, true)}
+            </ThemedView>
           ) : (
             <ThemedView style={styles.emptyState}>
               <MaterialIcons
