@@ -16,7 +16,7 @@ export const darkTheme: Theme = {
       tertiary: "#334155", // Medium dark gray for contrast areas
       accent: "#475569", // Medium gray for separators
       card: "#1e293b", // Dark gray for cards and elevated elements
-      section: "#1e293b", // Dark gray for content sections
+      section: "#0f172a", // Very dark gray for content sections
       separator: "#334155", // Medium dark gray for borders and dividers
       elevated: "#334155", // Medium dark gray for elevated elements
       overlay: "rgba(0, 0, 0, 0.95)", // Nearly opaque black for modal overlays

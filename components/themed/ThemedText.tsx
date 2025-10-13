@@ -56,7 +56,7 @@ export function ThemedText({
       case "caption":
         baseStyles.fontSize = 14;
         baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || theme.colors.text.tertiary;
+        baseStyles.color = color || theme.colors.text.secondary;
         break;
       case "link":
         baseStyles.fontSize = 16;

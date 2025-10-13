@@ -71,10 +71,9 @@ export const ImageGalleryHeader = React.memo<ImageGalleryHeaderProps>(
             alignItems: "center",
           },
           imageCounter: {
-            backgroundColor: theme.colors.background.overlay,
+            backgroundColor: "transparent",
             paddingHorizontal: DesignTokens.spacing[3],
             paddingVertical: DesignTokens.spacing[2],
-            borderRadius: DesignTokens.borderRadius.md,
           },
         }),
       [theme, insets]
@@ -106,8 +105,9 @@ export const ImageGalleryHeader = React.memo<ImageGalleryHeaderProps>(
         >
           <ThemedText
             style={{
-              color: theme.colors.text.inverse,
-              fontWeight: DesignTokens.typography.fontWeight.semibold,
+              color: "#ffffff",
+              fontSize: DesignTokens.typography.fontSize.base,
+              fontWeight: "600",
             }}
           >
             {currentIndex + 1} of {totalImages}

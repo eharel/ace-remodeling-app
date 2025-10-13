@@ -1,62 +1,64 @@
 /**
- * Light Theme - Clean, bright theme with high contrast
+ * Main Theme - Brand theme matching the website design
+ * Uses the professional color palette from the ACE Remodeling website
  */
 
 import type { Theme } from "./base/types";
-export const lightTheme: Theme = {
-  name: "light",
+
+export const mainTheme: Theme = {
+  name: "main",
   isDark: false,
   isLight: true,
 
   colors: {
-    // Background colors - Light theme uses white and light grays
+    // Background colors - Warm, professional backgrounds
     background: {
-      primary: "#f8fafc", // Very light gray for main backgrounds
-      secondary: "#f1f5f9", // Light gray for secondary backgrounds
-      tertiary: "#f1f5f9", // Light gray for contrast areas
+      primary: "#F7F4EF", // Warm off-white from website
+      secondary: "#ffffff", // Pure white for contrast
+      tertiary: "#323B4A", // Dark blue-gray for headers/footers (like website footer)
       accent: "#e2e8f0", // Medium light gray for separators
       card: "#ffffff", // White for cards and elevated elements
-      section: "#f8fafc", // Very light gray for content sections
+      section: "#F7F4EF", // Warm off-white for content sections
       separator: "#e2e8f0", // Light gray for borders and dividers
       elevated: "#ffffff", // White for elevated elements
-      overlay: "rgba(0, 0, 0, 0.95)", // Nearly opaque black for modal overlays
+      overlay: "rgba(50, 59, 74, 0.95)", // Dark blue-gray overlay for modals
     },
 
-    // Text colors - Dark text on light backgrounds
+    // Text colors - Professional, readable text
     text: {
       primary: "#0f172a", // Very dark blue-gray for primary text
       secondary: "#475569", // Medium gray for secondary text
-      tertiary: "#64748b", // Lighter gray for tertiary text
+      tertiary: "#ffffff", // White for tertiary text (good contrast on dark backgrounds)
       inverse: "#ffffff", // White for text on dark backgrounds
-      accent: "#3b82f6", // Blue for accent text
+      accent: "#BB9D67", // Warm gold for accent text
       disabled: "#94a3b8", // Light gray for disabled text
       placeholder: "#9ca3af", // Light gray for placeholder text
     },
 
-    // Border colors - Subtle borders that don't overpower content
+    // Border colors - Subtle, professional borders
     border: {
       primary: "#e2e8f0", // Light gray for primary borders
       secondary: "#cbd5e1", // Slightly darker gray for secondary borders
-      accent: "#3b82f6", // Blue for accent borders (focus states)
+      accent: "#BB9D67", // Warm gold for accent borders (focus states)
       error: "#ef4444", // Red for error borders
       success: "#10b981", // Green for success borders
       warning: "#f59e0b", // Orange for warning borders
-      info: "#3b82f6", // Blue for info borders
+      info: "#6196B5", // Soft blue for info borders
     },
 
-    // Interactive colors - Clear, accessible interactive elements
+    // Interactive colors - Brand colors for interactive elements
     interactive: {
-      primary: "#3b82f6", // Blue for primary actions
-      primaryHover: "#2563eb", // Darker blue for hover states
-      primaryPressed: "#1d4ed8", // Even darker blue for pressed states
-      secondary: "#64748b", // Gray for secondary actions
-      secondaryHover: "#475569", // Darker gray for hover states
-      secondaryPressed: "#334155", // Even darker gray for pressed states
+      primary: "#BB9D67", // Warm gold for primary actions
+      primaryHover: "#a68a5a", // Darker gold for hover states
+      primaryPressed: "#91774d", // Even darker gold for pressed states
+      secondary: "#72907F", // Sage green for secondary actions
+      secondaryHover: "#5f7a6b", // Darker sage for hover states
+      secondaryPressed: "#4c6357", // Even darker sage for pressed states
       disabled: "#e2e8f0", // Light gray for disabled elements
       disabledText: "#94a3b8", // Light gray for disabled text
     },
 
-    // Status colors - Clear status indicators
+    // Status colors - Brand-aligned status indicators
     status: {
       success: "#10b981", // Green for success states
       successLight: "#d1fae5", // Light green for success backgrounds
@@ -64,19 +66,19 @@ export const lightTheme: Theme = {
       warningLight: "#fef3c7", // Light orange for warning backgrounds
       error: "#ef4444", // Red for error states
       errorLight: "#fee2e2", // Light red for error backgrounds
-      info: "#3b82f6", // Blue for info states
+      info: "#6196B5", // Soft blue for info states
       infoLight: "#dbeafe", // Light blue for info backgrounds
     },
 
-    // Component-specific colors - Tailored for specific UI components
+    // Component-specific colors - Brand-consistent component styling
     components: {
       button: {
-        primary: "#3b82f6", // Blue for primary buttons
-        primaryHover: "#2563eb", // Darker blue for hover
-        secondary: "#64748b", // Gray for secondary buttons
-        secondaryHover: "#475569", // Darker gray for hover
+        primary: "#BB9D67", // Warm gold for primary buttons
+        primaryHover: "#a68a5a", // Darker gold for hover
+        secondary: "#72907F", // Sage green for secondary buttons
+        secondaryHover: "#5f7a6b", // Darker sage for hover
         outline: "transparent", // Transparent for outline buttons
-        outlineBorder: "#e2e8f0", // Light gray border for outline buttons
+        outlineBorder: "#BB9D67", // Gold border for outline buttons
       },
       card: {
         background: "#ffffff", // White background for cards
@@ -86,14 +88,14 @@ export const lightTheme: Theme = {
       input: {
         background: "#ffffff", // White background for inputs
         border: "#e2e8f0", // Light gray border for inputs
-        borderFocus: "#3b82f6", // Blue border for focused inputs
+        borderFocus: "#BB9D67", // Gold border for focused inputs
         placeholder: "#9ca3af", // Light gray for placeholder text
       },
       // Floating Action Button component
       fab: {
-        backgroundColor: "#3b82f6", // Blue background
+        backgroundColor: "#BB9D67", // Gold background
         shadowColor: "#000000", // Black shadow for FAB
-        shadowOpacity: 0.2, // Lighter shadow for light theme
+        shadowOpacity: 0.2, // Standard shadow opacity
         activeOpacity: 0.7, // Standard active opacity
       },
 
@@ -103,14 +105,14 @@ export const lightTheme: Theme = {
         borderColor: "#e2e8f0", // Light gray border
         borderRadius: 12, // Standard border radius
         borderWidth: 1, // Standard border width
-        overlayOpacity: 0.5, // Lighter overlay for light theme
+        overlayOpacity: 0.5, // Standard overlay opacity
       },
 
       // Header component
       header: {
-        backgroundColor: "#ffffff", // White background
+        backgroundColor: "#323B4A", // Dark blue-gray background
         borderColor: "#e2e8f0", // Light gray border
-        titleFontWeight: "600", // Bold title for light theme
+        titleFontWeight: "600", // Bold title
         progressFontWeight: "500", // Medium weight for progress text
         borderBottomWidth: 1, // Standard border width
         padding: 20, // Standard padding

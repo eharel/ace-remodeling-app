@@ -283,7 +283,7 @@ export interface Theme {
  * Theme name type - derived from actual theme implementations
  * This ensures type safety when referencing theme names
  */
-export type ThemeName = "light" | "dark" | "blue";
+export type ThemeName = "main" | "light" | "dark";
 
 /**
  * Theme setting type - includes system option
@@ -312,12 +312,12 @@ export type CompleteTheme<T extends Theme> = T;
  * Type guard to check if a value is a valid theme name
  */
 export function isThemeName(value: string): value is ThemeName {
-  return ["light", "dark", "blue"].includes(value);
+  return ["main", "light", "dark"].includes(value);
 }
 
 /**
  * Type guard to check if a value is a valid theme setting
  */
 export function isThemeSetting(value: string): value is ThemeSetting {
-  return ["light", "dark", "blue", "system"].includes(value);
+  return ["main", "light", "dark", "system"].includes(value);
 }
