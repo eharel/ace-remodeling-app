@@ -12,13 +12,16 @@ import {
 
 import { ImageGalleryModal } from "@/components/gallery";
 import { ThemedText, ThemedView } from "@/components/themed";
+import { useProjects } from "@/contexts/ProjectsContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { mockProjects } from "@/data/mockProjects";
+// Comment out mock data for now (keeping for fallback)
+// import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/themes";
 import { Project } from "@/types";
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { projects } = useProjects();
   const [project, setProject] = useState<Project | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -34,10 +37,14 @@ export default function ProjectDetailScreen() {
 
   useEffect(() => {
     if (id) {
-      const foundProject = mockProjects.find((p) => p.id === id);
+      // Use Firebase data instead of mock data
+      const foundProject = projects.find((p) => p.id === id);
       setProject(foundProject || null);
+
+      // Fallback to mock data if needed (commented out for now)
+      // const foundProject = mockProjects.find((p) => p.id === id);
     }
-  }, [id]);
+  }, [id, projects]);
 
   const closeGallery = () => {
     setGalleryVisible(false);

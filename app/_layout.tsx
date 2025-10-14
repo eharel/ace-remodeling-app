@@ -14,6 +14,7 @@ import { LogBox } from "react-native";
 
 import { FloatingChecklistButton } from "@/components/checklist";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ProjectsProvider } from "@/contexts/ProjectsContext";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 LogBox.ignoreAllLogs(true);
 
@@ -59,8 +60,10 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
-        <Navigation />
-        <FloatingChecklistButton />
+        <ProjectsProvider>
+          <Navigation />
+          <FloatingChecklistButton />
+        </ProjectsProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   );

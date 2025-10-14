@@ -23,7 +23,7 @@ export const mockProjects: Project[] = [
         description:
           "Original bathroom condition - outdated fixtures and layout",
         order: 1,
-        createdAt: new Date("2024-01-15"),
+        createdAt: "2024-01-15T00:00:00.000Z",
       },
       {
         id: "1-3",
@@ -34,7 +34,7 @@ export const mockProjects: Project[] = [
         type: "before",
         description: "Original vanity and mirror setup",
         order: 2,
-        createdAt: new Date("2024-01-15"),
+        createdAt: "2024-01-15T00:00:00.000Z",
       },
       {
         id: "1-5",
@@ -45,7 +45,7 @@ export const mockProjects: Project[] = [
         type: "before",
         description: "Original basic bathtub",
         order: 3,
-        createdAt: new Date("2024-01-15"),
+        createdAt: "2024-01-15T00:00:00.000Z",
       },
       {
         id: "1-6",
@@ -56,7 +56,7 @@ export const mockProjects: Project[] = [
         type: "after",
         description: "New freestanding soaking tub",
         order: 4,
-        createdAt: new Date("2024-01-15"),
+        createdAt: "2024-01-15T00:00:00.000Z",
       },
       {
         id: "1-8",
@@ -67,7 +67,7 @@ export const mockProjects: Project[] = [
         type: "after",
         description: "New tile flooring and wall installation",
         order: 5,
-        createdAt: new Date("2024-01-15"),
+        createdAt: "2024-01-15T00:00:00.000Z",
       },
       {
         id: "1-10",
@@ -78,7 +78,7 @@ export const mockProjects: Project[] = [
         type: "after",
         description: "New modern lighting fixtures and dimmers",
         order: 6,
-        createdAt: new Date("2024-01-15"),
+        createdAt: "2024-01-15T00:00:00.000Z",
       },
     ],
     documents: [
@@ -89,7 +89,7 @@ export const mockProjects: Project[] = [
         url: "#",
         fileType: "PDF",
         description: "Project contract and specifications",
-        uploadedAt: new Date("2024-01-10"),
+        uploadedAt: "2024-01-10T00:00:00.000Z",
       },
       {
         id: "doc-1b",
@@ -98,7 +98,7 @@ export const mockProjects: Project[] = [
         url: "#",
         fileType: "PDF",
         description: "City building permit for plumbing and electrical work",
-        uploadedAt: new Date("2024-01-12"),
+        uploadedAt: "2024-01-12T00:00:00.000Z",
       },
       {
         id: "doc-1c",
@@ -107,7 +107,7 @@ export const mockProjects: Project[] = [
         url: "#",
         fileType: "PDF",
         description: "Detailed material specifications and installation notes",
-        uploadedAt: new Date("2024-01-15"),
+        uploadedAt: "2024-01-15T00:00:00.000Z",
       },
       {
         id: "doc-1d",
@@ -116,7 +116,7 @@ export const mockProjects: Project[] = [
         url: "#",
         fileType: "PDF",
         description: "Final project invoice and payment details",
-        uploadedAt: new Date("2024-02-15"),
+        uploadedAt: "2024-02-15T00:00:00.000Z",
       },
     ],
     logs: [
@@ -126,7 +126,7 @@ export const mockProjects: Project[] = [
         type: "milestone",
         title: "Project Started",
         description: "Demolition and preparation work began",
-        date: new Date("2024-01-10"),
+        date: "2024-01-10T00:00:00.000Z",
         author: "Mike Johnson",
         status: "completed",
       },
@@ -139,13 +139,14 @@ export const mockProjects: Project[] = [
       email: "sarah.chen@email.com",
     },
     projectDates: {
-      startDate: new Date("2024-01-10"),
-      completionDate: new Date("2024-02-15"),
-      estimatedCompletion: new Date("2024-02-20"),
+      startDate: "2024-01-10T00:00:00.000Z",
+      completionDate: "2024-02-15T00:00:00.000Z",
+      estimatedCompletion: "2024-02-20T00:00:00.000Z",
     },
     status: "completed",
-    createdAt: new Date("2024-01-05"),
-    updatedAt: new Date("2024-02-15"),
+    createdAt: "2024-01-05T00:00:00.000Z",
+    updatedAt: "2024-02-15T00:00:00.000Z",
+    pms: [{ name: "Mike Johnson" }],
     tags: [
       "master bathroom",
       "walk-in shower",
@@ -175,7 +176,7 @@ export const mockProjects: Project[] = [
         type: "before",
         description: "Original kitchen layout",
         order: 1,
-        createdAt: new Date("2024-02-01"),
+        createdAt: "2024-02-01T00:00:00.000Z",
       },
       {
         id: "2-2",
@@ -186,7 +187,7 @@ export const mockProjects: Project[] = [
         type: "after",
         description: "Completed kitchen with island",
         order: 2,
-        createdAt: new Date("2024-02-01"),
+        createdAt: "2024-02-01T00:00:00.000Z",
       },
     ],
     documents: [
@@ -197,7 +198,7 @@ export const mockProjects: Project[] = [
         url: "#",
         fileType: "PDF",
         description: "City building permit",
-        uploadedAt: new Date("2024-01-25"),
+        uploadedAt: "2024-01-25T00:00:00.000Z",
       },
     ],
     logs: [
@@ -207,7 +208,7 @@ export const mockProjects: Project[] = [
         type: "milestone",
         title: "Island Construction Complete",
         description: "Custom island frame and countertop installed",
-        date: new Date("2024-02-20"),
+        date: "2024-02-20T00:00:00.000Z",
         author: "Mike Johnson",
         status: "completed",
       },
@@ -220,13 +221,14 @@ export const mockProjects: Project[] = [
       email: "maria.rodriguez@email.com",
     },
     projectDates: {
-      startDate: new Date("2024-01-25"),
-      completionDate: new Date("2024-02-20"),
-      estimatedCompletion: new Date("2024-03-15"),
+      startDate: "2024-01-25T00:00:00.000Z",
+      completionDate: "2024-02-20T00:00:00.000Z",
+      estimatedCompletion: "2024-03-15T00:00:00.000Z",
     },
     status: "in-progress",
-    createdAt: new Date("2024-01-20"),
-    updatedAt: new Date("2024-02-20"),
+    createdAt: "2024-01-20T00:00:00.000Z",
+    updatedAt: "2024-02-20T00:00:00.000Z",
+    pms: [{ name: "Sarah Wilson" }],
     tags: [
       "kitchen island",
       "cabinet update",
@@ -254,7 +256,7 @@ export const mockProjects: Project[] = [
         type: "before",
         description: "Original deck size",
         order: 1,
-        createdAt: new Date("2024-03-01"),
+        createdAt: "2024-03-01T00:00:00.000Z",
       },
       {
         id: "3-2",
@@ -265,7 +267,7 @@ export const mockProjects: Project[] = [
         type: "after",
         description: "Completed outdoor space",
         order: 2,
-        createdAt: new Date("2024-03-01"),
+        createdAt: "2024-03-01T00:00:00.000Z",
       },
     ],
     documents: [
@@ -276,7 +278,7 @@ export const mockProjects: Project[] = [
         url: "#",
         fileType: "PDF",
         description: "Final project invoice",
-        uploadedAt: new Date("2024-04-01"),
+        uploadedAt: "2024-04-01T00:00:00.000Z",
       },
     ],
     logs: [
@@ -286,7 +288,7 @@ export const mockProjects: Project[] = [
         type: "completion",
         title: "Project Completed",
         description: "Deck extension and patio cover finished",
-        date: new Date("2024-04-01"),
+        date: "2024-04-01T00:00:00.000Z",
         author: "Mike Johnson",
         status: "completed",
       },
@@ -299,13 +301,14 @@ export const mockProjects: Project[] = [
       email: "robert.thompson@email.com",
     },
     projectDates: {
-      startDate: new Date("2024-03-01"),
-      completionDate: new Date("2024-04-01"),
-      estimatedCompletion: new Date("2024-04-15"),
+      startDate: "2024-03-01T00:00:00.000Z",
+      completionDate: "2024-04-01T00:00:00.000Z",
+      estimatedCompletion: "2024-04-15T00:00:00.000Z",
     },
     status: "completed",
-    createdAt: new Date("2024-02-25"),
-    updatedAt: new Date("2024-04-01"),
+    createdAt: "2024-02-25T00:00:00.000Z",
+    updatedAt: "2024-04-01T00:00:00.000Z",
+    pms: [{ name: "Mike Johnson" }, { name: "Carlos Martinez" }],
     tags: [
       "deck extension",
       "covered patio",
@@ -335,7 +338,7 @@ export const mockProjects: Project[] = [
         type: "before",
         description: "Original guest bathroom",
         order: 1,
-        createdAt: new Date("2024-02-01"),
+        createdAt: "2024-02-01T00:00:00.000Z",
       },
       {
         id: "4-2",
@@ -346,7 +349,7 @@ export const mockProjects: Project[] = [
         type: "after",
         description: "Updated bathroom with modern fixtures",
         order: 2,
-        createdAt: new Date("2024-02-01"),
+        createdAt: "2024-02-01T00:00:00.000Z",
       },
     ],
     documents: [
@@ -357,7 +360,7 @@ export const mockProjects: Project[] = [
         url: "#",
         fileType: "PDF",
         description: "Project contract and specifications",
-        uploadedAt: new Date("2024-01-25"),
+        uploadedAt: "2024-01-25T00:00:00.000Z",
       },
     ],
     logs: [
@@ -367,7 +370,7 @@ export const mockProjects: Project[] = [
         type: "milestone",
         title: "Project Started",
         description: "Fixtures and materials ordered",
-        date: new Date("2024-01-25"),
+        date: "2024-01-25T00:00:00.000Z",
         author: "Mike Johnson",
         status: "completed",
       },
@@ -380,13 +383,14 @@ export const mockProjects: Project[] = [
       email: "jennifer.martinez@email.com",
     },
     projectDates: {
-      startDate: new Date("2024-01-25"),
-      completionDate: new Date("2024-02-10"),
-      estimatedCompletion: new Date("2024-02-15"),
+      startDate: "2024-01-25T00:00:00.000Z",
+      completionDate: "2024-02-10T00:00:00.000Z",
+      estimatedCompletion: "2024-02-15T00:00:00.000Z",
     },
     status: "completed",
-    createdAt: new Date("2024-01-20"),
-    updatedAt: new Date("2024-02-10"),
+    createdAt: "2024-01-20T00:00:00.000Z",
+    updatedAt: "2024-02-10T00:00:00.000Z",
+    pms: [{ name: "Sarah Wilson" }],
     tags: [
       "guest bathroom",
       "fixtures update",
@@ -416,7 +420,7 @@ export const mockProjects: Project[] = [
         type: "before",
         description: "Original powder room condition",
         order: 1,
-        createdAt: new Date("2024-03-15"),
+        createdAt: "2024-03-15T00:00:00.000Z",
       },
       {
         id: "5-2",
@@ -427,7 +431,7 @@ export const mockProjects: Project[] = [
         type: "after",
         description: "Custom vanity and tile work completed",
         order: 2,
-        createdAt: new Date("2024-03-15"),
+        createdAt: "2024-03-15T00:00:00.000Z",
       },
     ],
     documents: [
@@ -438,7 +442,7 @@ export const mockProjects: Project[] = [
         url: "#",
         fileType: "PDF",
         description: "Design specifications and tile layout",
-        uploadedAt: new Date("2024-03-10"),
+        uploadedAt: "2024-03-10T00:00:00.000Z",
       },
     ],
     logs: [
@@ -448,7 +452,7 @@ export const mockProjects: Project[] = [
         type: "milestone",
         title: "Project Started",
         description: "Demolition and preparation work began",
-        date: new Date("2024-03-10"),
+        date: "2024-03-10T00:00:00.000Z",
         author: "Mike Johnson",
         status: "in-progress",
       },
@@ -461,13 +465,14 @@ export const mockProjects: Project[] = [
       email: "michael.rodriguez@email.com",
     },
     projectDates: {
-      startDate: new Date("2024-03-10"),
+      startDate: "2024-03-10T00:00:00.000Z",
       completionDate: undefined,
-      estimatedCompletion: new Date("2024-04-05"),
+      estimatedCompletion: "2024-04-05T00:00:00.000Z",
     },
     status: "in-progress",
-    createdAt: new Date("2024-03-05"),
-    updatedAt: new Date("2024-03-15"),
+    createdAt: "2024-03-05T00:00:00.000Z",
+    updatedAt: "2024-03-15T00:00:00.000Z",
+    pms: [{ name: "Carlos Martinez" }],
     tags: ["powder room", "custom vanity", "tile work", "small space design"],
     estimatedCost: 12000,
     actualCost: undefined,
@@ -492,7 +497,7 @@ export const mockProjects: Project[] = [
         type: "before",
         description: "Original closed kitchen",
         order: 1,
-        createdAt: new Date("2024-01-20"),
+        createdAt: "2024-01-20T00:00:00.000Z",
       },
       {
         id: "6-2",
@@ -503,7 +508,7 @@ export const mockProjects: Project[] = [
         type: "after",
         description: "Open concept kitchen completed",
         order: 2,
-        createdAt: new Date("2024-01-20"),
+        createdAt: "2024-01-20T00:00:00.000Z",
       },
     ],
     documents: [
@@ -514,7 +519,7 @@ export const mockProjects: Project[] = [
         url: "#",
         fileType: "PDF",
         description: "Project contract and structural specifications",
-        uploadedAt: new Date("2024-01-15"),
+        uploadedAt: "2024-01-15T00:00:00.000Z",
       },
     ],
     logs: [
@@ -524,7 +529,7 @@ export const mockProjects: Project[] = [
         type: "milestone",
         title: "Project Started",
         description: "Structural work and wall removal began",
-        date: new Date("2024-01-15"),
+        date: "2024-01-15T00:00:00.000Z",
         author: "Mike Johnson",
         status: "completed",
       },
@@ -537,13 +542,14 @@ export const mockProjects: Project[] = [
       email: "david.wilson@email.com",
     },
     projectDates: {
-      startDate: new Date("2024-01-15"),
-      completionDate: new Date("2024-03-01"),
-      estimatedCompletion: new Date("2024-03-15"),
+      startDate: "2024-01-15T00:00:00.000Z",
+      completionDate: "2024-03-01T00:00:00.000Z",
+      estimatedCompletion: "2024-03-15T00:00:00.000Z",
     },
     status: "completed",
-    createdAt: new Date("2024-01-10"),
-    updatedAt: new Date("2024-03-01"),
+    createdAt: "2024-01-10T00:00:00.000Z",
+    updatedAt: "2024-03-01T00:00:00.000Z",
+    pms: [{ name: "Mike Johnson" }, { name: "Sarah Wilson" }],
     tags: [
       "open concept",
       "structural work",
@@ -570,6 +576,7 @@ export const getProjectSummaries = (): ProjectSummary[] => {
     thumbnail: project.thumbnail,
     status: project.status,
     completedAt: project.projectDates?.completionDate,
+    pmNames: project.pms?.map((pm) => pm.name) || [],
   }));
 };
 
@@ -592,6 +599,7 @@ export const getProjectSummariesByCategory = (
     thumbnail: project.thumbnail,
     status: project.status,
     completedAt: project.projectDates?.completionDate,
+    pmNames: project.pms?.map((pm) => pm.name) || [],
   }));
 
   console.log(
