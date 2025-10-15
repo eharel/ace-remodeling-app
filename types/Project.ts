@@ -7,6 +7,7 @@ import { ProjectStatus } from "./Status";
 
 export interface Project {
   id: string;
+  projectNumber: string; // ACE project tracking number (e.g., "217", "311B")
   name: string;
   category: ProjectCategory;
   briefDescription: string;
@@ -47,6 +48,7 @@ export interface Project {
 // Simplified version for list views
 export interface ProjectSummary {
   id: string;
+  projectNumber: string; // ACE project tracking number
   name: string;
   category: ProjectCategory;
   briefDescription: string;

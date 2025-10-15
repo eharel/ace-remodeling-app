@@ -21,9 +21,11 @@ import {
   getDocs,
   QueryDocumentSnapshot,
 } from "firebase/firestore";
+import * as fs from "fs";
+import * as path from "path";
 import { db } from "../config/firebase";
 import { seedProjects } from "../data/seedData";
-import { Project } from "../types";
+import { Picture, Project } from "../types";
 
 /**
  * Result summary from seeding operation
@@ -37,6 +39,122 @@ interface SeedResult {
 }
 
 /**
+ * Uploaded project data structure from Firebase Storage
+ */
+interface UploadedProject {
+  id: string;
+  slug: string;
+  name: string;
+  category: string;
+  photos: {
+    url: string;
+    category: string;
+    filename: string;
+    storagePath: string;
+    size: number;
+    order: number;
+  }[];
+  documents: {
+    url: string;
+    category: string;
+    filename: string;
+    storagePath: string;
+    size: number;
+    type: string;
+  }[];
+}
+
+/**
+ * Load uploaded projects from JSON file if available
+ */
+function loadUploadedProjects(): UploadedProject[] | null {
+  try {
+    const uploadedDataPath = path.join(
+      __dirname,
+      "output",
+      "kitchen-projects.json"
+    );
+
+    if (!fs.existsSync(uploadedDataPath)) {
+      console.log("ℹ️  No uploaded projects file found, using seed data only");
+      return null;
+    }
+
+    const jsonData = fs.readFileSync(uploadedDataPath, "utf-8");
+    const data = JSON.parse(jsonData);
+
+    console.log(
+      `✅ Loaded ${data.projects.length} uploaded projects from Firebase Storage`
+    );
+    return data.projects;
+  } catch (error) {
+    console.warn("⚠️  Error loading uploaded projects:", error);
+    return null;
+  }
+}
+
+/**
+ * Convert uploaded project data to seed format
+ *
+ * @param uploadedProject - Project data from Firebase Storage upload
+ * @returns Project object ready for Firestore
+ */
+function convertUploadedProject(
+  uploadedProject: UploadedProject
+): Omit<Project, "id"> {
+  // Map photos from uploaded format to Picture format
+  const pictures: Picture[] = uploadedProject.photos.map((photo) => ({
+    id: `${uploadedProject.slug}-photo-${photo.order}`,
+    url: photo.url,
+    type: mapCategoryToType(photo.category),
+    category: photo.category,
+    order: photo.order,
+    filename: photo.filename,
+    storagePath: photo.storagePath,
+    size: photo.size,
+    altText: `${uploadedProject.name} - ${photo.category} photo`,
+    createdAt: new Date().toISOString(),
+  }));
+
+  return {
+    projectNumber: uploadedProject.id,
+    name: uploadedProject.name,
+    category: uploadedProject.category as "kitchen" | "bathroom" | "outdoor",
+    briefDescription: `Professional ${uploadedProject.category} remodeling project`,
+    longDescription: `This ${uploadedProject.category} remodeling project showcases our expertise in transforming spaces with quality craftsmanship and attention to detail.`,
+    thumbnail:
+      pictures.find((p) => p.type === "after")?.url || pictures[0]?.url || "",
+    pms: [{ name: "Mike Johnson" }],
+    pictures,
+    documents: [],
+    logs: [],
+    location: "Austin, TX",
+    status: "completed" as const,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    tags: [uploadedProject.category, "remodel", "completed"],
+  };
+}
+
+/**
+ * Map upload category to Picture type
+ */
+function mapCategoryToType(category: string): Picture["type"] {
+  const mapping: Record<string, Picture["type"]> = {
+    before: "before",
+    after: "after",
+    progress: "progress",
+    rendering: "rendering",
+    materials: "detail",
+    other: "other",
+  };
+  return mapping[category] || "other";
+}
+
+// Load uploaded projects at module level
+const uploadedProjects = loadUploadedProjects();
+
+/**
  * Validates that a project object has all required fields
  *
  * @param project - The project object to validate
@@ -45,6 +163,7 @@ interface SeedResult {
  */
 function validateProject(project: Omit<Project, "id">): boolean {
   const requiredFields = [
+    "projectNumber",
     "name",
     "category",
     "briefDescription",
@@ -69,6 +188,13 @@ function validateProject(project: Omit<Project, "id">): boolean {
   }
 
   // Validate field types
+  if (
+    typeof project.projectNumber !== "string" ||
+    project.projectNumber.trim() === ""
+  ) {
+    throw new Error("Project number must be a non-empty string");
+  }
+
   if (typeof project.name !== "string" || project.name.trim() === "") {
     throw new Error("Project name must be a non-empty string");
   }
@@ -148,12 +274,29 @@ async function addSeedProjects(): Promise<{
   successCount: number;
   errors: string[];
 }> {
-  console.log(`\n📦 Adding ${seedProjects.length} seed projects...`);
+  // Prepare projects: use uploaded projects if available, otherwise use seed data
+  let projectsToSeed: Omit<Project, "id">[] = [];
+
+  if (uploadedProjects && uploadedProjects.length > 0) {
+    // Convert uploaded projects to seed format
+    projectsToSeed = uploadedProjects.map(convertUploadedProject);
+    console.log(
+      `\n📦 Adding ${projectsToSeed.length} projects from Firebase Storage...`
+    );
+    console.log(
+      `   (${uploadedProjects.length} uploaded projects with real photos)\n`
+    );
+  } else {
+    // Fallback to seed data
+    projectsToSeed = seedProjects;
+    console.log(`\n📦 Adding ${seedProjects.length} seed projects...`);
+    console.log(`   (Using mock data - no uploaded projects found)\n`);
+  }
 
   const errors: string[] = [];
   let successCount = 0;
 
-  for (const project of seedProjects) {
+  for (const project of projectsToSeed) {
     try {
       // Validate project data before inserting
       validateProject(project);
@@ -163,8 +306,13 @@ async function addSeedProjects(): Promise<{
       const docRef = await addDoc(projectsCollection, project);
 
       successCount++;
+
+      // Show indicator if project has real photos
+      const hasRealPhotos = project.pictures.some((p) => p.storagePath);
+      const indicator = hasRealPhotos ? "🎨" : "📷";
+
       console.log(
-        `   ✓ Added: "${project.name}" (${project.category}) - ID: ${docRef.id}`
+        `   ${indicator} Added: "${project.name}" (${project.category}, ${project.pictures.length} photos) - ID: ${docRef.id}`
       );
     } catch (error) {
       const errorMessage =
@@ -196,7 +344,12 @@ async function main(): Promise<SeedResult> {
   console.log("\n🌱 Starting Firebase Database Seeding");
   console.log("=====================================\n");
   console.log(`⏰ Started at: ${new Date().toLocaleString()}`);
-  console.log(`📊 Projects to seed: ${seedProjects.length}\n`);
+
+  const projectCount = uploadedProjects?.length || seedProjects.length;
+  const dataSource = uploadedProjects
+    ? "uploaded from Firebase Storage"
+    : "mock seed data";
+  console.log(`📊 Projects to seed: ${projectCount} (${dataSource})\n`);
 
   const result: SeedResult = {
     success: false,

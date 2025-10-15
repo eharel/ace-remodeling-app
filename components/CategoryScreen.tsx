@@ -25,6 +25,7 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
   // Convert Project[] to ProjectSummary[] for the CategoryPage component
   const projectSummaries: ProjectSummary[] = projects.map((project) => ({
     id: project.id,
+    projectNumber: project.projectNumber,
     name: project.name,
     category: project.category,
     briefDescription: project.briefDescription,

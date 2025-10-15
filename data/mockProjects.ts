@@ -4,6 +4,7 @@ import { Project, ProjectSummary } from "../types";
 export const mockProjects: Project[] = [
   {
     id: "1",
+    projectNumber: "217",
     name: "Modern Master Bathroom Renovation",
     category: "bathroom",
     briefDescription:
@@ -158,6 +159,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: "2",
+    projectNumber: "189",
     name: "Kitchen Island Addition & Remodel",
     category: "kitchen",
     briefDescription:
@@ -239,6 +241,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: "3",
+    projectNumber: "256",
     name: "Outdoor Deck & Patio Extension",
     category: "outdoor",
     briefDescription: "Extended existing deck and added covered patio area",
@@ -320,6 +323,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: "4",
+    projectNumber: "304A",
     name: "Guest Bathroom Refresh",
     category: "bathroom",
     briefDescription:
@@ -402,6 +406,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: "5",
+    projectNumber: "278C",
     name: "Powder Room Transformation",
     category: "bathroom",
     briefDescription:
@@ -479,6 +484,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: "6",
+    projectNumber: "311B",
     name: "Open Concept Kitchen Remodel",
     category: "kitchen",
     briefDescription:
@@ -570,6 +576,7 @@ export const getProjectsByCategory = (category: string): Project[] => {
 export const getProjectSummaries = (): ProjectSummary[] => {
   return mockProjects.map((project) => ({
     id: project.id,
+    projectNumber: project.projectNumber,
     name: project.name,
     category: project.category,
     briefDescription: project.briefDescription,
@@ -593,6 +600,7 @@ export const getProjectSummariesByCategory = (
 
   const summaries = filteredProjects.map((project) => ({
     id: project.id,
+    projectNumber: project.projectNumber,
     name: project.name,
     category: project.category,
     briefDescription: project.briefDescription,

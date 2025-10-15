@@ -9,7 +9,10 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "seed": "tsx scripts/seedFirebase.ts"
+    "seed": "tsx scripts/seedFirebase.ts",
+    "upload": "tsx scripts/uploadPhotos.ts",
+    "upload:dry-run": "tsx scripts/uploadPhotos.ts --dry-run",
+    "upload:force": "tsx scripts/uploadPhotos.ts --force"
   },
   "dependencies": {
     "@expo/metro-config": "^54.0.3",

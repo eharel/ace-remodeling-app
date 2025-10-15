@@ -16,6 +16,7 @@ import { Project } from "@/types";
  */
 export const seedProjects: Omit<Project, "id">[] = [
   {
+    projectNumber: "217",
     name: "Luxury Master Bathroom Remodel",
     category: "bathroom",
     briefDescription:
@@ -69,6 +70,7 @@ export const seedProjects: Omit<Project, "id">[] = [
   },
 
   {
+    projectNumber: "304A",
     name: "Modern Guest Bathroom Update",
     category: "bathroom",
     briefDescription:
@@ -114,6 +116,7 @@ export const seedProjects: Omit<Project, "id">[] = [
   },
 
   {
+    projectNumber: "189",
     name: "Open Concept Kitchen Transformation",
     category: "kitchen",
     briefDescription:
@@ -161,6 +164,7 @@ export const seedProjects: Omit<Project, "id">[] = [
   },
 
   {
+    projectNumber: "311B",
     name: "Farmhouse Kitchen Refresh",
     category: "kitchen",
     briefDescription:
