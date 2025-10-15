@@ -134,21 +134,46 @@ function convertUploadedProject(
 
   return {
     projectNumber: uploadedProject.id,
-    name: uploadedProject.name,
+    name: uploadedProject.name, // Will be updated with descriptive names from boss
     category: uploadedProject.category as "kitchen" | "bathroom" | "outdoor",
     briefDescription: `Professional ${uploadedProject.category} remodeling project`,
     longDescription: `This ${uploadedProject.category} remodeling project showcases our expertise in transforming spaces with quality craftsmanship and attention to detail.`,
     thumbnail:
       pictures.find((p) => p.type === "after")?.url || pictures[0]?.url || "",
+
+    // Location: zip code + neighborhood (not full address)
+    location: {
+      zipCode: "78701", // Default Austin zip - will update with real data
+      neighborhood: "Austin, TX",
+    },
+
+    // Duration: typical project timeline
+    duration: {
+      value: 8,
+      unit: "weeks" as const,
+    },
+
+    // Scope: description with design aspects (placeholder for now)
+    scope: `Professional ${uploadedProject.category} remodeling featuring modern design elements, quality craftsmanship, and attention to detail. This project showcases innovative solutions and timeless aesthetics.`,
+
+    // Testimonial: will be added when boss provides them
+    // testimonial: undefined,
+
     pms: [{ name: "Mike Johnson" }],
     pictures,
     documents,
     logs: [],
-    location: "Austin, TX",
+
+    // Internal metadata
+    projectDates: {
+      startDate: new Date().toISOString(),
+      completionDate: new Date().toISOString(),
+    },
     status: "completed" as const,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     tags: [uploadedProject.category, "remodel", "completed"],
+    featured: uploadedProject.id === "117", // Make one project featured
   };
 }
 
@@ -185,6 +210,9 @@ function validateProject(project: Omit<Project, "id">): boolean {
     "briefDescription",
     "longDescription",
     "thumbnail",
+    "location",
+    "duration",
+    "scope",
     "pictures",
     "documents",
     "logs",
@@ -225,6 +253,29 @@ function validateProject(project: Omit<Project, "id">): boolean {
 
   if (!Array.isArray(project.logs)) {
     throw new Error("Project logs must be an array");
+  }
+
+  // Validate location structure
+  if (
+    typeof project.location !== "object" ||
+    !project.location.zipCode ||
+    !project.location.neighborhood
+  ) {
+    throw new Error("Project must have location with zipCode and neighborhood");
+  }
+
+  // Validate duration structure
+  if (
+    typeof project.duration !== "object" ||
+    typeof project.duration.value !== "number" ||
+    !project.duration.unit
+  ) {
+    throw new Error("Project must have duration with value and unit");
+  }
+
+  // Validate scope
+  if (typeof project.scope !== "string" || project.scope.trim() === "") {
+    throw new Error("Project scope must be a non-empty string");
   }
 
   // Validate dates are ISO strings

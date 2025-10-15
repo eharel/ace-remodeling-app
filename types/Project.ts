@@ -8,11 +8,33 @@ import { ProjectStatus } from "./Status";
 export interface Project {
   id: string;
   projectNumber: string; // ACE project tracking number (e.g., "217", "311B")
-  name: string;
+  name: string; // Descriptive design-focused name
   category: ProjectCategory;
   briefDescription: string;
   longDescription: string;
   thumbnail: string;
+
+  // Location (public-facing: zip code + neighborhood only)
+  location: {
+    zipCode: string; // e.g., "78701"
+    neighborhood: string; // e.g., "Downtown Austin"
+  };
+
+  // Project duration
+  duration: {
+    value: number; // e.g., 8
+    unit: "days" | "weeks" | "months";
+  };
+
+  // Scope with design aspects
+  scope: string;
+
+  // Client testimonial (optional - will be added as received)
+  testimonial?: {
+    text: string;
+    author: string; // First name or initials
+    date?: string; // ISO string format
+  };
 
   // PM information - multiple PMs can work on a project
   pms?: ProjectManager[];
@@ -22,27 +44,17 @@ export interface Project {
   documents: Document[];
   logs: Log[];
 
-  // Additional fields
-  location?: string;
-  clientInfo?: {
-    name: string;
-    address: string;
-    phone?: string;
-    email?: string;
-  };
+  // Internal metadata (not shown to public)
   projectDates?: {
     startDate: string; // ISO string format
     completionDate?: string;
     estimatedCompletion?: string;
   };
   status: ProjectStatus;
-
-  // Metadata
   createdAt: string; // ISO string format
   updatedAt: string; // ISO string format
   tags?: string[];
-  estimatedCost?: number;
-  actualCost?: number;
+  featured?: boolean;
 }
 
 // Simplified version for list views

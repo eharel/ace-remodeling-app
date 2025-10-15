@@ -26,6 +26,25 @@ export const seedProjects: Omit<Project, "id">[] = [
     thumbnail:
       "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop",
 
+    // Location: zip code + neighborhood only
+    location: {
+      zipCode: "78746",
+      neighborhood: "Westlake Hills",
+    },
+
+    // Project duration
+    duration: {
+      value: 8,
+      unit: "weeks",
+    },
+
+    // Scope with design aspects
+    scope:
+      "Complete master bathroom transformation featuring spa-inspired design with walk-in shower, freestanding soaking tub, double vanity with quartz countertops, and heated tile flooring. Modern fixtures and thoughtful lighting create a luxurious retreat.",
+
+    // Testimonial: will be added when available
+    // testimonial: undefined,
+
     // PM information
     pms: [{ name: "Mike Johnson" }],
 
@@ -34,29 +53,15 @@ export const seedProjects: Omit<Project, "id">[] = [
     documents: [],
     logs: [],
 
-    // Location and client details
-    location: "Austin, TX - Westlake Hills",
-    clientInfo: {
-      name: "Jennifer & Robert Martinez",
-      address: "2847 Scenic Ridge Drive, Austin, TX 78746",
-      phone: "(512) 555-0198",
-      email: "jennifer.martinez@email.com",
-    },
-
-    // Project timeline
+    // Internal metadata
     projectDates: {
       startDate: "2024-01-15T09:00:00.000Z",
       completionDate: "2024-03-10T17:00:00.000Z",
       estimatedCompletion: "2024-03-15T17:00:00.000Z",
     },
-
     status: "completed",
-
-    // Metadata
     createdAt: "2024-01-10T14:30:00.000Z",
     updatedAt: "2024-03-10T17:00:00.000Z",
-
-    // Additional details
     tags: [
       "master bathroom",
       "walk-in shower",
@@ -65,8 +70,7 @@ export const seedProjects: Omit<Project, "id">[] = [
       "spa bathroom",
       "luxury remodel",
     ],
-    estimatedCost: 52000,
-    actualCost: 49800,
+    featured: false,
   },
 
   {
@@ -80,39 +84,40 @@ export const seedProjects: Omit<Project, "id">[] = [
     thumbnail:
       "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop",
 
+    location: {
+      zipCode: "78701",
+      neighborhood: "Hyde Park",
+    },
+
+    duration: {
+      value: 2,
+      unit: "weeks",
+    },
+
+    scope:
+      "Guest bathroom modernization with updated fixtures, contemporary finishes, and fresh paint. Features new vanity, mirror, lighting, and hardware for a clean, modern aesthetic.",
+
     pms: [{ name: "Sarah Wilson" }],
 
     pictures: [],
     documents: [],
     logs: [],
 
-    location: "Austin, TX - Hyde Park",
-    clientInfo: {
-      name: "David Chen",
-      address: "1523 Duval Street, Austin, TX 78701",
-      phone: "(512) 555-0242",
-      email: "david.chen@email.com",
-    },
-
     projectDates: {
       startDate: "2024-02-05T08:00:00.000Z",
       completionDate: "2024-02-18T16:00:00.000Z",
       estimatedCompletion: "2024-02-20T16:00:00.000Z",
     },
-
     status: "completed",
-
     createdAt: "2024-01-28T10:15:00.000Z",
     updatedAt: "2024-02-18T16:00:00.000Z",
-
     tags: [
       "guest bathroom",
       "budget remodel",
       "modern fixtures",
       "quick renovation",
     ],
-    estimatedCost: 8500,
-    actualCost: 8200,
+    featured: false,
   },
 
   {
@@ -126,31 +131,33 @@ export const seedProjects: Omit<Project, "id">[] = [
     thumbnail:
       "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=800&h=600&fit=crop",
 
+    location: {
+      zipCode: "78703",
+      neighborhood: "Tarrytown",
+    },
+
+    duration: {
+      value: 10,
+      unit: "weeks",
+    },
+
+    scope:
+      "Major kitchen transformation with structural wall removal to create open-concept layout. Features custom island with waterfall quartz countertop, shaker-style cabinetry, high-end stainless appliances, handmade subway tile backsplash in herringbone pattern, and designer lighting throughout.",
+
     pms: [{ name: "Mike Johnson" }, { name: "Carlos Martinez" }],
 
     pictures: [],
     documents: [],
     logs: [],
 
-    location: "Austin, TX - Tarrytown",
-    clientInfo: {
-      name: "Amanda & Steven Rodriguez",
-      address: "3156 Windsor Road, Austin, TX 78703",
-      phone: "(512) 555-0367",
-      email: "amanda.rodriguez@email.com",
-    },
-
     projectDates: {
       startDate: "2024-01-08T07:30:00.000Z",
       completionDate: "2024-03-22T18:00:00.000Z",
       estimatedCompletion: "2024-03-30T18:00:00.000Z",
     },
-
     status: "completed",
-
     createdAt: "2023-12-15T11:00:00.000Z",
     updatedAt: "2024-03-22T18:00:00.000Z",
-
     tags: [
       "open concept",
       "structural work",
@@ -159,8 +166,7 @@ export const seedProjects: Omit<Project, "id">[] = [
       "complete remodel",
       "entertaining space",
     ],
-    estimatedCost: 78000,
-    actualCost: 75500,
+    featured: true,
   },
 
   {
@@ -174,31 +180,33 @@ export const seedProjects: Omit<Project, "id">[] = [
     thumbnail:
       "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=600&fit=crop",
 
+    location: {
+      zipCode: "78704",
+      neighborhood: "Bouldin Creek",
+    },
+
+    duration: {
+      value: 5,
+      unit: "weeks",
+    },
+
+    scope:
+      "Farmhouse-style kitchen refresh featuring painted cabinetry in warm cream, custom shiplap range hood, butcher block countertops, classic white subway tile backsplash with dark grout, open shelving, farmhouse sink with bridge faucet, and statement lighting.",
+
     pms: [{ name: "Sarah Wilson" }],
 
     pictures: [],
     documents: [],
     logs: [],
 
-    location: "Austin, TX - Bouldin Creek",
-    clientInfo: {
-      name: "Emily Thompson",
-      address: "1842 South 3rd Street, Austin, TX 78704",
-      phone: "(512) 555-0421",
-      email: "emily.thompson@email.com",
-    },
-
     projectDates: {
       startDate: "2024-02-12T08:00:00.000Z",
       completionDate: "2024-03-15T17:00:00.000Z",
       estimatedCompletion: "2024-03-18T17:00:00.000Z",
     },
-
     status: "completed",
-
     createdAt: "2024-02-01T09:30:00.000Z",
     updatedAt: "2024-03-15T17:00:00.000Z",
-
     tags: [
       "farmhouse style",
       "cabinet painting",
@@ -207,7 +215,6 @@ export const seedProjects: Omit<Project, "id">[] = [
       "vintage details",
       "budget friendly",
     ],
-    estimatedCost: 32000,
-    actualCost: 30800,
+    featured: false,
   },
 ];
