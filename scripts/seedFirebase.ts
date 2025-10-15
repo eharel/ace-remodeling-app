@@ -25,7 +25,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { db } from "../config/firebase";
 import { seedProjects } from "../data/seedData";
-import { Picture, Project } from "../types";
+import { Document, Picture, Project } from "../types";
 
 /**
  * Result summary from seeding operation
@@ -116,6 +116,22 @@ function convertUploadedProject(
     createdAt: new Date().toISOString(),
   }));
 
+  // Map documents from uploaded format to Document format
+  const documents: Document[] = (uploadedProject.documents || []).map(
+    (doc) => ({
+      id: `${uploadedProject.slug}-doc-${doc.filename}`,
+      name: doc.filename,
+      url: doc.url,
+      type: doc.type, // Use the type from uploaded JSON (e.g., "3D Rendering", "Floor Plan")
+      category: doc.category,
+      fileType: "PDF",
+      fileSize: doc.size,
+      description: `${doc.type} for ${uploadedProject.name}`,
+      uploadedAt: new Date().toISOString(),
+      storagePath: doc.storagePath,
+    })
+  );
+
   return {
     projectNumber: uploadedProject.id,
     name: uploadedProject.name,
@@ -126,7 +142,7 @@ function convertUploadedProject(
       pictures.find((p) => p.type === "after")?.url || pictures[0]?.url || "",
     pms: [{ name: "Mike Johnson" }],
     pictures,
-    documents: [],
+    documents,
     logs: [],
     location: "Austin, TX",
     status: "completed" as const,
@@ -311,8 +327,16 @@ async function addSeedProjects(): Promise<{
       const hasRealPhotos = project.pictures.some((p) => p.storagePath);
       const indicator = hasRealPhotos ? "🎨" : "📷";
 
+      // Build details string
+      const photoCount = `${project.pictures.length} photo${
+        project.pictures.length !== 1 ? "s" : ""
+      }`;
+      const docCount = project.documents?.length || 0;
+      const docString =
+        docCount > 0 ? `, ${docCount} doc${docCount !== 1 ? "s" : ""}` : "";
+
       console.log(
-        `   ${indicator} Added: "${project.name}" (${project.category}, ${project.pictures.length} photos) - ID: ${docRef.id}`
+        `   ${indicator} Added: "${project.name}" (${project.category}, ${photoCount}${docString}) - ID: ${docRef.id}`
       );
     } catch (error) {
       const errorMessage =
