@@ -132,6 +132,11 @@ function convertUploadedProject(
     })
   );
 
+  // Generate realistic project dates (8 weeks duration as default)
+  const endDate = new Date();
+  const startDate = new Date(endDate);
+  startDate.setDate(startDate.getDate() - 56); // 8 weeks ago (56 days)
+
   return {
     projectNumber: uploadedProject.id,
     name: uploadedProject.name, // Will be updated with descriptive names from boss
@@ -147,10 +152,10 @@ function convertUploadedProject(
       neighborhood: "Austin, TX",
     },
 
-    // Duration: typical project timeline
-    duration: {
-      value: 8,
-      unit: "weeks" as const,
+    // Project dates (duration calculated from these)
+    projectDates: {
+      start: startDate.toISOString().split("T")[0], // "2024-03-01"
+      end: endDate.toISOString().split("T")[0], // "2024-05-15"
     },
 
     // Scope: description with design aspects (placeholder for now)
@@ -165,15 +170,12 @@ function convertUploadedProject(
     logs: [],
 
     // Internal metadata
-    projectDates: {
-      startDate: new Date().toISOString(),
-      completionDate: new Date().toISOString(),
-    },
     status: "completed" as const,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     tags: [uploadedProject.category, "remodel", "completed"],
     featured: uploadedProject.id === "117", // Make one project featured
+    completionDate: endDate.toISOString(),
   };
 }
 
@@ -211,7 +213,7 @@ function validateProject(project: Omit<Project, "id">): boolean {
     "longDescription",
     "thumbnail",
     "location",
-    "duration",
+    "projectDates",
     "scope",
     "pictures",
     "documents",
@@ -264,13 +266,29 @@ function validateProject(project: Omit<Project, "id">): boolean {
     throw new Error("Project must have location with zipCode and neighborhood");
   }
 
-  // Validate duration structure
+  // Validate projectDates structure
   if (
-    typeof project.duration !== "object" ||
-    typeof project.duration.value !== "number" ||
-    !project.duration.unit
+    typeof project.projectDates !== "object" ||
+    !project.projectDates.start ||
+    !project.projectDates.end
   ) {
-    throw new Error("Project must have duration with value and unit");
+    throw new Error("Project must have projectDates with start and end");
+  }
+
+  // Validate dates are valid ISO strings
+  const startDate = new Date(project.projectDates.start);
+  const endDate = new Date(project.projectDates.end);
+
+  if (isNaN(startDate.getTime())) {
+    throw new Error("Project start date must be a valid date");
+  }
+
+  if (isNaN(endDate.getTime())) {
+    throw new Error("Project end date must be a valid date");
+  }
+
+  if (endDate < startDate) {
+    throw new Error("Project end date must be after start date");
   }
 
   // Validate scope

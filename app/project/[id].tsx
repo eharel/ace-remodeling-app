@@ -18,6 +18,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/themes";
 import { Project } from "@/types";
+import { getProjectDuration } from "@/utils/duration";
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -545,28 +546,6 @@ export default function ProjectDetailScreen() {
           fontSize: DesignTokens.typography.fontSize.sm,
           lineHeight: 20,
         },
-        clientInfo: {
-          backgroundColor: theme.colors.background.secondary,
-          padding: DesignTokens.spacing[6],
-          borderRadius: DesignTokens.borderRadius.xl,
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          ...DesignTokens.shadows.sm,
-        },
-        clientName: {
-          fontSize: DesignTokens.typography.fontSize.lg,
-          fontWeight: "600",
-          marginBottom: DesignTokens.spacing[2],
-        },
-        clientDetails: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          opacity: 0.7,
-          lineHeight: 20,
-        },
-        clientContact: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          opacity: 0.7,
-        },
       }),
     [theme]
   );
@@ -772,7 +751,8 @@ export default function ProjectDetailScreen() {
                 Location
               </ThemedText>
               <ThemedText style={styles.metaValue}>
-                {project.location}
+                {project.location?.neighborhood || "Austin, TX"}{" "}
+                {project.location?.zipCode || ""}
               </ThemedText>
             </ThemedView>
             <ThemedView style={[styles.metaItem, styles.metaItemLast]}>
@@ -782,10 +762,10 @@ export default function ProjectDetailScreen() {
                   { color: theme.colors.text.secondary },
                 ]}
               >
-                Estimated Cost
+                Duration
               </ThemedText>
               <ThemedText style={styles.metaValue}>
-                ${project.estimatedCost?.toLocaleString() || "N/A"}
+                {getProjectDuration(project)}
               </ThemedText>
             </ThemedView>
           </ThemedView>
@@ -938,8 +918,8 @@ export default function ProjectDetailScreen() {
           )}
         </ThemedView>
 
-        {/* Client Information */}
-        {project.clientInfo && (
+        {/* Scope Section */}
+        {project.scope && (
           <ThemedView style={styles.section}>
             <ThemedText
               style={[
@@ -947,25 +927,55 @@ export default function ProjectDetailScreen() {
                 { color: theme.colors.text.primary },
               ]}
             >
-              Client Information
+              Project Scope
             </ThemedText>
-            <ThemedView style={styles.clientInfo}>
-              <ThemedText style={styles.clientName}>
-                {project.clientInfo.name}
+            <ThemedText
+              style={[
+                styles.projectDescription,
+                { color: theme.colors.text.secondary },
+              ]}
+            >
+              {project.scope}
+            </ThemedText>
+          </ThemedView>
+        )}
+
+        {/* Testimonial Section */}
+        {project.testimonial && (
+          <ThemedView style={styles.section}>
+            <ThemedText
+              style={[
+                styles.sectionTitle,
+                { color: theme.colors.text.primary },
+              ]}
+            >
+              Client Testimonial
+            </ThemedText>
+            <ThemedView
+              style={{
+                backgroundColor: theme.colors.background.secondary,
+                padding: DesignTokens.spacing[6],
+                borderRadius: DesignTokens.borderRadius.xl,
+                borderLeftWidth: 4,
+                borderLeftColor: theme.colors.accent.primary,
+              }}
+            >
+              <ThemedText
+                style={[
+                  styles.projectDescription,
+                  { color: theme.colors.text.secondary, fontStyle: "italic" },
+                ]}
+              >
+                &ldquo;{project.testimonial.text}&rdquo;
               </ThemedText>
-              <ThemedText style={styles.clientDetails}>
-                {project.clientInfo.address}
+              <ThemedText
+                style={[
+                  styles.metaValue,
+                  { marginTop: DesignTokens.spacing[4], textAlign: "right" },
+                ]}
+              >
+                — {project.testimonial.author}
               </ThemedText>
-              {project.clientInfo.phone && (
-                <ThemedText style={styles.clientContact}>
-                  {project.clientInfo.phone}
-                </ThemedText>
-              )}
-              {project.clientInfo.email && (
-                <ThemedText style={styles.clientContact}>
-                  {project.clientInfo.email}
-                </ThemedText>
-              )}
             </ThemedView>
           </ThemedView>
         )}

@@ -32,10 +32,10 @@ export const seedProjects: Omit<Project, "id">[] = [
       neighborhood: "Westlake Hills",
     },
 
-    // Project duration
-    duration: {
-      value: 8,
-      unit: "weeks",
+    // Project dates (duration calculated from these: 8 weeks = 56 days)
+    projectDates: {
+      start: "2024-01-15",
+      end: "2024-03-10",
     },
 
     // Scope with design aspects
@@ -54,14 +54,10 @@ export const seedProjects: Omit<Project, "id">[] = [
     logs: [],
 
     // Internal metadata
-    projectDates: {
-      startDate: "2024-01-15T09:00:00.000Z",
-      completionDate: "2024-03-10T17:00:00.000Z",
-      estimatedCompletion: "2024-03-15T17:00:00.000Z",
-    },
     status: "completed",
     createdAt: "2024-01-10T14:30:00.000Z",
     updatedAt: "2024-03-10T17:00:00.000Z",
+    completionDate: "2024-03-10T17:00:00.000Z",
     tags: [
       "master bathroom",
       "walk-in shower",
@@ -89,9 +85,10 @@ export const seedProjects: Omit<Project, "id">[] = [
       neighborhood: "Hyde Park",
     },
 
-    duration: {
-      value: 2,
-      unit: "weeks",
+    // Project dates (duration calculated from these: 2 weeks = 14 days)
+    projectDates: {
+      start: "2024-02-05",
+      end: "2024-02-18",
     },
 
     scope:
@@ -103,14 +100,10 @@ export const seedProjects: Omit<Project, "id">[] = [
     documents: [],
     logs: [],
 
-    projectDates: {
-      startDate: "2024-02-05T08:00:00.000Z",
-      completionDate: "2024-02-18T16:00:00.000Z",
-      estimatedCompletion: "2024-02-20T16:00:00.000Z",
-    },
     status: "completed",
     createdAt: "2024-01-28T10:15:00.000Z",
     updatedAt: "2024-02-18T16:00:00.000Z",
+    completionDate: "2024-02-18T16:00:00.000Z",
     tags: [
       "guest bathroom",
       "budget remodel",
@@ -136,9 +129,10 @@ export const seedProjects: Omit<Project, "id">[] = [
       neighborhood: "Tarrytown",
     },
 
-    duration: {
-      value: 10,
-      unit: "weeks",
+    // Project dates (duration calculated from these: 10 weeks = 70 days)
+    projectDates: {
+      start: "2024-01-08",
+      end: "2024-03-22",
     },
 
     scope:
@@ -150,14 +144,10 @@ export const seedProjects: Omit<Project, "id">[] = [
     documents: [],
     logs: [],
 
-    projectDates: {
-      startDate: "2024-01-08T07:30:00.000Z",
-      completionDate: "2024-03-22T18:00:00.000Z",
-      estimatedCompletion: "2024-03-30T18:00:00.000Z",
-    },
     status: "completed",
     createdAt: "2023-12-15T11:00:00.000Z",
     updatedAt: "2024-03-22T18:00:00.000Z",
+    completionDate: "2024-03-22T18:00:00.000Z",
     tags: [
       "open concept",
       "structural work",
@@ -185,9 +175,10 @@ export const seedProjects: Omit<Project, "id">[] = [
       neighborhood: "Bouldin Creek",
     },
 
-    duration: {
-      value: 5,
-      unit: "weeks",
+    // Project dates (duration calculated from these: 5 weeks = 35 days)
+    projectDates: {
+      start: "2024-02-12",
+      end: "2024-03-15",
     },
 
     scope:
@@ -199,14 +190,10 @@ export const seedProjects: Omit<Project, "id">[] = [
     documents: [],
     logs: [],
 
-    projectDates: {
-      startDate: "2024-02-12T08:00:00.000Z",
-      completionDate: "2024-03-15T17:00:00.000Z",
-      estimatedCompletion: "2024-03-18T17:00:00.000Z",
-    },
     status: "completed",
     createdAt: "2024-02-01T09:30:00.000Z",
     updatedAt: "2024-03-15T17:00:00.000Z",
+    completionDate: "2024-03-15T17:00:00.000Z",
     tags: [
       "farmhouse style",
       "cabinet painting",

@@ -20,10 +20,10 @@ export interface Project {
     neighborhood: string; // e.g., "Downtown Austin"
   };
 
-  // Project duration
-  duration: {
-    value: number; // e.g., 8
-    unit: "days" | "weeks" | "months";
+  // Project dates (duration calculated from these)
+  projectDates: {
+    start: string; // ISO date: "2024-03-01"
+    end: string; // ISO date: "2024-05-15"
   };
 
   // Scope with design aspects
@@ -45,16 +45,12 @@ export interface Project {
   logs: Log[];
 
   // Internal metadata (not shown to public)
-  projectDates?: {
-    startDate: string; // ISO string format
-    completionDate?: string;
-    estimatedCompletion?: string;
-  };
   status: ProjectStatus;
   createdAt: string; // ISO string format
   updatedAt: string; // ISO string format
   tags?: string[];
   featured?: boolean;
+  completionDate?: string; // For backward compatibility
 }
 
 // Simplified version for list views
