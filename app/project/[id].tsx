@@ -12,13 +12,17 @@ import {
 
 import { ImageGalleryModal } from "@/components/gallery";
 import { ThemedText, ThemedView } from "@/components/themed";
+import { useProjects } from "@/contexts/ProjectsContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { mockProjects } from "@/data/mockProjects";
+// Comment out mock data for now (keeping for fallback)
+// import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/themes";
 import { Project } from "@/types";
+import { getProjectDuration } from "@/utils/duration";
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { projects } = useProjects();
   const [project, setProject] = useState<Project | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -34,10 +38,14 @@ export default function ProjectDetailScreen() {
 
   useEffect(() => {
     if (id) {
-      const foundProject = mockProjects.find((p) => p.id === id);
+      // Use Firebase data instead of mock data
+      const foundProject = projects.find((p) => p.id === id);
       setProject(foundProject || null);
+
+      // Fallback to mock data if needed (commented out for now)
+      // const foundProject = mockProjects.find((p) => p.id === id);
     }
-  }, [id]);
+  }, [id, projects]);
 
   const closeGallery = () => {
     setGalleryVisible(false);
@@ -538,28 +546,6 @@ export default function ProjectDetailScreen() {
           fontSize: DesignTokens.typography.fontSize.sm,
           lineHeight: 20,
         },
-        clientInfo: {
-          backgroundColor: theme.colors.background.secondary,
-          padding: DesignTokens.spacing[6],
-          borderRadius: DesignTokens.borderRadius.xl,
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          ...DesignTokens.shadows.sm,
-        },
-        clientName: {
-          fontSize: DesignTokens.typography.fontSize.lg,
-          fontWeight: "600",
-          marginBottom: DesignTokens.spacing[2],
-        },
-        clientDetails: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          opacity: 0.7,
-          lineHeight: 20,
-        },
-        clientContact: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          opacity: 0.7,
-        },
       }),
     [theme]
   );
@@ -765,7 +751,8 @@ export default function ProjectDetailScreen() {
                 Location
               </ThemedText>
               <ThemedText style={styles.metaValue}>
-                {project.location}
+                {project.location?.neighborhood || "Austin, TX"}{" "}
+                {project.location?.zipCode || ""}
               </ThemedText>
             </ThemedView>
             <ThemedView style={[styles.metaItem, styles.metaItemLast]}>
@@ -775,10 +762,10 @@ export default function ProjectDetailScreen() {
                   { color: theme.colors.text.secondary },
                 ]}
               >
-                Estimated Cost
+                Duration
               </ThemedText>
               <ThemedText style={styles.metaValue}>
-                ${project.estimatedCost?.toLocaleString() || "N/A"}
+                {getProjectDuration(project)}
               </ThemedText>
             </ThemedView>
           </ThemedView>
@@ -931,8 +918,8 @@ export default function ProjectDetailScreen() {
           )}
         </ThemedView>
 
-        {/* Client Information */}
-        {project.clientInfo && (
+        {/* Scope Section */}
+        {project.scope && (
           <ThemedView style={styles.section}>
             <ThemedText
               style={[
@@ -940,25 +927,55 @@ export default function ProjectDetailScreen() {
                 { color: theme.colors.text.primary },
               ]}
             >
-              Client Information
+              Project Scope
             </ThemedText>
-            <ThemedView style={styles.clientInfo}>
-              <ThemedText style={styles.clientName}>
-                {project.clientInfo.name}
+            <ThemedText
+              style={[
+                styles.projectDescription,
+                { color: theme.colors.text.secondary },
+              ]}
+            >
+              {project.scope}
+            </ThemedText>
+          </ThemedView>
+        )}
+
+        {/* Testimonial Section */}
+        {project.testimonial && (
+          <ThemedView style={styles.section}>
+            <ThemedText
+              style={[
+                styles.sectionTitle,
+                { color: theme.colors.text.primary },
+              ]}
+            >
+              Client Testimonial
+            </ThemedText>
+            <ThemedView
+              style={{
+                backgroundColor: theme.colors.background.secondary,
+                padding: DesignTokens.spacing[6],
+                borderRadius: DesignTokens.borderRadius.xl,
+                borderLeftWidth: 4,
+                borderLeftColor: theme.colors.accent.primary,
+              }}
+            >
+              <ThemedText
+                style={[
+                  styles.projectDescription,
+                  { color: theme.colors.text.secondary, fontStyle: "italic" },
+                ]}
+              >
+                &ldquo;{project.testimonial.text}&rdquo;
               </ThemedText>
-              <ThemedText style={styles.clientDetails}>
-                {project.clientInfo.address}
+              <ThemedText
+                style={[
+                  styles.metaValue,
+                  { marginTop: DesignTokens.spacing[4], textAlign: "right" },
+                ]}
+              >
+                — {project.testimonial.author}
               </ThemedText>
-              {project.clientInfo.phone && (
-                <ThemedText style={styles.clientContact}>
-                  {project.clientInfo.phone}
-                </ThemedText>
-              )}
-              {project.clientInfo.email && (
-                <ThemedText style={styles.clientContact}>
-                  {project.clientInfo.email}
-                </ThemedText>
-              )}
             </ThemedView>
           </ThemedView>
         )}

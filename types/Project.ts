@@ -2,51 +2,66 @@ import { ProjectCategory } from "./Category";
 import { Document } from "./Document";
 import { Log } from "./Log";
 import { Picture } from "./Picture";
+import { ProjectManager } from "./ProjectManager";
 import { ProjectStatus } from "./Status";
 
 export interface Project {
   id: string;
-  name: string;
+  projectNumber: string; // ACE project tracking number (e.g., "217", "311B")
+  name: string; // Descriptive design-focused name
   category: ProjectCategory;
   briefDescription: string;
   longDescription: string;
   thumbnail: string;
+
+  // Location (public-facing: zip code + neighborhood only)
+  location: {
+    zipCode: string; // e.g., "78701"
+    neighborhood: string; // e.g., "Downtown Austin"
+  };
+
+  // Project dates (duration calculated from these)
+  projectDates: {
+    start: string; // ISO date: "2024-03-01"
+    end: string; // ISO date: "2024-05-15"
+  };
+
+  // Scope with design aspects
+  scope: string;
+
+  // Client testimonial (optional - will be added as received)
+  testimonial?: {
+    text: string;
+    author: string; // First name or initials
+    date?: string; // ISO string format
+  };
+
+  // PM information - multiple PMs can work on a project
+  pms?: ProjectManager[];
 
   // Media and documents
   pictures: Picture[];
   documents: Document[];
   logs: Log[];
 
-  // Additional fields for future use
-  location?: string;
-  clientInfo?: {
-    name: string;
-    address: string;
-    phone?: string;
-    email?: string;
-  };
-  projectDates?: {
-    startDate: Date;
-    completionDate?: Date;
-    estimatedCompletion?: Date;
-  };
+  // Internal metadata (not shown to public)
   status: ProjectStatus;
-
-  // Metadata
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string; // ISO string format
+  updatedAt: string; // ISO string format
   tags?: string[];
-  estimatedCost?: number;
-  actualCost?: number;
+  featured?: boolean;
+  completionDate?: string; // For backward compatibility
 }
 
 // Simplified version for list views
 export interface ProjectSummary {
   id: string;
+  projectNumber: string; // ACE project tracking number
   name: string;
   category: ProjectCategory;
   briefDescription: string;
   thumbnail: string;
-  status: Project["status"];
-  completedAt?: Date;
+  status: ProjectStatus;
+  completedAt?: string;
+  pmNames?: string[]; // PM names for list views and filtering
 }
