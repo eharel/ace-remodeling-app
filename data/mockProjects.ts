@@ -87,7 +87,7 @@ export const mockProjects: Project[] = [
         id: "doc-1",
         name: "Bathroom Renovation Contract",
         type: "contract",
-        url: "#",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
         fileType: "PDF",
         description: "Project contract and specifications",
         uploadedAt: "2024-01-10T00:00:00.000Z",
@@ -197,7 +197,7 @@ export const mockProjects: Project[] = [
         id: "doc-2",
         name: "Kitchen Remodel Permit",
         type: "permit",
-        url: "#",
+        url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
         fileType: "PDF",
         description: "City building permit",
         uploadedAt: "2024-01-25T00:00:00.000Z",
@@ -591,12 +591,7 @@ export const getProjectSummaries = (): ProjectSummary[] => {
 export const getProjectSummariesByCategory = (
   category: string
 ): ProjectSummary[] => {
-  console.log(`🔍 Getting projects for category: "${category}"`);
-
   const filteredProjects = getProjectsByCategory(category);
-  console.log(
-    `   Found ${filteredProjects.length} projects in category "${category}"`
-  );
 
   const summaries = filteredProjects.map((project) => ({
     id: project.id,

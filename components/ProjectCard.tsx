@@ -54,13 +54,11 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
   };
 
   const handleImageLoad = () => {
-    console.log(`✅ Successfully loaded image for project "${project.name}"`);
     setImageLoading(false);
     setImageError(false);
   };
 
   const handleImageLoadStart = () => {
-    console.log(`🔄 Starting to load image for project "${project.name}"`);
     setImageLoading(true);
     setImageError(false);
   };

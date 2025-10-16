@@ -35,6 +35,13 @@ function Navigation() {
       >
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="pdf-viewer"
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />

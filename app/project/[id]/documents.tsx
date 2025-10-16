@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import React from "react";
 import {
   Dimensions,
@@ -10,8 +10,8 @@ import {
 } from "react-native";
 
 import { ThemedText } from "@/components/themed";
+import { useProjects } from "@/contexts/ProjectsContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/themes";
 import { Document } from "@/types/Document";
 
@@ -29,10 +29,20 @@ interface DocumentsPageProps {}
 export default function DocumentsPage({}: DocumentsPageProps) {
   const { theme } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { projects } = useProjects();
 
-  // Find the project by ID
-  const project = mockProjects.find((p) => p.id === id);
+  // Find the project by ID using Firebase data
+  const project = projects.find((p) => p.id === id);
   const documents = project?.documents || [];
+
+  // Debug logging
+  console.log("Documents page - Project ID:", id);
+  console.log(
+    "Documents page - Available projects:",
+    projects.map((p) => ({ id: p.id, name: p.name }))
+  );
+  console.log("Documents page - Found project:", project);
+  console.log("Documents page - Documents:", documents);
 
   // Calculate grid layout
   const numColumns = 2;
@@ -85,8 +95,17 @@ export default function DocumentsPage({}: DocumentsPageProps) {
   };
 
   const handleDocumentPress = (document: Document) => {
-    console.log("Open document:", document.name);
-    // TODO: Implement document opening functionality
+    console.log("Opening document:", document.name);
+
+    // Navigate to PDF viewer with document details
+    router.push({
+      pathname: "/pdf-viewer",
+      params: {
+        url: document.url,
+        name: document.name,
+        id: document.id,
+      },
+    });
   };
 
   const styles = StyleSheet.create({
@@ -240,7 +259,9 @@ export default function DocumentsPage({}: DocumentsPageProps) {
                   )}
                   <View style={styles.documentMeta}>
                     <ThemedText style={styles.documentDate}>
-                      {document.uploadedAt.toLocaleDateString()}
+                      {document.uploadedAt
+                        ? new Date(document.uploadedAt).toLocaleDateString()
+                        : "Unknown date"}
                     </ThemedText>
                     <ThemedText style={styles.documentSize}>
                       {document.fileType}

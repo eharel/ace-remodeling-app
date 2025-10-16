@@ -51,10 +51,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
           } as Project);
         });
 
-        console.log(
-          `✅ Fetched ${projectsData.length} projects from Firebase:`,
-          projectsData
-        );
+        console.log(`✅ Loaded ${projectsData.length} projects from Firebase`);
         setProjects(projectsData);
       } catch (err) {
         console.error("❌ Error fetching projects:", err);
