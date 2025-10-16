@@ -1,7 +1,10 @@
 import { File, Paths } from "expo-file-system";
+import { getDownloadURL, ref } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Pdf from "react-native-pdf";
+
+import { storage } from "@/config/firebase";
 
 import { ErrorState } from "./ErrorState";
 import { LoadingState } from "./LoadingState";
@@ -63,8 +66,52 @@ export function PdfDisplay({ uri }: PdfDisplayProps) {
     try {
       console.log("📥 Downloading PDF from:", url);
 
+      let downloadUrl = url;
+
+      // Check if this is a Firebase Storage URL with storagePath
+      // If it's a Firebase URL, try to get a fresh download URL
+      if (url.includes("firebasestorage.googleapis.com")) {
+        try {
+          console.log(
+            "🔄 Detected Firebase Storage URL, getting fresh download URL..."
+          );
+
+          // Extract the storage path from the URL
+          // URL format: https://firebasestorage.googleapis.com/v0/b/[bucket]/o/[path]?alt=media&token=[token]
+          const urlParts = url.split("/o/");
+          if (urlParts.length > 1) {
+            const pathPart = urlParts[1].split("?")[0];
+            const storagePath = decodeURIComponent(pathPart);
+
+            console.log("📁 Storage path:", storagePath);
+
+            // Get a fresh download URL from Firebase Storage
+            const storageRef = ref(storage, storagePath);
+            downloadUrl = await getDownloadURL(storageRef);
+
+            console.log("✅ Fresh download URL obtained:", downloadUrl);
+          }
+        } catch (firebaseError) {
+          console.warn(
+            "⚠️ Failed to get fresh Firebase URL, using original:",
+            firebaseError
+          );
+          // Continue with original URL
+        }
+      }
+
+      // Validate the URL
+      const response = await fetch(downloadUrl, { method: "HEAD" });
+      if (!response.ok) {
+        throw new Error(
+          `URL validation failed: ${response.status} ${response.statusText}`
+        );
+      }
+
+      console.log("✅ URL validated, proceeding with download");
+
       // Use the File.downloadFileAsync static method to download
-      const downloadedFile = await File.downloadFileAsync(url, file, {
+      const downloadedFile = await File.downloadFileAsync(downloadUrl, file, {
         idempotent: true,
       });
 
@@ -75,8 +122,25 @@ export function PdfDisplay({ uri }: PdfDisplayProps) {
     } catch (error) {
       setDownloading(false);
       console.error("Download error:", error);
+
+      // If it's a 400 error, it's likely an invalid/expired URL
+      if (error instanceof Error && error.message.includes("400")) {
+        throw new Error(
+          "PDF URL is invalid or expired. Please contact support."
+        );
+      }
+
       throw error;
     }
+  };
+
+  // Fallback to test PDF for development when Firebase fails
+  const getFallbackUrl = (originalUrl: string): string => {
+    if (originalUrl.includes("firebasestorage.googleapis.com")) {
+      console.log("🔄 Using fallback test PDF for development");
+      return "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+    }
+    return originalUrl;
   };
 
   // Load PDF with caching
@@ -110,11 +174,39 @@ export function PdfDisplay({ uri }: PdfDisplayProps) {
         } catch (downloadError) {
           console.error("Download failed:", downloadError);
           if (isMounted) {
-            // Fallback to original URI if download fails
-            console.log("⚠️ Download failed, falling back to original URI");
-            setPdfSource(uri);
-            setLoading(false);
-            setError(null);
+            // Check if it's a URL validation error
+            if (
+              downloadError instanceof Error &&
+              downloadError.message.includes("URL validation failed")
+            ) {
+              console.log("⚠️ Invalid URL detected, trying fallback");
+              // Try fallback URL for development
+              const fallbackUrl = getFallbackUrl(uri);
+              if (fallbackUrl !== uri) {
+                console.log("🔄 Attempting fallback URL:", fallbackUrl);
+                try {
+                  const fallbackDownloaded = await downloadAndCache(
+                    fallbackUrl
+                  );
+                  setCachedUri(fallbackDownloaded);
+                  setPdfSource(fallbackDownloaded);
+                  setLoading(false);
+                  return;
+                } catch (fallbackError) {
+                  console.error("Fallback also failed:", fallbackError);
+                }
+              }
+              setError(
+                "PDF URL is invalid or expired. Please contact support."
+              );
+              setLoading(false);
+            } else {
+              // Fallback to original URI for other errors
+              console.log("⚠️ Download failed, falling back to original URI");
+              setPdfSource(uri);
+              setLoading(false);
+              setError(null);
+            }
           }
         }
       } catch (err) {
