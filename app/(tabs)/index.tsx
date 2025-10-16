@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
+import { PdfDisplay } from "@/components/PdfDisplay";
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesignTokens } from "@/themes";
@@ -138,6 +139,23 @@ export default function HomeScreen() {
           color: theme.colors.text.tertiary,
           textAlign: "center",
         },
+        pdfTestSection: {
+          marginHorizontal: DesignTokens.spacing[4],
+          marginBottom: DesignTokens.spacing[8],
+          height: 400,
+          backgroundColor: theme.colors.background.card,
+          borderRadius: DesignTokens.borderRadius.lg,
+          overflow: "hidden",
+          ...DesignTokens.shadows.base,
+        },
+        pdfTestTitle: {
+          fontSize: DesignTokens.typography.fontSize.lg,
+          textAlign: "center",
+          marginBottom: DesignTokens.spacing[4],
+          marginTop: DesignTokens.spacing[4],
+          color: theme.colors.text.primary,
+          fontFamily: DesignTokens.typography.fontFamily.bold,
+        },
       }),
     [theme]
   );
@@ -171,6 +189,14 @@ export default function HomeScreen() {
         <ThemedText variant="body" style={styles.instructionText}>
           Select a category below to view our featured projects
         </ThemedText>
+      </View>
+
+      {/* TEMPORARY: PDF Test Section */}
+      <ThemedText style={styles.pdfTestTitle}>
+        📄 PDF Test (Temporary)
+      </ThemedText>
+      <View style={styles.pdfTestSection}>
+        <PdfDisplay uri="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" />
       </View>
 
       {/* Category Navigation */}
