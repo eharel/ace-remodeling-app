@@ -591,12 +591,7 @@ export const getProjectSummaries = (): ProjectSummary[] => {
 export const getProjectSummariesByCategory = (
   category: string
 ): ProjectSummary[] => {
-  console.log(`🔍 Getting projects for category: "${category}"`);
-
   const filteredProjects = getProjectsByCategory(category);
-  console.log(
-    `   Found ${filteredProjects.length} projects in category "${category}"`
-  );
 
   const summaries = filteredProjects.map((project) => ({
     id: project.id,
