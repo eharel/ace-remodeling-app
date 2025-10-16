@@ -156,6 +156,19 @@ export default function HomeScreen() {
           color: theme.colors.text.primary,
           fontFamily: DesignTokens.typography.fontFamily.bold,
         },
+        testButton: {
+          backgroundColor: theme.colors.interactive.primary,
+          marginHorizontal: DesignTokens.spacing[4],
+          marginBottom: DesignTokens.spacing[4],
+          paddingVertical: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.md,
+          alignItems: "center",
+        },
+        testButtonText: {
+          color: theme.colors.text.inverse,
+          fontSize: DesignTokens.typography.fontSize.base,
+          fontWeight: DesignTokens.typography.fontWeight.medium,
+        },
       }),
     [theme]
   );
@@ -198,6 +211,28 @@ export default function HomeScreen() {
       <View style={styles.pdfTestSection}>
         <PdfDisplay uri="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" />
       </View>
+
+      {/* TEMPORARY: PDF Viewer Test Button */}
+      <Pressable
+        style={({ pressed }) => [
+          styles.testButton,
+          pressed && { opacity: 0.7 },
+        ]}
+        onPress={() => {
+          router.push({
+            pathname: "/pdf-viewer",
+            params: {
+              url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+              name: "Test Document",
+              id: "test-123",
+            },
+          });
+        }}
+      >
+        <ThemedText style={styles.testButtonText}>
+          🚀 Open PDF Viewer
+        </ThemedText>
+      </Pressable>
 
       {/* Category Navigation */}
       <View style={styles.categoriesSection}>
