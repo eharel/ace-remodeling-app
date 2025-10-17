@@ -39,3 +39,6 @@ yarn-error.*
 app-example
 
 commit-msg.txt
+
+# Documentation
+project-overview.md

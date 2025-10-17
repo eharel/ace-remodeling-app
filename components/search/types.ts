@@ -9,6 +9,7 @@ export interface SearchFilters {
   categories: ProjectCategory[];
   statuses: ProjectStatus[];
   projectManagers: string[];
+  tags: string[];
 }
 
 /**

@@ -14,6 +14,7 @@ export function useSearchFilters(projects: Project[]) {
     categories: [],
     statuses: [],
     projectManagers: [],
+    tags: [],
   });
 
   // Extract unique project managers from all projects
@@ -27,6 +28,19 @@ export function useSearchFilters(projects: Project[]) {
       });
     });
     return Array.from(pmSet).sort();
+  }, [projects]);
+
+  // Extract unique tags from all projects
+  const availableTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    projects.forEach((project) => {
+      project.tags?.forEach((tag) => {
+        if (tag.trim()) {
+          tagSet.add(tag.trim());
+        }
+      });
+    });
+    return Array.from(tagSet).sort();
   }, [projects]);
 
   // Update individual filter
@@ -43,6 +57,7 @@ export function useSearchFilters(projects: Project[]) {
       categories: [],
       statuses: [],
       projectManagers: [],
+      tags: [],
     });
   }, []);
 
@@ -51,7 +66,8 @@ export function useSearchFilters(projects: Project[]) {
     return (
       filters.categories.length > 0 ||
       filters.statuses.length > 0 ||
-      filters.projectManagers.length > 0
+      filters.projectManagers.length > 0 ||
+      filters.tags.length > 0
     );
   }, [filters]);
 
@@ -85,6 +101,17 @@ export function useSearchFilters(projects: Project[]) {
           }
         }
 
+        // Tags filter (OR logic: match ANY selected tag)
+        if (filters.tags.length > 0) {
+          const projectTags = project.tags || [];
+          const hasMatchingTag = filters.tags.some((tag) =>
+            projectTags.includes(tag)
+          );
+          if (!hasMatchingTag) {
+            return false;
+          }
+        }
+
         return true;
       });
     },
@@ -96,7 +123,8 @@ export function useSearchFilters(projects: Project[]) {
     return (
       filters.categories.length +
       filters.statuses.length +
-      filters.projectManagers.length
+      filters.projectManagers.length +
+      filters.tags.length
     );
   }, [filters]);
 
@@ -116,6 +144,8 @@ export function useSearchFilters(projects: Project[]) {
     [filters.projectManagers]
   );
 
+  const getTagFilters = useCallback(() => filters.tags, [filters.tags]);
+
   return {
     filters,
     updateFilter,
@@ -124,8 +154,10 @@ export function useSearchFilters(projects: Project[]) {
     activeFilterCount,
     applyFilters,
     availableProjectManagers,
+    availableTags,
     getCategoryFilters,
     getStatusFilters,
     getProjectManagerFilters,
+    getTagFilters,
   };
 }

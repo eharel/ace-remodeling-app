@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -33,6 +33,7 @@ export function FilterDropdown<T extends string>({
     useState<T[]>(selectedValues);
   const [canScrollUp, setCanScrollUp] = useState(false);
   const [canScrollDown, setCanScrollDown] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   // Update temp values when modal opens
   const handleOpen = () => {
@@ -85,6 +86,25 @@ export function FilterDropdown<T extends string>({
 
     setCanScrollUp(scrollY > 0);
     setCanScrollDown(scrollY < contentHeight - scrollViewHeight - 10); // 10px buffer
+  };
+
+  // Handle scroll indicator clicks
+  const handleScrollToTop = () => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+  };
+
+  const handleScrollToBottom = () => {
+    scrollViewRef.current?.scrollToEnd({ animated: true });
+  };
+
+  // Handle quick actions
+  const handleSelectAll = () => {
+    const allValues = options.map((option) => option.value as T);
+    setTempSelectedValues(allValues);
+  };
+
+  const handleClearAll = () => {
+    setTempSelectedValues([]);
   };
 
   // Calculate dynamic max height based on screen size
@@ -145,9 +165,32 @@ export function FilterDropdown<T extends string>({
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border.primary,
     },
+    modalHeaderContent: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
     modalHeaderText: {
       fontSize: DesignTokens.typography.fontSize.lg,
       fontWeight: "600",
+      flex: 1,
+    },
+    quickActions: {
+      flexDirection: "row",
+      gap: DesignTokens.spacing[2],
+    },
+    quickActionButton: {
+      paddingHorizontal: DesignTokens.spacing[2],
+      paddingVertical: DesignTokens.spacing[1],
+      borderRadius: DesignTokens.borderRadius.sm,
+      backgroundColor: theme.colors.background.elevated,
+      borderWidth: 1,
+      borderColor: theme.colors.border.primary,
+    },
+    quickActionText: {
+      fontSize: DesignTokens.typography.fontSize.xs,
+      color: theme.colors.text.secondary,
+      fontWeight: "500",
     },
     optionsScrollContainer: {
       flex: 1,
@@ -226,7 +269,7 @@ export function FilterDropdown<T extends string>({
       justifyContent: "center",
       alignItems: "center",
       zIndex: 2,
-      backgroundColor: theme.colors.interactive.primary,
+      backgroundColor: theme.colors.interactive.secondary,
       shadowColor: "#000000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.2,
@@ -281,13 +324,38 @@ export function FilterDropdown<T extends string>({
           <Pressable onPress={(e) => e.stopPropagation()}>
             <ThemedView style={styles.modalContent}>
               <ThemedView style={styles.modalHeader}>
-                <ThemedText style={styles.modalHeaderText}>
-                  Filter by {label}
-                </ThemedText>
+                <View style={styles.modalHeaderContent}>
+                  <ThemedText style={styles.modalHeaderText}>
+                    Filter by {label}
+                  </ThemedText>
+                  <View style={styles.quickActions}>
+                    <TouchableOpacity
+                      style={styles.quickActionButton}
+                      onPress={handleSelectAll}
+                      accessibilityLabel="Select all options"
+                      accessibilityRole="button"
+                    >
+                      <ThemedText style={styles.quickActionText}>
+                        All
+                      </ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.quickActionButton}
+                      onPress={handleClearAll}
+                      accessibilityLabel="Clear all selections"
+                      accessibilityRole="button"
+                    >
+                      <ThemedText style={styles.quickActionText}>
+                        None
+                      </ThemedText>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </ThemedView>
 
               <View style={{ position: "relative", flex: 1 }}>
                 <ScrollView
+                  ref={scrollViewRef}
                   style={styles.optionsScrollContainer}
                   contentContainerStyle={styles.optionsList}
                   onScroll={handleScroll}
@@ -336,29 +404,35 @@ export function FilterDropdown<T extends string>({
 
                 {/* Scroll indicators */}
                 {canScrollUp && (
-                  <View
+                  <TouchableOpacity
                     style={[styles.scrollIndicator, styles.scrollIndicatorTop]}
+                    onPress={handleScrollToTop}
+                    accessibilityLabel="Scroll to top"
+                    accessibilityRole="button"
                   >
                     <MaterialIcons
                       name="keyboard-arrow-up"
                       size={18}
                       style={styles.scrollIndicatorIcon}
                     />
-                  </View>
+                  </TouchableOpacity>
                 )}
                 {canScrollDown && (
-                  <View
+                  <TouchableOpacity
                     style={[
                       styles.scrollIndicator,
                       styles.scrollIndicatorBottom,
                     ]}
+                    onPress={handleScrollToBottom}
+                    accessibilityLabel="Scroll to bottom"
+                    accessibilityRole="button"
                   >
                     <MaterialIcons
                       name="keyboard-arrow-down"
                       size={18}
                       style={styles.scrollIndicatorIcon}
                     />
-                  </View>
+                  </TouchableOpacity>
                 )}
               </View>
 

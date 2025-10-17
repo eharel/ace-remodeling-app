@@ -14,10 +14,13 @@ interface SearchFiltersBarProps {
   categoryValues: ProjectCategory[];
   statusValues: ProjectStatus[];
   projectManagerValues: string[];
+  tagValues: string[];
   availableProjectManagers: string[];
+  availableTags: string[];
   onCategoryChange: (values: ProjectCategory[]) => void;
   onStatusChange: (values: ProjectStatus[]) => void;
   onProjectManagerChange: (values: string[]) => void;
+  onTagChange: (values: string[]) => void;
   onResetFilters: () => void;
   hasActiveFilters: boolean;
   activeFilterCount: number;
@@ -31,10 +34,13 @@ export function SearchFiltersBar({
   categoryValues,
   statusValues,
   projectManagerValues,
+  tagValues,
   availableProjectManagers,
+  availableTags,
   onCategoryChange,
   onStatusChange,
   onProjectManagerChange,
+  onTagChange,
   onResetFilters,
   hasActiveFilters,
   activeFilterCount,
@@ -80,6 +86,11 @@ export function SearchFiltersBar({
     }
     return availableProjectManagers.map((pm) => ({ value: pm, label: pm }));
   }, [availableProjectManagers]);
+
+  // Tag options
+  const tagOptions = useMemo<FilterOption<string>[]>(() => {
+    return availableTags.map((tag) => ({ value: tag, label: tag }));
+  }, [availableTags]);
 
   const styles = StyleSheet.create({
     container: {
@@ -144,11 +155,20 @@ export function SearchFiltersBar({
         </View>
         <View style={styles.filterItem}>
           <FilterDropdown
-            label="Project Manager"
+            label="PM"
             selectedValues={projectManagerValues}
             options={projectManagerOptions}
             onChange={onProjectManagerChange}
             testID="pm-filter"
+          />
+        </View>
+        <View style={styles.filterItem}>
+          <FilterDropdown
+            label="Tags"
+            selectedValues={tagValues}
+            options={tagOptions}
+            onChange={onTagChange}
+            testID="tag-filter"
           />
         </View>
       </View>

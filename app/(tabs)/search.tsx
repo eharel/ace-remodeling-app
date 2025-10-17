@@ -85,9 +85,11 @@ export default function SearchScreen() {
     activeFilterCount,
     applyFilters,
     availableProjectManagers,
+    availableTags,
     getCategoryFilters,
     getStatusFilters,
     getProjectManagerFilters,
+    getTagFilters,
   } = useSearchFilters(projects);
 
   // Memoized function to create searchable text from a project
@@ -237,12 +239,15 @@ export default function SearchScreen() {
         categoryValues={getCategoryFilters()}
         statusValues={getStatusFilters()}
         projectManagerValues={getProjectManagerFilters()}
+        tagValues={getTagFilters()}
         availableProjectManagers={availableProjectManagers}
+        availableTags={availableTags}
         onCategoryChange={(values) => updateFilter("categories", values)}
         onStatusChange={(values) => updateFilter("statuses", values)}
         onProjectManagerChange={(values) =>
           updateFilter("projectManagers", values)
         }
+        onTagChange={(values) => updateFilter("tags", values)}
         onResetFilters={resetFilters}
         hasActiveFilters={hasActiveFilters}
         activeFilterCount={activeFilterCount}
