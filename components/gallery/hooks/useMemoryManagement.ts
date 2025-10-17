@@ -126,7 +126,6 @@ export const useMemoryManagement = ({
   const handleAppStateChange = useCallback(
     (nextAppState: AppStateStatus) => {
       if (nextAppState === "background") {
-        console.log("📱 App backgrounded - cleaning up resources");
         onAppBackground?.();
 
         // Stop memory monitoring when backgrounded
@@ -135,7 +134,6 @@ export const useMemoryManagement = ({
           memoryCheckInterval.current = null;
         }
       } else if (nextAppState === "active") {
-        console.log("📱 App foregrounded - resuming monitoring");
         onAppForeground?.();
 
         // Resume memory monitoring
@@ -173,9 +171,6 @@ export const useMemoryManagement = ({
     try {
       if (global.gc) {
         global.gc();
-        console.log("🗑️ Forced garbage collection");
-      } else {
-        console.log("⚠️ Garbage collection not available");
       }
     } catch (error) {
       console.warn("Garbage collection failed:", error);

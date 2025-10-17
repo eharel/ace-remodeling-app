@@ -186,14 +186,8 @@ export default function SearchScreen() {
       !isSearching &&
       !projectsLoading
     ) {
-      const resultCount = searchResults.length;
       // This would typically use AccessibilityInfo.announceForAccessibility
       // but for now we'll rely on the existing accessibility labels
-      console.log(
-        `Search results: ${resultCount} project${
-          resultCount === 1 ? "" : "s"
-        } found`
-      );
     }
   }, [searchResults, debouncedSearchQuery, isSearching, projectsLoading]);
 

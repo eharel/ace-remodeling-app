@@ -58,14 +58,10 @@ export const useImageGallery = ({
 
   // Update currentIndex when initialIndex changes
   useEffect(() => {
-    console.log(
-      `🔄 ImageGalleryModal: initialIndex changed to ${initialIndex}, images.length: ${images.length}`
-    );
     if (initialIndex >= 0 && initialIndex < images.length) {
       setCurrentIndex(initialIndex);
       translateX.value = -initialIndex * screenWidth;
     } else {
-      console.log(`⚠️ Invalid initialIndex: ${initialIndex}, setting to 0`);
       setCurrentIndex(0);
       translateX.value = 0;
     }

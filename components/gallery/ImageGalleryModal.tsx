@@ -83,15 +83,8 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
     );
 
     if (!visible || !currentImage) {
-      console.log(
-        `🚫 ImageGalleryModal not rendering - visible: ${visible}, currentImage: ${!!currentImage}`
-      );
       return null;
     }
-
-    console.log(
-      `✅ ImageGalleryModal rendering - visible: ${visible}, currentIndex: ${currentIndex}, images.length: ${images.length}`
-    );
 
     return (
       <Modal
