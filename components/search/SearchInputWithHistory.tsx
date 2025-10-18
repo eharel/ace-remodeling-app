@@ -1,9 +1,16 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-import { DesignTokens } from "@/components/themed";
+import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useSearchHistory } from "@/utils/useSearchHistory";
 
 interface SearchInputWithHistoryProps {
   value: string;
@@ -26,12 +33,20 @@ export function SearchInputWithHistory({
   const inputRef = useRef<TextInput>(null);
   const [isFocused, setIsFocused] = useState(false);
 
+  // Phase 3: Add history hook
+  const { history } = useSearchHistory();
+
+  // Calculate when to show dropdown
+  const shouldShowHistory =
+    isFocused && value.trim() === "" && history.length > 0;
+
   const handleFocus = () => {
     setIsFocused(true);
   };
 
   const handleBlur = () => {
-    setIsFocused(false);
+    // Critical: 200ms delay to allow Pressable events to register
+    setTimeout(() => setIsFocused(false), 200);
   };
 
   const handleClear = () => {
@@ -42,6 +57,7 @@ export function SearchInputWithHistory({
   const styles = StyleSheet.create({
     container: {
       position: "relative",
+      zIndex: 1000,
     },
     inputContainer: {
       flexDirection: "row",
@@ -68,6 +84,22 @@ export function SearchInputWithHistory({
     clearButton: {
       padding: DesignTokens.spacing[1],
       opacity: 0.6,
+    },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      zIndex: 999,
+    },
+    historyDropdown: {
+      position: "absolute",
+      top: "100%",
+      left: 0,
+      right: 0,
+      marginTop: DesignTokens.spacing[2],
+      borderRadius: DesignTokens.borderRadius.lg,
+      borderWidth: 1,
+      borderColor: theme.colors.border.secondary,
+      padding: DesignTokens.spacing[4],
+      zIndex: 1001,
     },
   });
 
@@ -107,6 +139,24 @@ export function SearchInputWithHistory({
           </TouchableOpacity>
         )}
       </View>
+
+      {shouldShowHistory && (
+        <>
+          {/* Backdrop - closes dropdown on tap */}
+          <Pressable
+            style={styles.backdrop}
+            onPress={() => {
+              setIsFocused(false);
+              inputRef.current?.blur();
+            }}
+          />
+
+          {/* Dropdown - existing code */}
+          <ThemedView variant="elevated" style={styles.historyDropdown}>
+            <ThemedText variant="body">History will go here</ThemedText>
+          </ThemedView>
+        </>
+      )}
     </View>
   );
 }
