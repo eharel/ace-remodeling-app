@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { Button, StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
 import { ProjectGallery } from "@/components/ProjectGallery";
@@ -17,6 +17,7 @@ import { useProjects } from "@/contexts/ProjectsContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Project, ProjectSummary } from "@/types/Project";
 import { logError, logWarning } from "@/utils/errorLogger";
+import { useSearchHistory } from "@/utils/useSearchHistory";
 
 // Constants
 const SEARCH_DEBOUNCE_MS = 500;
@@ -76,6 +77,14 @@ export default function SearchScreen() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [debouncedSearchQuery] = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
+
+  // Phase 1 Test: Search history hook
+  const { history, addToHistory } = useSearchHistory();
+
+  // Temporary test - remove after verification
+  useEffect(() => {
+    console.log("📚 Current search history:", history);
+  }, [history]);
 
   // Initialize filters hook
   const {
@@ -226,6 +235,12 @@ export default function SearchScreen() {
           disabled={isLoading}
           accessibilityLabel="Search projects input"
           accessibilityHint="Type to search for projects by name, description, location, client, or tags"
+        />
+
+        {/* TEMPORARY TEST BUTTON - Remove after verification */}
+        <Button
+          title="Test Add to History"
+          onPress={() => addToHistory("test search " + Date.now())}
         />
       </ThemedView>
 
