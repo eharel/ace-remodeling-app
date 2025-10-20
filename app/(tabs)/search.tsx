@@ -98,6 +98,7 @@ export default function SearchScreen() {
 
   // Memoized function to create searchable text from a project
   const createSearchableText = useCallback((project: Project) => {
+    const pmNames = project.pms?.map((pm) => pm.name) || [];
     return [
       project.name,
       project.briefDescription,
@@ -106,6 +107,8 @@ export default function SearchScreen() {
       project.location?.neighborhood || "",
       ...(project.tags || []),
       project.scope || "",
+      project.projectNumber || "",
+      ...pmNames,
     ]
       .join(" ")
       .toLowerCase();
