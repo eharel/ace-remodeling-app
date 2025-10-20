@@ -16,6 +16,7 @@ import { useProjects } from "@/contexts/ProjectsContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Project, ProjectSummary } from "@/types/Project";
 import { logError, logWarning } from "@/utils/errorLogger";
+import { useSearchHistory } from "@/utils/useSearchHistory";
 
 // Constants
 const SEARCH_DEBOUNCE_MS = 500;
@@ -75,6 +76,16 @@ export default function SearchScreen() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [debouncedSearchQuery] = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
+
+  // Temporary test: Add long query to history
+  const { addToHistory } = useSearchHistory();
+
+  useEffect(() => {
+    // Add a very long test query to verify truncation
+    addToHistory(
+      "This is an extremely long search query that should definitely be truncated with ellipsis because it contains way too many characters to fit comfortably in the available horizontal space of the dropdown"
+    );
+  }, [addToHistory]);
 
   // Initialize filters hook
   const {

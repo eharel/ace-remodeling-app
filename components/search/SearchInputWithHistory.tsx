@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
 import {
+  FlatList,
   Pressable,
   StyleSheet,
   TextInput,
@@ -98,8 +99,29 @@ export function SearchInputWithHistory({
       borderRadius: DesignTokens.borderRadius.lg,
       borderWidth: 1,
       borderColor: theme.colors.border.secondary,
-      padding: DesignTokens.spacing[4],
       zIndex: 1001,
+      overflow: "hidden",
+    },
+    historyHeader: {
+      paddingHorizontal: DesignTokens.spacing[4],
+      paddingVertical: DesignTokens.spacing[2],
+      borderBottomWidth: 1,
+      borderBottomColor: "rgba(0, 0, 0, 0.1)",
+    },
+    historyList: {
+      maxHeight: 200,
+    },
+    historyItem: {
+      paddingHorizontal: DesignTokens.spacing[4],
+      paddingVertical: DesignTokens.spacing[3],
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    historyIcon: {
+      marginRight: DesignTokens.spacing[2],
+    },
+    historyText: {
+      flex: 1,
     },
   });
 
@@ -151,9 +173,39 @@ export function SearchInputWithHistory({
             }}
           />
 
-          {/* Dropdown - existing code */}
+          {/* Dropdown with history items */}
           <ThemedView variant="elevated" style={styles.historyDropdown}>
-            <ThemedText variant="body">History will go here</ThemedText>
+            {/* Header Section */}
+            <View style={styles.historyHeader}>
+              <ThemedText variant="caption" style={{ fontWeight: "600" }}>
+                Recent Searches
+              </ThemedText>
+            </View>
+
+            {/* History List */}
+            <FlatList
+              data={history}
+              scrollEnabled={false}
+              keyExtractor={(item) => item.query}
+              style={styles.historyList}
+              renderItem={({ item }) => (
+                <View style={styles.historyItem}>
+                  <MaterialIcons
+                    name="history"
+                    size={16}
+                    color={theme.colors.text.tertiary}
+                    style={styles.historyIcon}
+                  />
+                  <ThemedText
+                    variant="body"
+                    numberOfLines={1}
+                    style={styles.historyText}
+                  >
+                    {item.query}
+                  </ThemedText>
+                </View>
+              )}
+            />
           </ThemedView>
         </>
       )}
