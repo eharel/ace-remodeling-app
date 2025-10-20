@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Pressable,
   StyleSheet,
@@ -36,7 +36,7 @@ export function SearchInputWithHistory({
   const [isFocused, setIsFocused] = useState(false);
 
   // Phase 3: Add history hook
-  const { history, removeFromHistory } = useSearchHistory();
+  const { history, removeFromHistory, clearHistory } = useSearchHistory();
 
   // Calculate when to show dropdown
   const shouldShowHistory =
@@ -67,6 +67,11 @@ export function SearchInputWithHistory({
     removeFromHistory(query);
     inputRef.current?.focus();
   };
+
+  const handleClearAll = useCallback(() => {
+    clearHistory();
+    inputRef.current?.focus();
+  }, [clearHistory]);
 
   const styles = StyleSheet.create({
     container: {
@@ -120,6 +125,9 @@ export function SearchInputWithHistory({
       overflow: "hidden",
     },
     historyHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
       paddingHorizontal: DesignTokens.spacing[4],
       paddingVertical: DesignTokens.spacing[2],
       borderBottomWidth: 1,
@@ -189,6 +197,16 @@ export function SearchInputWithHistory({
             <ThemedText variant="caption" style={{ fontWeight: "600" }}>
               Recent Searches
             </ThemedText>
+
+            {/* Clear All Button */}
+            <Pressable hitSlop={8} onPress={handleClearAll}>
+              <ThemedText
+                variant="caption"
+                style={{ color: theme.colors.components.button.primary }}
+              >
+                Clear All
+              </ThemedText>
+            </Pressable>
           </View>
 
           {/* History List - FIXED: Replace FlatList with simple View */}
