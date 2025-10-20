@@ -7,15 +7,16 @@ import { useDebounce } from "use-debounce";
 import { ProjectGallery } from "@/components/ProjectGallery";
 import { ErrorState } from "@/components/error-states";
 import {
-  DesignTokens,
-  ThemedInput,
-  ThemedText,
-  ThemedView,
-} from "@/components/themed";
+  SearchFiltersBar,
+  SearchInputWithHistory,
+  useSearchFilters,
+} from "@/components/search";
+import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
+import { useProjects } from "@/contexts/ProjectsContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { mockProjects } from "@/data/mockProjects";
 import { Project, ProjectSummary } from "@/types/Project";
 import { logError, logWarning } from "@/utils/errorLogger";
+import { useSearchHistory } from "@/utils/useSearchHistory";
 
 // Constants
 const SEARCH_DEBOUNCE_MS = 500;
@@ -69,22 +70,45 @@ const styles = StyleSheet.create({
 
 export default function SearchScreen() {
   const { theme } = useTheme();
+  const { projects, loading: projectsLoading } = useProjects();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<ProjectSummary[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [debouncedSearchQuery] = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
 
+  // Phase 8: Connect search to history (single state instance)
+  const { history, addToHistory, removeFromHistory, clearHistory } =
+    useSearchHistory();
+
+  // Initialize filters hook
+  const {
+    updateFilter,
+    resetFilters,
+    hasActiveFilters,
+    activeFilterCount,
+    applyFilters,
+    availableProjectManagers,
+    availableTags,
+    getCategoryFilters,
+    getStatusFilters,
+    getProjectManagerFilters,
+    getTagFilters,
+  } = useSearchFilters(projects);
+
   // Memoized function to create searchable text from a project
   const createSearchableText = useCallback((project: Project) => {
+    const pmNames = project.pms?.map((pm) => pm.name) || [];
     return [
       project.name,
       project.briefDescription,
       project.longDescription || "",
-      project.location || "",
+      project.location?.zipCode || "",
+      project.location?.neighborhood || "",
       ...(project.tags || []),
-      project.clientInfo?.name || "",
-      project.clientInfo?.address || "",
+      project.scope || "",
+      project.projectNumber || "",
+      ...pmNames,
     ]
       .join(" ")
       .toLowerCase();
@@ -94,20 +118,22 @@ export default function SearchScreen() {
   const searchProjects = useCallback(
     (query: string) => {
       try {
-        if (query.trim() === "") return [];
-
-        const searchTerms = query
-          .toLowerCase()
-          .trim()
-          .split(/\s+/)
-          .filter((term) => term.length > 0);
-
-        if (!Array.isArray(mockProjects)) {
+        if (!Array.isArray(projects)) {
           throw new Error("Project data is not available");
         }
 
-        return mockProjects
-          .filter((project) => {
+        // Step 1: Apply filters first
+        let filteredProjects = applyFilters(projects);
+
+        // Step 2: If there's a text query, apply text search to filtered results
+        if (query.trim() !== "") {
+          const searchTerms = query
+            .toLowerCase()
+            .trim()
+            .split(/\s+/)
+            .filter((term) => term.length > 0);
+
+          filteredProjects = filteredProjects.filter((project) => {
             try {
               const searchableText = createSearchableText(project);
               return searchTerms.every((term) => searchableText.includes(term));
@@ -118,24 +144,36 @@ export default function SearchScreen() {
               });
               return false;
             }
-          })
-          .map((project) => ({
-            id: project.id,
-            name: project.name,
-            category: project.category,
-            briefDescription: project.briefDescription,
-            thumbnail: project.thumbnail,
-            status: project.status,
-          }));
+          });
+        }
+
+        // Step 3: Map to ProjectSummary format
+        return filteredProjects.map((project) => ({
+          id: project.id,
+          projectNumber: project.projectNumber,
+          name: project.name,
+          category: project.category,
+          briefDescription: project.briefDescription,
+          thumbnail: project.thumbnail,
+          status: project.status,
+          completedAt: project.completionDate,
+          pmNames: project.pms?.map((pm) => pm.name) || [],
+        }));
       } catch (error) {
         logError("Search operation failed", { query, error: error });
         throw error;
       }
     },
-    [createSearchableText]
+    [createSearchableText, projects, applyFilters]
   );
 
   useEffect(() => {
+    console.log("🔍 SEARCH TRIGGERED:", {
+      query: debouncedSearchQuery,
+      queryLength: debouncedSearchQuery.length,
+      isEmpty: debouncedSearchQuery.trim() === "",
+    });
+
     setIsSearching(true);
     setSearchError(null);
 
@@ -154,19 +192,19 @@ export default function SearchScreen() {
     }
   }, [debouncedSearchQuery, searchProjects]);
 
+  // Phase 8A: History is now saved only on Enter key press (handled in SearchInputWithHistory)
+
   // Announce search results to screen readers
   useEffect(() => {
-    if (debouncedSearchQuery.trim() !== "" && !isSearching) {
-      const resultCount = searchResults.length;
+    if (
+      debouncedSearchQuery.trim() !== "" &&
+      !isSearching &&
+      !projectsLoading
+    ) {
       // This would typically use AccessibilityInfo.announceForAccessibility
       // but for now we'll rely on the existing accessibility labels
-      console.log(
-        `Search results: ${resultCount} project${
-          resultCount === 1 ? "" : "s"
-        } found`
-      );
     }
-  }, [searchResults, debouncedSearchQuery, isSearching]);
+  }, [searchResults, debouncedSearchQuery, isSearching, projectsLoading]);
 
   const handleProjectPress = (project: ProjectSummary) => {
     try {
@@ -181,6 +219,12 @@ export default function SearchScreen() {
     }
   };
 
+  const isLoading = isSearching || projectsLoading;
+
+  // Determine if we should show results (either has text query or active filters)
+  const shouldShowResults =
+    debouncedSearchQuery.trim() !== "" || hasActiveFilters;
+
   return (
     <ThemedView
       style={styles.container}
@@ -190,16 +234,40 @@ export default function SearchScreen() {
         <ThemedText variant="title" accessibilityRole="header">
           Search Projects
         </ThemedText>
-        <ThemedInput
-          placeholder={isSearching ? "Searching..." : "Search projects"}
+        <SearchInputWithHistory
+          placeholder={isLoading ? "Searching..." : "Search projects"}
           value={searchQuery}
           onChangeText={setSearchQuery}
-          disabled={isSearching}
-          accessibilityLabel="Search projects input"
-          accessibilityHint="Type to search for projects by name, description, location, client, or tags"
+          onSelectHistory={setSearchQuery}
+          disabled={isLoading}
+          history={history}
+          onRemoveHistory={removeFromHistory}
+          onClearHistory={clearHistory}
+          onAddToHistory={addToHistory}
+          projects={searchResults}
+          onSelectProject={(id) => router.push(`/project/${id}`)}
         />
       </ThemedView>
-      {isSearching ? (
+
+      <SearchFiltersBar
+        categoryValues={getCategoryFilters()}
+        statusValues={getStatusFilters()}
+        projectManagerValues={getProjectManagerFilters()}
+        tagValues={getTagFilters()}
+        availableProjectManagers={availableProjectManagers}
+        availableTags={availableTags}
+        onCategoryChange={(values) => updateFilter("categories", values)}
+        onStatusChange={(values) => updateFilter("statuses", values)}
+        onProjectManagerChange={(values) =>
+          updateFilter("projectManagers", values)
+        }
+        onTagChange={(values) => updateFilter("tags", values)}
+        onResetFilters={resetFilters}
+        hasActiveFilters={hasActiveFilters}
+        activeFilterCount={activeFilterCount}
+      />
+
+      {isLoading ? (
         <ThemedView
           style={styles.placeholderContainer}
           accessibilityLabel="Searching for projects"
@@ -271,9 +339,7 @@ export default function SearchScreen() {
         <ThemedView
           style={styles.placeholderContainer}
           accessibilityLabel={
-            debouncedSearchQuery.trim() === ""
-              ? "Search instructions"
-              : "No search results"
+            shouldShowResults ? "No search results" : "Search instructions"
           }
         >
           <MaterialIcons
@@ -286,26 +352,26 @@ export default function SearchScreen() {
           <ThemedText
             style={styles.placeholderText}
             accessibilityLabel={
-              debouncedSearchQuery.trim() === ""
-                ? "Start typing to search projects"
-                : "No projects found"
+              shouldShowResults
+                ? "No projects found"
+                : "Start typing to search projects"
             }
           >
-            {debouncedSearchQuery.trim() === ""
-              ? "Start typing to search projects"
-              : "No projects found"}
+            {shouldShowResults
+              ? "No projects found"
+              : "Start typing to search projects"}
           </ThemedText>
           <ThemedText
             style={styles.descriptionText}
             accessibilityLabel={
-              debouncedSearchQuery.trim() === ""
-                ? "Search by project name, description, location, client, or tags to find what you're looking for."
-                : `No projects match "${debouncedSearchQuery}". Try a different search term.`
+              shouldShowResults
+                ? "No projects match your search criteria. Try adjusting your search term or filters."
+                : "Search by project name, description, location, or tags. Use filters to narrow results."
             }
           >
-            {debouncedSearchQuery.trim() === ""
-              ? "Search by project name, description, location, client, or tags to find what you're looking for."
-              : `No projects match "${debouncedSearchQuery}". Try a different search term.`}
+            {shouldShowResults
+              ? "No projects match your search criteria. Try adjusting your search term or filters."
+              : "Search by project name, description, location, or tags. Use filters to narrow results."}
           </ThemedText>
         </ThemedView>
       )}

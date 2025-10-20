@@ -35,15 +35,6 @@ export default function DocumentsPage({}: DocumentsPageProps) {
   const project = projects.find((p) => p.id === id);
   const documents = project?.documents || [];
 
-  // Debug logging
-  console.log("Documents page - Project ID:", id);
-  console.log(
-    "Documents page - Available projects:",
-    projects.map((p) => ({ id: p.id, name: p.name }))
-  );
-  console.log("Documents page - Found project:", project);
-  console.log("Documents page - Documents:", documents);
-
   // Calculate grid layout
   const numColumns = 2;
   const itemWidth =
@@ -95,8 +86,6 @@ export default function DocumentsPage({}: DocumentsPageProps) {
   };
 
   const handleDocumentPress = (document: Document) => {
-    console.log("Opening document:", document.name);
-
     // Navigate to PDF viewer with document details
     router.push({
       pathname: "/pdf-viewer",
