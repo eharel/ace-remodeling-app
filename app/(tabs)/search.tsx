@@ -244,6 +244,8 @@ export default function SearchScreen() {
           onRemoveHistory={removeFromHistory}
           onClearHistory={clearHistory}
           onAddToHistory={addToHistory}
+          projects={searchResults}
+          onSelectProject={(id) => router.push(`/project/${id}`)}
         />
       </ThemedView>
 

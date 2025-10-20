@@ -10,7 +10,10 @@ import {
 
 import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
+import { ProjectSummary } from "@/types/Project";
 import { SearchHistoryItem } from "@/utils/useSearchHistory";
+
+import { SearchSuggestions } from "./SearchSuggestions";
 
 interface SearchInputWithHistoryProps {
   value: string;
@@ -22,6 +25,8 @@ interface SearchInputWithHistoryProps {
   onRemoveHistory: (query: string) => void;
   onClearHistory: () => void;
   onAddToHistory: (query: string) => void;
+  projects: ProjectSummary[];
+  onSelectProject: (projectId: string) => void;
 }
 
 /**
@@ -38,6 +43,8 @@ export function SearchInputWithHistory({
   onRemoveHistory,
   onClearHistory,
   onAddToHistory,
+  projects,
+  onSelectProject,
 }: SearchInputWithHistoryProps) {
   const { theme } = useTheme();
   const inputRef = useRef<TextInput>(null);
@@ -45,9 +52,10 @@ export function SearchInputWithHistory({
 
   // History is now passed as props from parent (single state instance)
 
-  // Calculate when to show dropdown
+  // Calculate when to show dropdowns (Phase 9: Add suggestions)
   const shouldShowHistory =
     isFocused && value.trim() === "" && history.length > 0;
+  const shouldShowSuggestions = isFocused && value.trim().length >= 2;
 
   // Debug: Log dropdown visibility
   console.log("🔎 Dropdown visibility:", {
@@ -215,7 +223,16 @@ export function SearchInputWithHistory({
         )}
       </View>
 
-      {shouldShowHistory && (
+      {/* Phase 9: Show suggestions when typing, history when empty */}
+      {shouldShowSuggestions && (
+        <SearchSuggestions
+          projects={projects}
+          query={value}
+          onSelectProject={onSelectProject}
+        />
+      )}
+
+      {shouldShowHistory && !shouldShowSuggestions && (
         <ThemedView variant="elevated" style={styles.historyDropdown}>
           {/* Header Section */}
           <View style={styles.historyHeader}>
