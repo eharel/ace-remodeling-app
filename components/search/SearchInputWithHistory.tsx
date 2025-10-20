@@ -36,7 +36,7 @@ export function SearchInputWithHistory({
   const [isFocused, setIsFocused] = useState(false);
 
   // Phase 3: Add history hook
-  const { history } = useSearchHistory();
+  const { history, removeFromHistory } = useSearchHistory();
 
   // Calculate when to show dropdown
   const shouldShowHistory =
@@ -60,6 +60,11 @@ export function SearchInputWithHistory({
     // Update parent-controlled value and ensure local change path too
     onSelectHistory(query);
     onChangeText(query);
+    inputRef.current?.focus();
+  };
+
+  const handleRemoveHistory = (query: string) => {
+    removeFromHistory(query);
     inputRef.current?.focus();
   };
 
@@ -134,6 +139,9 @@ export function SearchInputWithHistory({
     },
     historyText: {
       flex: 1,
+    },
+    removeButton: {
+      padding: DesignTokens.spacing[1],
     },
   });
 
@@ -211,6 +219,22 @@ export function SearchInputWithHistory({
                 >
                   {item.query}
                 </ThemedText>
+
+                {/* Remove button */}
+                <Pressable
+                  style={styles.removeButton}
+                  hitSlop={8}
+                  onPress={(e) => {
+                    e.stopPropagation(); // Prevent parent Pressable from firing
+                    handleRemoveHistory(item.query);
+                  }}
+                >
+                  <MaterialIcons
+                    name="close"
+                    size={18}
+                    color={theme.colors.text.primary}
+                  />
+                </Pressable>
               </Pressable>
             ))}
           </View>
