@@ -10,7 +10,7 @@ import {
 
 import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useSearchHistory } from "@/utils/useSearchHistory";
+import { SearchHistoryItem } from "@/utils/useSearchHistory";
 
 interface SearchInputWithHistoryProps {
   value: string;
@@ -18,6 +18,10 @@ interface SearchInputWithHistoryProps {
   onSelectHistory: (query: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  history: SearchHistoryItem[];
+  onRemoveHistory: (query: string) => void;
+  onClearHistory: () => void;
+  onAddToHistory: (query: string) => void;
 }
 
 /**
@@ -30,17 +34,30 @@ export function SearchInputWithHistory({
   onSelectHistory,
   placeholder,
   disabled,
+  history,
+  onRemoveHistory,
+  onClearHistory,
+  onAddToHistory,
 }: SearchInputWithHistoryProps) {
   const { theme } = useTheme();
   const inputRef = useRef<TextInput>(null);
   const [isFocused, setIsFocused] = useState(false);
 
-  // Phase 3: Add history hook
-  const { history, removeFromHistory, clearHistory } = useSearchHistory();
+  // History is now passed as props from parent (single state instance)
 
   // Calculate when to show dropdown
   const shouldShowHistory =
     isFocused && value.trim() === "" && history.length > 0;
+
+  // Debug: Log dropdown visibility
+  console.log("🔎 Dropdown visibility:", {
+    isFocused,
+    valueEmpty: value.trim() === "",
+    historyLength: history.length,
+    shouldShowHistory,
+    historyItems: history.map((item) => item.query),
+    currentInputValue: value,
+  });
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -64,14 +81,21 @@ export function SearchInputWithHistory({
   };
 
   const handleRemoveHistory = (query: string) => {
-    removeFromHistory(query);
+    onRemoveHistory(query);
     inputRef.current?.focus();
   };
 
   const handleClearAll = useCallback(() => {
-    clearHistory();
+    onClearHistory();
     inputRef.current?.focus();
-  }, [clearHistory]);
+  }, [onClearHistory]);
+
+  const handleSubmit = () => {
+    // Only save to history if query is ≥2 characters
+    if (value.trim().length >= 2) {
+      onAddToHistory(value.trim());
+    }
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -168,6 +192,7 @@ export function SearchInputWithHistory({
           onChangeText={onChangeText}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          onSubmitEditing={handleSubmit}
           placeholder={placeholder}
           placeholderTextColor={theme.colors.text.placeholder}
           editable={!disabled}

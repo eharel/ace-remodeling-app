@@ -16,7 +16,7 @@ import { useProjects } from "@/contexts/ProjectsContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Project, ProjectSummary } from "@/types/Project";
 import { logError, logWarning } from "@/utils/errorLogger";
-// import { useSearchHistory } from "@/utils/useSearchHistory";
+import { useSearchHistory } from "@/utils/useSearchHistory";
 
 // Constants
 const SEARCH_DEBOUNCE_MS = 500;
@@ -77,7 +77,9 @@ export default function SearchScreen() {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [debouncedSearchQuery] = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
 
-  // Temporary test removed: we no longer inject a long query into history
+  // Phase 8: Connect search to history (single state instance)
+  const { history, addToHistory, removeFromHistory, clearHistory } =
+    useSearchHistory();
 
   // Initialize filters hook
   const {
@@ -163,6 +165,12 @@ export default function SearchScreen() {
   );
 
   useEffect(() => {
+    console.log("🔍 SEARCH TRIGGERED:", {
+      query: debouncedSearchQuery,
+      queryLength: debouncedSearchQuery.length,
+      isEmpty: debouncedSearchQuery.trim() === "",
+    });
+
     setIsSearching(true);
     setSearchError(null);
 
@@ -180,6 +188,8 @@ export default function SearchScreen() {
       setIsSearching(false);
     }
   }, [debouncedSearchQuery, searchProjects]);
+
+  // Phase 8A: History is now saved only on Enter key press (handled in SearchInputWithHistory)
 
   // Announce search results to screen readers
   useEffect(() => {
@@ -227,6 +237,10 @@ export default function SearchScreen() {
           onChangeText={setSearchQuery}
           onSelectHistory={setSearchQuery}
           disabled={isLoading}
+          history={history}
+          onRemoveHistory={removeFromHistory}
+          onClearHistory={clearHistory}
+          onAddToHistory={addToHistory}
         />
       </ThemedView>
 
