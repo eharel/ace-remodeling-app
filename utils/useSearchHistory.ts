@@ -7,6 +7,23 @@ const SEARCH_HISTORY_KEY = "@ace_search_history";
 const MAX_HISTORY_ITEMS = 5;
 const MIN_QUERY_LENGTH = 2;
 
+// Development seed to stabilize UI during implementation phases
+const DEV_SEED_HISTORY = true;
+const getSeedItems = (): SearchHistoryItem[] => {
+  const now = Date.now();
+  return [
+    {
+      query:
+        "This is an extremely long search query that should definitely be truncated with ellipsis because it contains way too many characters to fit comfortably in the available horizontal space of the dropdown",
+      timestamp: now,
+    },
+    { query: "test search 1760745439473", timestamp: now - 1 },
+    { query: "test search 1760745437754", timestamp: now - 2 },
+    { query: "test search 1760745437221", timestamp: now - 3 },
+    { query: "test search 1760745436573", timestamp: now - 4 },
+  ];
+};
+
 interface SearchHistoryItem {
   query: string;
   timestamp: number;
@@ -26,7 +43,17 @@ export function useSearchHistory() {
       const stored = await AsyncStorage.getItem(SEARCH_HISTORY_KEY);
       if (stored) {
         const parsedHistory = JSON.parse(stored) as SearchHistoryItem[];
-        setHistory(parsedHistory);
+        if (parsedHistory && parsedHistory.length >= 5) {
+          setHistory(parsedHistory);
+          return;
+        }
+      }
+
+      // Seed during development if no history found OR if we have less than 5 items
+      if (DEV_SEED_HISTORY) {
+        const seed = getSeedItems();
+        setHistory(seed);
+        await AsyncStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(seed));
       }
     } catch (error) {
       logError("Failed to load search history", { error });

@@ -1,7 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
 import {
-  FlatList,
   Pressable,
   StyleSheet,
   TextInput,
@@ -16,6 +15,7 @@ import { useSearchHistory } from "@/utils/useSearchHistory";
 interface SearchInputWithHistoryProps {
   value: string;
   onChangeText: (text: string) => void;
+  onSelectHistory: (query: string) => void;
   placeholder?: string;
   disabled?: boolean;
 }
@@ -27,6 +27,7 @@ interface SearchInputWithHistoryProps {
 export function SearchInputWithHistory({
   value,
   onChangeText,
+  onSelectHistory,
   placeholder,
   disabled,
 }: SearchInputWithHistoryProps) {
@@ -52,6 +53,13 @@ export function SearchInputWithHistory({
 
   const handleClear = () => {
     onChangeText("");
+    inputRef.current?.focus();
+  };
+
+  const handleSelectHistory = (query: string) => {
+    // Update parent-controlled value and ensure local change path too
+    onSelectHistory(query);
+    onChangeText(query);
     inputRef.current?.focus();
   };
 
@@ -87,7 +95,11 @@ export function SearchInputWithHistory({
       opacity: 0.6,
     },
     backdrop: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
       zIndex: 999,
     },
     historyDropdown: {
@@ -99,7 +111,7 @@ export function SearchInputWithHistory({
       borderRadius: DesignTokens.borderRadius.lg,
       borderWidth: 1,
       borderColor: theme.colors.border.secondary,
-      zIndex: 1001,
+      zIndex: 1002,
       overflow: "hidden",
     },
     historyHeader: {
@@ -163,51 +175,46 @@ export function SearchInputWithHistory({
       </View>
 
       {shouldShowHistory && (
-        <>
-          {/* Backdrop - closes dropdown on tap */}
-          <Pressable
-            style={styles.backdrop}
-            onPress={() => {
-              setIsFocused(false);
-              inputRef.current?.blur();
-            }}
-          />
+        <ThemedView variant="elevated" style={styles.historyDropdown}>
+          {/* Header Section */}
+          <View style={styles.historyHeader}>
+            <ThemedText variant="caption" style={{ fontWeight: "600" }}>
+              Recent Searches
+            </ThemedText>
+          </View>
 
-          {/* Dropdown with history items */}
-          <ThemedView variant="elevated" style={styles.historyDropdown}>
-            {/* Header Section */}
-            <View style={styles.historyHeader}>
-              <ThemedText variant="caption" style={{ fontWeight: "600" }}>
-                Recent Searches
-              </ThemedText>
-            </View>
-
-            {/* History List */}
-            <FlatList
-              data={history}
-              scrollEnabled={false}
-              keyExtractor={(item) => item.query}
-              style={styles.historyList}
-              renderItem={({ item }) => (
-                <View style={styles.historyItem}>
-                  <MaterialIcons
-                    name="history"
-                    size={16}
-                    color={theme.colors.text.tertiary}
-                    style={styles.historyIcon}
-                  />
-                  <ThemedText
-                    variant="body"
-                    numberOfLines={1}
-                    style={styles.historyText}
-                  >
-                    {item.query}
-                  </ThemedText>
-                </View>
-              )}
-            />
-          </ThemedView>
-        </>
+          {/* History List - FIXED: Replace FlatList with simple View */}
+          <View style={styles.historyList}>
+            {history.map((item) => (
+              <Pressable
+                key={item.query}
+                style={({ pressed }) => [
+                  styles.historyItem,
+                  {
+                    backgroundColor: pressed
+                      ? theme.colors.background.secondary
+                      : "transparent",
+                  },
+                ]}
+                onPress={() => handleSelectHistory(item.query)}
+              >
+                <MaterialIcons
+                  name="history"
+                  size={16}
+                  color={theme.colors.text.tertiary}
+                  style={styles.historyIcon}
+                />
+                <ThemedText
+                  variant="body"
+                  numberOfLines={1}
+                  style={styles.historyText}
+                >
+                  {item.query}
+                </ThemedText>
+              </Pressable>
+            ))}
+          </View>
+        </ThemedView>
       )}
     </View>
   );
