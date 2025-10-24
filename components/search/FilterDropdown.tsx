@@ -265,7 +265,7 @@ export function FilterDropdown<T extends string>({
       transform: [{ translateX: -15 }], // Center the 30px wide circle
       width: 30,
       height: 30,
-      borderRadius: 15,
+      borderRadius: DesignTokens.borderRadius.full,
       justifyContent: "center",
       alignItems: "center",
       zIndex: 2,

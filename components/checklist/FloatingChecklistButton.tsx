@@ -65,9 +65,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 100, // Position above tab bar
     right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: DesignTokens.components.fab.size,
+    height: DesignTokens.components.fab.size,
+    borderRadius: DesignTokens.components.fab.borderRadius,
     justifyContent: "center",
     alignItems: "center",
     elevation: 8,

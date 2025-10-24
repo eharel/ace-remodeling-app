@@ -153,7 +153,10 @@ export function SearchSuggestions({
               {project.name}
             </ThemedText>
             <View style={styles.categoryBadge}>
-              <ThemedText variant="caption" style={{ fontSize: 11 }}>
+              <ThemedText
+                variant="caption"
+                style={{ fontSize: DesignTokens.typography.fontSize.xs }}
+              >
                 {project.category}
               </ThemedText>
             </View>

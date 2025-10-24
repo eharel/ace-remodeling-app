@@ -199,34 +199,48 @@ export const DesignTokens = {
     fab: 1000, // Floating Action Button
   },
 
-  // Component Size Constants - Universal dimensions only
-  componentSizes: {
-    // Floating Action Button (FAB)
+  // Component-specific dimensions and behavior (theme-agnostic)
+  components: {
     fab: {
       size: 56,
       iconSize: 24,
       borderRadius: 28, // Half of size for perfect circle
     },
-
-    // Modal
     modal: {
+      borderRadius: 12,
+      borderWidth: 1,
       maxWidth: 500,
       maxHeightPercent: 70,
       minHeight: 500,
     },
-
-    // Header - only universal dimensions
+    card: {
+      borderRadius: 16,
+      borderWidth: 1,
+    },
+    button: {
+      borderRadius: 12,
+      minHeight: 48,
+    },
+    input: {
+      borderRadius: 8,
+      borderWidth: 1,
+      minHeight: 44,
+    },
     header: {
-      // Only keep truly universal dimensions here
-      // Font sizes, weights, and spacing should be in theme files
+      titleFontWeight: "600" as const,
+      progressFontWeight: "500" as const,
+      borderBottomWidth: 1,
+      padding: 20,
     },
-
-    // Checklist Item - only universal dimensions
     checklistItem: {
-      // Only keep truly universal dimensions here
-      // Font sizes and spacing should be in theme files
+      paddingVertical: 12,
+      paddingHorizontal: 4,
+      checkedOpacity: 0.6,
     },
+  },
 
+  // Component Size Constants - Universal dimensions only
+  componentSizes: {
     // Icon Button - universal dimensions
     iconButton: 40,
 

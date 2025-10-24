@@ -182,7 +182,7 @@ export const ImageGalleryFooter = React.memo<ImageGalleryFooterProps>(
           paginationDot: {
             width: 8,
             height: 8,
-            borderRadius: 4,
+            borderRadius: DesignTokens.borderRadius.sm,
             backgroundColor: "#ffffff",
             opacity: 0.4,
           },

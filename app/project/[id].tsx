@@ -319,9 +319,9 @@ export default function ProjectDetailScreen() {
         },
         zoomIcon: {
           backgroundColor: "rgba(255, 255, 255, 0.9)",
-          borderRadius: 20,
-          width: 40,
-          height: 40,
+          borderRadius: DesignTokens.borderRadius.lg,
+          width: DesignTokens.componentSizes.iconButton,
+          height: DesignTokens.componentSizes.iconButton,
           justifyContent: "center",
           alignItems: "center",
         },
@@ -344,7 +344,7 @@ export default function ProjectDetailScreen() {
           borderRadius: DesignTokens.borderRadius.lg,
           overflow: "hidden",
           borderWidth: 1,
-          borderColor: theme.colors.border.subtle,
+          borderColor: theme.colors.border.primary,
         },
         documentContainer: {
           flexDirection: "row",
@@ -353,7 +353,7 @@ export default function ProjectDetailScreen() {
           paddingHorizontal: DesignTokens.spacing[5],
           backgroundColor: theme.colors.background.card,
           borderBottomWidth: 1,
-          borderBottomColor: theme.colors.border.subtle,
+          borderBottomColor: theme.colors.border.primary,
           minHeight: 72,
         },
         documentContainerLast: {
@@ -435,7 +435,7 @@ export default function ProjectDetailScreen() {
           borderRadius: DesignTokens.borderRadius.lg,
           padding: DesignTokens.spacing[4],
           borderWidth: 1,
-          borderColor: theme.colors.border.subtle,
+          borderColor: theme.colors.border.primary,
         },
         documentPreviewItem: {
           flexDirection: "row",
@@ -956,7 +956,7 @@ export default function ProjectDetailScreen() {
                 padding: DesignTokens.spacing[6],
                 borderRadius: DesignTokens.borderRadius.xl,
                 borderLeftWidth: 4,
-                borderLeftColor: theme.colors.accent.primary,
+                borderLeftColor: theme.colors.text.accent,
               }}
             >
               <ThemedText
