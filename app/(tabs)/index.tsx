@@ -1,8 +1,7 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useMemo } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -11,132 +10,82 @@ import { DesignTokens } from "@/themes";
 export default function HomeScreen() {
   const { theme, isDark } = useTheme();
 
-  const handleKitchenPress = () => {
-    router.push("/(tabs)/kitchens");
+  const handleBrowsePortfolio = () => {
+    router.push("/(tabs)/portfolio" as any);
   };
-
-  const handleBathroomPress = () => {
-    router.push("/(tabs)/bathrooms");
-  };
-
-  console.log("Home page loaded");
 
   const styles = useMemo(
     () =>
       StyleSheet.create({
         container: {
           flex: 1,
-          backgroundColor: theme.colors.background.secondary,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: DesignTokens.spacing[6],
+          backgroundColor: theme.colors.background.primary,
         },
         header: {
           alignItems: "center",
-          paddingTop: DesignTokens.spacing[20],
-          paddingBottom: DesignTokens.spacing[8],
-          paddingHorizontal: DesignTokens.spacing[6],
+          marginBottom: DesignTokens.spacing[12],
         },
         logo: {
           width: 200,
-          height: 80,
-          marginBottom: DesignTokens.spacing[6],
+          height: 60,
+          marginBottom: DesignTokens.spacing[4],
         },
-        companyName: {
-          fontSize: DesignTokens.typography.fontSize["4xl"],
-          textAlign: "center",
+        title: {
+          fontSize: DesignTokens.typography.fontSize["5xl"],
           fontWeight: DesignTokens.typography.fontWeight.bold,
+          fontFamily: DesignTokens.typography.fontFamily.bold,
           color: theme.colors.text.primary,
-          lineHeight: DesignTokens.typography.lineHeight.tight,
           marginBottom: DesignTokens.spacing[2],
+          textAlign: "center",
         },
         tagline: {
           fontSize: DesignTokens.typography.fontSize.lg,
-          textAlign: "center",
+          fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.secondary,
-          fontWeight: DesignTokens.typography.fontWeight.medium,
-        },
-        welcomeSection: {
-          alignItems: "center",
-          paddingHorizontal: DesignTokens.spacing[6],
-          paddingBottom: DesignTokens.spacing[2],
-        },
-        welcomeText: {
-          fontSize: DesignTokens.typography.fontSize.xl,
           textAlign: "center",
-          color: theme.colors.text.primary,
-          fontFamily: DesignTokens.typography.fontFamily.semibold,
-          marginBottom: DesignTokens.spacing[2],
-        },
-        instructionText: {
-          fontSize: DesignTokens.typography.fontSize.base,
-          textAlign: "center",
-          color: theme.colors.text.secondary,
-          lineHeight: DesignTokens.typography.lineHeight.relaxed,
-          marginTop: DesignTokens.spacing[4],
-          paddingVertical: DesignTokens.spacing[6],
-          minHeight: 80, // Ensure proper height for text visibility
-        },
-        categoriesSection: {
-          paddingHorizontal: DesignTokens.spacing[6],
-          paddingVertical: DesignTokens.spacing[6],
-          backgroundColor: theme.colors.background.primary,
-          borderRadius: DesignTokens.borderRadius.lg,
-          marginHorizontal: DesignTokens.spacing[4],
-          marginTop: DesignTokens.spacing[4],
+          maxWidth: 300,
           marginBottom: DesignTokens.spacing[8],
-          ...DesignTokens.shadows.sm,
         },
-        categoriesTitle: {
-          fontSize: DesignTokens.typography.fontSize.xl,
-          textAlign: "center",
-          marginBottom: DesignTokens.spacing[6],
-          color: theme.colors.text.primary,
+        stats: {
+          flexDirection: "row",
+          justifyContent: "space-around",
+          width: "100%",
+          marginBottom: DesignTokens.spacing[8],
+        },
+        statItem: {
+          alignItems: "center",
+        },
+        statNumber: {
+          fontSize: DesignTokens.typography.fontSize["3xl"],
+          fontWeight: DesignTokens.typography.fontWeight.bold,
           fontFamily: DesignTokens.typography.fontFamily.bold,
-        },
-        categoryButtons: {
-          gap: DesignTokens.spacing[4],
-          width: "85%",
-          alignSelf: "center",
-        },
-        categoryButton: {
-          backgroundColor: theme.colors.background.card,
-          padding: DesignTokens.spacing[6],
-          borderRadius: DesignTokens.borderRadius.lg,
-          alignItems: "center",
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          ...DesignTokens.shadows.base,
-          minHeight: 120,
-        },
-        categoryButtonPressed: {
-          backgroundColor: theme.colors.background.secondary,
-          transform: [{ scale: 0.98 }],
-          ...DesignTokens.shadows.sm,
-        },
-        categoryButtonText: {
-          fontSize: DesignTokens.typography.fontSize.lg,
+          color: theme.colors.interactive.primary,
           marginBottom: DesignTokens.spacing[1],
-          color: theme.colors.text.primary,
-          fontWeight: DesignTokens.typography.fontWeight.semibold,
         },
-        categoryDescription: {
+        statLabel: {
           fontSize: DesignTokens.typography.fontSize.sm,
-          color: theme.colors.text.secondary,
-          textAlign: "center",
-          lineHeight: DesignTokens.typography.lineHeight.relaxed,
-        },
-        categoryIcon: {
-          marginBottom: DesignTokens.spacing[3],
-        },
-        footer: {
-          alignItems: "center",
-          paddingVertical: DesignTokens.spacing[6],
-          paddingHorizontal: DesignTokens.spacing[6],
-          borderTopWidth: 1,
-          borderTopColor: theme.colors.border.primary,
-        },
-        footerText: {
-          fontSize: DesignTokens.typography.fontSize.sm,
+          fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.tertiary,
-          textAlign: "center",
+        },
+        button: {
+          paddingHorizontal: DesignTokens.spacing[8],
+          paddingVertical: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.lg,
+          backgroundColor: theme.colors.interactive.primary,
+          ...DesignTokens.shadows.md,
+        },
+        buttonPressed: {
+          transform: [{ scale: 0.98 }],
+          ...DesignTokens.shadows.lg,
+        },
+        buttonText: {
+          color: "#FFFFFF",
+          fontSize: DesignTokens.typography.fontSize.lg,
+          fontWeight: DesignTokens.typography.fontWeight.semibold,
+          fontFamily: DesignTokens.typography.fontFamily.semibold,
         },
       }),
     [theme]
@@ -144,7 +93,6 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {/* Header Section */}
       <View style={styles.header}>
         <Image
           source={
@@ -155,87 +103,39 @@ export default function HomeScreen() {
           style={styles.logo}
           contentFit="contain"
         />
-        <ThemedText variant="title" style={styles.companyName}>
-          ACE Remodeling
-        </ThemedText>
-        <ThemedText variant="subtitle" style={styles.tagline}>
-          Transforming Austin Homes
+        <ThemedText style={styles.title}>ACE Remodeling</ThemedText>
+        <ThemedText style={styles.tagline}>
+          Transforming Austin Homes with Excellence
         </ThemedText>
       </View>
 
-      {/* Welcome Message */}
-      <View style={styles.welcomeSection}>
-        <ThemedText variant="body" style={styles.welcomeText}>
-          Ready to showcase our work!
-        </ThemedText>
-        <ThemedText variant="body" style={styles.instructionText}>
-          Select a category below to view our featured projects
-        </ThemedText>
-      </View>
-
-      {/* Category Navigation */}
-      <View style={styles.categoriesSection}>
-        <ThemedText variant="subtitle" style={styles.categoriesTitle}>
-          Our Services
-        </ThemedText>
-
-        <View style={styles.categoryButtons}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.categoryButton,
-              pressed && styles.categoryButtonPressed,
-            ]}
-            onPress={handleKitchenPress}
-            android_ripple={{
-              color: theme.colors.interactive.primaryLight,
-            }}
-          >
-            <MaterialIcons
-              name="kitchen"
-              size={32}
-              color={theme.colors.interactive.primary}
-              style={styles.categoryIcon}
-            />
-            <ThemedText variant="body" style={styles.categoryButtonText}>
-              Kitchen
-            </ThemedText>
-            <ThemedText style={styles.categoryDescription}>
-              Kitchen remodeling and renovations
-            </ThemedText>
-          </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.categoryButton,
-              pressed && styles.categoryButtonPressed,
-            ]}
-            onPress={handleBathroomPress}
-            android_ripple={{
-              color: theme.colors.interactive.primaryLight,
-            }}
-          >
-            <MaterialIcons
-              name="bathroom"
-              size={32}
-              color={theme.colors.interactive.primary}
-              style={styles.categoryIcon}
-            />
-            <ThemedText variant="body" style={styles.categoryButtonText}>
-              Bathroom
-            </ThemedText>
-            <ThemedText style={styles.categoryDescription}>
-              Bathroom transformations
-            </ThemedText>
-          </Pressable>
+      <View style={styles.stats}>
+        <View style={styles.statItem}>
+          <ThemedText style={styles.statNumber}>47+</ThemedText>
+          <ThemedText style={styles.statLabel}>Projects</ThemedText>
+        </View>
+        <View style={styles.statItem}>
+          <ThemedText style={styles.statNumber}>5</ThemedText>
+          <ThemedText style={styles.statLabel}>Years</ThemedText>
+        </View>
+        <View style={styles.statItem}>
+          <ThemedText style={styles.statNumber}>100%</ThemedText>
+          <ThemedText style={styles.statLabel}>Satisfied</ThemedText>
         </View>
       </View>
 
-      {/* Footer */}
-      <View style={styles.footer}>
-        <ThemedText style={styles.footerText}>
-          Professional remodeling services in Austin, TX
-        </ThemedText>
-      </View>
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          pressed && styles.buttonPressed,
+        ]}
+        onPress={handleBrowsePortfolio}
+        accessibilityRole="button"
+        accessibilityLabel="Browse our portfolio"
+        accessibilityHint="Navigate to the portfolio section to view our projects"
+      >
+        <Text style={styles.buttonText}>Browse Our Portfolio</Text>
+      </Pressable>
     </ThemedView>
   );
 }
