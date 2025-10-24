@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View, type ViewProps } from "react-native";
+import { View, type ViewProps, type ViewStyle } from "react-native";
 
 import { useTheme } from "@/contexts";
 import { DesignTokens, ThemeVariant } from "@/themes";
@@ -20,8 +20,8 @@ export function ThemedView({
   const { theme } = useTheme();
 
   // Generate theme-aware styles based on variant and props
-  const themedStyles = useMemo(() => {
-    const baseStyles: any = {};
+  const themedStyles = useMemo((): ViewStyle => {
+    const baseStyles: ViewStyle = {};
 
     // Apply variant-based styling
     switch (variant) {
@@ -75,33 +75,3 @@ export function ThemedView({
 
   return <View style={[themedStyles, style]} {...otherProps} />;
 }
-
-// Predefined style variants for common use cases
-export const ThemedViewVariants = {
-  // Container variants
-  container: {
-    variant: "primary" as const,
-  },
-  section: {
-    variant: "secondary" as const,
-  },
-
-  // Card variants
-  card: {
-    variant: "card" as const,
-  },
-  elevatedCard: {
-    variant: "elevated" as const,
-  },
-  outlinedCard: {
-    variant: "outlined" as const,
-  },
-
-  // Interactive variants
-  button: {
-    variant: "primary" as const,
-  },
-  ghostButton: {
-    variant: "ghost" as const,
-  },
-} as const;

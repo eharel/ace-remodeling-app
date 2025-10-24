@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Text, type TextProps } from "react-native";
 
 import { useTheme } from "@/contexts";
+import { DesignTokens } from "@/themes";
 
 export type ThemedTextProps = TextProps & {
   variant?:
@@ -15,15 +16,11 @@ export type ThemedTextProps = TextProps & {
     | "success"
     | "warning"
     | "info";
-  type?: "default" | "defaultSemiBold"; // Legacy support
-  color?: string; // Allow custom color override
 };
 
 export function ThemedText({
   style,
   variant = "default",
-  type, // Legacy support
-  color,
   ...rest
 }: ThemedTextProps) {
   const { theme } = useTheme();
@@ -35,76 +32,70 @@ export function ThemedText({
     // Apply variant-based styling
     switch (variant) {
       case "title":
-        baseStyles.fontSize = 32;
-        baseStyles.fontWeight = "bold";
-        baseStyles.lineHeight = 32;
-        baseStyles.fontFamily = "Inter-Bold";
-        baseStyles.color = color || theme.colors.text.primary;
+        baseStyles.fontSize = DesignTokens.typography.fontSize["2xl"];
+        baseStyles.fontWeight = DesignTokens.typography.fontWeight.bold;
+        baseStyles.lineHeight = DesignTokens.typography.lineHeight.tight;
+        baseStyles.fontFamily = DesignTokens.typography.fontFamily.bold;
+        baseStyles.color = theme.colors.text.primary;
         break;
       case "subtitle":
-        baseStyles.fontSize = 20;
-        baseStyles.fontWeight = "bold";
-        baseStyles.fontFamily = "Inter-Bold";
-        baseStyles.color = color || theme.colors.text.primary;
+        baseStyles.fontSize = DesignTokens.typography.fontSize.xl;
+        baseStyles.fontWeight = DesignTokens.typography.fontWeight.bold;
+        baseStyles.fontFamily = DesignTokens.typography.fontFamily.bold;
+        baseStyles.color = theme.colors.text.primary;
         break;
       case "body":
-        baseStyles.fontSize = 16;
-        baseStyles.lineHeight = 24;
-        baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || theme.colors.text.secondary;
+        baseStyles.fontSize = DesignTokens.typography.fontSize.base;
+        baseStyles.lineHeight = DesignTokens.typography.lineHeight.normal;
+        baseStyles.fontFamily = DesignTokens.typography.fontFamily.regular;
+        baseStyles.color = theme.colors.text.secondary;
         break;
       case "caption":
-        baseStyles.fontSize = 14;
-        baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || theme.colors.text.secondary;
+        baseStyles.fontSize = DesignTokens.typography.fontSize.sm;
+        baseStyles.fontFamily = DesignTokens.typography.fontFamily.regular;
+        baseStyles.color = theme.colors.text.secondary;
         break;
       case "link":
-        baseStyles.fontSize = 16;
-        baseStyles.lineHeight = 30;
-        baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || theme.colors.text.accent;
+        baseStyles.fontSize = DesignTokens.typography.fontSize.base;
+        baseStyles.lineHeight = DesignTokens.typography.lineHeight.relaxed;
+        baseStyles.fontFamily = DesignTokens.typography.fontFamily.regular;
+        baseStyles.color = theme.colors.text.accent;
         break;
       case "error":
-        baseStyles.fontSize = 16;
-        baseStyles.lineHeight = 24;
-        baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || theme.colors.status.error;
+        baseStyles.fontSize = DesignTokens.typography.fontSize.base;
+        baseStyles.lineHeight = DesignTokens.typography.lineHeight.normal;
+        baseStyles.fontFamily = DesignTokens.typography.fontFamily.regular;
+        baseStyles.color = theme.colors.status.error;
         break;
       case "success":
-        baseStyles.fontSize = 16;
-        baseStyles.lineHeight = 24;
-        baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || theme.colors.status.success;
+        baseStyles.fontSize = DesignTokens.typography.fontSize.base;
+        baseStyles.lineHeight = DesignTokens.typography.lineHeight.normal;
+        baseStyles.fontFamily = DesignTokens.typography.fontFamily.regular;
+        baseStyles.color = theme.colors.status.success;
         break;
       case "warning":
-        baseStyles.fontSize = 16;
-        baseStyles.lineHeight = 24;
-        baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || theme.colors.status.warning;
+        baseStyles.fontSize = DesignTokens.typography.fontSize.base;
+        baseStyles.lineHeight = DesignTokens.typography.lineHeight.normal;
+        baseStyles.fontFamily = DesignTokens.typography.fontFamily.regular;
+        baseStyles.color = theme.colors.status.warning;
         break;
       case "info":
-        baseStyles.fontSize = 16;
-        baseStyles.lineHeight = 24;
-        baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || theme.colors.status.info;
+        baseStyles.fontSize = DesignTokens.typography.fontSize.base;
+        baseStyles.lineHeight = DesignTokens.typography.lineHeight.normal;
+        baseStyles.fontFamily = DesignTokens.typography.fontFamily.regular;
+        baseStyles.color = theme.colors.status.info;
         break;
       case "default":
       default:
-        baseStyles.fontSize = 16;
-        baseStyles.lineHeight = 24;
-        baseStyles.fontFamily = "Inter-Regular";
-        baseStyles.color = color || theme.colors.text.primary;
+        baseStyles.fontSize = DesignTokens.typography.fontSize.base;
+        baseStyles.lineHeight = DesignTokens.typography.lineHeight.normal;
+        baseStyles.fontFamily = DesignTokens.typography.fontFamily.regular;
+        baseStyles.color = theme.colors.text.primary;
         break;
     }
 
-    // Legacy type support (deprecated, use variant instead)
-    if (type === "defaultSemiBold") {
-      baseStyles.fontWeight = "600";
-      baseStyles.fontFamily = "Inter-SemiBold";
-    }
-
     return baseStyles;
-  }, [variant, type, color, theme]);
+  }, [variant, theme]);
 
   return <Text style={[themedStyles, style]} {...rest} />;
 }
