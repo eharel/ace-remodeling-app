@@ -42,15 +42,20 @@ export function EmptyState({
         },
         title: {
           fontSize: DesignTokens.typography.fontSize.xl,
+          lineHeight:
+            DesignTokens.typography.fontSize.xl *
+            DesignTokens.typography.lineHeight.tight,
           fontWeight: DesignTokens.typography.fontWeight.bold,
           textAlign: "center",
           marginBottom: DesignTokens.spacing[2],
         },
         message: {
           fontSize: DesignTokens.typography.fontSize.base,
+          lineHeight:
+            DesignTokens.typography.fontSize.base *
+            DesignTokens.typography.lineHeight.normal,
           textAlign: "center",
           opacity: 0.7,
-          lineHeight: 22,
           marginBottom: DesignTokens.spacing[4],
         },
         actionButton: {
@@ -63,6 +68,9 @@ export function EmptyState({
         actionText: {
           color: theme.colors.text.inverse,
           fontSize: DesignTokens.typography.fontSize.base,
+          lineHeight:
+            DesignTokens.typography.fontSize.base *
+            DesignTokens.typography.lineHeight.normal,
           fontWeight: DesignTokens.typography.fontWeight.medium,
         },
       }),

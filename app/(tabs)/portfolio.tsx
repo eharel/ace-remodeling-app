@@ -121,6 +121,9 @@ export default function PortfolioScreen() {
         },
         title: {
           fontSize: DesignTokens.typography.fontSize["3xl"],
+          lineHeight:
+            DesignTokens.typography.fontSize["3xl"] *
+            DesignTokens.typography.lineHeight.tight,
           fontWeight: DesignTokens.typography.fontWeight.bold,
           fontFamily: DesignTokens.typography.fontFamily.bold,
           color: theme.colors.text.primary,
@@ -128,6 +131,9 @@ export default function PortfolioScreen() {
         },
         subtitle: {
           fontSize: DesignTokens.typography.fontSize.lg,
+          lineHeight:
+            DesignTokens.typography.fontSize.lg *
+            DesignTokens.typography.lineHeight.normal,
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.secondary,
         },
@@ -164,6 +170,9 @@ export default function PortfolioScreen() {
         },
         categoryName: {
           fontSize: DesignTokens.typography.fontSize.lg,
+          lineHeight:
+            DesignTokens.typography.fontSize.lg *
+            DesignTokens.typography.lineHeight.tight,
           fontWeight: DesignTokens.typography.fontWeight.semibold,
           fontFamily: DesignTokens.typography.fontFamily.semibold,
           color: theme.colors.text.primary,
@@ -171,6 +180,9 @@ export default function PortfolioScreen() {
         },
         categoryCount: {
           fontSize: DesignTokens.typography.fontSize.sm,
+          lineHeight:
+            DesignTokens.typography.fontSize.sm *
+            DesignTokens.typography.lineHeight.tight,
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.secondary,
         },

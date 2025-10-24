@@ -138,10 +138,17 @@ export function FilterDropdown<T extends string>({
     },
     triggerText: {
       fontSize: DesignTokens.typography.fontSize.sm,
+      lineHeight:
+        DesignTokens.typography.fontSize.sm *
+        DesignTokens.typography.lineHeight.tight,
+      fontWeight: DesignTokens.typography.fontWeight.medium,
       flex: 1,
     },
     triggerLabel: {
       fontSize: DesignTokens.typography.fontSize.xs,
+      lineHeight:
+        DesignTokens.typography.fontSize.xs *
+        DesignTokens.typography.lineHeight.tight,
       opacity: 0.7,
       marginRight: DesignTokens.spacing[1],
     },
@@ -172,6 +179,9 @@ export function FilterDropdown<T extends string>({
     },
     modalHeaderText: {
       fontSize: DesignTokens.typography.fontSize.lg,
+      lineHeight:
+        DesignTokens.typography.fontSize.lg *
+        DesignTokens.typography.lineHeight.tight,
       fontWeight: "600",
       flex: 1,
     },
@@ -189,6 +199,9 @@ export function FilterDropdown<T extends string>({
     },
     quickActionText: {
       fontSize: DesignTokens.typography.fontSize.xs,
+      lineHeight:
+        DesignTokens.typography.fontSize.xs *
+        DesignTokens.typography.lineHeight.tight,
       color: theme.colors.text.secondary,
       fontWeight: "500",
     },
@@ -221,6 +234,9 @@ export function FilterDropdown<T extends string>({
     },
     optionText: {
       fontSize: DesignTokens.typography.fontSize.base,
+      lineHeight:
+        DesignTokens.typography.fontSize.base *
+        DesignTokens.typography.lineHeight.normal,
       flex: 1,
     },
     optionTextSelected: {
@@ -251,6 +267,9 @@ export function FilterDropdown<T extends string>({
     },
     buttonText: {
       fontSize: DesignTokens.typography.fontSize.base,
+      lineHeight:
+        DesignTokens.typography.fontSize.base *
+        DesignTokens.typography.lineHeight.normal,
       fontWeight: "600",
     },
     cancelButtonText: {
@@ -300,7 +319,13 @@ export function FilterDropdown<T extends string>({
         accessibilityRole="button"
         testID={testID}
       >
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
           <ThemedText style={styles.triggerLabel}>{label}:</ThemedText>
           <ThemedText style={styles.triggerText} numberOfLines={1}>
             {displayValue}

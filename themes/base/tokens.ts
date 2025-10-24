@@ -102,11 +102,24 @@ export const DesignTokens = {
       extrabold: "800",
     },
 
+    /**
+     * Line Height Scale
+     *
+     * Guidelines:
+     * - tight (1.2): Use for compact UI elements where space is constrained
+     *   (buttons, dropdowns, badges, tabs, chips, labels in forms)
+     * - normal (1.4): Use for general body text and UI text
+     * - relaxed (1.6): Use for comfortable reading in longer text blocks
+     * - loose (1.8): Use for large headings that need breathing room
+     *
+     * Note: React Native's default lineHeight is ~1.4-1.5x, which can cause
+     * text clipping in compact UI elements. Always specify lineHeight explicitly.
+     */
     lineHeight: {
-      tight: 1.2,
-      normal: 1.4,
-      relaxed: 1.6,
-      loose: 1.8,
+      tight: 1.2, // For compact UI elements (buttons, labels, dropdowns, badges)
+      normal: 1.4, // For body text and readable content (CURRENT DEFAULT)
+      relaxed: 1.6, // For comfortable reading (paragraphs, articles)
+      loose: 1.8, // For large headings with breathing room
     },
   },
 

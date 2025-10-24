@@ -122,6 +122,9 @@ export function ThemeToggle() {
 const styles = StyleSheet.create({
   buttonLabel: {
     fontSize: DesignTokens.typography.fontSize.xs,
+    lineHeight:
+      DesignTokens.typography.fontSize.xs *
+      DesignTokens.typography.lineHeight.tight,
     fontWeight: DesignTokens.typography.fontWeight.medium,
     textAlign: "center",
   },

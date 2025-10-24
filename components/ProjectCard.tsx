@@ -94,11 +94,15 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
         },
         title: {
           fontSize: DesignTokens.typography.fontSize.lg,
-          lineHeight: 22,
+          lineHeight:
+            DesignTokens.typography.fontSize.lg *
+            DesignTokens.typography.lineHeight.tight,
         },
         description: {
           fontSize: DesignTokens.typography.fontSize.sm,
-          lineHeight: 18,
+          lineHeight:
+            DesignTokens.typography.fontSize.sm *
+            DesignTokens.typography.lineHeight.normal,
           opacity: 0.7,
         },
         meta: {
@@ -126,11 +130,17 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
         },
         statusText: {
           fontSize: DesignTokens.typography.fontSize.xs,
+          lineHeight:
+            DesignTokens.typography.fontSize.xs *
+            DesignTokens.typography.lineHeight.tight,
           fontWeight: DesignTokens.typography.fontWeight.semibold,
           color: theme.colors.text.secondary,
         },
         category: {
           fontSize: DesignTokens.typography.fontSize.xs,
+          lineHeight:
+            DesignTokens.typography.fontSize.xs *
+            DesignTokens.typography.lineHeight.tight,
           opacity: 0.6,
           textTransform: "capitalize",
         },
@@ -163,6 +173,9 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
         },
         errorText: {
           fontSize: DesignTokens.typography.fontSize.sm,
+          lineHeight:
+            DesignTokens.typography.fontSize.sm *
+            DesignTokens.typography.lineHeight.normal,
           color: theme.colors.text.secondary,
           textAlign: "center",
           opacity: 0.7,
