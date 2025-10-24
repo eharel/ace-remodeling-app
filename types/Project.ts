@@ -5,6 +5,10 @@ import { Picture } from "./Picture";
 import { ProjectManager } from "./ProjectManager";
 import { ProjectStatus } from "./Status";
 
+/**
+ * Main project interface representing a complete remodeling project
+ * Contains all project data including metadata, media, and tracking information
+ */
 export interface Project {
   id: string;
   projectNumber: string; // ACE project tracking number (e.g., "217", "311B")
@@ -22,8 +26,8 @@ export interface Project {
 
   // Project dates (duration calculated from these)
   projectDates: {
-    start: string; // ISO date: "2024-03-01"
-    end: string; // ISO date: "2024-05-15"
+    start: string; // ISO date string: "2024-03-01T00:00:00.000Z"
+    end: string; // ISO date string: "2024-05-15T00:00:00.000Z"
   };
 
   // Scope with design aspects
@@ -33,7 +37,7 @@ export interface Project {
   testimonial?: {
     text: string;
     author: string; // First name or initials
-    date?: string; // ISO string format
+    date: string; // ISO date string format
   };
 
   // PM information - multiple PMs can work on a project
@@ -46,8 +50,8 @@ export interface Project {
 
   // Internal metadata (not shown to public)
   status: ProjectStatus;
-  createdAt: string; // ISO string format
-  updatedAt: string; // ISO string format
+  createdAt: string; // ISO date string format
+  updatedAt: string; // ISO date string format
   tags?: string[];
   featured?: boolean;
   completionDate?: string; // For backward compatibility
