@@ -10,6 +10,7 @@ import { useProjects } from "@/contexts/ProjectsContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesignTokens } from "@/themes";
 import { ProjectCategory } from "@/types/Category";
+import { getCategoryDisplayName, getCategoryIcon } from "@/utils/categoryUtils";
 
 interface CategoryItem {
   id: ProjectCategory;
@@ -29,32 +30,32 @@ export default function PortfolioScreen() {
     const categoryData: CategoryItem[] = [
       {
         id: "bathroom",
-        name: "Bathrooms",
-        icon: "bathroom",
+        name: getCategoryDisplayName("bathroom"),
+        icon: getCategoryIcon("bathroom"),
         count: projects.filter((p) => p.category === "bathroom").length,
       },
       {
         id: "kitchen",
-        name: "Kitchens",
-        icon: "kitchen",
+        name: getCategoryDisplayName("kitchen"),
+        icon: getCategoryIcon("kitchen"),
         count: projects.filter((p) => p.category === "kitchen").length,
       },
       {
         id: "deck",
-        name: "Decks",
-        icon: "deck",
+        name: getCategoryDisplayName("deck"),
+        icon: getCategoryIcon("deck"),
         count: projects.filter((p) => p.category === "deck").length,
       },
       {
         id: "pool",
-        name: "Pools",
-        icon: "pool",
+        name: getCategoryDisplayName("pool"),
+        icon: getCategoryIcon("pool"),
         count: projects.filter((p) => p.category === "pool").length,
       },
       {
         id: "full-house",
-        name: "Full House",
-        icon: "home",
+        name: getCategoryDisplayName("full-house"),
+        icon: getCategoryIcon("full-house"),
         count: projects.filter((p) => p.category === "full-house").length,
       },
     ];

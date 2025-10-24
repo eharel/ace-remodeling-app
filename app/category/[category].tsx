@@ -2,6 +2,7 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { CategoryPicker } from "@/components/CategoryPicker";
 import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
 import { ProjectGallery } from "@/components/ProjectGallery";
@@ -10,18 +11,10 @@ import { useProjects } from "@/contexts/ProjectsContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesignTokens } from "@/themes";
 import { ProjectCategory } from "@/types/Category";
-
-const CATEGORY_NAMES: Record<ProjectCategory, string> = {
-  bathroom: "Bathrooms",
-  kitchen: "Kitchens",
-  deck: "Decks",
-  pool: "Pools",
-  "full-house": "Full House",
-  "general-remodeling": "General Remodeling",
-  outdoor: "Outdoor",
-  basement: "Basement",
-  attic: "Attic",
-};
+import {
+  getAllCategories,
+  getCategoryDisplayName,
+} from "@/utils/categoryUtils";
 
 export default function CategoryScreen() {
   const { theme } = useTheme();
@@ -30,7 +23,7 @@ export default function CategoryScreen() {
 
   // Validate category parameter
   const validCategory = category as ProjectCategory;
-  if (!category || !Object.keys(CATEGORY_NAMES).includes(category)) {
+  if (!category || !getAllCategories().includes(category as ProjectCategory)) {
     return (
       <ThemedView style={styles.container}>
         <Stack.Screen
@@ -56,10 +49,15 @@ export default function CategoryScreen() {
     return projects.filter((project) => project.category === validCategory);
   }, [projects, validCategory]);
 
-  const categoryDisplayName = CATEGORY_NAMES[validCategory];
+  const categoryDisplayName = getCategoryDisplayName(validCategory);
 
   const handleProjectPress = (project: any) => {
     router.push(`/project/${project.id}`);
+  };
+
+  const handleCategoryChange = (newCategory: ProjectCategory) => {
+    // Use replace to avoid building up navigation stack
+    router.replace(`/category/${newCategory}`);
   };
 
   const styles = useMemo(
@@ -103,8 +101,13 @@ export default function CategoryScreen() {
       <ThemedView style={styles.container}>
         <Stack.Screen
           options={{
-            title: categoryDisplayName,
             headerShown: true,
+            headerTitle: () => (
+              <CategoryPicker
+                currentCategory={validCategory}
+                onCategoryChange={handleCategoryChange}
+              />
+            ),
             headerBackTitle: "Portfolio",
           }}
         />
@@ -118,8 +121,13 @@ export default function CategoryScreen() {
       <ThemedView style={styles.container}>
         <Stack.Screen
           options={{
-            title: categoryDisplayName,
             headerShown: true,
+            headerTitle: () => (
+              <CategoryPicker
+                currentCategory={validCategory}
+                onCategoryChange={handleCategoryChange}
+              />
+            ),
             headerBackTitle: "Portfolio",
           }}
         />
@@ -138,8 +146,13 @@ export default function CategoryScreen() {
       <ThemedView style={styles.container}>
         <Stack.Screen
           options={{
-            title: categoryDisplayName,
             headerShown: true,
+            headerTitle: () => (
+              <CategoryPicker
+                currentCategory={validCategory}
+                onCategoryChange={handleCategoryChange}
+              />
+            ),
             headerBackTitle: "Portfolio",
           }}
         />
@@ -157,8 +170,13 @@ export default function CategoryScreen() {
     <ThemedView style={styles.container}>
       <Stack.Screen
         options={{
-          title: categoryDisplayName,
           headerShown: true,
+          headerTitle: () => (
+            <CategoryPicker
+              currentCategory={validCategory}
+              onCategoryChange={handleCategoryChange}
+            />
+          ),
           headerBackTitle: "Portfolio",
         }}
       />
