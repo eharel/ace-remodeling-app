@@ -99,10 +99,10 @@ function MyScreen() {
 ### **Custom Styling with Theme**
 
 ```typescript
-import { useThemeStyling } from "@/utils/styling";
+import { useTheme } from "@/contexts/ThemeContext";
 
 function MyCustomComponent() {
-  const { themeColor, spacing, fontSize } = useThemeStyling();
+  const { theme } = useTheme();
 
   const styles = StyleSheet.create({
     container: {
@@ -349,7 +349,7 @@ getThemeColor("backgrounds.ffffff");
 
 ```typescript
 // ✅ Good
-const { themeColor, spacing, fontSize } = useThemeStyling();
+const { theme } = useTheme();
 
 // ❌ Avoid
 const { color } = styling; // Legacy approach
@@ -412,4 +412,3 @@ const backgroundColor = "#ffffff"; // Hardcoded
 ---
 
 **Need Help?** Check the component examples or create an issue for specific problems.
-

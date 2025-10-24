@@ -1,4 +1,4 @@
-import { Project, ProjectSummary } from "../types";
+import { Project, ProjectSummary, getProjectCompletionDate } from "../types";
 
 // Sample projects for development and testing
 export const mockProjects: Project[] = [
@@ -582,8 +582,8 @@ export const getProjectSummaries = (): ProjectSummary[] => {
     briefDescription: project.briefDescription,
     thumbnail: project.thumbnail,
     status: project.status,
-    completedAt: project.projectDates?.completionDate,
-    pmNames: project.pms?.map((pm) => pm.name) || [],
+    completedAt: getProjectCompletionDate(project),
+    // REMOVED: pmNames - computed field no longer stored
   }));
 };
 
@@ -601,8 +601,8 @@ export const getProjectSummariesByCategory = (
     briefDescription: project.briefDescription,
     thumbnail: project.thumbnail,
     status: project.status,
-    completedAt: project.projectDates?.completionDate,
-    pmNames: project.pms?.map((pm) => pm.name) || [],
+    completedAt: getProjectCompletionDate(project),
+    // REMOVED: pmNames - computed field no longer stored
   }));
 
   console.log(

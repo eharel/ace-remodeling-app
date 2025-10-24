@@ -28,3 +28,12 @@ export const CATEGORY_LABELS: Record<ProjectCategory, string> = {
   [PROJECT_CATEGORIES.BASEMENT]: "Basement",
   [PROJECT_CATEGORIES.ATTIC]: "Attic",
 };
+
+/**
+ * Type guard to check if a string is a valid ProjectCategory
+ */
+export function isValidProjectCategory(
+  category: string
+): category is ProjectCategory {
+  return category in PROJECT_CATEGORIES;
+}

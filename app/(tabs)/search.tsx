@@ -14,7 +14,12 @@ import {
 import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
 import { useProjects } from "@/contexts/ProjectsContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Project, ProjectSummary } from "@/types/Project";
+import {
+  Project,
+  ProjectSummary,
+  getProjectCompletionDate,
+  getProjectPMNames,
+} from "@/types/Project";
 import { logError, logWarning } from "@/utils/errorLogger";
 import { useSearchHistory } from "@/utils/useSearchHistory";
 
@@ -98,7 +103,7 @@ export default function SearchScreen() {
 
   // Memoized function to create searchable text from a project
   const createSearchableText = useCallback((project: Project) => {
-    const pmNames = project.pms?.map((pm) => pm.name) || [];
+    const pmNames = getProjectPMNames(project);
     return [
       project.name,
       project.briefDescription,
@@ -156,8 +161,8 @@ export default function SearchScreen() {
           briefDescription: project.briefDescription,
           thumbnail: project.thumbnail,
           status: project.status,
-          completedAt: project.completionDate,
-          pmNames: project.pms?.map((pm) => pm.name) || [],
+          completedAt: getProjectCompletionDate(project),
+          // REMOVED: pmNames - computed field no longer stored
         }));
       } catch (error) {
         logError("Search operation failed", { query, error: error });

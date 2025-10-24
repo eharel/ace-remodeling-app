@@ -13,8 +13,17 @@
  * @returns Number of days (rounded up)
  */
 export function calculateDays(startDate: string, endDate: string): number {
+  if (!startDate || !endDate) {
+    throw new Error("Start date and end date are required");
+  }
+
   const start = new Date(startDate);
   const end = new Date(endDate);
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    throw new Error("Invalid date format");
+  }
+
   const diffTime = Math.abs(end.getTime() - start.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;
@@ -45,16 +54,37 @@ export function formatDuration(days: number): string {
 
   // Less than 2 weeks: show days
   if (weeks < 2) {
-    return `${days} day${days !== 1 ? "s" : ""}`;
+    return formatDays(days);
   }
 
   // 2-8 weeks: show weeks (rounded)
   if (weeks < 8) {
-    const roundedWeeks = Math.round(weeks);
-    return `${roundedWeeks} week${roundedWeeks !== 1 ? "s" : ""}`;
+    return formatWeeks(weeks);
   }
 
   // 8+ weeks: show months (rounded to nearest 0.5)
+  return formatMonths(months);
+}
+
+/**
+ * Format days with proper pluralization
+ */
+function formatDays(days: number): string {
+  return `${days} day${days !== 1 ? "s" : ""}`;
+}
+
+/**
+ * Format weeks with proper pluralization
+ */
+function formatWeeks(weeks: number): string {
+  const roundedWeeks = Math.round(weeks);
+  return `${roundedWeeks} week${roundedWeeks !== 1 ? "s" : ""}`;
+}
+
+/**
+ * Format months with proper pluralization
+ */
+function formatMonths(months: number): string {
   const roundedMonths = Math.round(months * 2) / 2;
   return `${roundedMonths} month${roundedMonths !== 1 ? "s" : ""}`;
 }
@@ -130,32 +160,45 @@ export function formatDurationCustom(
     shortForm = false,
   } = options || {};
 
-  let value: number;
-  let unit: string;
-  let shortUnit: string;
-
-  if (preferredUnit === "days" || (!preferredUnit && days < 14)) {
-    value = days;
-    unit = "day";
-    shortUnit = "d";
-  } else if (preferredUnit === "weeks" || (!preferredUnit && days < 56)) {
-    value = days / 7;
-    unit = "week";
-    shortUnit = "w";
-  } else {
-    value = days / 30;
-    unit = "month";
-    shortUnit = "mo";
-  }
-
-  const formattedValue = showDecimals
-    ? value.toFixed(1)
-    : Math.round(value).toString();
+  const { value, unit, shortUnit } = determineUnitAndValue(days, preferredUnit);
+  const formattedValue = formatValue(value, showDecimals);
 
   if (shortForm) {
     return `${formattedValue}${shortUnit}`;
   }
 
-  const pluralUnit = parseFloat(formattedValue) !== 1 ? `${unit}s` : unit;
+  const pluralUnit = getPluralUnit(unit, parseFloat(formattedValue));
   return `${formattedValue} ${pluralUnit}`;
+}
+
+/**
+ * Determine the appropriate unit and calculate value
+ */
+function determineUnitAndValue(
+  days: number,
+  preferredUnit?: "days" | "weeks" | "months"
+): { value: number; unit: string; shortUnit: string } {
+  if (preferredUnit === "days" || (!preferredUnit && days < 14)) {
+    return { value: days, unit: "day", shortUnit: "d" };
+  }
+
+  if (preferredUnit === "weeks" || (!preferredUnit && days < 56)) {
+    return { value: days / 7, unit: "week", shortUnit: "w" };
+  }
+
+  return { value: days / 30, unit: "month", shortUnit: "mo" };
+}
+
+/**
+ * Format the numeric value based on decimal preference
+ */
+function formatValue(value: number, showDecimals: boolean): string {
+  return showDecimals ? value.toFixed(1) : Math.round(value).toString();
+}
+
+/**
+ * Get the plural form of a unit
+ */
+function getPluralUnit(unit: string, value: number): string {
+  return value !== 1 ? `${unit}s` : unit;
 }

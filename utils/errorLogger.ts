@@ -4,7 +4,7 @@ interface ErrorLog {
   level: "error" | "warning" | "info";
   message: string;
   stack?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   userId?: string;
   sessionId?: string;
 }
@@ -14,13 +14,13 @@ class ErrorLogger {
   private maxLogs = 100; // Keep only last 100 logs in memory
 
   private generateId(): string {
-    return `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `error_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
   private addLog(
     level: ErrorLog["level"],
     message: string,
-    context?: Record<string, any>,
+    context?: Record<string, unknown>,
     stack?: string
   ): void {
     const log: ErrorLog = {
@@ -31,8 +31,8 @@ class ErrorLogger {
       stack,
       context,
       // In a real app, you'd get these from user session
-      userId: "anonymous",
-      sessionId: "current_session",
+      userId: process.env.NODE_ENV === "development" ? "dev_user" : "anonymous",
+      sessionId: `session_${Date.now()}`,
     };
 
     this.logs.unshift(log); // Add to beginning
@@ -54,15 +54,19 @@ class ErrorLogger {
     // this.sendToErrorService(log);
   }
 
-  error(message: string, context?: Record<string, any>, stack?: string): void {
+  error(
+    message: string,
+    context?: Record<string, unknown>,
+    stack?: string
+  ): void {
     this.addLog("error", message, context, stack);
   }
 
-  warning(message: string, context?: Record<string, any>): void {
+  warning(message: string, context?: Record<string, unknown>): void {
     this.addLog("warning", message, context);
   }
 
-  info(message: string, context?: Record<string, any>): void {
+  info(message: string, context?: Record<string, unknown>): void {
     this.addLog("info", message, context);
   }
 
@@ -98,16 +102,19 @@ export const errorLogger = new ErrorLogger();
 // Convenience functions
 export const logError = (
   message: string,
-  context?: Record<string, any>,
+  context?: Record<string, unknown>,
   stack?: string
 ) => {
   errorLogger.error(message, context, stack);
 };
 
-export const logWarning = (message: string, context?: Record<string, any>) => {
+export const logWarning = (
+  message: string,
+  context?: Record<string, unknown>
+) => {
   errorLogger.warning(message, context);
 };
 
-export const logInfo = (message: string, context?: Record<string, any>) => {
+export const logInfo = (message: string, context?: Record<string, unknown>) => {
   errorLogger.info(message, context);
 };

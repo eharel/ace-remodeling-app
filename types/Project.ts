@@ -54,7 +54,7 @@ export interface Project {
   updatedAt: string; // ISO date string format
   tags?: string[];
   featured?: boolean;
-  completionDate?: string; // For backward compatibility
+  // REMOVED: completionDate - use projectDates.end instead
 }
 
 // Simplified version for list views
@@ -67,5 +67,30 @@ export interface ProjectSummary {
   thumbnail: string;
   status: ProjectStatus;
   completedAt?: string;
-  pmNames?: string[]; // PM names for list views and filtering
+  // REMOVED: pmNames - compute from pms array instead of storing
+}
+
+/**
+ * Utility functions for Project interfaces
+ */
+
+/**
+ * Get PM names from a project
+ */
+export function getProjectPMNames(project: Project): string[] {
+  return project.pms?.map((pm) => pm.name) || [];
+}
+
+/**
+ * Get completion date from project dates
+ */
+export function getProjectCompletionDate(project: Project): string | undefined {
+  return project.projectDates?.end;
+}
+
+/**
+ * Check if project is completed
+ */
+export function isProjectCompleted(project: Project): boolean {
+  return project.status === "completed";
 }

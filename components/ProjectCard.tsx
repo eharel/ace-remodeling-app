@@ -12,8 +12,8 @@ import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesignTokens } from "@/themes";
 import { ProjectSummary } from "@/types";
+import { getStatusDisplayText, getStatusStyleKey } from "@/types/Status";
 import { logError } from "@/utils/errorLogger";
-import { getStatusDisplayText, getStatusStyleKey } from "@/utils/statusUtils";
 
 interface ProjectCardProps {
   project: ProjectSummary;

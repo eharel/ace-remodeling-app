@@ -50,3 +50,10 @@ export function getStatusDisplayText(status: ProjectStatus): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
+
+/**
+ * Type guard to check if a string is a valid ProjectStatus
+ */
+export function isValidProjectStatus(status: string): status is ProjectStatus {
+  return status in PROJECT_STATUSES;
+}
