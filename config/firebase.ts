@@ -2,7 +2,10 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// Your Firebase config from the Firebase Console
+/**
+ * Firebase configuration
+ * API keys are safe to be public in client applications
+ */
 const firebaseConfig = {
   apiKey: "AIzaSyChT79bqGCihMp5fOlbidZR89CgAeaFuaU",
   authDomain: "ace-remodeling.firebaseapp.com",
@@ -13,11 +16,21 @@ const firebaseConfig = {
   measurementId: "G-9W8N02F06S",
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+/**
+ * Initialize Firebase with error handling
+ */
+let app: any;
+let db: any;
+let storage: any;
 
-// Initialize Firebase services
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+try {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  storage = getStorage(app);
+} catch (error) {
+  console.error("Failed to initialize Firebase:", error);
+  throw new Error("Firebase initialization failed");
+}
 
+export { db, storage };
 export default app;

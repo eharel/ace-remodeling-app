@@ -3,11 +3,12 @@ import React from "react";
 
 import { CategoryPage } from "@/components/CategoryPage";
 import { EmptyState } from "@/components/EmptyState";
-import { CategoryKey, getCategoryConfig } from "@/config/categoryConfig";
+import { CategoryKey, getCategoryConfig } from "@/constants/categoryConfig";
 import { useProjects } from "@/contexts/ProjectsContext";
 // Comment out mock data for now (keeping for fallback)
 // import { getProjectSummariesByCategory } from "@/data/mockProjects";
 import { ProjectSummary, getProjectCompletionDate } from "@/types";
+import { MaterialIcons } from "@expo/vector-icons";
 
 interface CategoryScreenProps {
   category: CategoryKey;
@@ -71,7 +72,7 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
       <EmptyState
         title={config.emptyTitle}
         message={config.emptyMessage}
-        icon={config.emptyIcon}
+        icon={config.emptyIcon as keyof typeof MaterialIcons.glyphMap}
         testID={`${category}-empty-state`}
       />
     );
