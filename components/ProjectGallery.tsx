@@ -42,22 +42,22 @@ export function ProjectGallery({
   // Memoize column count calculation
   const columnCount = useMemo(() => getColumnCount(width), [width]);
 
-  // Memoize item width calculation
-  const itemWidth = useMemo(
-    () =>
-      (width -
-        DesignTokens.spacing[10] -
-        (columnCount - 1) * DesignTokens.spacing[4]) /
-      columnCount,
-    [width, columnCount]
-  );
+  // Use flex instead of manual width calculation for responsive layout
+  const itemWidth = useMemo(() => {
+    // For single column, use full width minus padding
+    if (columnCount === 1) {
+      return width - DesignTokens.spacing[6] * 2;
+    }
+    // For multiple columns, let flex handle the sizing naturally
+    return undefined;
+  }, [width, columnCount]);
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
     },
     listContent: {
-      paddingHorizontal: DesignTokens.spacing[5],
+      paddingHorizontal: DesignTokens.spacing[6],
       paddingBottom: DesignTokens.spacing[5],
     },
     emptyState: {
@@ -85,10 +85,13 @@ export function ProjectGallery({
       maxWidth: 300,
     },
     row: {
+      flexDirection: "row",
       justifyContent: "space-between",
-      marginBottom: DesignTokens.spacing[4],
+      marginBottom: DesignTokens.spacing[12],
+      gap: DesignTokens.spacing[4],
     },
     rowCentered: {
+      flexDirection: "row",
       justifyContent: "center",
       gap: DesignTokens.spacing[4],
     },
@@ -100,7 +103,7 @@ export function ProjectGallery({
       <ProjectCard
         project={item}
         onPress={onProjectPress}
-        style={{ width: itemWidth }}
+        style={itemWidth ? { width: itemWidth } : { flex: 1 }}
       />
     ),
     [onProjectPress, itemWidth]
