@@ -2,7 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens, ThemeSetting } from "@/themes";
 import { ThemedText } from "./themed";
 

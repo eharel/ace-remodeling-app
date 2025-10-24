@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { Pressable, StyleSheet, ViewStyle } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 
 interface EmptyStateProps {

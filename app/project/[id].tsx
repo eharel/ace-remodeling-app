@@ -12,8 +12,7 @@ import {
 
 import { ImageGalleryModal } from "@/components/gallery";
 import { ThemedText, ThemedView } from "@/components/themed";
-import { useProjects } from "@/contexts/ProjectsContext";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useProjects, useTheme } from "@/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/themes";

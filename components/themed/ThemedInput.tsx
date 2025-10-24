@@ -1,4 +1,4 @@
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";

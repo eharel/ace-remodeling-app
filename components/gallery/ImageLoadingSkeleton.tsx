@@ -8,7 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { ThemedText } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 
 interface ImageLoadingSkeletonProps {

@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 
 import { accessibilityStrings } from "./constants/accessibilityStrings";
 import { useAccessibilityAnnouncements } from "./hooks/useAccessibilityAnnouncements";

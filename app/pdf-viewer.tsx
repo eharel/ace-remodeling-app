@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 import { PdfDisplay } from "@/components/PdfDisplay";
 import { ThemedText } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 
 export default function PdfViewer() {

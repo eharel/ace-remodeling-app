@@ -4,7 +4,7 @@ import React from "react";
 import { CategoryPage } from "@/components/CategoryPage";
 import { EmptyState } from "@/components/EmptyState";
 import { CategoryKey, getCategoryConfig } from "@/constants/categoryConfig";
-import { useProjects } from "@/contexts/ProjectsContext";
+import { useProjects } from "@/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { getProjectSummariesByCategory } from "@/data/mockProjects";
 import { ProjectSummary, getProjectCompletionDate } from "@/types";

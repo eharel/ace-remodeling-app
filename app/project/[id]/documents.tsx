@@ -10,8 +10,7 @@ import {
 } from "react-native";
 
 import { ThemedText } from "@/components/themed";
-import { useProjects } from "@/contexts/ProjectsContext";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useProjects, useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 import { Document } from "@/types/Document";
 

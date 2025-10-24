@@ -14,8 +14,7 @@ import { LogBox } from "react-native";
 
 import { FloatingChecklistButton } from "@/components/checklist";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { ProjectsProvider } from "@/contexts/ProjectsContext";
-import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+import { ProjectsProvider, ThemeProvider, useTheme } from "@/contexts";
 LogBox.ignoreAllLogs(true);
 
 // Disable error overlay in development

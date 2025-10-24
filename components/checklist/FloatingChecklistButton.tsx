@@ -2,7 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useCallback, useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 import { ChecklistModal } from "./ChecklistModal";
 import { useChecklist } from "./useChecklist";

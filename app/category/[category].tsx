@@ -7,8 +7,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { LoadingState } from "@/components/LoadingState";
 import { ProjectGallery } from "@/components/ProjectGallery";
 import { ThemedText, ThemedView } from "@/components/themed";
-import { useProjects } from "@/contexts/ProjectsContext";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useProjects, useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 import { ProjectCategory } from "@/types/Category";
 import {

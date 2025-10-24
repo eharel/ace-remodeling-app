@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 
 import { FilterDropdownProps } from "./types";
 

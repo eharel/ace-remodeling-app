@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 
 export default function HomeScreen() {

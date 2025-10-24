@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 
 export default function SettingsScreen() {

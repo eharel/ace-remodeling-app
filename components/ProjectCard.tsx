@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 import { ProjectSummary } from "@/types";
 import { getStatusDisplayText, getStatusStyleKey } from "@/types/Status";

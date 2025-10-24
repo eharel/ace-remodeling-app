@@ -12,8 +12,7 @@ import {
   useSearchFilters,
 } from "@/components/search";
 import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
-import { useProjects } from "@/contexts/ProjectsContext";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useProjects, useTheme } from "@/contexts";
 import {
   Project,
   ProjectSummary,

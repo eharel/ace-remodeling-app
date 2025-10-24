@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { ProjectSummary } from "@/types/Project";
 import { SearchHistoryItem } from "@/utils/useSearchHistory";
 

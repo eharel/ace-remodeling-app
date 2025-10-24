@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { ProjectSummary } from "@/types/Project";
 
 const MAX_SUGGESTIONS = 10;
