@@ -36,20 +36,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="bathrooms"
+        name="portfolio"
         options={{
-          title: "Bathrooms",
+          title: "Portfolio",
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="bathroom" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="kitchens"
-        options={{
-          title: "Kitchens",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="kitchen" size={size} color={color} />
+            <MaterialIcons name="business" size={size} color={color} />
           ),
         }}
       />
