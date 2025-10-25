@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
-import { ProjectGallery } from "@/components/ProjectGallery";
+import { PageHeader, ProjectGallery } from "@/components";
 import { ErrorState } from "@/components/error-states";
 import {
   SearchFiltersBar,
@@ -31,7 +31,6 @@ const styles = StyleSheet.create({
     // Remove padding from here since ProjectGallery has its own
   },
   header: {
-    marginTop: DesignTokens.spacing[16], // Match other category pages
     marginBottom: DesignTokens.spacing[8],
     gap: DesignTokens.spacing[2],
     // Add padding only to the header
@@ -234,10 +233,7 @@ export default function SearchScreen() {
       style={styles.container}
       accessibilityLabel="Search Projects Screen"
     >
-      <ThemedView style={styles.header} accessibilityLabel="Search header">
-        <ThemedText variant="title" accessibilityRole="header">
-          Search Projects
-        </ThemedText>
+      <PageHeader title="Search Projects">
         <SearchInputWithHistory
           placeholder={isLoading ? "Searching..." : "Search projects"}
           value={searchQuery}
@@ -251,7 +247,7 @@ export default function SearchScreen() {
           projects={searchResults}
           onSelectProject={(id) => router.push(`/project/${id}`)}
         />
-      </ThemedView>
+      </PageHeader>
 
       <SearchFiltersBar
         categoryValues={getCategoryFilters()}

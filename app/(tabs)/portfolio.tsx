@@ -3,8 +3,7 @@ import { router } from "expo-router";
 import { useMemo } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
-import { EmptyState } from "@/components/EmptyState";
-import { LoadingState } from "@/components/LoadingState";
+import { EmptyState, LoadingState, PageHeader } from "@/components";
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useProjects, useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
@@ -112,31 +111,6 @@ export default function PortfolioScreen() {
           flex: 1,
           backgroundColor: theme.colors.background.primary,
         },
-        content: {
-          flex: 1,
-          padding: DesignTokens.spacing[4],
-        },
-        header: {
-          marginBottom: DesignTokens.spacing[6],
-        },
-        title: {
-          fontSize: DesignTokens.typography.fontSize["3xl"],
-          lineHeight:
-            DesignTokens.typography.fontSize["3xl"] *
-            DesignTokens.typography.lineHeight.tight,
-          fontWeight: DesignTokens.typography.fontWeight.bold,
-          fontFamily: DesignTokens.typography.fontFamily.bold,
-          color: theme.colors.text.primary,
-          marginBottom: DesignTokens.spacing[2],
-        },
-        subtitle: {
-          fontSize: DesignTokens.typography.fontSize.lg,
-          lineHeight:
-            DesignTokens.typography.fontSize.lg *
-            DesignTokens.typography.lineHeight.normal,
-          fontFamily: DesignTokens.typography.fontFamily.medium,
-          color: theme.colors.text.secondary,
-        },
         categoryItem: {
           borderRadius: DesignTokens.borderRadius.lg,
           marginBottom: DesignTokens.spacing[3],
@@ -226,22 +200,21 @@ export default function PortfolioScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <ThemedText style={styles.title}>Portfolio</ThemedText>
-          <ThemedText style={styles.subtitle}>
-            Browse our projects by category
-          </ThemedText>
-        </View>
+      <PageHeader
+        title="Portfolio"
+        subtitle="Browse our projects by category"
+      />
 
-        <FlatList
-          data={categories}
-          renderItem={renderCategoryItem}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: DesignTokens.spacing[8] }}
-        />
-      </View>
+      <FlatList
+        data={categories}
+        renderItem={renderCategoryItem}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: DesignTokens.spacing[4],
+          paddingBottom: DesignTokens.spacing[8],
+        }}
+      />
     </ThemedView>
   );
 }

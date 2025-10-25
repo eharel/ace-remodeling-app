@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 
+import { PageHeader } from "@/components";
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
@@ -15,10 +16,10 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
-        <ThemedText style={styles.title}>ACE Remodeling</ThemedText>
-        <ThemedText style={styles.subtitle}>
-          Transforming Austin Homes
-        </ThemedText>
+        <PageHeader
+          title="ACE Remodeling"
+          subtitle="Transforming Austin Homes"
+        />
 
         <Pressable
           style={[
@@ -43,22 +44,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: DesignTokens.spacing[8],
-    paddingTop: DesignTokens.spacing[12],
-  },
-  title: {
-    fontSize: DesignTokens.typography.fontSize["3xl"],
-    fontWeight: DesignTokens.typography.fontWeight.bold,
-    fontFamily: DesignTokens.typography.fontFamily.bold,
-    textAlign: "center",
-    marginBottom: DesignTokens.spacing[4],
-    lineHeight: 40,
-  },
-  subtitle: {
-    fontSize: DesignTokens.typography.fontSize.lg,
-    fontFamily: DesignTokens.typography.fontFamily.medium,
-    textAlign: "center",
-    marginBottom: DesignTokens.spacing[8],
-    opacity: 0.7,
   },
   button: {
     paddingHorizontal: DesignTokens.spacing[8],
