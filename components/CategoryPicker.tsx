@@ -65,6 +65,9 @@ export function CategoryPicker({
         },
         triggerText: {
           fontSize: DesignTokens.typography.fontSize.lg,
+          lineHeight:
+            DesignTokens.typography.fontSize.lg *
+            DesignTokens.typography.lineHeight.tight,
           fontWeight: DesignTokens.typography.fontWeight.semibold,
           fontFamily: DesignTokens.typography.fontFamily.semibold,
           color: theme.colors.text.primary,
@@ -97,6 +100,9 @@ export function CategoryPicker({
         },
         modalTitle: {
           fontSize: DesignTokens.typography.fontSize.lg,
+          lineHeight:
+            DesignTokens.typography.fontSize.lg *
+            DesignTokens.typography.lineHeight.tight,
           fontWeight: DesignTokens.typography.fontWeight.semibold,
           fontFamily: DesignTokens.typography.fontFamily.semibold,
           color: theme.colors.text.primary,
@@ -140,6 +146,9 @@ export function CategoryPicker({
         },
         categoryName: {
           fontSize: DesignTokens.typography.fontSize.base,
+          lineHeight:
+            DesignTokens.typography.fontSize.base *
+            DesignTokens.typography.lineHeight.normal,
           fontWeight: DesignTokens.typography.fontWeight.medium,
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.primary,
@@ -147,6 +156,9 @@ export function CategoryPicker({
         },
         categoryCount: {
           fontSize: DesignTokens.typography.fontSize.sm,
+          lineHeight:
+            DesignTokens.typography.fontSize.sm *
+            DesignTokens.typography.lineHeight.tight,
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.secondary,
         },

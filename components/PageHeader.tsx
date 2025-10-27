@@ -8,26 +8,43 @@ interface PageHeaderProps {
   title: string;
   subtitle?: string;
   children?: React.ReactNode; // For custom content below title/subtitle
+  variant?: "default" | "compact"; // Spacing variant
 }
 
 /**
  * PageHeader - Standardized page header component
  *
  * Features:
- * - Consistent top spacing (64px from top)
+ * - Consistent top spacing (64px default, 32px compact)
  * - Standardized typography
  * - Optional subtitle
  * - Optional custom content
  * - Theme-aware styling
+ * - Variant support for different spacing needs
+ *
+ * Variants:
+ * - default: 64px top spacing (for pages without nav bars)
+ * - compact: 32px top spacing (for pages with nav bars)
  *
  * Usage:
  * <PageHeader title="Portfolio" subtitle="Browse our projects by category" />
+ * <PageHeader title="Kitchen" variant="compact" />
  */
-export function PageHeader({ title, subtitle, children }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  subtitle,
+  children,
+  variant = "default",
+}: PageHeaderProps) {
   const { theme } = useTheme();
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        variant === "compact" && styles.containerCompact,
+      ]}
+    >
       <ThemedText variant="title" style={styles.title}>
         {title}
       </ThemedText>
@@ -45,9 +62,12 @@ export function PageHeader({ title, subtitle, children }: PageHeaderProps) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: DesignTokens.spacing[16], // 64px - standardized top spacing
+    paddingTop: DesignTokens.spacing[16], // 64px - for pages WITHOUT nav bar
     paddingHorizontal: DesignTokens.spacing[4], // 16px side padding
     marginBottom: DesignTokens.spacing[6], // 24px bottom margin
+  },
+  containerCompact: {
+    paddingTop: DesignTokens.spacing[8], // 32px - for pages WITH nav bar
   },
   title: {
     // Uses ThemedText variant="title" styling

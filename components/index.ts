@@ -1,4 +1,5 @@
 // Barrel file for components
+export { CategoryPicker } from "./CategoryPicker";
 export { EmptyState } from "./EmptyState";
 export { ErrorBoundary } from "./ErrorBoundary";
 export { ErrorState } from "./ErrorState";

@@ -2,10 +2,13 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { CategoryPicker } from "@/components/CategoryPicker";
-import { EmptyState } from "@/components/EmptyState";
-import { LoadingState } from "@/components/LoadingState";
-import { ProjectGallery } from "@/components/ProjectGallery";
+import {
+  CategoryPicker,
+  EmptyState,
+  LoadingState,
+  PageHeader,
+  ProjectGallery,
+} from "@/components";
 import { ThemedText, ThemedView } from "@/components/themed";
 import { useProjects, useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
@@ -68,28 +71,16 @@ export default function CategoryScreen() {
         },
         content: {
           flex: 1,
-          padding: DesignTokens.spacing[4],
-        },
-        header: {
-          marginBottom: DesignTokens.spacing[6],
-        },
-        title: {
-          fontSize: DesignTokens.typography.fontSize["3xl"],
-          fontWeight: DesignTokens.typography.fontWeight.bold,
-          fontFamily: DesignTokens.typography.fontFamily.bold,
-          color: theme.colors.text.primary,
-          marginBottom: DesignTokens.spacing[2],
-        },
-        subtitle: {
-          fontSize: DesignTokens.typography.fontSize.lg,
-          fontFamily: DesignTokens.typography.fontFamily.medium,
-          color: theme.colors.text.secondary,
+          paddingHorizontal: DesignTokens.spacing[4],
+          paddingBottom: DesignTokens.spacing[8],
         },
         projectCount: {
           fontSize: DesignTokens.typography.fontSize.sm,
+          lineHeight:
+            DesignTokens.typography.fontSize.sm *
+            DesignTokens.typography.lineHeight.tight,
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.tertiary,
-          marginTop: DesignTokens.spacing[1],
         },
       }),
     [theme]
@@ -179,18 +170,18 @@ export default function CategoryScreen() {
           headerBackTitle: "Portfolio",
         }}
       />
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <ThemedText style={styles.title}>{categoryDisplayName}</ThemedText>
-          <ThemedText style={styles.subtitle}>
-            Explore our {categoryDisplayName.toLowerCase()} portfolio
-          </ThemedText>
-          <ThemedText style={styles.projectCount}>
-            {categoryProjects.length} project
-            {categoryProjects.length !== 1 ? "s" : ""}
-          </ThemedText>
-        </View>
+      <PageHeader
+        title={categoryDisplayName}
+        subtitle={`Explore our ${categoryDisplayName.toLowerCase()} portfolio`}
+        variant="compact"
+      >
+        <ThemedText style={styles.projectCount}>
+          {categoryProjects.length} project
+          {categoryProjects.length !== 1 ? "s" : ""}
+        </ThemedText>
+      </PageHeader>
 
+      <View style={styles.content}>
         <ProjectGallery
           projects={categoryProjects}
           onProjectPress={handleProjectPress}
