@@ -163,7 +163,7 @@ export function SearchInputWithHistory({
       paddingHorizontal: DesignTokens.spacing[4],
       paddingVertical: DesignTokens.spacing[2],
       borderBottomWidth: 1,
-      borderBottomColor: "rgba(0, 0, 0, 0.1)",
+      borderBottomColor: theme.colors.border.secondary,
     },
     historyList: {
       maxHeight: 200,

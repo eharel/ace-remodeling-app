@@ -6,6 +6,24 @@ import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts";
 import { ProjectSummary } from "@/types/Project";
 
+// Constants for SearchSuggestions component
+const SEARCH_SUGGESTIONS_CONSTANTS = {
+  // Query requirements
+  MIN_QUERY_LENGTH: 2, // Minimum characters to show suggestions
+
+  // Scoring system
+  EXACT_MATCH_SCORE: 100, // Exact name match
+  STARTS_WITH_SCORE: 50, // Name starts with query
+  NAME_CONTAINS_SCORE: 30, // Name contains query
+  DESCRIPTION_SCORE: 20, // Description contains query
+  LOCATION_SCORE: 10, // Location contains query
+
+  // UI sizing
+  DROPDOWN_MAX_HEIGHT: 400, // Maximum dropdown height
+  SUGGESTIONS_LIST_MAX_HEIGHT: 350, // Maximum suggestions list height
+  ICON_SIZE: 16, // Material icon size
+} as const;
+
 const MAX_SUGGESTIONS = 10;
 
 interface SearchSuggestionsProps {
@@ -29,7 +47,10 @@ export function SearchSuggestions({
 
   // Filter and sort projects based on query
   const suggestions = useMemo(() => {
-    if (!query.trim() || query.trim().length < 2) {
+    if (
+      !query.trim() ||
+      query.trim().length < SEARCH_SUGGESTIONS_CONSTANTS.MIN_QUERY_LENGTH
+    ) {
       return [];
     }
 
@@ -49,12 +70,17 @@ export function SearchSuggestions({
         // Calculate relevance score
         let score = 0;
         if (project.name.toLowerCase() === lowerQuery)
-          score = 100; // Exact match
+          score = SEARCH_SUGGESTIONS_CONSTANTS.EXACT_MATCH_SCORE; // Exact match
         else if (project.name.toLowerCase().startsWith(lowerQuery))
-          score = 50; // Starts with
-        else if (nameMatch) score = 30; // Contains in name
-        else if (descMatch) score = 20; // Contains in description
-        else if (locationMatch) score = 10; // Contains in location
+          score = SEARCH_SUGGESTIONS_CONSTANTS.STARTS_WITH_SCORE; // Starts with
+        else if (nameMatch)
+          score =
+            SEARCH_SUGGESTIONS_CONSTANTS.NAME_CONTAINS_SCORE; // Contains in name
+        else if (descMatch)
+          score =
+            SEARCH_SUGGESTIONS_CONSTANTS.DESCRIPTION_SCORE; // Contains in description
+        else if (locationMatch)
+          score = SEARCH_SUGGESTIONS_CONSTANTS.LOCATION_SCORE; // Contains in location
 
         return { project, score };
       })
@@ -83,16 +109,16 @@ export function SearchSuggestions({
       borderColor: theme.colors.border.secondary,
       zIndex: 1002,
       overflow: "hidden",
-      maxHeight: 400,
+      maxHeight: SEARCH_SUGGESTIONS_CONSTANTS.DROPDOWN_MAX_HEIGHT,
     },
     header: {
       paddingHorizontal: DesignTokens.spacing[4],
       paddingVertical: DesignTokens.spacing[2],
       borderBottomWidth: 1,
-      borderBottomColor: "rgba(0, 0, 0, 0.1)",
+      borderBottomColor: theme.colors.border.secondary,
     },
     suggestionsList: {
-      maxHeight: 350,
+      maxHeight: SEARCH_SUGGESTIONS_CONSTANTS.SUGGESTIONS_LIST_MAX_HEIGHT,
     },
     suggestionItem: {
       paddingHorizontal: DesignTokens.spacing[4],
@@ -141,7 +167,7 @@ export function SearchSuggestions({
           >
             <MaterialIcons
               name="search"
-              size={16}
+              size={SEARCH_SUGGESTIONS_CONSTANTS.ICON_SIZE}
               color={theme.colors.text.tertiary}
               style={styles.searchIcon}
             />

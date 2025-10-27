@@ -15,6 +15,39 @@ import { useTheme } from "@/contexts";
 
 import { FilterDropdownProps } from "./types";
 
+// Constants for FilterDropdown component
+const FILTER_DROPDOWN_CONSTANTS = {
+  // Layout calculations
+  OPTION_HEIGHT: 56, // Estimated height per option
+  HEADER_HEIGHT: 56, // Modal header height
+  FOOTER_HEIGHT: 60, // Modal footer height
+  CONTENT_MARGIN: 32, // Additional margin for content
+
+  // Scroll behavior
+  SCROLL_BUFFER: 10, // Buffer for scroll detection
+
+  // Scroll indicators
+  SCROLL_INDICATOR_SIZE: 30, // Width/height of scroll indicator
+  SCROLL_INDICATOR_OFFSET: -15, // Transform offset to center indicator
+
+  // Modal sizing
+  MODAL_WIDTH_PERCENT: 0.4, // 40% of screen width
+  MODAL_MAX_WIDTH: 500, // Maximum modal width
+  MODAL_MIN_HEIGHT: 400, // Minimum modal height
+  MODAL_MAX_HEIGHT_PERCENT: 0.7, // 70% of screen height
+  MODAL_MAX_AVAILABLE_PERCENT: 0.8, // 80% of screen for content calculation
+
+  // UI elements
+  CHECKBOX_SIZE: 24, // Checkbox width/height
+  CHECKBOX_BORDER_WIDTH: 2, // Checkbox border width
+  ICON_SIZE: 18, // Material icon size
+  ARROW_ICON_SIZE: 20, // Arrow dropdown icon size
+
+  // Spacing
+  SCROLL_INDICATOR_TOP: 8, // Top scroll indicator position
+  SCROLL_INDICATOR_BOTTOM: 8, // Bottom scroll indicator position
+} as const;
+
 /**
  * FilterDropdown Component
  * A multi-select dropdown menu for selecting filter options
@@ -85,7 +118,12 @@ export function FilterDropdown<T extends string>({
     const scrollViewHeight = layoutMeasurement.height;
 
     setCanScrollUp(scrollY > 0);
-    setCanScrollDown(scrollY < contentHeight - scrollViewHeight - 10); // 10px buffer
+    setCanScrollDown(
+      scrollY <
+        contentHeight -
+          scrollViewHeight -
+          FILTER_DROPDOWN_CONSTANTS.SCROLL_BUFFER
+    );
   };
 
   // Handle scroll indicator clicks
@@ -106,15 +144,6 @@ export function FilterDropdown<T extends string>({
   const handleClearAll = () => {
     setTempSelectedValues([]);
   };
-
-  // Calculate dynamic max height based on screen size
-  // Estimate: ~56px per option + 56px header + 60px footer + margin
-  const estimatedContentHeight = options.length * 56 + 56 + 60 + 32;
-  const maxAvailableHeight = windowHeight * 0.8; // Use up to 80% of screen
-  const calculatedMaxHeight = Math.min(
-    estimatedContentHeight,
-    maxAvailableHeight
-  );
 
   const styles = StyleSheet.create({
     container: {
@@ -156,13 +185,17 @@ export function FilterDropdown<T extends string>({
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      backgroundColor: theme.colors.background.overlay,
     },
     modalContent: {
-      width: Math.min(windowWidth * 0.4, 500), // 40% of screen width, max 500px
-      maxWidth: 500,
-      minHeight: 400,
-      maxHeight: windowHeight * 0.7,
+      width: Math.min(
+        windowWidth * FILTER_DROPDOWN_CONSTANTS.MODAL_WIDTH_PERCENT,
+        FILTER_DROPDOWN_CONSTANTS.MODAL_MAX_WIDTH
+      ),
+      maxWidth: FILTER_DROPDOWN_CONSTANTS.MODAL_MAX_WIDTH,
+      minHeight: FILTER_DROPDOWN_CONSTANTS.MODAL_MIN_HEIGHT,
+      maxHeight:
+        windowHeight * FILTER_DROPDOWN_CONSTANTS.MODAL_MAX_HEIGHT_PERCENT,
       borderRadius: DesignTokens.borderRadius.lg,
       overflow: "hidden",
     },
@@ -220,10 +253,10 @@ export function FilterDropdown<T extends string>({
       gap: DesignTokens.spacing[3],
     },
     checkbox: {
-      width: 24,
-      height: 24,
+      width: FILTER_DROPDOWN_CONSTANTS.CHECKBOX_SIZE,
+      height: FILTER_DROPDOWN_CONSTANTS.CHECKBOX_SIZE,
       borderRadius: DesignTokens.borderRadius.sm,
-      borderWidth: 2,
+      borderWidth: FILTER_DROPDOWN_CONSTANTS.CHECKBOX_BORDER_WIDTH,
       borderColor: theme.colors.border.primary,
       alignItems: "center",
       justifyContent: "center",
@@ -276,33 +309,35 @@ export function FilterDropdown<T extends string>({
       color: theme.colors.text.primary,
     },
     applyButtonText: {
-      color: "#FFFFFF",
+      color: theme.colors.text.inverse,
     },
     scrollIndicator: {
       position: "absolute",
       left: "50%",
-      transform: [{ translateX: -15 }], // Center the 30px wide circle
-      width: 30,
-      height: 30,
+      transform: [
+        { translateX: FILTER_DROPDOWN_CONSTANTS.SCROLL_INDICATOR_OFFSET },
+      ],
+      width: FILTER_DROPDOWN_CONSTANTS.SCROLL_INDICATOR_SIZE,
+      height: FILTER_DROPDOWN_CONSTANTS.SCROLL_INDICATOR_SIZE,
       borderRadius: DesignTokens.borderRadius.full,
       justifyContent: "center",
       alignItems: "center",
       zIndex: 2,
       backgroundColor: theme.colors.interactive.secondary,
-      shadowColor: "#000000",
+      shadowColor: theme.colors.shadows.base.shadowColor,
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
+      shadowOpacity: theme.colors.shadows.base.shadowOpacity,
       shadowRadius: 4,
       elevation: 4, // Android shadow
     },
     scrollIndicatorTop: {
-      top: 8,
+      top: FILTER_DROPDOWN_CONSTANTS.SCROLL_INDICATOR_TOP,
     },
     scrollIndicatorBottom: {
-      bottom: 8,
+      bottom: FILTER_DROPDOWN_CONSTANTS.SCROLL_INDICATOR_BOTTOM,
     },
     scrollIndicatorIcon: {
-      color: "#FFFFFF",
+      color: theme.colors.text.inverse,
     },
   });
 
@@ -333,7 +368,7 @@ export function FilterDropdown<T extends string>({
         </View>
         <MaterialIcons
           name="arrow-drop-down"
-          size={20}
+          size={FILTER_DROPDOWN_CONSTANTS.ARROW_ICON_SIZE}
           color={theme.colors.text.secondary}
         />
       </Pressable>
@@ -409,8 +444,8 @@ export function FilterDropdown<T extends string>({
                           {isSelected && (
                             <MaterialIcons
                               name="check"
-                              size={18}
-                              color="#FFFFFF"
+                              size={FILTER_DROPDOWN_CONSTANTS.ICON_SIZE}
+                              color={theme.colors.text.inverse}
                             />
                           )}
                         </View>
@@ -437,7 +472,7 @@ export function FilterDropdown<T extends string>({
                   >
                     <MaterialIcons
                       name="keyboard-arrow-up"
-                      size={18}
+                      size={FILTER_DROPDOWN_CONSTANTS.ICON_SIZE}
                       style={styles.scrollIndicatorIcon}
                     />
                   </TouchableOpacity>
@@ -454,7 +489,7 @@ export function FilterDropdown<T extends string>({
                   >
                     <MaterialIcons
                       name="keyboard-arrow-down"
-                      size={18}
+                      size={FILTER_DROPDOWN_CONSTANTS.ICON_SIZE}
                       style={styles.scrollIndicatorIcon}
                     />
                   </TouchableOpacity>
