@@ -5,23 +5,17 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts";
 import { ProjectSummary } from "@/types/Project";
+import { calculateProjectScore } from "@/utils/searchScoring";
 
 /**
- * Constants for SearchSuggestions component behavior and scoring
+ * Constants for SearchSuggestions component UI behavior
  *
- * These values control the suggestion algorithm and UI behavior.
- * The scoring system prioritizes exact matches over partial matches.
+ * These values control the UI appearance and behavior.
+ * Scoring constants are now imported from utils/searchScoring.ts
  */
 const SEARCH_SUGGESTIONS_CONSTANTS = {
   /** Query requirements */
   MIN_QUERY_LENGTH: 2, // Minimum characters required to show suggestions
-
-  /** Scoring system - higher scores = better matches */
-  EXACT_MATCH_SCORE: 100, // Exact project name match (highest priority)
-  STARTS_WITH_SCORE: 50, // Project name starts with query
-  NAME_CONTAINS_SCORE: 30, // Project name contains query anywhere
-  DESCRIPTION_SCORE: 20, // Project description contains query
-  LOCATION_SCORE: 10, // Project location contains query (lowest priority)
 
   /** UI sizing */
   DROPDOWN_MAX_HEIGHT: 400, // Maximum dropdown height in pixels
@@ -76,34 +70,12 @@ export function SearchSuggestions({
 
     const lowerQuery = query.toLowerCase().trim();
 
-    // Create scored matches
+    // Create scored matches using pure utility function
     const matches = projects
-      .map((project) => {
-        const nameMatch = project.name.toLowerCase().includes(lowerQuery);
-        const descMatch = project.briefDescription
-          ?.toLowerCase()
-          .includes(lowerQuery);
-        const locationMatch =
-          project.location?.neighborhood?.toLowerCase().includes(lowerQuery) ||
-          project.location?.zipCode?.includes(lowerQuery);
-
-        // Calculate relevance score
-        let score = 0;
-        if (project.name.toLowerCase() === lowerQuery)
-          score = SEARCH_SUGGESTIONS_CONSTANTS.EXACT_MATCH_SCORE; // Exact match
-        else if (project.name.toLowerCase().startsWith(lowerQuery))
-          score = SEARCH_SUGGESTIONS_CONSTANTS.STARTS_WITH_SCORE; // Starts with
-        else if (nameMatch)
-          score = SEARCH_SUGGESTIONS_CONSTANTS.NAME_CONTAINS_SCORE;
-        // Contains in name
-        else if (descMatch)
-          score = SEARCH_SUGGESTIONS_CONSTANTS.DESCRIPTION_SCORE;
-        // Contains in description
-        else if (locationMatch)
-          score = SEARCH_SUGGESTIONS_CONSTANTS.LOCATION_SCORE; // Contains in location
-
-        return { project, score };
-      })
+      .map((project) => ({
+        project,
+        score: calculateProjectScore(lowerQuery, project),
+      }))
       .filter((match) => match.score > 0) // Only include matches
       .sort((a, b) => b.score - a.score) // Sort by relevance
       .slice(0, maxSuggestions) // Limit results

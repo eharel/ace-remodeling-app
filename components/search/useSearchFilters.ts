@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { ProjectCategory } from "@/types/Category";
 import { Project } from "@/types/Project";
 import { ProjectStatus } from "@/types/Status";
+import { applyAllFilters } from "@/utils/searchFilters";
 
 import { SearchFilters } from "./types";
 
@@ -130,45 +131,9 @@ export function useSearchFilters(projects: Project[]) {
    */
   const applyFilters = useCallback(
     (projectsToFilter: Project[]): Project[] => {
-      return projectsToFilter.filter((project) => {
-        // Category filter (OR logic: match ANY selected category)
-        if (filters.categories.length > 0) {
-          if (!filters.categories.includes(project.category)) {
-            return false;
-          }
-        }
-
-        // Status filter (OR logic: match ANY selected status)
-        if (filters.statuses.length > 0) {
-          if (!filters.statuses.includes(project.status)) {
-            return false;
-          }
-        }
-
-        // Project Manager filter (OR logic: match ANY selected PM)
-        if (filters.projectManagers.length > 0) {
-          const projectPmNames = project.pms?.map((pm) => pm.name) || [];
-          const hasMatchingPm = filters.projectManagers.some((pmName) =>
-            projectPmNames.includes(pmName)
-          );
-          if (!hasMatchingPm) {
-            return false;
-          }
-        }
-
-        // Tags filter (OR logic: match ANY selected tag)
-        if (filters.tags.length > 0) {
-          const projectTags = project.tags || [];
-          const hasMatchingTag = filters.tags.some((tag) =>
-            projectTags.includes(tag)
-          );
-          if (!hasMatchingTag) {
-            return false;
-          }
-        }
-
-        return true;
-      });
+      return projectsToFilter.filter((project) =>
+        applyAllFilters(project, filters)
+      );
     },
     [filters]
   );
