@@ -6,22 +6,27 @@ import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
 import { useTheme } from "@/contexts";
 import { ProjectSummary } from "@/types/Project";
 
-// Constants for SearchSuggestions component
+/**
+ * Constants for SearchSuggestions component behavior and scoring
+ *
+ * These values control the suggestion algorithm and UI behavior.
+ * The scoring system prioritizes exact matches over partial matches.
+ */
 const SEARCH_SUGGESTIONS_CONSTANTS = {
-  // Query requirements
-  MIN_QUERY_LENGTH: 2, // Minimum characters to show suggestions
+  /** Query requirements */
+  MIN_QUERY_LENGTH: 2, // Minimum characters required to show suggestions
 
-  // Scoring system
-  EXACT_MATCH_SCORE: 100, // Exact name match
-  STARTS_WITH_SCORE: 50, // Name starts with query
-  NAME_CONTAINS_SCORE: 30, // Name contains query
-  DESCRIPTION_SCORE: 20, // Description contains query
-  LOCATION_SCORE: 10, // Location contains query
+  /** Scoring system - higher scores = better matches */
+  EXACT_MATCH_SCORE: 100, // Exact project name match (highest priority)
+  STARTS_WITH_SCORE: 50, // Project name starts with query
+  NAME_CONTAINS_SCORE: 30, // Project name contains query anywhere
+  DESCRIPTION_SCORE: 20, // Project description contains query
+  LOCATION_SCORE: 10, // Project location contains query (lowest priority)
 
-  // UI sizing
-  DROPDOWN_MAX_HEIGHT: 400, // Maximum dropdown height
+  /** UI sizing */
+  DROPDOWN_MAX_HEIGHT: 400, // Maximum dropdown height in pixels
   SUGGESTIONS_LIST_MAX_HEIGHT: 350, // Maximum suggestions list height
-  ICON_SIZE: 16, // Material icon size
+  ICON_SIZE: 16, // Material icon size for search icon
 } as const;
 
 const MAX_SUGGESTIONS = 10;
@@ -46,6 +51,21 @@ export function SearchSuggestions({
   const { theme } = useTheme();
 
   // Filter and sort projects based on query
+  /**
+   * Generates project suggestions based on search query using a scoring algorithm
+   *
+   * Scoring system (higher = better match):
+   * - Exact name match: 100 points
+   * - Name starts with query: 50 points
+   * - Name contains query: 30 points
+   * - Description contains query: 20 points
+   * - Location contains query: 10 points
+   *
+   * Results are sorted by score (highest first) and limited to MAX_SUGGESTIONS.
+   * Only shows suggestions for queries ≥2 characters.
+   *
+   * @returns Array of ProjectSummary objects matching the query, sorted by relevance
+   */
   const suggestions = useMemo(() => {
     if (
       !query.trim() ||
@@ -74,11 +94,11 @@ export function SearchSuggestions({
         else if (project.name.toLowerCase().startsWith(lowerQuery))
           score = SEARCH_SUGGESTIONS_CONSTANTS.STARTS_WITH_SCORE; // Starts with
         else if (nameMatch)
-          score =
-            SEARCH_SUGGESTIONS_CONSTANTS.NAME_CONTAINS_SCORE; // Contains in name
+          score = SEARCH_SUGGESTIONS_CONSTANTS.NAME_CONTAINS_SCORE;
+        // Contains in name
         else if (descMatch)
-          score =
-            SEARCH_SUGGESTIONS_CONSTANTS.DESCRIPTION_SCORE; // Contains in description
+          score = SEARCH_SUGGESTIONS_CONSTANTS.DESCRIPTION_SCORE;
+        // Contains in description
         else if (locationMatch)
           score = SEARCH_SUGGESTIONS_CONSTANTS.LOCATION_SCORE; // Contains in location
 

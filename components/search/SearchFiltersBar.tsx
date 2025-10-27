@@ -10,19 +10,39 @@ import { getStatusDisplayText, ProjectStatus } from "@/types/Status";
 import { FilterDropdown } from "./FilterDropdown";
 import { FilterOption } from "./types";
 
+/**
+ * Props for the SearchFiltersBar component
+ *
+ * This component renders a row of multi-select filter dropdowns for
+ * searching projects by category, status, project manager, and tags.
+ * Also includes a "Clear All" button when filters are active.
+ */
 interface SearchFiltersBarProps {
+  /** Currently selected category values */
   categoryValues: ProjectCategory[];
+  /** Currently selected status values */
   statusValues: ProjectStatus[];
+  /** Currently selected project manager names */
   projectManagerValues: string[];
+  /** Currently selected tag values */
   tagValues: string[];
+  /** Available project managers extracted from all projects */
   availableProjectManagers: string[];
+  /** Available tags extracted from all projects */
   availableTags: string[];
+  /** Callback when category selection changes */
   onCategoryChange: (values: ProjectCategory[]) => void;
+  /** Callback when status selection changes */
   onStatusChange: (values: ProjectStatus[]) => void;
+  /** Callback when project manager selection changes */
   onProjectManagerChange: (values: string[]) => void;
+  /** Callback when tag selection changes */
   onTagChange: (values: string[]) => void;
+  /** Callback to reset all filters to empty state */
   onResetFilters: () => void;
+  /** Whether any filters are currently active (non-empty arrays) */
   hasActiveFilters: boolean;
+  /** Total count of active filter selections across all filter types */
   activeFilterCount: number;
 }
 

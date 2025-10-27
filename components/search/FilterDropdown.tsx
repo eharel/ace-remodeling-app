@@ -15,37 +15,43 @@ import { useTheme } from "@/contexts";
 
 import { FilterDropdownProps } from "./types";
 
-// Constants for FilterDropdown component
+/**
+ * Constants for FilterDropdown component layout and behavior
+ *
+ * These values control the visual appearance and interaction behavior
+ * of the multi-select dropdown modal. All values are theme-agnostic
+ * dimensions that work across different screen sizes.
+ */
 const FILTER_DROPDOWN_CONSTANTS = {
-  // Layout calculations
-  OPTION_HEIGHT: 56, // Estimated height per option
-  HEADER_HEIGHT: 56, // Modal header height
-  FOOTER_HEIGHT: 60, // Modal footer height
-  CONTENT_MARGIN: 32, // Additional margin for content
+  /** Layout calculations */
+  OPTION_HEIGHT: 56, // Estimated height per option for scroll calculations
+  HEADER_HEIGHT: 56, // Modal header height (includes title and quick actions)
+  FOOTER_HEIGHT: 60, // Modal footer height (includes Apply/Cancel buttons)
+  CONTENT_MARGIN: 32, // Additional margin for content area
 
-  // Scroll behavior
-  SCROLL_BUFFER: 10, // Buffer for scroll detection
+  /** Scroll behavior */
+  SCROLL_BUFFER: 10, // Buffer pixels for scroll detection (prevents flickering)
 
-  // Scroll indicators
-  SCROLL_INDICATOR_SIZE: 30, // Width/height of scroll indicator
-  SCROLL_INDICATOR_OFFSET: -15, // Transform offset to center indicator
+  /** Scroll indicators */
+  SCROLL_INDICATOR_SIZE: 30, // Width/height of floating scroll indicator buttons
+  SCROLL_INDICATOR_OFFSET: -15, // Transform offset to center indicator horizontally
 
-  // Modal sizing
-  MODAL_WIDTH_PERCENT: 0.4, // 40% of screen width
-  MODAL_MAX_WIDTH: 500, // Maximum modal width
-  MODAL_MIN_HEIGHT: 400, // Minimum modal height
-  MODAL_MAX_HEIGHT_PERCENT: 0.7, // 70% of screen height
+  /** Modal sizing */
+  MODAL_WIDTH_PERCENT: 0.4, // 40% of screen width (responsive sizing)
+  MODAL_MAX_WIDTH: 500, // Maximum modal width (prevents too-wide modals on tablets)
+  MODAL_MIN_HEIGHT: 400, // Minimum modal height (ensures usability)
+  MODAL_MAX_HEIGHT_PERCENT: 0.7, // 70% of screen height (prevents overflow)
   MODAL_MAX_AVAILABLE_PERCENT: 0.8, // 80% of screen for content calculation
 
-  // UI elements
-  CHECKBOX_SIZE: 24, // Checkbox width/height
-  CHECKBOX_BORDER_WIDTH: 2, // Checkbox border width
-  ICON_SIZE: 18, // Material icon size
-  ARROW_ICON_SIZE: 20, // Arrow dropdown icon size
+  /** UI elements */
+  CHECKBOX_SIZE: 24, // Checkbox width/height (touch-friendly size)
+  CHECKBOX_BORDER_WIDTH: 2, // Checkbox border width (visual clarity)
+  ICON_SIZE: 18, // Material icon size for checkmarks and scroll indicators
+  ARROW_ICON_SIZE: 20, // Arrow dropdown icon size in trigger button
 
-  // Spacing
-  SCROLL_INDICATOR_TOP: 8, // Top scroll indicator position
-  SCROLL_INDICATOR_BOTTOM: 8, // Bottom scroll indicator position
+  /** Spacing */
+  SCROLL_INDICATOR_TOP: 8, // Top scroll indicator position from modal edge
+  SCROLL_INDICATOR_BOTTOM: 8, // Bottom scroll indicator position from modal edge
 } as const;
 
 /**
@@ -75,6 +81,16 @@ export function FilterDropdown<T extends string>({
   };
 
   // Generate display value based on selections
+  /**
+   * Generates the display text for the dropdown trigger based on current selections
+   *
+   * Handles three display states:
+   * - No selections: "All"
+   * - Single selection: Shows the option label
+   * - Multiple selections: Shows count like "3 selected"
+   *
+   * @returns The text to display in the dropdown trigger button
+   */
   const getDisplayValue = () => {
     if (selectedValues.length === 0) {
       return "All";
@@ -111,6 +127,14 @@ export function FilterDropdown<T extends string>({
   };
 
   // Handle scroll events to show/hide scroll indicators
+  /**
+   * Handles scroll events to determine when to show scroll indicators
+   *
+   * Scroll indicators appear when content overflows the visible area.
+   * Uses a buffer to prevent flickering when scrolling near the edges.
+   *
+   * @param event - ScrollView scroll event containing position and size data
+   */
   const handleScroll = (event: any) => {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
     const scrollY = contentOffset.y;
