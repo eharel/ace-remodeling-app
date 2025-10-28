@@ -63,8 +63,8 @@ export function FloatingChecklistButton() {
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    bottom: 100, // Position above tab bar
-    right: 20,
+    bottom: DesignTokens.spacing[25], // 100px - Position above tab bar
+    right: DesignTokens.spacing[5], // 20px
     width: DesignTokens.components.fab.size,
     height: DesignTokens.components.fab.size,
     borderRadius: DesignTokens.components.fab.borderRadius,
