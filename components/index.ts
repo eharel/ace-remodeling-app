@@ -20,6 +20,3 @@ export * from "./gallery";
 
 // Checklist components
 export * from "./checklist";
-
-// Zoom components
-export * from "./zoom";

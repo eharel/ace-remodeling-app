@@ -50,7 +50,9 @@ export function ErrorState({
           fontSize: DesignTokens.typography.fontSize.base,
           textAlign: "center",
           opacity: 0.7,
-          lineHeight: 22,
+          lineHeight:
+            DesignTokens.typography.fontSize.base *
+            DesignTokens.typography.lineHeight.normal,
           marginBottom: DesignTokens.spacing[4],
         },
         retryButton: {

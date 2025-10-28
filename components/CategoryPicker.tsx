@@ -75,7 +75,7 @@ export function CategoryPicker({
         },
         modalOverlay: {
           flex: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          backgroundColor: theme.colors.background.overlay,
           justifyContent: "center",
           alignItems: "center",
           padding: DesignTokens.spacing[4],
@@ -240,7 +240,7 @@ export function CategoryPicker({
                       <MaterialIcons
                         name={item.icon as any}
                         size={18}
-                        color="#FFFFFF"
+                        color={theme.colors.text.inverse}
                       />
                     </View>
                     <View style={styles.categoryInfo}>

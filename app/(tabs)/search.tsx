@@ -4,8 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
-import { PageHeader, ProjectGallery } from "@/components";
-import { ErrorState } from "@/components/error-states";
+import { ErrorState, PageHeader, ProjectGallery } from "@/components";
 import {
   SearchFiltersBar,
   SearchInputWithHistory,
