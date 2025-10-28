@@ -23,9 +23,9 @@ import {
 } from "firebase/firestore";
 import * as fs from "fs";
 import * as path from "path";
-import { db } from "../config/firebase";
+import { db } from "../core/config";
 import { seedProjects } from "../data/seedData";
-import { Document, Picture, Project } from "../types";
+import { Document, Picture, Project } from "../core/types";
 
 /**
  * Result summary from seeding operation

@@ -7,8 +7,8 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { db } from "../config/firebase";
-import { Project, PROJECT_CATEGORIES } from "../types";
+import { db } from "@/core/config";
+import { Project, PROJECT_CATEGORIES } from "@/core/types";
 
 // Constants
 const PROJECTS_COLLECTION = "projects";

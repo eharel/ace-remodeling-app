@@ -1,4 +1,4 @@
-import { Project } from "@/types";
+import { Project } from "@/core/types";
 
 /**
  * Seed data for Firestore database

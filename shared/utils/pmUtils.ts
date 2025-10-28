@@ -1,4 +1,4 @@
-import { Project } from "../types/Project";
+import { Project } from "@/core/types/Project";
 
 /**
  * Utility functions for working with multiple Project Managers

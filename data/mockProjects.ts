@@ -1,4 +1,4 @@
-import { Project, ProjectSummary, getProjectCompletionDate } from "../types";
+import { Project, ProjectSummary, getProjectCompletionDate } from "../core/types";
 
 // Sample projects for development and testing
 export const mockProjects: Project[] = [

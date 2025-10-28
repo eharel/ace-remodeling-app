@@ -4,4 +4,4 @@
  */
 
 export { ProjectsProvider, useProjects } from "./ProjectsContext";
-export { ThemeProvider, useTheme } from "./ThemeContext";
+export { ThemeProvider, useTheme, UnifiedTheme } from "./ThemeContext";
