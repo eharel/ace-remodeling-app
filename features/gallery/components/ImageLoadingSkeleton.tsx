@@ -7,9 +7,9 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { DesignTokens } from "@/core/themes";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
-import { DesignTokens } from "@/core/themes";
 
 interface ImageLoadingSkeletonProps {
   message?: string;

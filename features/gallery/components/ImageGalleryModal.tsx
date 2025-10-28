@@ -7,10 +7,10 @@ import { accessibilityStrings } from "../constants/accessibilityStrings";
 import { useAccessibilityAnnouncements } from "../hooks/useAccessibilityAnnouncements";
 import { useImageGallery } from "../hooks/useImageGallery";
 import { useImageNavigation } from "../hooks/useImageNavigation";
+import { GalleryStyles, ImageGalleryModalProps } from "../types/gallery.types";
 import { ImageGalleryCarousel } from "./ImageGalleryCarousel";
 import { ImageGalleryFooter } from "./ImageGalleryFooter";
 import { ImageGalleryHeader } from "./ImageGalleryHeader";
-import { GalleryStyles, ImageGalleryModalProps } from "../types/gallery.types";
 
 /**
  * ImageGalleryModal - A full-screen modal for viewing and navigating through images

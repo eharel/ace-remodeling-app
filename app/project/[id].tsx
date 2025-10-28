@@ -15,9 +15,9 @@ import { ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
-import { getProjectDuration } from "@/shared/utils";
 import { DesignTokens } from "@/core/themes";
 import { Project } from "@/core/types";
+import { getProjectDuration } from "@/shared/utils";
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

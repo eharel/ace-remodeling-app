@@ -1,7 +1,7 @@
-import { useTheme } from "../contexts";
 import { DesignTokens } from "@/core/themes";
 import React from "react";
 import { StyleSheet, View } from "react-native";
+import { useTheme } from "../contexts";
 import { ThemedText } from "./themed/ThemedText";
 
 interface PageHeaderProps {

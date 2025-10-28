@@ -2,6 +2,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
+import { DesignTokens } from "@/core/themes";
+import { ProjectCategory } from "@/core/types";
 import { ThemedText } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import {
@@ -9,8 +11,6 @@ import {
   getCategoryDisplayName,
   getCategoryIcon,
 } from "@/shared/utils";
-import { DesignTokens } from "@/core/themes";
-import { ProjectCategory } from "@/core/types";
 
 interface CategoryPickerProps {
   currentCategory: ProjectCategory;

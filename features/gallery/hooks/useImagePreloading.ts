@@ -1,4 +1,6 @@
 import { Picture } from "@/core/types";
+import { Image } from "expo-image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   createPreloadStats,
   createPreloadTimeout,
@@ -7,8 +9,6 @@ import {
   PRELOADING_CONSTANTS,
   shouldPreloadImage,
 } from "../utils/imagePreloading";
-import { Image } from "expo-image";
-import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseImagePreloadingProps {
   images: Picture[];

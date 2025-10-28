@@ -2,10 +2,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { ThemedText, ThemedView } from "@/shared/components";
-import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/core/themes";
 import { ProjectSummary } from "@/core/types/Project";
+import { ThemedText, ThemedView } from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
 import { calculateProjectScore } from "../utils/searchScoring";
 
 /**

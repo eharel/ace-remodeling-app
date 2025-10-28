@@ -2,11 +2,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { ThemedText } from "@/shared/components";
-import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/core/themes";
 import { ProjectCategory } from "@/core/types/Category";
 import { ProjectStatus } from "@/core/types/Status";
+import { ThemedText } from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
 import { createFilterConfig } from "../utils/filterConfig";
 
 import { FilterButton } from "./FilterButton";

@@ -1,3 +1,5 @@
+import { db } from "@/core/config";
+import { Project, PROJECT_CATEGORIES } from "@/core/types";
 import { collection, getDocs } from "firebase/firestore";
 import React, {
   createContext,
@@ -7,8 +9,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { db } from "@/core/config";
-import { Project, PROJECT_CATEGORIES } from "@/core/types";
 
 // Constants
 const PROJECTS_COLLECTION = "projects";

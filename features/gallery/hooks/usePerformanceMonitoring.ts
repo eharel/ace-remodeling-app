@@ -1,10 +1,10 @@
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   calculateAverageMetrics,
   calculatePerformanceScore,
   createDefaultPerformanceStats,
   getPerformanceRecommendations,
 } from "../utils/galleryPerformance";
-import { useCallback, useEffect, useRef, useState } from "react";
 
 interface PerformanceMetrics {
   renderTime: number;

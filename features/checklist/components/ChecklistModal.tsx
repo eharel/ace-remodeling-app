@@ -1,8 +1,8 @@
 import React from "react";
 import { Modal, StyleSheet, TouchableOpacity } from "react-native";
 
-import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/core/themes";
+import { useTheme } from "@/shared/contexts";
 import { ChecklistBody } from "./ChecklistBody";
 import { ChecklistHeader } from "./ChecklistHeader";
 

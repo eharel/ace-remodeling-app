@@ -1,9 +1,9 @@
 import { router } from "expo-router";
 import React from "react";
 
-import { CategoryPage } from "./CategoryPage";
 import { EmptyState } from "@/shared/components";
 import { useProjects } from "@/shared/contexts";
+import { CategoryPage } from "./CategoryPage";
 // Comment out mock data for now (keeping for fallback)
 // import { getProjectSummariesByCategory } from "@/data/mockProjects";
 import { CategoryKey, getCategoryConfig } from "@/core/constants";

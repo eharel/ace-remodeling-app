@@ -4,6 +4,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
+import { DesignTokens } from "@/core/themes";
+import {
+  Project,
+  ProjectSummary,
+  getProjectCompletionDate,
+  getProjectPMNames,
+} from "@/core/types";
 import { ProjectGallery } from "@/features/projects";
 import {
   SearchFiltersBar,
@@ -18,13 +25,6 @@ import {
 } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import { logError, logWarning, useSearchHistory } from "@/shared/utils";
-import { DesignTokens } from "@/core/themes";
-import {
-  Project,
-  ProjectSummary,
-  getProjectCompletionDate,
-  getProjectPMNames,
-} from "@/core/types";
 
 // Constants
 const SEARCH_DEBOUNCE_MS = 500;

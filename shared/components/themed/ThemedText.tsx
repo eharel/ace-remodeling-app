@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { Text, type TextProps } from "react-native";
 
-import { useTheme } from "../../contexts";
 import { DesignTokens } from "@/core/themes";
+import { useTheme } from "../../contexts";
 
 /**
  * ThemedText Component

@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import { ActivityIndicator, StyleSheet, ViewStyle } from "react-native";
 
-import { ThemedText, ThemedView } from "./themed";
-import { useTheme } from "../contexts";
 import { DesignTokens } from "@/core/themes";
+import { useTheme } from "../contexts";
+import { ThemedText, ThemedView } from "./themed";
 
 interface LoadingStateProps {
   message?: string;

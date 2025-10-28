@@ -1,7 +1,4 @@
-import {
-  PerformanceMetrics,
-  PerformanceStats,
-} from "../types/gallery.types";
+import { PerformanceMetrics, PerformanceStats } from "../types/gallery.types";
 
 /**
  * Performance calculation utilities for image gallery

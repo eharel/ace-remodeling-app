@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useRef } from "react";
+import { AppState, AppStateStatus } from "react-native";
 import {
   calculateMemoryStats,
   forceGarbageCollection as forceGC,
@@ -5,8 +7,6 @@ import {
   MEMORY_CONSTANTS,
   shouldCheckMemory,
 } from "../utils/memoryManagement";
-import { useCallback, useEffect, useRef } from "react";
-import { AppState, AppStateStatus } from "react-native";
 
 interface UseMemoryManagementProps {
   onMemoryWarning?: () => void;

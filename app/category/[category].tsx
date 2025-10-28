@@ -2,6 +2,8 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { DesignTokens } from "@/core/themes";
+import { ProjectCategory } from "@/core/types";
 import { CategoryPicker } from "@/features/category";
 import { ProjectGallery } from "@/features/projects";
 import {
@@ -12,12 +14,7 @@ import {
   ThemedView,
 } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
-import { DesignTokens } from "@/core/themes";
-import { ProjectCategory } from "@/core/types";
-import {
-  getAllCategories,
-  getCategoryDisplayName,
-} from "@/shared/utils";
+import { getAllCategories, getCategoryDisplayName } from "@/shared/utils";
 
 export default function CategoryScreen() {
   const { theme } = useTheme();

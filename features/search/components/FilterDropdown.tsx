@@ -10,9 +10,9 @@ import {
   View,
 } from "react-native";
 
+import { DesignTokens } from "@/core/themes";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
-import { DesignTokens } from "@/core/themes";
 
 import { FilterDropdownProps } from "../types/types";
 

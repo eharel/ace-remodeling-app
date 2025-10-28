@@ -1,4 +1,5 @@
 import { Picture } from "@/core/types";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   calculateLoadingDelay,
   createLoadingStats,
@@ -7,7 +8,6 @@ import {
   getVisibleIndices,
   LAZY_LOADING_CONSTANTS,
 } from "../utils/lazyLoading";
-import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseLazyLoadingProps {
   images: Picture[];

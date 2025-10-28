@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import Pdf from "react-native-pdf";
 
-import { ErrorState, LoadingState } from "@/shared/components";
 import { storage } from "@/core/config";
+import { ErrorState, LoadingState } from "@/shared/components";
 
 interface PdfDisplayProps {
   uri: string;

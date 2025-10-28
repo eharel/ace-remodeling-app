@@ -5,10 +5,10 @@ import {
 } from "react-error-boundary";
 import { StyleSheet } from "react-native";
 
-import { ThemedText, ThemedView } from "./themed";
+import { DesignTokens } from "@/core/themes";
 import { useTheme } from "../contexts";
 import { logError } from "../utils";
-import { DesignTokens } from "@/core/themes";
+import { ThemedText, ThemedView } from "./themed";
 
 // Error fallback component with theming integration
 function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {

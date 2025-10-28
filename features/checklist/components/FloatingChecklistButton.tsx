@@ -2,10 +2,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useCallback, useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/core/themes";
-import { ChecklistModal } from "./ChecklistModal";
+import { useTheme } from "@/shared/contexts";
 import { useChecklist } from "../hooks/useChecklist";
+import { ChecklistModal } from "./ChecklistModal";
 
 /**
  * Floating Action Button component for the meeting checklist

@@ -1,8 +1,8 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-import { FilterDropdown } from "./FilterDropdown";
 import { FilterOption } from "../types/types";
+import { FilterDropdown } from "./FilterDropdown";
 
 /**
  * Props for the FilterButton component

@@ -1,8 +1,8 @@
-import { useTheme } from "../../contexts";
 import { DesignTokens } from "@/core/themes";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { useTheme } from "../../contexts";
 
 // Constants for clear button calculations
 const CLEAR_BUTTON_SIZE = DesignTokens.componentSizes.iconButton;

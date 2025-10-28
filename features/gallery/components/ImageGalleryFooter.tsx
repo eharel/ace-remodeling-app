@@ -3,12 +3,15 @@ import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ThemedText } from "@/shared/components";
 import { DesignTokens } from "@/core/themes";
+import { ThemedText } from "@/shared/components";
 
 import { accessibilityStrings } from "../constants/accessibilityStrings";
 import { MAX_PAGINATION_DOTS } from "../constants/gestureConstants";
-import { ImageGalleryFooterProps, ThumbnailProps } from "../types/gallery.types";
+import {
+  ImageGalleryFooterProps,
+  ThumbnailProps,
+} from "../types/gallery.types";
 
 /**
  * Constants for ImageGalleryFooter component
