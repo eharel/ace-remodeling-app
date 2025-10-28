@@ -10,8 +10,9 @@ import {
   SearchInputWithHistory,
   useSearchFilters,
 } from "@/components/search";
-import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
+import { ThemedText, ThemedView } from "@/components/themed";
 import { useProjects, useTheme } from "@/contexts";
+import { DesignTokens } from "@/themes";
 import {
   Project,
   ProjectSummary,

@@ -28,7 +28,11 @@ export default function HomeScreen() {
           ]}
           onPress={handleBrowsePortfolio}
         >
-          <ThemedText style={styles.buttonText}>Browse Portfolio</ThemedText>
+          <ThemedText
+            style={[styles.buttonText, { color: theme.colors.text.inverse }]}
+          >
+            Browse Portfolio
+          </ThemedText>
         </Pressable>
       </View>
     </ThemedView>
@@ -51,7 +55,6 @@ const styles = StyleSheet.create({
     borderRadius: DesignTokens.borderRadius.lg,
   },
   buttonText: {
-    color: "#FFFFFF",
     fontSize: DesignTokens.typography.fontSize.lg,
     fontWeight: DesignTokens.typography.fontWeight.semibold,
     fontFamily: DesignTokens.typography.fontFamily.semibold,

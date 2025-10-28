@@ -86,7 +86,11 @@ export default function PortfolioScreen() {
               { backgroundColor: theme.colors.interactive.primary },
             ]}
           >
-            <MaterialIcons name={item.icon as any} size={24} color="#FFFFFF" />
+            <MaterialIcons
+              name={item.icon as any}
+              size={24}
+              color={theme.colors.text.inverse}
+            />
           </View>
           <View style={styles.categoryInfo}>
             <ThemedText style={styles.categoryName}>{item.name}</ThemedText>
