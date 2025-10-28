@@ -3,7 +3,7 @@ import {
   calculatePerformanceScore,
   createDefaultPerformanceStats,
   getPerformanceRecommendations,
-} from "@/utils/galleryPerformance";
+} from "../utils/galleryPerformance";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface PerformanceMetrics {

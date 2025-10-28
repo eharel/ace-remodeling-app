@@ -2,12 +2,12 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { ThemedText } from "@/components/themed";
-import { DesignTokens } from "@/themes";
+import { ThemedText } from "@/shared/components";
+import { DesignTokens } from "@/core/themes";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { accessibilityStrings } from "./constants/accessibilityStrings";
-import { ImageGalleryHeaderProps } from "./types/gallery.types";
+import { accessibilityStrings } from "../constants/accessibilityStrings";
+import { ImageGalleryHeaderProps } from "../types/gallery.types";
 
 /**
  * ImageGalleryHeader - Header component for the image gallery modal

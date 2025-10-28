@@ -3,14 +3,14 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
-import { DesignTokens } from "@/themes";
+import { DesignTokens } from "@/core/themes";
 import { Image } from "expo-image";
 import { ImageErrorState } from "./ImageErrorState";
-import { accessibilityStrings } from "./constants/accessibilityStrings";
-import { useImageLoading } from "./hooks/useImageLoading";
-import { useImagePreloading } from "./hooks/useImagePreloading";
-import { useLazyLoading } from "./hooks/useLazyLoading";
-import { ImageGalleryCarouselProps } from "./types/gallery.types";
+import { accessibilityStrings } from "../constants/accessibilityStrings";
+import { useImageLoading } from "../hooks/useImageLoading";
+import { useImagePreloading } from "../hooks/useImagePreloading";
+import { useLazyLoading } from "../hooks/useLazyLoading";
+import { ImageGalleryCarouselProps } from "../types/gallery.types";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 

@@ -4,7 +4,7 @@ import {
   getEstimatedMemoryUsage,
   MEMORY_CONSTANTS,
   shouldCheckMemory,
-} from "@/utils/memoryManagement";
+} from "../utils/memoryManagement";
 import { useCallback, useEffect, useRef } from "react";
 import { AppState, AppStateStatus } from "react-native";
 

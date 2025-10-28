@@ -1,4 +1,4 @@
-import { Picture } from "@/types";
+import { Picture } from "@/core/types";
 import {
   calculateLoadingDelay,
   createLoadingStats,
@@ -6,7 +6,7 @@ import {
   getLoadIndices,
   getVisibleIndices,
   LAZY_LOADING_CONSTANTS,
-} from "@/utils/lazyLoading";
+} from "../utils/lazyLoading";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseLazyLoadingProps {

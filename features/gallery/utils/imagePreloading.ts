@@ -1,4 +1,4 @@
-import { Picture } from "@/types";
+import { Picture } from "@/core/types";
 
 /**
  * Image preloading utility functions for gallery

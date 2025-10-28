@@ -2,7 +2,7 @@ import { TextStyle, ViewStyle } from "react-native";
 import { PanGesture } from "react-native-gesture-handler";
 import { SharedValue } from "react-native-reanimated";
 
-import { Picture } from "@/types";
+import { Picture } from "@/core/types";
 
 /**
  * Theme interface for gallery components

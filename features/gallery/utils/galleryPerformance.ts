@@ -1,7 +1,7 @@
 import {
   PerformanceMetrics,
   PerformanceStats,
-} from "@/components/gallery/types/gallery.types";
+} from "../types/gallery.types";
 
 /**
  * Performance calculation utilities for image gallery

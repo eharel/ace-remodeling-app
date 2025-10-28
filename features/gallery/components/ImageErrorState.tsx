@@ -2,9 +2,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { ThemedText } from "@/components/themed";
-import { useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
+import { ThemedText } from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/core/themes";
 
 interface ImageErrorStateProps {
   error?: string;

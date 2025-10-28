@@ -1,16 +1,16 @@
 import React, { useMemo } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 
-import { useTheme } from "@/contexts";
+import { useTheme } from "@/shared/contexts";
 
-import { accessibilityStrings } from "./constants/accessibilityStrings";
-import { useAccessibilityAnnouncements } from "./hooks/useAccessibilityAnnouncements";
-import { useImageGallery } from "./hooks/useImageGallery";
-import { useImageNavigation } from "./hooks/useImageNavigation";
+import { accessibilityStrings } from "../constants/accessibilityStrings";
+import { useAccessibilityAnnouncements } from "../hooks/useAccessibilityAnnouncements";
+import { useImageGallery } from "../hooks/useImageGallery";
+import { useImageNavigation } from "../hooks/useImageNavigation";
 import { ImageGalleryCarousel } from "./ImageGalleryCarousel";
 import { ImageGalleryFooter } from "./ImageGalleryFooter";
 import { ImageGalleryHeader } from "./ImageGalleryHeader";
-import { GalleryStyles, ImageGalleryModalProps } from "./types/gallery.types";
+import { GalleryStyles, ImageGalleryModalProps } from "../types/gallery.types";
 
 /**
  * ImageGalleryModal - A full-screen modal for viewing and navigating through images

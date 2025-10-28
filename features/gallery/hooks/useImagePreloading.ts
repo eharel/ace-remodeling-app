@@ -1,4 +1,4 @@
-import { Picture } from "@/types";
+import { Picture } from "@/core/types";
 import {
   createPreloadStats,
   createPreloadTimeout,
@@ -6,7 +6,7 @@ import {
   getPreloadIndices,
   PRELOADING_CONSTANTS,
   shouldPreloadImage,
-} from "@/utils/imagePreloading";
+} from "../utils/imagePreloading";
 import { Image } from "expo-image";
 import { useCallback, useEffect, useRef, useState } from "react";
 

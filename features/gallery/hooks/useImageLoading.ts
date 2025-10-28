@@ -1,4 +1,4 @@
-import { Picture } from "@/types";
+import { Picture } from "@/core/types";
 import { useCallback, useEffect, useState } from "react";
 import { ImageLoadingState, ImageState } from "../types/gallery.types";
 
