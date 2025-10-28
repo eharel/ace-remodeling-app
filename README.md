@@ -55,15 +55,17 @@ The **ACE Remodeling App** is a custom business application designed specificall
 
 1. Open the app on your iPad
 2. Navigate to the **Home** tab to see the company branding
-3. Use the **Search** tab to find relevant projects for the client's needs
-4. Review project details and photos before the meeting
+3. Use the **Portfolio** tab to browse projects by category
+4. Use the **Search** tab to find relevant projects for the client's needs
+5. Review project details and photos before the meeting
 
 #### **2. During Client Meetings**
 
-1. **Showcasing Work**: Navigate to **Bathrooms** or **Kitchens** tabs to show relevant projects
+1. **Showcasing Work**: Navigate to **Portfolio** tab to show projects by category (Bathroom, Kitchen, Outdoor, etc.)
 2. **Project Details**: Tap any project to view full details, photos, and client information
 3. **Search Functionality**: Use the search feature to quickly find projects matching client requirements
-4. **Professional Presentation**: The clean interface helps maintain a professional appearance
+4. **Meeting Checklist**: Use the floating checklist button to track meeting progress
+5. **Professional Presentation**: The clean interface helps maintain a professional appearance
 
 #### **3. Project Information Access**
 
@@ -80,8 +82,7 @@ The **ACE Remodeling App** is a custom business application designed specificall
 #### **Tab Navigation**
 
 - **Home**: Company branding and service overview
-- **Bathrooms**: Gallery of completed bathroom projects
-- **Kitchens**: Gallery of completed kitchen projects
+- **Portfolio**: Browse projects by category (Bathroom, Kitchen, Outdoor, etc.)
 - **Search**: Advanced search functionality across all projects
 - **Settings**: App preferences and theme selection
 
@@ -113,29 +114,40 @@ The **ACE Remodeling App** is a custom business application designed specificall
 
 #### **App Structure**
 
+The app uses a **feature-first architecture** for better organization and maintainability:
+
 ```
-app/
-├── (tabs)/           # Main tab navigation
-│   ├── index.tsx     # Home screen
-│   ├── bathrooms.tsx # Bathroom projects
-│   ├── kitchens.tsx  # Kitchen projects
-│   ├── search.tsx    # Search functionality
-│   └── settings.tsx  # App settings
-├── project/[id].tsx  # Individual project details
-└── _layout.tsx       # Root layout and theme
+app/                      # Expo Router screens
+├── (tabs)/              # Tab navigation
+│   ├── index.tsx        # Home screen
+│   ├── portfolio.tsx    # Portfolio by category
+│   ├── search.tsx       # Search functionality
+│   └── settings.tsx     # App settings
+├── category/[category].tsx  # Category detail pages
+├── project/[id].tsx     # Project detail screen
+└── _layout.tsx          # Root layout and theme
 
-components/
-├── ProjectCard.tsx   # Project display component
-├── ProjectGallery.tsx # Project grid layout
-└── themed/          # Themed UI components
+features/                # Feature modules
+├── category/            # Category browsing
+├── checklist/           # Meeting checklist
+├── gallery/             # Image gallery with performance optimization
+├── pdf/                 # PDF document viewing
+├── projects/            # Project display components
+└── search/              # Search and filtering
 
-types/
-├── Project.ts       # Project data structure
-├── Category.ts      # Project categories
-├── Status.ts        # Project statuses
-├── Picture.ts       # Image data structure
-├── Document.ts      # Document data structure
-└── Log.ts          # Project log structure
+shared/                  # Shared across features
+├── components/          # Reusable UI components
+├── contexts/            # React contexts (Theme, Projects)
+└── utils/               # Utility functions
+
+core/                    # App infrastructure
+├── config/              # Firebase configuration
+├── constants/           # App constants
+├── themes/              # Design system and theming
+└── types/               # TypeScript type definitions
+
+scripts/                 # Build and upload scripts
+└── uploadPhotos.ts      # Upload local photos to Firebase
 ```
 
 ### Data Management
@@ -152,9 +164,10 @@ Each project contains:
 
 #### **Data Storage**
 
-- **Mock Data**: Currently uses hardcoded sample data for development
-- **No Local Storage**: Project data is compiled into the app bundle
-- **Future Integration**: Ready for backend API integration
+- **Firebase Integration**: Cloud-based data storage using Firebase Firestore
+- **Firebase Storage**: Project photos and documents stored in Firebase Storage
+- **Real-time Sync**: Projects sync from Firebase database on app load
+- **Local Scripts**: Upload local project photos using `npm run upload`
 
 ## Business-Focused Documentation
 
@@ -192,32 +205,32 @@ Each project contains:
 
 #### **Client Data Storage**
 
-- **Hardcoded Data**: All data compiled into app bundle
-- **Privacy**: No external data transmission
-- **No Backup**: Data is part of app installation
+- **Firebase Firestore**: All project data stored in cloud database
+- **Privacy**: Data transmitted securely via Firebase
+- **Automatic Backup**: Data backed up by Firebase infrastructure
 - **Data Retention**: Projects maintained for portfolio purposes
 
 #### **Project Data Sync**
 
-- **Current State**: No data sync (hardcoded data)
-- **Future Plans**: Cloud sync for multi-device access
-- **Data Export**: Capability to export project data
+- **Current State**: Cloud-based Firebase sync
+- **Multi-Device**: Projects accessible from all devices with the app
+- **Data Upload**: Use `npm run upload` script to upload local photos to Firebase
 
 ### Offline Capabilities
 
-#### **Limited Offline Functionality**
+#### **Internet Connection Required**
 
-- **Project Browsing**: All projects accessible without internet (hardcoded data)
-- **Search**: Complete search functionality works offline
-- **Photo Viewing**: **Requires internet** - photos are external URLs
-- **Client Information**: Full client data available offline
+- **Project Data**: Requires internet to load projects from Firebase
+- **Photo Viewing**: Photos loaded from Firebase Storage
+- **Real-time Updates**: Projects sync when online
+- **Image Caching**: expo-image provides automatic caching for viewed photos
 
 #### **Offline Limitations**
 
-- **Photos**: Cannot view project photos without internet connection
-- **External Images**: All images loaded from Unsplash URLs
-- **No Caching**: Images are not cached locally
-- **Internet Required**: For full functionality including photo viewing
+- **Initial Load**: Requires internet connection on first app launch
+- **Photo Loading**: New photos require internet connection
+- **Data Sync**: Cannot fetch updates without connection
+- **Cached Content**: Previously viewed photos may be available offline via cache
 
 ## Maintenance & Support
 
@@ -239,9 +252,9 @@ Each project contains:
 
 **Photos Not Loading**
 
-- Check device storage space
-- Restart the app
-- Ensure photos are properly cached
+- Check internet connection
+- Verify Firebase Storage access
+- Restart the app to retry loading
 
 **Performance Issues**
 
@@ -251,9 +264,11 @@ Each project contains:
 
 #### **Performance Optimization**
 
-- **Memory Management**: App automatically manages memory usage
-- **Image Loading**: Photos loaded from external URLs
+- **Memory Management**: Gallery automatically manages memory with lazy loading
+- **Image Loading**: Optimized loading with expo-image and Firebase Storage
 - **Search Optimization**: Debounced search prevents performance issues
+- **Lazy Loading**: Images load only when needed to save bandwidth and memory
+- **Image Preloading**: Adjacent images preloaded for smooth navigation
 
 ### Known Limitations
 
