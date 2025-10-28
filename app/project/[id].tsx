@@ -179,19 +179,23 @@ export default function ProjectDetailScreen() {
         },
         statusBadgeText: {
           fontSize: DesignTokens.typography.fontSize.xs,
-          fontWeight: "700",
+          fontWeight: DesignTokens.typography.fontWeight.bold,
           textTransform: "uppercase",
           letterSpacing: 0.5,
         },
         projectName: {
           fontSize: DesignTokens.typography.fontSize["4xl"],
-          fontWeight: "800",
+          fontWeight: DesignTokens.typography.fontWeight.extrabold,
           marginBottom: DesignTokens.spacing[2],
-          lineHeight: 40,
+          lineHeight:
+            DesignTokens.typography.fontSize["4xl"] *
+            DesignTokens.typography.lineHeight.tight,
         },
         projectDescription: {
           fontSize: DesignTokens.typography.fontSize.lg,
-          lineHeight: 26,
+          lineHeight:
+            DesignTokens.typography.fontSize.lg *
+            DesignTokens.typography.lineHeight.normal,
           marginBottom: DesignTokens.spacing[6],
         },
         metaGrid: {
@@ -212,12 +216,12 @@ export default function ProjectDetailScreen() {
           fontSize: DesignTokens.typography.fontSize.xs,
           marginBottom: 0,
           textTransform: "uppercase",
-          fontWeight: "600",
+          fontWeight: DesignTokens.typography.fontWeight.semibold,
           flex: 1,
         },
         metaValue: {
           fontSize: DesignTokens.typography.fontSize.lg,
-          fontWeight: "700",
+          fontWeight: DesignTokens.typography.fontWeight.bold,
           flex: 1,
           textAlign: "right",
         },
@@ -232,7 +236,7 @@ export default function ProjectDetailScreen() {
         },
         sectionTitle: {
           fontSize: DesignTokens.typography.fontSize["2xl"],
-          fontWeight: "700",
+          fontWeight: DesignTokens.typography.fontWeight.bold,
           marginBottom: DesignTokens.spacing[6],
         },
         picturesGrid: {
@@ -264,14 +268,14 @@ export default function ProjectDetailScreen() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          backgroundColor: theme.colors.background.overlay,
           justifyContent: "center",
           alignItems: "center",
         },
         moreImagesText: {
           fontSize: DesignTokens.typography.fontSize.xl,
-          fontWeight: "bold",
-          color: "#ffffff",
+          fontWeight: DesignTokens.typography.fontWeight.bold,
+          color: theme.colors.text.inverse,
           textAlign: "center",
         },
         sectionSubtitle: {
@@ -309,7 +313,7 @@ export default function ProjectDetailScreen() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.3)",
+          backgroundColor: theme.colors.background.overlay,
           justifyContent: "center",
           alignItems: "center",
           opacity: 0,
@@ -318,7 +322,7 @@ export default function ProjectDetailScreen() {
           opacity: 1,
         },
         zoomIcon: {
-          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          backgroundColor: theme.colors.background.card,
           borderRadius: DesignTokens.borderRadius.lg,
           width: DesignTokens.componentSizes.iconButton,
           height: DesignTokens.componentSizes.iconButton,
@@ -398,7 +402,9 @@ export default function ProjectDetailScreen() {
         documentDescription: {
           fontSize: DesignTokens.typography.fontSize.sm,
           color: theme.colors.text.secondary,
-          lineHeight: 20,
+          lineHeight:
+            DesignTokens.typography.fontSize.sm *
+            DesignTokens.typography.lineHeight.normal,
           marginTop: DesignTokens.spacing[1],
         },
         documentAction: {
@@ -543,7 +549,9 @@ export default function ProjectDetailScreen() {
         },
         logDescription: {
           fontSize: DesignTokens.typography.fontSize.sm,
-          lineHeight: 20,
+          lineHeight:
+            DesignTokens.typography.fontSize.sm *
+            DesignTokens.typography.lineHeight.normal,
         },
       }),
     [theme]
