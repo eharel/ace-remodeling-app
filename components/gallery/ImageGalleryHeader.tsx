@@ -105,9 +105,9 @@ export const ImageGalleryHeader = React.memo<ImageGalleryHeaderProps>(
         >
           <ThemedText
             style={{
-              color: "#ffffff",
+              color: theme.colors.text.inverse,
               fontSize: DesignTokens.typography.fontSize.base,
-              fontWeight: "600",
+              fontWeight: DesignTokens.typography.fontWeight.semibold,
             }}
           >
             {currentIndex + 1} of {totalImages}
