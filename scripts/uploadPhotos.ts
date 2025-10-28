@@ -11,10 +11,11 @@
  * - Supports dry-run mode and selective uploads
  *
  * Usage:
- *   npm run upload                    # Normal upload
- *   npm run upload -- --dry-run       # Preview without uploading
- *   npm run upload -- --force         # Re-upload existing files
- *   npm run upload -- --project 104   # Upload specific project only
+ *   npm run upload                           # Normal upload (defaults to kitchen)
+ *   npm run upload -- --category bathroom    # Upload bathroom projects
+ *   npm run upload -- --dry-run              # Preview without uploading
+ *   npm run upload -- --force                # Re-upload existing files
+ *   npm run upload -- --project 104          # Upload specific project only
  *
  * @module scripts/uploadPhotos
  */
@@ -24,19 +25,20 @@ import * as fs from "fs";
 import * as path from "path";
 import { storage } from "../core/config";
 import {
+  BASE_ASSETS_PATH,
   DEFAULT_OUTPUT_PATH,
   DOCUMENT_CATEGORY_MAPPINGS,
   DOCUMENT_EXTENSIONS,
   DOCUMENT_TYPE_NAMES,
   IMAGE_CATEGORY_MAPPINGS,
   IMAGE_EXTENSIONS,
-  LOCAL_PHOTOS_PATH,
   MAX_FILE_SIZE_MB,
   MAX_RETRY_ATTEMPTS,
   MIME_TYPES,
   RETRY_DELAY_MS,
   SKIP_FILES,
   UPLOAD_BATCH_SIZE,
+  VALID_CATEGORIES,
 } from "./config/uploadConfig";
 import {
   FirestoreData,
@@ -787,6 +789,24 @@ async function main(): Promise<void> {
   console.log("\n🚀 Firebase Storage Upload Script");
   console.log("=====================================\n");
 
+  // Parse command-line arguments to get category FIRST
+  const args = process.argv.slice(2);
+  const categoryIndex = args.indexOf("--category");
+  const category = categoryIndex !== -1 ? args[categoryIndex + 1] : "kitchen";
+
+  // Validate category
+  if (!VALID_CATEGORIES.includes(category as any)) {
+    console.error(`❌ Invalid category: ${category}`);
+    console.error(`   Valid categories: ${VALID_CATEGORIES.join(", ")}`);
+    process.exit(1);
+  }
+
+  // Build path dynamically based on category
+  const LOCAL_PHOTOS_PATH = path.join(BASE_ASSETS_PATH, category);
+
+  console.log(`📂 Category: ${category}`);
+  console.log(`📁 Scanning path: ${LOCAL_PHOTOS_PATH}\n`);
+
   // Show security reminder
   console.log("⚠️  IMPORTANT: Ensure Firebase Storage rules allow writes");
   console.log("   Go to: Firebase Console → Storage → Rules");
@@ -795,7 +815,7 @@ async function main(): Promise<void> {
 
   try {
     // Parse command-line arguments
-    const options = parseArguments(process.argv.slice(2));
+    const options = parseArguments(args);
 
     if (options.dryRun) {
       console.log("🔍 DRY RUN MODE - No files will be uploaded\n");
@@ -861,10 +881,7 @@ async function main(): Promise<void> {
 
     // Generate and save Firestore data (only for successful uploads)
     if (uploadResult.uploaded.length > 0 && !options.dryRun) {
-      // Extract category from LOCAL_PHOTOS_PATH or default to "kitchen"
-      const pathSegments = LOCAL_PHOTOS_PATH.split("/");
-      const category = pathSegments[pathSegments.length - 1] || "kitchen";
-
+      // Category already parsed at start of main(), use it directly
       const firestoreData = generateFirestoreData(
         uploadResult.uploaded,
         category

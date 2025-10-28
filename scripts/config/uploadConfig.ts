@@ -6,11 +6,24 @@
  */
 
 /**
- * Local path to the folder containing project assets
+ * Base path to the folder containing project assets
+ * Category-specific folders (kitchen, bathroom, pools, etc.) are subdirectories
  * Update this path to match your local setup
  */
-export const LOCAL_PHOTOS_PATH =
-  "/Users/eliharel/Code/Projects/ace-remodeling-assets/kitchen";
+export const BASE_ASSETS_PATH =
+  "/Users/eliharel/Code/Projects/ace-remodeling-assets";
+
+/**
+ * Valid project categories
+ */
+export const VALID_CATEGORIES = [
+  "kitchen",
+  "bathroom",
+  "pools",
+  "outdoor",
+  "adu",
+  "addition",
+] as const;
 
 /**
  * Supported image file extensions
