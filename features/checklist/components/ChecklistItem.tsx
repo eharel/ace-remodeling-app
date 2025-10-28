@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import { useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
+import { useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/core/themes";
 
 /**
  * Props for the ChecklistItem component

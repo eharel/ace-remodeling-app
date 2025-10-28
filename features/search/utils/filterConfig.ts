@@ -1,7 +1,6 @@
-import { CATEGORY_LABELS, ProjectCategory } from "@/types/Category";
-import { getStatusDisplayText, ProjectStatus } from "@/types/Status";
-
-import { FilterOption } from "@/components/search/types";
+import { CATEGORY_LABELS, ProjectCategory } from "@/core/types/Category";
+import { getStatusDisplayText, ProjectStatus } from "@/core/types/Status";
+import { FilterOption } from "../types/types";
 
 /**
  * Creates filter configuration options from available project managers and tags

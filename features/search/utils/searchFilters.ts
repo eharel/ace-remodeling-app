@@ -1,6 +1,6 @@
-import { ProjectCategory } from "@/types/Category";
-import { Project } from "@/types/Project";
-import { ProjectStatus } from "@/types/Status";
+import { ProjectCategory } from "@/core/types/Category";
+import { Project } from "@/core/types/Project";
+import { ProjectStatus } from "@/core/types/Status";
 
 /**
  * Pure utility functions for filtering projects

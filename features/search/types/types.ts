@@ -1,5 +1,5 @@
-import { ProjectCategory } from "@/types/Category";
-import { ProjectStatus } from "@/types/Status";
+import { ProjectCategory } from "@/core/types/Category";
+import { ProjectStatus } from "@/core/types/Status";
 
 /**
  * Search filter state supporting multi-select functionality

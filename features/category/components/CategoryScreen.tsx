@@ -1,13 +1,13 @@
 import { router } from "expo-router";
 import React from "react";
 
-import { CategoryPage } from "@/components/CategoryPage";
-import { EmptyState } from "@/components/EmptyState";
-import { CategoryKey, getCategoryConfig } from "@/constants/categoryConfig";
-import { useProjects } from "@/contexts";
+import { CategoryPage } from "./CategoryPage";
+import { EmptyState } from "@/shared/components";
+import { useProjects } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { getProjectSummariesByCategory } from "@/data/mockProjects";
-import { ProjectSummary, getProjectCompletionDate } from "@/types";
+import { CategoryKey, getCategoryConfig } from "@/core/constants";
+import { ProjectSummary, getProjectCompletionDate } from "@/core/types";
 import { MaterialIcons } from "@expo/vector-icons";
 
 interface CategoryScreenProps {

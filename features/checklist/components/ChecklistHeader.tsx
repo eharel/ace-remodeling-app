@@ -2,8 +2,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
+import { useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/core/themes";
 
 interface ChecklistHeaderProps {
   /** Progress information for the checklist */

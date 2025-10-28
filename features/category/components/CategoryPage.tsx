@@ -1,9 +1,9 @@
 import { StyleSheet } from "react-native";
 
-import { ProjectGallery } from "@/components/ProjectGallery";
-import { ThemedText, ThemedView } from "@/components/themed";
-import { DesignTokens } from "@/themes";
-import { ProjectCategory, ProjectSummary } from "@/types";
+import { ProjectGallery } from "@/features/projects";
+import { ThemedText, ThemedView } from "@/shared/components";
+import { DesignTokens } from "@/core/themes";
+import { ProjectCategory, ProjectSummary } from "@/core/types";
 
 interface CategoryPageProps {
   category: ProjectCategory;

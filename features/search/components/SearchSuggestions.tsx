@@ -2,10 +2,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts";
-import { ProjectSummary } from "@/types/Project";
-import { calculateProjectScore } from "@/utils/searchScoring";
+import { ThemedText, ThemedView } from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/core/themes";
+import { ProjectSummary } from "@/core/types/Project";
+import { calculateProjectScore } from "../utils/searchScoring";
 
 /**
  * Constants for SearchSuggestions component UI behavior

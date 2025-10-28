@@ -8,10 +8,11 @@ import {
   View,
 } from "react-native";
 
-import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts";
-import { ProjectSummary } from "@/types/Project";
-import { SearchHistoryItem } from "@/utils/useSearchHistory";
+import { ThemedText, ThemedView } from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
+import { SearchHistoryItem } from "@/shared/utils";
+import { DesignTokens } from "@/core/themes";
+import { ProjectSummary } from "@/core/types/Project";
 
 import { SearchSuggestions } from "./SearchSuggestions";
 

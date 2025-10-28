@@ -2,15 +2,15 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
-import { ThemedText } from "@/components/themed";
-import { useProjects, useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
-import { ProjectCategory } from "@/types/Category";
+import { ThemedText } from "@/shared/components";
+import { useProjects, useTheme } from "@/shared/contexts";
 import {
   getAllCategories,
   getCategoryDisplayName,
   getCategoryIcon,
-} from "@/utils/categoryUtils";
+} from "@/shared/utils";
+import { DesignTokens } from "@/core/themes";
+import { ProjectCategory } from "@/core/types";
 
 interface CategoryPickerProps {
   currentCategory: ProjectCategory;

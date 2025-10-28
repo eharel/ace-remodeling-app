@@ -1,4 +1,4 @@
-import { ProjectSummary } from "@/types/Project";
+import { ProjectSummary } from "@/core/types/Project";
 
 /**
  * Constants for search scoring algorithm

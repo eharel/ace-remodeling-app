@@ -7,11 +7,11 @@ import {
   ViewStyle,
 } from "react-native";
 
-import { useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
-import { ProjectSummary } from "@/types";
+import { ThemedText, ThemedView } from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/core/themes";
+import { ProjectSummary } from "@/core/types";
 import { ProjectCard } from "./ProjectCard";
-import { ThemedText, ThemedView } from "./themed";
 
 interface ProjectGalleryProps {
   projects: ProjectSummary[];

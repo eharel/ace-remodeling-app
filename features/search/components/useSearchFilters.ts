@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { ProjectCategory } from "@/types/Category";
-import { Project } from "@/types/Project";
-import { ProjectStatus } from "@/types/Status";
-import { applyAllFilters } from "@/utils/searchFilters";
+import { ProjectCategory } from "@/core/types/Category";
+import { Project } from "@/core/types/Project";
+import { ProjectStatus } from "@/core/types/Status";
+import { applyAllFilters } from "../utils/searchFilters";
 
-import { SearchFilters } from "./types";
+import { SearchFilters } from "../types/types";
 
 /**
  * Hook for managing multi-select search filters and applying them to projects

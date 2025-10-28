@@ -1,8 +1,8 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
-import { DesignTokens } from "@/themes";
+import { DesignTokens } from "@/core/themes";
+import { CHECKLIST_CONFIG } from "@/core/constants";
 import { ChecklistItem as ChecklistItemComponent } from "./ChecklistItem";
 
 interface ChecklistBodyProps {

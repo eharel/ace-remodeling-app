@@ -8,12 +8,12 @@ import {
   ViewStyle,
 } from "react-native";
 
-import { ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
-import { ProjectSummary } from "@/types";
-import { getStatusDisplayText, getStatusStyleKey } from "@/types/Status";
-import { logError } from "@/utils/errorLogger";
+import { ThemedText, ThemedView } from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
+import { logError } from "@/shared/utils";
+import { DesignTokens } from "@/core/themes";
+import { ProjectSummary } from "@/core/types";
+import { getStatusDisplayText, getStatusStyleKey } from "@/core/types/Status";
 
 interface ProjectCardProps {
   project: ProjectSummary;

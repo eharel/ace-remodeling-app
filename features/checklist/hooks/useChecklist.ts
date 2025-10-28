@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { CHECKLIST_CONFIG } from "@/constants/ChecklistConfig";
+import { CHECKLIST_CONFIG } from "@/core/constants";
 
 /**
  * Custom hook for managing checklist state and operations

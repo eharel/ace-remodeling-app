@@ -10,10 +10,11 @@ import {
   View,
 } from "react-native";
 
-import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts";
+import { ThemedText, ThemedView } from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/core/themes";
 
-import { FilterDropdownProps } from "./types";
+import { FilterDropdownProps } from "../types/types";
 
 /**
  * Constants for FilterDropdown component layout and behavior
