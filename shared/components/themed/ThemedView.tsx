@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { View, type ViewProps, type ViewStyle } from "react-native";
 
-import { useTheme } from "@/contexts";
-import { DesignTokens, ThemeVariant } from "@/themes";
+import { useTheme } from "../../contexts";
+import { DesignTokens, ThemeVariant } from "@/core/themes";
 
 export type ThemedViewProps = ViewProps & {
   variant?: ThemeVariant;

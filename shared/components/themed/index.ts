@@ -6,7 +6,7 @@ export { ThemedText, ThemedTextVariants } from "./ThemedText";
 export { ThemedView } from "./ThemedView";
 
 // Theme context and utilities
-export { ThemeProvider, UnifiedTheme, useTheme } from "@/contexts";
+export { ThemeProvider, UnifiedTheme, useTheme } from "../../contexts";
 
 // Design tokens and types
-export { DesignTokens, ThemeVariant } from "@/themes";
+export { DesignTokens, ThemeVariant } from "@/core/themes";

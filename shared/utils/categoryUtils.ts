@@ -2,7 +2,7 @@ import {
   CATEGORY_LABELS,
   PROJECT_CATEGORIES,
   ProjectCategory,
-} from "@/types/Category";
+} from "@/core/types/Category";
 
 /**
  * Get the display name for a category

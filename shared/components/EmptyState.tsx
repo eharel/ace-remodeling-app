@@ -2,9 +2,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { Pressable, StyleSheet, ViewStyle } from "react-native";
 
-import { ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
+import { ThemedText, ThemedView } from "./themed";
+import { useTheme } from "../contexts";
+import { DesignTokens } from "@/core/themes";
 
 interface EmptyStateProps {
   title?: string;

@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { useColorScheme } from "react-native";
 
-import { ThemeName, themes, ThemeSetting } from "@/themes";
+import { ThemeName, themes, ThemeSetting } from "@/core/themes";
 
 // Theme constants - derived from themes system (single source of truth)
 const THEME_NAMES: ThemeName[] = Object.keys(themes) as ThemeName[];
