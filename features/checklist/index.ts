@@ -1,11 +1,14 @@
 /**
- * Checklist components and hooks exports
- * Centralized export for all checklist-related code
+ * Checklist Feature Module
+ * Exports all checklist-related components and hooks
  */
 
-export { ChecklistBody } from "./ChecklistBody";
-export { ChecklistHeader } from "./ChecklistHeader";
-export { ChecklistItem } from "./ChecklistItem";
-export { ChecklistModal } from "./ChecklistModal";
-export { FloatingChecklistButton } from "./FloatingChecklistButton";
-export { useChecklist } from "./useChecklist";
+// Components
+export { ChecklistBody } from "./components/ChecklistBody";
+export { ChecklistHeader } from "./components/ChecklistHeader";
+export { ChecklistItem } from "./components/ChecklistItem";
+export { ChecklistModal } from "./components/ChecklistModal";
+export { FloatingChecklistButton } from "./components/FloatingChecklistButton";
+
+// Hooks
+export { useChecklist } from "./hooks/useChecklist";

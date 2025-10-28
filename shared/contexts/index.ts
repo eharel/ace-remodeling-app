@@ -1,10 +1,7 @@
 /**
- * Barrel file for contexts
- * Simplifies imports across the application
+ * Shared Contexts Module
+ * Exports all React context providers and hooks
  */
 
-// Projects context exports
-export * from "./ProjectsContext";
-
-// Theme context exports
-export * from "./ThemeContext";
+export { ProjectsProvider, useProjects } from "./ProjectsContext";
+export { ThemeProvider, useTheme } from "./ThemeContext";

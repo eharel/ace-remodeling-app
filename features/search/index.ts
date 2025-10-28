@@ -1,12 +1,24 @@
 /**
- * Search Components
- * Exports all search-related components, hooks, and types
+ * Search Feature Module
+ * Exports all search-related components, hooks, types, and utils
  */
 
-export { FilterButton } from "./FilterButton";
-export { FilterDropdown } from "./FilterDropdown";
-export { SearchFiltersBar } from "./SearchFiltersBar";
-export { SearchInputWithHistory } from "./SearchInputWithHistory";
-export { SearchSuggestions } from "./SearchSuggestions";
-export type { FilterDropdownProps, FilterOption, SearchFilters } from "./types";
-export { useSearchFilters } from "./useSearchFilters";
+// Components
+export { FilterButton } from "./components/FilterButton";
+export { FilterDropdown } from "./components/FilterDropdown";
+export { SearchFiltersBar } from "./components/SearchFiltersBar";
+export { SearchInputWithHistory } from "./components/SearchInputWithHistory";
+export { SearchSuggestions } from "./components/SearchSuggestions";
+export { useSearchFilters } from "./components/useSearchFilters";
+
+// Types
+export type {
+  FilterDropdownProps,
+  FilterOption,
+  SearchFilters,
+} from "./types/types";
+
+// Utils
+export * from "./utils/filterConfig";
+export * from "./utils/searchFilters";
+export * from "./utils/searchScoring";
