@@ -1,4 +1,4 @@
-import { PROJECT_CATEGORIES, ProjectCategory } from "@/types/Category";
+import { PROJECT_CATEGORIES, ProjectCategory } from "../types/Category";
 
 // Use centralized category types instead of duplicating
 export type CategoryKey = ProjectCategory;
