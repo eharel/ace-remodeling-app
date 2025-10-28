@@ -65,7 +65,9 @@ export { usePerformanceMonitoring } from "./hooks/usePerformanceMonitoring";
 export { accessibilityStrings } from "./constants/accessibilityStrings";
 export {
   ANIMATION_CONFIG,
-  EDGE_RESISTANCE,
+  MAX_EDGE_DRAG,
+  MAX_PAGINATION_DOTS,
+  SCREEN_WIDTH,
   SWIPE_THRESHOLD,
   VELOCITY_THRESHOLD,
 } from "./constants/gestureConstants";
