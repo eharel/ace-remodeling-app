@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { Pressable, StyleSheet, ViewStyle } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 
 interface ErrorStateProps {
@@ -50,7 +50,9 @@ export function ErrorState({
           fontSize: DesignTokens.typography.fontSize.base,
           textAlign: "center",
           opacity: 0.7,
-          lineHeight: 22,
+          lineHeight:
+            DesignTokens.typography.fontSize.base *
+            DesignTokens.typography.lineHeight.normal,
           marginBottom: DesignTokens.spacing[4],
         },
         retryButton: {

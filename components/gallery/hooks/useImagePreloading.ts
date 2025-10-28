@@ -1,4 +1,12 @@
 import { Picture } from "@/types";
+import {
+  createPreloadStats,
+  createPreloadTimeout,
+  getImagesToKeep,
+  getPreloadIndices,
+  PRELOADING_CONSTANTS,
+  shouldPreloadImage,
+} from "@/utils/imagePreloading";
 import { Image } from "expo-image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -54,7 +62,7 @@ interface PreloadState {
 export const useImagePreloading = ({
   images,
   currentIndex,
-  preloadRadius = 2,
+  preloadRadius = PRELOADING_CONSTANTS.DEFAULT_PRELOAD_RADIUS,
 }: UseImagePreloadingProps) => {
   const [preloadState, setPreloadState] = useState<PreloadState>({
     loaded: new Set(),
@@ -64,31 +72,21 @@ export const useImagePreloading = ({
 
   const preloadTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
-  // Get images that should be preloaded
-  const getPreloadIndices = useCallback(() => {
-    if (!images || images.length === 0) {
-      return [];
-    }
+  // Get images that should be preloaded using utility function
+  const getPreloadIndicesCallback = useCallback(() => {
+    return getPreloadIndices(currentIndex, images.length, preloadRadius);
+  }, [currentIndex, images.length, preloadRadius]);
 
-    const indices = new Set<number>();
-
-    for (let i = -preloadRadius; i <= preloadRadius; i++) {
-      const index = currentIndex + i;
-      if (index >= 0 && index < images.length) {
-        indices.add(index);
-      }
-    }
-
-    return Array.from(indices);
-  }, [currentIndex, images, preloadRadius]);
-
-  // Preload a single image
+  // Preload a single image using utility functions
   const preloadImage = useCallback(
     async (image: Picture) => {
       if (
-        preloadState.loaded.has(image.id) ||
-        preloadState.loading.has(image.id) ||
-        preloadState.failed.has(image.id)
+        !shouldPreloadImage(
+          image.id,
+          preloadState.loaded,
+          preloadState.loading,
+          preloadState.failed
+        )
       ) {
         return;
       }
@@ -98,19 +96,20 @@ export const useImagePreloading = ({
         loading: new Set([...prev.loading, image.id]),
       }));
 
-      // Set timeout for preload
-      const timeout = setTimeout(() => {
-        setPreloadState((prev) => ({
-          ...prev,
-          failed: new Set([...prev.failed, image.id]),
-          loading: new Set([...prev.loading].filter((id) => id !== image.id)),
-        }));
-      }, 10000); // 10 second timeout
-
-      preloadTimeouts.current.set(
+      // Set timeout for preload using utility function
+      const timeout = createPreloadTimeout(
         image.id,
-        timeout as unknown as NodeJS.Timeout
+        PRELOADING_CONSTANTS.PRELOAD_TIMEOUT,
+        () => {
+          setPreloadState((prev) => ({
+            ...prev,
+            failed: new Set([...prev.failed, image.id]),
+            loading: new Set([...prev.loading].filter((id) => id !== image.id)),
+          }));
+        }
       );
+
+      preloadTimeouts.current.set(image.id, timeout);
 
       try {
         // Use expo-image's prefetch method for React Native
@@ -140,9 +139,9 @@ export const useImagePreloading = ({
     [preloadState]
   );
 
-  // Preload images based on current index
+  // Preload images based on current index using utility function
   useEffect(() => {
-    const indicesToPreload = getPreloadIndices();
+    const indicesToPreload = getPreloadIndicesCallback();
 
     indicesToPreload.forEach((index) => {
       const image = images[index];
@@ -150,18 +149,16 @@ export const useImagePreloading = ({
         preloadImage(image);
       }
     });
-  }, [currentIndex, images, getPreloadIndices, preloadImage]);
+  }, [currentIndex, images, getPreloadIndicesCallback, preloadImage]);
 
-  // Cleanup unused images
+  // Cleanup unused images using utility function
   useEffect(() => {
-    const currentIndices = getPreloadIndices();
+    const currentIndices = getPreloadIndicesCallback();
     if (!currentIndices || currentIndices.length === 0) {
       return;
     }
 
-    const imagesToKeep = new Set(
-      currentIndices.map((index) => images[index]?.id).filter(Boolean)
-    );
+    const imagesToKeep = getImagesToKeep(images, currentIndices);
 
     // Clean up images that are no longer needed
     preloadTimeouts.current.forEach((timeout, imageId) => {
@@ -179,7 +176,7 @@ export const useImagePreloading = ({
         }));
       }
     });
-  }, [currentIndex, images, getPreloadIndices]);
+  }, [currentIndex, images, getPreloadIndicesCallback]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -207,14 +204,14 @@ export const useImagePreloading = ({
     [preloadState.failed]
   );
 
-  // Get preload statistics
+  // Get preload statistics using utility function
   const getPreloadStats = useCallback(() => {
-    return {
-      loaded: preloadState.loaded.size,
-      loading: preloadState.loading.size,
-      failed: preloadState.failed.size,
-      total: images.length,
-    };
+    return createPreloadStats(
+      preloadState.loaded,
+      preloadState.loading,
+      preloadState.failed,
+      images.length
+    );
   }, [preloadState, images.length]);
 
   return {

@@ -2,7 +2,7 @@
  * Theme System - Main Export File
  *
  * Usage:
- * import { lightTheme, darkTheme, blueTheme } from '@/themes';
+ * import { lightTheme, darkTheme, mainTheme } from '@/themes';
  * import type { Theme, ThemeName } from '@/themes';
  */
 
@@ -22,7 +22,7 @@ export type {
   BackgroundColors,
   BorderColors,
   CompleteTheme,
-  ComponentStyles,
+  ComponentColors,
   InteractiveColors,
   StatusColors,
   TextColors,
@@ -70,16 +70,11 @@ export const themes = {
  * Get a theme by name
  */
 export function getTheme(name: ThemeName): Theme {
-  switch (name) {
-    case "main":
-      return mainTheme;
-    case "light":
-      return lightTheme;
-    case "dark":
-      return darkTheme;
-    default:
-      throw new Error(`Theme '${name}' not found`);
+  const theme = themes[name as keyof typeof themes];
+  if (!theme) {
+    throw new Error(`Theme '${name}' not found`);
   }
+  return theme;
 }
 
 /**

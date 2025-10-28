@@ -3,6 +3,7 @@
  */
 
 import type { Theme } from "./base/types";
+
 export const lightTheme: Theme = {
   name: "light",
   isDark: false,
@@ -68,8 +69,24 @@ export const lightTheme: Theme = {
       infoLight: "#dbeafe", // Light blue for info backgrounds
     },
 
-    // Component-specific colors - Tailored for specific UI components
+    // Component colors - ONLY colors, NO dimensions
     components: {
+      fab: {
+        backgroundColor: "#3b82f6", // Blue background
+        shadowColor: "#000000", // Black shadow for FAB
+        shadowOpacity: 0.2, // Lighter shadow for light theme
+      },
+      modal: {
+        backgroundColor: "#ffffff", // White background
+        borderColor: "#e2e8f0", // Light gray border
+        overlayColor: "#000000", // Black overlay
+        overlayOpacity: 0.5, // Lighter overlay for light theme
+      },
+      card: {
+        background: "#ffffff", // White background for cards
+        border: "#e2e8f0", // Light gray border for cards
+        shadow: "#000000", // Black shadow for cards
+      },
       button: {
         primary: "#3b82f6", // Blue for primary buttons
         primaryHover: "#2563eb", // Darker blue for hover
@@ -78,50 +95,11 @@ export const lightTheme: Theme = {
         outline: "transparent", // Transparent for outline buttons
         outlineBorder: "#e2e8f0", // Light gray border for outline buttons
       },
-      card: {
-        background: "#ffffff", // White background for cards
-        border: "#e2e8f0", // Light gray border for cards
-        shadow: "#000000", // Black shadow for cards
-      },
       input: {
         background: "#ffffff", // White background for inputs
         border: "#e2e8f0", // Light gray border for inputs
         borderFocus: "#3b82f6", // Blue border for focused inputs
         placeholder: "#9ca3af", // Light gray for placeholder text
-      },
-      // Floating Action Button component
-      fab: {
-        backgroundColor: "#3b82f6", // Blue background
-        shadowColor: "#000000", // Black shadow for FAB
-        shadowOpacity: 0.2, // Lighter shadow for light theme
-        activeOpacity: 0.7, // Standard active opacity
-      },
-
-      // Modal component
-      modal: {
-        backgroundColor: "#ffffff", // White background
-        borderColor: "#e2e8f0", // Light gray border
-        borderRadius: 12, // Standard border radius
-        borderWidth: 1, // Standard border width
-        overlayOpacity: 0.5, // Lighter overlay for light theme
-      },
-
-      // Header component
-      header: {
-        backgroundColor: "#ffffff", // White background
-        borderColor: "#e2e8f0", // Light gray border
-        titleFontWeight: "600", // Bold title for light theme
-        progressFontWeight: "500", // Medium weight for progress text
-        borderBottomWidth: 1, // Standard border width
-        padding: 20, // Standard padding
-      },
-
-      // Checklist item component
-      checklistItem: {
-        paddingVertical: 12, // Standard vertical padding
-        paddingHorizontal: 4, // Standard horizontal padding
-        checkedOpacity: 0.6, // Opacity when checked
-        activeOpacity: 0.7, // Standard active opacity
       },
     },
 

@@ -16,7 +16,16 @@ export function dateToISO(date: Date): string {
  * Use this when reading from Firebase
  */
 export function isoToDate(isoString: string): Date {
-  return new Date(isoString);
+  if (!isoString || typeof isoString !== "string") {
+    throw new Error("Invalid ISO string provided");
+  }
+
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) {
+    throw new Error("Invalid date format");
+  }
+
+  return date;
 }
 
 /**
@@ -35,13 +44,18 @@ export function formatISODate(
   isoString: string,
   options?: Intl.DateTimeFormatOptions
 ): string {
-  const date = isoToDate(isoString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    ...options,
-  });
+  try {
+    const date = isoToDate(isoString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      ...options,
+    });
+  } catch (error) {
+    console.warn("Failed to format date:", isoString, error);
+    return "Invalid date";
+  }
 }
 
 /**
@@ -82,19 +96,24 @@ export function isYesterday(isoString: string): boolean {
  * Get relative time (e.g., "2 hours ago", "3 days ago")
  */
 export function getRelativeTime(isoString: string): string {
-  const date = isoToDate(isoString);
-  const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
+  try {
+    const date = isoToDate(isoString);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
 
-  const seconds = Math.floor(diffInMs / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+    const seconds = Math.floor(diffInMs / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
 
-  if (seconds < 60) return "just now";
-  if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-  if (days < 7) return `${days} day${days > 1 ? "s" : ""} ago`;
+    if (seconds < 60) return "just now";
+    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    if (days < 7) return `${days} day${days > 1 ? "s" : ""} ago`;
 
-  return formatISODate(isoString);
+    return formatISODate(isoString);
+  } catch (error) {
+    console.warn("Failed to get relative time:", isoString, error);
+    return "Invalid date";
+  }
 }

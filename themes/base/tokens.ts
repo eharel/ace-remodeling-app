@@ -102,11 +102,24 @@ export const DesignTokens = {
       extrabold: "800",
     },
 
+    /**
+     * Line Height Scale
+     *
+     * Guidelines:
+     * - tight (1.2): Use for compact UI elements where space is constrained
+     *   (buttons, dropdowns, badges, tabs, chips, labels in forms)
+     * - normal (1.4): Use for general body text and UI text
+     * - relaxed (1.6): Use for comfortable reading in longer text blocks
+     * - loose (1.8): Use for large headings that need breathing room
+     *
+     * Note: React Native's default lineHeight is ~1.4-1.5x, which can cause
+     * text clipping in compact UI elements. Always specify lineHeight explicitly.
+     */
     lineHeight: {
-      tight: 1.2,
-      normal: 1.4,
-      relaxed: 1.6,
-      loose: 1.8,
+      tight: 1.2, // For compact UI elements (buttons, labels, dropdowns, badges)
+      normal: 1.4, // For body text and readable content (CURRENT DEFAULT)
+      relaxed: 1.6, // For comfortable reading (paragraphs, articles)
+      loose: 1.8, // For large headings with breathing room
     },
   },
 
@@ -199,34 +212,48 @@ export const DesignTokens = {
     fab: 1000, // Floating Action Button
   },
 
-  // Component Size Constants - Universal dimensions only
-  componentSizes: {
-    // Floating Action Button (FAB)
+  // Component-specific dimensions and behavior (theme-agnostic)
+  components: {
     fab: {
       size: 56,
       iconSize: 24,
       borderRadius: 28, // Half of size for perfect circle
     },
-
-    // Modal
     modal: {
+      borderRadius: 12,
+      borderWidth: 1,
       maxWidth: 500,
       maxHeightPercent: 70,
       minHeight: 500,
     },
-
-    // Header - only universal dimensions
+    card: {
+      borderRadius: 16,
+      borderWidth: 1,
+    },
+    button: {
+      borderRadius: 12,
+      minHeight: 48,
+    },
+    input: {
+      borderRadius: 8,
+      borderWidth: 1,
+      minHeight: 44,
+    },
     header: {
-      // Only keep truly universal dimensions here
-      // Font sizes, weights, and spacing should be in theme files
+      titleFontWeight: "600" as const,
+      progressFontWeight: "500" as const,
+      borderBottomWidth: 1,
+      padding: 20,
     },
-
-    // Checklist Item - only universal dimensions
     checklistItem: {
-      // Only keep truly universal dimensions here
-      // Font sizes and spacing should be in theme files
+      paddingVertical: 12,
+      paddingHorizontal: 4,
+      checkedOpacity: 0.6,
     },
+  },
 
+  // Component Size Constants - Universal dimensions only
+  componentSizes: {
     // Icon Button - universal dimensions
     iconButton: 40,
 

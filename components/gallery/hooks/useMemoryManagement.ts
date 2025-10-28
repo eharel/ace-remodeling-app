@@ -1,3 +1,10 @@
+import {
+  calculateMemoryStats,
+  forceGarbageCollection as forceGC,
+  getEstimatedMemoryUsage,
+  MEMORY_CONSTANTS,
+  shouldCheckMemory,
+} from "@/utils/memoryManagement";
 import { useCallback, useEffect, useRef } from "react";
 import { AppState, AppStateStatus } from "react-native";
 
@@ -72,48 +79,25 @@ export const useMemoryManagement = ({
     memoryPressure: "low",
   });
 
-  // Check memory usage (simplified version)
+  // Check memory usage using utility functions
   const checkMemoryUsage = useCallback(() => {
     const now = Date.now();
 
     // Only check every 5 seconds to avoid performance impact
-    if (now - lastMemoryCheck.current < 5000) {
+    if (!shouldCheckMemory(lastMemoryCheck.current, now)) {
       return;
     }
 
     lastMemoryCheck.current = now;
 
-    // In a real app, you'd use native modules to get actual memory stats
-    // For now, we'll use a simplified approach
     try {
-      // This is a placeholder - in production you'd use:
-      // - react-native-device-info for memory stats
-      // - react-native-memory-info for detailed memory monitoring
-      // - Native modules for platform-specific memory management
+      const { usedMemory, memoryLimit } = getEstimatedMemoryUsage();
+      const newStats = calculateMemoryStats(usedMemory, memoryLimit);
 
-      const estimatedMemoryUsage = performance.memory?.usedJSHeapSize || 0;
-      const estimatedMemoryLimit =
-        performance.memory?.totalJSHeapSize || 100 * 1024 * 1024; // 100MB default
-
-      const memoryUsagePercent =
-        (estimatedMemoryUsage / estimatedMemoryLimit) * 100;
-
-      let memoryPressure: "low" | "medium" | "high" = "low";
-      if (memoryUsagePercent > 80) {
-        memoryPressure = "high";
-      } else if (memoryUsagePercent > 60) {
-        memoryPressure = "medium";
-      }
-
-      memoryStats.current = {
-        usedMemory: estimatedMemoryUsage,
-        freeMemory: estimatedMemoryLimit - estimatedMemoryUsage,
-        totalMemory: estimatedMemoryLimit,
-        memoryPressure,
-      };
+      memoryStats.current = newStats;
 
       // Trigger memory warning if pressure is high
-      if (memoryPressure === "high" && onMemoryWarning) {
+      if (newStats.memoryPressure === "high" && onMemoryWarning) {
         console.warn("🚨 High memory pressure detected");
         onMemoryWarning();
       }
@@ -138,17 +122,23 @@ export const useMemoryManagement = ({
 
         // Resume memory monitoring
         if (!memoryCheckInterval.current) {
-          memoryCheckInterval.current = setInterval(checkMemoryUsage, 10000); // Check every 10 seconds
+          memoryCheckInterval.current = setInterval(
+            checkMemoryUsage,
+            MEMORY_CONSTANTS.MEMORY_CHECK_INTERVAL
+          );
         }
       }
     },
     [checkMemoryUsage, onAppBackground, onAppForeground]
   );
 
-  // Start memory monitoring
+  // Start memory monitoring using utility constant
   useEffect(() => {
     // Start monitoring when component mounts
-    memoryCheckInterval.current = setInterval(checkMemoryUsage, 10000);
+    memoryCheckInterval.current = setInterval(
+      checkMemoryUsage,
+      MEMORY_CONSTANTS.MEMORY_CHECK_INTERVAL
+    );
 
     // Listen to app state changes
     const subscription = AppState.addEventListener(
@@ -166,15 +156,9 @@ export const useMemoryManagement = ({
     };
   }, [checkMemoryUsage, handleAppStateChange]);
 
-  // Force garbage collection (if available)
+  // Force garbage collection using utility function
   const forceGarbageCollection = useCallback(() => {
-    try {
-      if (global.gc) {
-        global.gc();
-      }
-    } catch (error) {
-      console.warn("Garbage collection failed:", error);
-    }
+    return forceGC();
   }, []);
 
   // Get current memory stats

@@ -3,8 +3,7 @@ import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { ThemedText } from "@/components/themed";
-import { useProjects } from "@/contexts/ProjectsContext";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useProjects, useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 import { ProjectCategory } from "@/types/Category";
 import {
@@ -66,6 +65,9 @@ export function CategoryPicker({
         },
         triggerText: {
           fontSize: DesignTokens.typography.fontSize.lg,
+          lineHeight:
+            DesignTokens.typography.fontSize.lg *
+            DesignTokens.typography.lineHeight.tight,
           fontWeight: DesignTokens.typography.fontWeight.semibold,
           fontFamily: DesignTokens.typography.fontFamily.semibold,
           color: theme.colors.text.primary,
@@ -73,7 +75,7 @@ export function CategoryPicker({
         },
         modalOverlay: {
           flex: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          backgroundColor: theme.colors.background.overlay,
           justifyContent: "center",
           alignItems: "center",
           padding: DesignTokens.spacing[4],
@@ -98,6 +100,9 @@ export function CategoryPicker({
         },
         modalTitle: {
           fontSize: DesignTokens.typography.fontSize.lg,
+          lineHeight:
+            DesignTokens.typography.fontSize.lg *
+            DesignTokens.typography.lineHeight.tight,
           fontWeight: DesignTokens.typography.fontWeight.semibold,
           fontFamily: DesignTokens.typography.fontFamily.semibold,
           color: theme.colors.text.primary,
@@ -141,6 +146,9 @@ export function CategoryPicker({
         },
         categoryName: {
           fontSize: DesignTokens.typography.fontSize.base,
+          lineHeight:
+            DesignTokens.typography.fontSize.base *
+            DesignTokens.typography.lineHeight.normal,
           fontWeight: DesignTokens.typography.fontWeight.medium,
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.primary,
@@ -148,6 +156,9 @@ export function CategoryPicker({
         },
         categoryCount: {
           fontSize: DesignTokens.typography.fontSize.sm,
+          lineHeight:
+            DesignTokens.typography.fontSize.sm *
+            DesignTokens.typography.lineHeight.tight,
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.secondary,
         },
@@ -229,7 +240,7 @@ export function CategoryPicker({
                       <MaterialIcons
                         name={item.icon as any}
                         size={18}
-                        color="#FFFFFF"
+                        color={theme.colors.text.inverse}
                       />
                     </View>
                     <View style={styles.categoryInfo}>

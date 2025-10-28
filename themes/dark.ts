@@ -3,6 +3,7 @@
  */
 
 import type { Theme } from "./base/types";
+
 export const darkTheme: Theme = {
   name: "dark",
   isDark: true,
@@ -68,8 +69,24 @@ export const darkTheme: Theme = {
       infoLight: "#1e3a8a", // Dark blue for info backgrounds
     },
 
-    // Component-specific colors - Tailored for dark theme UI components
+    // Component colors - ONLY colors, NO dimensions
     components: {
+      fab: {
+        backgroundColor: "#60a5fa", // Light blue background
+        shadowColor: "#000000", // Black shadow for FAB
+        shadowOpacity: 0.4, // Stronger shadow for dark theme
+      },
+      modal: {
+        backgroundColor: "#1e293b", // Dark gray background
+        borderColor: "#334155", // Medium dark gray border
+        overlayColor: "#000000", // Black overlay
+        overlayOpacity: 0.7, // Stronger overlay for dark theme
+      },
+      card: {
+        background: "#1e293b", // Dark gray background for cards
+        border: "#334155", // Medium dark gray border for cards
+        shadow: "#000000", // Black shadow for cards
+      },
       button: {
         primary: "#60a5fa", // Light blue for primary buttons
         primaryHover: "#93c5fd", // Lighter blue for hover
@@ -78,50 +95,11 @@ export const darkTheme: Theme = {
         outline: "transparent", // Transparent for outline buttons
         outlineBorder: "#334155", // Dark gray border for outline buttons
       },
-      card: {
-        background: "#1e293b", // Dark gray background for cards
-        border: "#334155", // Medium dark gray border for cards
-        shadow: "#000000", // Black shadow for cards
-      },
       input: {
         background: "#1e293b", // Dark gray background for inputs
         border: "#334155", // Medium dark gray border for inputs
         borderFocus: "#60a5fa", // Light blue border for focused inputs
         placeholder: "#64748b", // Medium gray for placeholder text
-      },
-      // Floating Action Button component
-      fab: {
-        backgroundColor: "#60a5fa", // Light blue background
-        shadowColor: "#000000", // Black shadow for FAB
-        shadowOpacity: 0.4, // Stronger shadow for dark theme
-        activeOpacity: 0.7, // Standard active opacity
-      },
-
-      // Modal component
-      modal: {
-        backgroundColor: "#1e293b", // Dark gray background
-        borderColor: "#334155", // Medium dark gray border
-        borderRadius: 12, // Standard border radius
-        borderWidth: 1, // Standard border width
-        overlayOpacity: 0.7, // Stronger overlay for dark theme
-      },
-
-      // Header component
-      header: {
-        backgroundColor: "#1e293b", // Dark gray background
-        borderColor: "#334155", // Medium dark gray border
-        titleFontWeight: "600", // Bold title for dark theme
-        progressFontWeight: "500", // Medium weight for progress text
-        borderBottomWidth: 1, // Standard border width
-        padding: 20, // Standard padding
-      },
-
-      // Checklist item component
-      checklistItem: {
-        paddingVertical: 12, // Standard vertical padding
-        paddingHorizontal: 4, // Standard horizontal padding
-        checkedOpacity: 0.6, // Opacity when checked
-        activeOpacity: 0.7, // Standard active opacity
       },
     },
 

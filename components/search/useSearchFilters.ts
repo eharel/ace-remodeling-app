@@ -3,11 +3,43 @@ import { useCallback, useMemo, useState } from "react";
 import { ProjectCategory } from "@/types/Category";
 import { Project } from "@/types/Project";
 import { ProjectStatus } from "@/types/Status";
+import { applyAllFilters } from "@/utils/searchFilters";
 
 import { SearchFilters } from "./types";
 
 /**
  * Hook for managing multi-select search filters and applying them to projects
+ *
+ * Provides a complete filtering system with:
+ * - Multi-select filter state management
+ * - Automatic extraction of available filter options from projects
+ * - Filter application logic with OR/AND semantics
+ * - Helper functions for accessing individual filter values
+ *
+ * Filter Logic:
+ * - Within each filter type: OR logic (match ANY selected value)
+ * - Between filter types: AND logic (must match ALL active filter types)
+ * - Empty arrays = no filter applied (show all items)
+ *
+ * @param projects - Array of projects to filter and extract options from
+ * @returns Object containing filter state, actions, and computed values
+ *
+ * @example
+ * ```typescript
+ * const {
+ *   filters,
+ *   updateFilter,
+ *   applyFilters,
+ *   hasActiveFilters,
+ *   availableProjectManagers
+ * } = useSearchFilters(projects);
+ *
+ * // Apply filters to projects
+ * const filteredProjects = applyFilters(projects);
+ *
+ * // Update a specific filter
+ * updateFilter('categories', ['kitchen', 'bathroom']);
+ * ```
  */
 export function useSearchFilters(projects: Project[]) {
   const [filters, setFilters] = useState<SearchFilters>({
@@ -73,47 +105,35 @@ export function useSearchFilters(projects: Project[]) {
 
   // Apply filters to projects
   // Uses OR logic within each filter type, AND logic between filter types
+  /**
+   * Applies current filter state to a list of projects
+   *
+   * Filter Logic:
+   * - Category filter: Show projects matching ANY selected category (OR logic)
+   * - Status filter: Show projects matching ANY selected status (OR logic)
+   * - Project Manager filter: Show projects with ANY selected PM (OR logic)
+   * - Tags filter: Show projects with ANY selected tag (OR logic)
+   * - Between filter types: Project must match ALL active filter types (AND logic)
+   *
+   * Empty filter arrays are ignored (no filtering applied for that type).
+   *
+   * @param projectsToFilter - Array of projects to filter
+   * @returns Filtered array of projects matching all active filter criteria
+   *
+   * @example
+   * ```typescript
+   * // Filter for kitchen OR bathroom projects that are completed
+   * const filtered = applyFilters(projects);
+   * // Returns projects where:
+   * // - category is "kitchen" OR "bathroom"
+   * // - AND status is "completed"
+   * ```
+   */
   const applyFilters = useCallback(
     (projectsToFilter: Project[]): Project[] => {
-      return projectsToFilter.filter((project) => {
-        // Category filter (OR logic: match ANY selected category)
-        if (filters.categories.length > 0) {
-          if (!filters.categories.includes(project.category)) {
-            return false;
-          }
-        }
-
-        // Status filter (OR logic: match ANY selected status)
-        if (filters.statuses.length > 0) {
-          if (!filters.statuses.includes(project.status)) {
-            return false;
-          }
-        }
-
-        // Project Manager filter (OR logic: match ANY selected PM)
-        if (filters.projectManagers.length > 0) {
-          const projectPmNames = project.pms?.map((pm) => pm.name) || [];
-          const hasMatchingPm = filters.projectManagers.some((pmName) =>
-            projectPmNames.includes(pmName)
-          );
-          if (!hasMatchingPm) {
-            return false;
-          }
-        }
-
-        // Tags filter (OR logic: match ANY selected tag)
-        if (filters.tags.length > 0) {
-          const projectTags = project.tags || [];
-          const hasMatchingTag = filters.tags.some((tag) =>
-            projectTags.includes(tag)
-          );
-          if (!hasMatchingTag) {
-            return false;
-          }
-        }
-
-        return true;
-      });
+      return projectsToFilter.filter((project) =>
+        applyAllFilters(project, filters)
+      );
     },
     [filters]
   );
@@ -129,21 +149,37 @@ export function useSearchFilters(projects: Project[]) {
   }, [filters]);
 
   // Get filter values for specific filter types
+  /**
+   * Gets the currently selected category filters
+   * @returns Array of selected ProjectCategory values
+   */
   const getCategoryFilters = useCallback(
     () => filters.categories as ProjectCategory[],
     [filters.categories]
   );
 
+  /**
+   * Gets the currently selected status filters
+   * @returns Array of selected ProjectStatus values
+   */
   const getStatusFilters = useCallback(
     () => filters.statuses as ProjectStatus[],
     [filters.statuses]
   );
 
+  /**
+   * Gets the currently selected project manager filters
+   * @returns Array of selected project manager names
+   */
   const getProjectManagerFilters = useCallback(
     () => filters.projectManagers,
     [filters.projectManagers]
   );
 
+  /**
+   * Gets the currently selected tag filters
+   * @returns Array of selected tag values
+   */
   const getTagFilters = useCallback(() => filters.tags, [filters.tags]);
 
   return {

@@ -16,6 +16,7 @@ const THEME_NAMES: ThemeName[] = Object.keys(themes) as ThemeName[];
 const SYSTEM_THEME = "system" as const;
 const DEFAULT_THEME: ThemeName = "main"; // Design decision: main as default
 const DEFAULT_SETTING: ThemeSetting = SYSTEM_THEME;
+const THEME_SETTING_KEY = "@theme_setting";
 
 // Theme Context Types
 interface ThemeContextType {
@@ -28,7 +29,7 @@ interface ThemeContextType {
   toggleTheme: () => void;
 
   // Theme data access
-  theme: any;
+  theme: (typeof themes)[ThemeName];
   isDark: boolean;
   isLight: boolean;
   isMain: boolean;
@@ -37,16 +38,22 @@ interface ThemeContextType {
 // Theme Context
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// Theme Storage Keys
-const THEME_SETTING_KEY = "@theme_setting";
-
-// Available themes (excluding "system") - same as THEME_NAMES
-const AVAILABLE_THEMES: ThemeName[] = THEME_NAMES;
-
 // Theme Provider Props
 interface ThemeProviderProps {
   children: React.ReactNode;
 }
+
+// Helper function to validate theme setting
+const isValidThemeSetting = (setting: string): setting is ThemeSetting => {
+  return THEME_NAMES.includes(setting as ThemeName) || setting === SYSTEM_THEME;
+};
+
+// Helper function to get next theme in cycle
+const getNextTheme = (currentTheme: ThemeName): ThemeName => {
+  const currentIndex = THEME_NAMES.indexOf(currentTheme);
+  const nextIndex = (currentIndex + 1) % THEME_NAMES.length;
+  return THEME_NAMES[nextIndex];
+};
 
 // Theme Provider Component
 export function ThemeProvider({ children }: ThemeProviderProps) {
@@ -82,11 +89,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const loadThemeSetting = async () => {
     try {
       const savedSetting = await AsyncStorage.getItem(THEME_SETTING_KEY);
-      if (
-        savedSetting &&
-        (THEME_NAMES.includes(savedSetting as ThemeName) ||
-          savedSetting === SYSTEM_THEME)
-      ) {
+      if (savedSetting && isValidThemeSetting(savedSetting)) {
         setThemeSettingState(savedSetting as ThemeSetting);
       }
     } catch (error) {
@@ -113,9 +116,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   // Toggle between available themes (cycles through all themes except "system")
   const toggleTheme = useCallback(() => {
-    const currentIndex = AVAILABLE_THEMES.indexOf(currentTheme);
-    const nextIndex = (currentIndex + 1) % AVAILABLE_THEMES.length;
-    setThemeSetting(AVAILABLE_THEMES[nextIndex]);
+    const nextTheme = getNextTheme(currentTheme);
+    setThemeSetting(nextTheme);
   }, [currentTheme, setThemeSetting]);
 
   // Context value

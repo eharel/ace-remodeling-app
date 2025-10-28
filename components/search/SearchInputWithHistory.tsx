@@ -9,23 +9,43 @@ import {
 } from "react-native";
 
 import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { ProjectSummary } from "@/types/Project";
 import { SearchHistoryItem } from "@/utils/useSearchHistory";
 
 import { SearchSuggestions } from "./SearchSuggestions";
 
+/**
+ * Props for the SearchInputWithHistory component
+ *
+ * Enhanced search input that provides:
+ * - Search suggestions as user types (≥2 characters)
+ * - Search history when input is empty and focused
+ * - Clear button and proper keyboard handling
+ * - Integration with project search functionality
+ */
 interface SearchInputWithHistoryProps {
+  /** Current input value (controlled by parent) */
   value: string;
+  /** Callback when input text changes */
   onChangeText: (text: string) => void;
+  /** Callback when user selects a history item */
   onSelectHistory: (query: string) => void;
+  /** Placeholder text for the input */
   placeholder?: string;
+  /** Whether the input is disabled */
   disabled?: boolean;
+  /** Search history items (managed by parent) */
   history: SearchHistoryItem[];
+  /** Callback to remove a specific history item */
   onRemoveHistory: (query: string) => void;
+  /** Callback to clear all search history */
   onClearHistory: () => void;
+  /** Callback to add current query to history */
   onAddToHistory: (query: string) => void;
+  /** Projects to search through for suggestions */
   projects: ProjectSummary[];
+  /** Callback when user selects a project from suggestions */
   onSelectProject: (projectId: string) => void;
 }
 
@@ -163,7 +183,7 @@ export function SearchInputWithHistory({
       paddingHorizontal: DesignTokens.spacing[4],
       paddingVertical: DesignTokens.spacing[2],
       borderBottomWidth: 1,
-      borderBottomColor: "rgba(0, 0, 0, 0.1)",
+      borderBottomColor: theme.colors.border.secondary,
     },
     historyList: {
       maxHeight: 200,

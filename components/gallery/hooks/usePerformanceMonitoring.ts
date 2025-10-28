@@ -1,3 +1,9 @@
+import {
+  calculateAverageMetrics,
+  calculatePerformanceScore,
+  createDefaultPerformanceStats,
+  getPerformanceRecommendations,
+} from "@/utils/galleryPerformance";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface PerformanceMetrics {
@@ -69,16 +75,9 @@ interface PerformanceStats {
  */
 export const usePerformanceMonitoring = () => {
   const [metrics, setMetrics] = useState<PerformanceMetrics[]>([]);
-  const [stats, setStats] = useState<PerformanceStats>({
-    averageRenderTime: 0,
-    averageImageLoadTime: 0,
-    averageMemoryUsage: 0,
-    averageFrameRate: 0,
-    averageGestureResponseTime: 0,
-    totalRenders: 0,
-    totalImageLoads: 0,
-    performanceScore: 100,
-  });
+  const [stats, setStats] = useState<PerformanceStats>(
+    createDefaultPerformanceStats()
+  );
 
   const frameCount = useRef(0);
   const lastFrameTime = useRef(0);
@@ -191,97 +190,36 @@ export const usePerformanceMonitoring = () => {
     frameCount.current++;
   }, []);
 
-  // Calculate performance score
-  const calculatePerformanceScore = useCallback(
+  // Calculate performance score using utility function
+  const calculatePerformanceScoreCallback = useCallback(
     (currentStats: PerformanceStats): number => {
-      let score = 100;
-
-      // Penalize slow renders (target: <16ms for 60fps)
-      if (currentStats.averageRenderTime > 16) {
-        score -= Math.min(30, (currentStats.averageRenderTime - 16) * 2);
-      }
-
-      // Penalize slow image loads (target: <500ms)
-      if (currentStats.averageImageLoadTime > 500) {
-        score -= Math.min(20, (currentStats.averageImageLoadTime - 500) / 50);
-      }
-
-      // Penalize low frame rate (target: >50fps)
-      if (currentStats.averageFrameRate < 50) {
-        score -= Math.min(25, (50 - currentStats.averageFrameRate) * 2);
-      }
-
-      // Penalize slow gesture response (target: <100ms)
-      if (currentStats.averageGestureResponseTime > 100) {
-        score -= Math.min(
-          15,
-          (currentStats.averageGestureResponseTime - 100) / 10
-        );
-      }
-
-      return Math.max(0, Math.min(100, score));
+      return calculatePerformanceScore(currentStats);
     },
     []
   );
 
-  // Update statistics
+  // Update statistics using utility functions
   useEffect(() => {
     if (metrics.length === 0) return;
 
-    const recentMetrics = metrics.slice(-50); // Last 50 measurements
-
-    const averageRenderTime =
-      recentMetrics
-        .filter((m) => m.renderTime > 0)
-        .reduce((sum, m) => sum + m.renderTime, 0) /
-      Math.max(1, recentMetrics.filter((m) => m.renderTime > 0).length);
-
-    const averageImageLoadTime =
-      recentMetrics
-        .filter((m) => m.imageLoadTime > 0)
-        .reduce((sum, m) => sum + m.imageLoadTime, 0) /
-      Math.max(1, recentMetrics.filter((m) => m.imageLoadTime > 0).length);
-
-    const averageFrameRate =
-      frameRateHistory.current.length > 0
-        ? frameRateHistory.current.reduce((sum, fps) => sum + fps, 0) /
-          frameRateHistory.current.length
-        : 0;
-
-    const averageGestureResponseTime =
-      recentMetrics
-        .filter((m) => m.gestureResponseTime > 0)
-        .reduce((sum, m) => sum + m.gestureResponseTime, 0) /
-      Math.max(
-        1,
-        recentMetrics.filter((m) => m.gestureResponseTime > 0).length
-      );
-
-    const averageMemoryUsage =
-      recentMetrics
-        .filter((m) => m.memoryUsage > 0)
-        .reduce((sum, m) => sum + m.memoryUsage, 0) /
-      Math.max(1, recentMetrics.filter((m) => m.memoryUsage > 0).length);
+    const baseStats = calculateAverageMetrics(
+      metrics,
+      frameRateHistory.current,
+      stats.totalRenders,
+      stats.totalImageLoads
+    );
 
     const newStats: PerformanceStats = {
-      averageRenderTime: averageRenderTime || 0,
-      averageImageLoadTime: averageImageLoadTime || 0,
-      averageMemoryUsage: averageMemoryUsage || 0,
-      averageFrameRate: averageFrameRate || 0,
-      averageGestureResponseTime: averageGestureResponseTime || 0,
-      totalRenders: stats.totalRenders,
-      totalImageLoads: stats.totalImageLoads,
-      performanceScore: 0,
+      ...baseStats,
+      performanceScore: calculatePerformanceScore(baseStats),
     };
-
-    newStats.performanceScore = calculatePerformanceScore(newStats);
 
     setStats(newStats);
   }, [
     metrics,
     stats.totalRenders,
     stats.totalImageLoads,
-    calculatePerformanceScore,
+    calculatePerformanceScoreCallback,
   ]);
 
   // Start frame rate monitoring
@@ -302,50 +240,15 @@ export const usePerformanceMonitoring = () => {
     };
   }, [measureFrameRate]);
 
-  // Get performance recommendations
-  const getPerformanceRecommendations = useCallback(() => {
-    const recommendations: string[] = [];
-
-    if (stats.averageRenderTime > 16) {
-      recommendations.push(
-        "Consider reducing image sizes or using lazy loading"
-      );
-    }
-
-    if (stats.averageImageLoadTime > 500) {
-      recommendations.push("Implement image preloading for better performance");
-    }
-
-    if (stats.averageFrameRate < 50) {
-      recommendations.push("Reduce animation complexity or optimize rendering");
-    }
-
-    if (stats.averageGestureResponseTime > 100) {
-      recommendations.push(
-        "Optimize gesture handling for better responsiveness"
-      );
-    }
-
-    if (stats.performanceScore < 70) {
-      recommendations.push("Overall performance needs improvement");
-    }
-
-    return recommendations;
+  // Get performance recommendations using utility function
+  const getPerformanceRecommendationsCallback = useCallback(() => {
+    return getPerformanceRecommendations(stats);
   }, [stats]);
 
   // Reset metrics
   const resetMetrics = useCallback(() => {
     setMetrics([]);
-    setStats({
-      averageRenderTime: 0,
-      averageImageLoadTime: 0,
-      averageMemoryUsage: 0,
-      averageFrameRate: 0,
-      averageGestureResponseTime: 0,
-      totalRenders: 0,
-      totalImageLoads: 0,
-      performanceScore: 100,
-    });
+    setStats(createDefaultPerformanceStats());
     frameRateHistory.current = [];
   }, []);
 
@@ -357,7 +260,7 @@ export const usePerformanceMonitoring = () => {
     endImageLoadTiming,
     startGestureTiming,
     endGestureTiming,
-    getPerformanceRecommendations,
+    getPerformanceRecommendations: getPerformanceRecommendationsCallback,
     resetMetrics,
   };
 };

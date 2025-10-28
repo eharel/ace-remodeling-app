@@ -68,7 +68,6 @@ export function addPMToProject(project: Project, pmInfo: PMInfo): Project {
   return {
     ...project,
     pms: [...currentPMs, pmInfo],
-    pmNames: getPMNames({ ...project, pms: [...currentPMs, pmInfo] }),
   };
 }
 
@@ -82,7 +81,6 @@ export function removePMFromProject(project: Project, pmName: string): Project {
   return {
     ...project,
     pms: updatedPMs,
-    pmNames: getPMNames({ ...project, pms: updatedPMs }),
   };
 }
 

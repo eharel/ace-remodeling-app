@@ -3,6 +3,7 @@
  * Exports all search-related components, hooks, and types
  */
 
+export { FilterButton } from "./FilterButton";
 export { FilterDropdown } from "./FilterDropdown";
 export { SearchFiltersBar } from "./SearchFiltersBar";
 export { SearchInputWithHistory } from "./SearchInputWithHistory";

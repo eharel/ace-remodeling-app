@@ -136,11 +136,11 @@ export interface StatusColors {
 }
 
 /**
- * Component styles interface
- * Defines ALL styling properties (colors, dimensions, effects) for UI components
- * This ensures TypeScript enforces complete component styling in all themes
+ * Component colors interface
+ * Defines ONLY color-related properties for UI components
+ * Dimensions and layout properties belong in DesignTokens
  */
-export interface ComponentStyles {
+export interface ComponentColors {
   /** Floating Action Button component */
   fab: {
     /** Background color */
@@ -149,8 +149,6 @@ export interface ComponentStyles {
     shadowColor: string;
     /** Shadow opacity */
     shadowOpacity: number;
-    /** Active opacity for touch interactions */
-    activeOpacity: number;
   };
 
   /** Modal component */
@@ -159,44 +157,10 @@ export interface ComponentStyles {
     backgroundColor: string;
     /** Border color */
     borderColor: string;
-    /** Border radius */
-    borderRadius: number;
-    /** Border width */
-    borderWidth: number;
+    /** Overlay color */
+    overlayColor: string;
     /** Overlay opacity */
     overlayOpacity: number;
-  };
-
-  /** Header component */
-  header: {
-    /** Background color */
-    backgroundColor: string;
-    /** Border color */
-    borderColor: string;
-    /** Title font weight */
-    titleFontWeight: string;
-    /** Progress text font weight */
-    progressFontWeight: string;
-    /** Border bottom width */
-    borderBottomWidth: number;
-    /** Padding */
-    padding: number;
-  };
-
-  /** Checklist item component */
-  checklistItem: {
-    /** Background color (optional) */
-    backgroundColor?: string;
-    /** Text color (optional) */
-    textColor?: string;
-    /** Vertical padding */
-    paddingVertical: number;
-    /** Horizontal padding */
-    paddingHorizontal: number;
-    /** Opacity when checked */
-    checkedOpacity: number;
-    /** Active opacity for touch interactions */
-    activeOpacity: number;
   };
 
   /** Card component */
@@ -253,8 +217,8 @@ export interface ThemeColors {
   interactive: InteractiveColors;
   /** Status colors */
   status: StatusColors;
-  /** Component-specific styles */
-  components: ComponentStyles;
+  /** Component-specific colors */
+  components: ComponentColors;
   /** Shadow definitions with theme-specific colors and opacity */
   shadows: {
     sm: { shadowColor: string; shadowOpacity: number };

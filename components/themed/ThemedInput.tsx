@@ -1,8 +1,13 @@
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+
+// Constants for clear button calculations
+const CLEAR_BUTTON_SIZE = DesignTokens.componentSizes.iconButton;
+const CLEAR_BUTTON_PADDING = DesignTokens.spacing[2];
+const CLEAR_BUTTON_TOTAL_SIZE = CLEAR_BUTTON_SIZE + CLEAR_BUTTON_PADDING * 2;
 
 // Static styles that don't depend on theme or props
 const staticStyles = StyleSheet.create({
@@ -19,15 +24,15 @@ const staticStyles = StyleSheet.create({
     fontFamily: DesignTokens.typography.fontFamily.regular,
   },
   inputWithClearButton: {
-    paddingRight: 48, // 20px icon + 8px padding + 12px margin + 8px extra
+    paddingRight: CLEAR_BUTTON_TOTAL_SIZE + DesignTokens.spacing[3],
   },
   clearButton: {
     position: "absolute",
-    right: DesignTokens.spacing[3], // 12px from edge
+    right: DesignTokens.spacing[3],
     top: "50%",
-    transform: [{ translateY: -18 }], // Center the button (20px icon + 16px padding = 36px total, so -18px)
-    padding: DesignTokens.spacing[2], // 8px padding for better touch target
-    borderRadius: DesignTokens.borderRadius.sm, // Rounded touch area
+    transform: [{ translateY: -CLEAR_BUTTON_TOTAL_SIZE / 2 }],
+    padding: CLEAR_BUTTON_PADDING,
+    borderRadius: DesignTokens.borderRadius.sm,
   },
 });
 
@@ -35,15 +40,9 @@ interface ThemedInputProps {
   placeholder: string;
   value: string;
   onChangeText: (text: string) => void;
-
-  // Optional icons
-
-  // Optional states
   error?: string;
   disabled?: boolean;
   loading?: boolean;
-
-  // Accessibility props
   accessibilityLabel?: string;
   accessibilityHint?: string;
 }
@@ -60,10 +59,6 @@ export function ThemedInput({
 }: ThemedInputProps) {
   const { theme } = useTheme();
   const [inputValue, setInputValue] = useState(value);
-
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
 
   // Dynamic styles that depend on theme or props
   const dynamicStyles = useMemo(
@@ -84,6 +79,7 @@ export function ThemedInput({
     setInputValue(text);
     onChangeText(text);
   };
+
   const handleClearInput = () => {
     setInputValue("");
     onChangeText("");
@@ -116,7 +112,7 @@ export function ThemedInput({
         >
           <MaterialIcons
             name="close"
-            size={20}
+            size={CLEAR_BUTTON_SIZE}
             color={theme.colors.text.secondary}
           />
         </TouchableOpacity>

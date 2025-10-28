@@ -2,7 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useCallback, useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 import { ChecklistModal } from "./ChecklistModal";
 import { useChecklist } from "./useChecklist";
@@ -64,10 +64,10 @@ const styles = StyleSheet.create({
   fab: {
     position: "absolute",
     bottom: 100, // Position above tab bar
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    right: DesignTokens.spacing[5], // 20px from left
+    width: DesignTokens.components.fab.size,
+    height: DesignTokens.components.fab.size,
+    borderRadius: DesignTokens.components.fab.borderRadius,
     justifyContent: "center",
     alignItems: "center",
     elevation: 8,

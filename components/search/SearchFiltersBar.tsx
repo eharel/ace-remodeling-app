@@ -3,32 +3,60 @@ import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens, ThemedText } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
-import { CATEGORY_LABELS, ProjectCategory } from "@/types/Category";
-import { getStatusDisplayText, ProjectStatus } from "@/types/Status";
+import { useTheme } from "@/contexts";
+import { ProjectCategory } from "@/types/Category";
+import { ProjectStatus } from "@/types/Status";
+import { createFilterConfig } from "@/utils/filterConfig";
 
-import { FilterDropdown } from "./FilterDropdown";
-import { FilterOption } from "./types";
+import { FilterButton } from "./FilterButton";
 
+/**
+ * Props for the SearchFiltersBar component
+ *
+ * This component renders a row of multi-select filter dropdowns for
+ * searching projects by category, status, project manager, and tags.
+ * Also includes a "Clear All" button when filters are active.
+ *
+ * Simplified interface that reduces prop drilling by using the
+ * useFilterConfig hook internally for filter configuration.
+ */
 interface SearchFiltersBarProps {
+  /** Currently selected category values */
   categoryValues: ProjectCategory[];
+  /** Currently selected status values */
   statusValues: ProjectStatus[];
+  /** Currently selected project manager names */
   projectManagerValues: string[];
+  /** Currently selected tag values */
   tagValues: string[];
+  /** Available project managers extracted from all projects */
   availableProjectManagers: string[];
+  /** Available tags extracted from all projects */
   availableTags: string[];
+  /** Callback when category selection changes */
   onCategoryChange: (values: ProjectCategory[]) => void;
+  /** Callback when status selection changes */
   onStatusChange: (values: ProjectStatus[]) => void;
+  /** Callback when project manager selection changes */
   onProjectManagerChange: (values: string[]) => void;
+  /** Callback when tag selection changes */
   onTagChange: (values: string[]) => void;
+  /** Callback to reset all filters to empty state */
   onResetFilters: () => void;
+  /** Whether any filters are currently active (non-empty arrays) */
   hasActiveFilters: boolean;
+  /** Total count of active filter selections across all filter types */
   activeFilterCount: number;
 }
 
 /**
  * SearchFiltersBar Component
- * Displays multi-select filter dropdowns for category, status, and project manager
+ *
+ * Displays multi-select filter dropdowns for category, status, project manager, and tags.
+ * Uses the useFilterConfig hook internally to reduce prop drilling and separate concerns.
+ *
+ * This component is now focused purely on orchestration and rendering, with all
+ * filter configuration logic extracted to the useFilterConfig hook.
  */
 export function SearchFiltersBar({
   categoryValues,
@@ -47,50 +75,12 @@ export function SearchFiltersBar({
 }: SearchFiltersBarProps) {
   const { theme } = useTheme();
 
-  // Category options
-  const categoryOptions = useMemo<FilterOption<ProjectCategory>[]>(
-    () => [
-      { value: "bathroom", label: CATEGORY_LABELS.bathroom },
-      { value: "kitchen", label: CATEGORY_LABELS.kitchen },
-      { value: "outdoor", label: CATEGORY_LABELS.outdoor },
-      {
-        value: "general-remodeling",
-        label: CATEGORY_LABELS["general-remodeling"],
-      },
-      { value: "basement", label: CATEGORY_LABELS.basement },
-      { value: "attic", label: CATEGORY_LABELS.attic },
-    ],
-    []
-  );
-
-  // Status options
-  const statusOptions = useMemo<FilterOption<ProjectStatus>[]>(
-    () => [
-      { value: "planning", label: getStatusDisplayText("planning") },
-      { value: "in-progress", label: getStatusDisplayText("in-progress") },
-      { value: "completed", label: getStatusDisplayText("completed") },
-      { value: "on-hold", label: getStatusDisplayText("on-hold") },
-    ],
-    []
-  );
-
-  // Project Manager options
-  const projectManagerOptions = useMemo<FilterOption<string>[]>(() => {
-    if (availableProjectManagers.length === 0) {
-      // Fallback options if no PMs are found
-      return [
-        { value: "Mike Johnson", label: "Mike Johnson" },
-        { value: "Sarah Wilson", label: "Sarah Wilson" },
-        { value: "Carlos Martinez", label: "Carlos Martinez" },
-      ];
-    }
-    return availableProjectManagers.map((pm) => ({ value: pm, label: pm }));
-  }, [availableProjectManagers]);
-
-  // Tag options
-  const tagOptions = useMemo<FilterOption<string>[]>(() => {
-    return availableTags.map((tag) => ({ value: tag, label: tag }));
-  }, [availableTags]);
+  // Get filter configurations from utility function (component-level memoization)
+  const { categoryOptions, statusOptions, projectManagerOptions, tagOptions } =
+    useMemo(
+      () => createFilterConfig(availableProjectManagers, availableTags),
+      [availableProjectManagers, availableTags]
+    );
 
   const styles = StyleSheet.create({
     container: {
@@ -102,10 +92,6 @@ export function SearchFiltersBar({
       flexDirection: "row",
       gap: DesignTokens.spacing[3],
       flexWrap: "wrap",
-    },
-    filterItem: {
-      flex: 1,
-      minWidth: 140,
     },
     clearRow: {
       flexDirection: "row",
@@ -135,42 +121,34 @@ export function SearchFiltersBar({
   return (
     <View style={styles.container}>
       <View style={styles.filtersRow}>
-        <View style={styles.filterItem}>
-          <FilterDropdown
-            label="Category"
-            selectedValues={categoryValues}
-            options={categoryOptions}
-            onChange={onCategoryChange}
-            testID="category-filter"
-          />
-        </View>
-        <View style={styles.filterItem}>
-          <FilterDropdown
-            label="Status"
-            selectedValues={statusValues}
-            options={statusOptions}
-            onChange={onStatusChange}
-            testID="status-filter"
-          />
-        </View>
-        <View style={styles.filterItem}>
-          <FilterDropdown
-            label="PM"
-            selectedValues={projectManagerValues}
-            options={projectManagerOptions}
-            onChange={onProjectManagerChange}
-            testID="pm-filter"
-          />
-        </View>
-        <View style={styles.filterItem}>
-          <FilterDropdown
-            label="Tags"
-            selectedValues={tagValues}
-            options={tagOptions}
-            onChange={onTagChange}
-            testID="tag-filter"
-          />
-        </View>
+        <FilterButton
+          label="Category"
+          selectedValues={categoryValues}
+          options={categoryOptions}
+          onChange={onCategoryChange}
+          testID="category-filter"
+        />
+        <FilterButton
+          label="Status"
+          selectedValues={statusValues}
+          options={statusOptions}
+          onChange={onStatusChange}
+          testID="status-filter"
+        />
+        <FilterButton
+          label="PM"
+          selectedValues={projectManagerValues}
+          options={projectManagerOptions}
+          onChange={onProjectManagerChange}
+          testID="pm-filter"
+        />
+        <FilterButton
+          label="Tags"
+          selectedValues={tagValues}
+          options={tagOptions}
+          onChange={onTagChange}
+          testID="tag-filter"
+        />
       </View>
 
       {hasActiveFilters && (

@@ -4,11 +4,16 @@ import React, {
   ReactNode,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { db } from "../config/firebase";
-import { Project } from "../types/Project";
+import { Project, PROJECT_CATEGORIES } from "../types";
 
+// Constants
+const PROJECTS_COLLECTION = "projects";
+
+// Context state interface
 interface ProjectsContextType {
   projects: Project[];
   loading: boolean;
@@ -29,17 +34,16 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   children,
 }) => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        console.log("🔄 Fetching projects from Firebase...");
         setLoading(true);
         setError(null);
 
-        const projectsCollection = collection(db, "projects");
+        const projectsCollection = collection(db, PROJECTS_COLLECTION);
         const querySnapshot = await getDocs(projectsCollection);
 
         const projectsData: Project[] = [];
@@ -51,13 +55,11 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
           } as Project);
         });
 
-        console.log(`✅ Loaded ${projectsData.length} projects from Firebase`);
         setProjects(projectsData);
       } catch (err) {
-        console.error("❌ Error fetching projects:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch projects"
-        );
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to fetch projects";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -66,21 +68,33 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
     fetchProjects();
   }, []);
 
-  // Calculate filtered projects
-  const bathroomProjects = projects.filter(
-    (project) => project.category === "bathroom"
-  );
-  const kitchenProjects = projects.filter(
-    (project) => project.category === "kitchen"
+  // Memoized filtered projects to prevent unnecessary recalculations
+  const bathroomProjects = useMemo(
+    () =>
+      projects.filter(
+        (project) => project.category === PROJECT_CATEGORIES.BATHROOM
+      ),
+    [projects]
   );
 
-  const value: ProjectsContextType = {
-    projects,
-    loading,
-    error,
-    bathroomProjects,
-    kitchenProjects,
-  };
+  const kitchenProjects = useMemo(
+    () =>
+      projects.filter(
+        (project) => project.category === PROJECT_CATEGORIES.KITCHEN
+      ),
+    [projects]
+  );
+
+  const value: ProjectsContextType = useMemo(
+    () => ({
+      projects,
+      loading,
+      error,
+      bathroomProjects,
+      kitchenProjects,
+    }),
+    [projects, loading, error, bathroomProjects, kitchenProjects]
+  );
 
   return (
     <ProjectsContext.Provider value={value}>

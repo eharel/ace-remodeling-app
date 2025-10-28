@@ -3,8 +3,25 @@ import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { ProjectSummary } from "@/types/Project";
+import { calculateProjectScore } from "@/utils/searchScoring";
+
+/**
+ * Constants for SearchSuggestions component UI behavior
+ *
+ * These values control the UI appearance and behavior.
+ * Scoring constants are now imported from utils/searchScoring.ts
+ */
+const SEARCH_SUGGESTIONS_CONSTANTS = {
+  /** Query requirements */
+  MIN_QUERY_LENGTH: 2, // Minimum characters required to show suggestions
+
+  /** UI sizing */
+  DROPDOWN_MAX_HEIGHT: 400, // Maximum dropdown height in pixels
+  SUGGESTIONS_LIST_MAX_HEIGHT: 350, // Maximum suggestions list height
+  ICON_SIZE: 16, // Material icon size for search icon
+} as const;
 
 const MAX_SUGGESTIONS = 10;
 
@@ -28,36 +45,37 @@ export function SearchSuggestions({
   const { theme } = useTheme();
 
   // Filter and sort projects based on query
+  /**
+   * Generates project suggestions based on search query using a scoring algorithm
+   *
+   * Scoring system (higher = better match):
+   * - Exact name match: 100 points
+   * - Name starts with query: 50 points
+   * - Name contains query: 30 points
+   * - Description contains query: 20 points
+   * - Location contains query: 10 points
+   *
+   * Results are sorted by score (highest first) and limited to MAX_SUGGESTIONS.
+   * Only shows suggestions for queries ≥2 characters.
+   *
+   * @returns Array of ProjectSummary objects matching the query, sorted by relevance
+   */
   const suggestions = useMemo(() => {
-    if (!query.trim() || query.trim().length < 2) {
+    if (
+      !query.trim() ||
+      query.trim().length < SEARCH_SUGGESTIONS_CONSTANTS.MIN_QUERY_LENGTH
+    ) {
       return [];
     }
 
     const lowerQuery = query.toLowerCase().trim();
 
-    // Create scored matches
+    // Create scored matches using pure utility function
     const matches = projects
-      .map((project) => {
-        const nameMatch = project.name.toLowerCase().includes(lowerQuery);
-        const descMatch = project.briefDescription
-          ?.toLowerCase()
-          .includes(lowerQuery);
-        const locationMatch =
-          project.location?.neighborhood?.toLowerCase().includes(lowerQuery) ||
-          project.location?.zipCode?.includes(lowerQuery);
-
-        // Calculate relevance score
-        let score = 0;
-        if (project.name.toLowerCase() === lowerQuery)
-          score = 100; // Exact match
-        else if (project.name.toLowerCase().startsWith(lowerQuery))
-          score = 50; // Starts with
-        else if (nameMatch) score = 30; // Contains in name
-        else if (descMatch) score = 20; // Contains in description
-        else if (locationMatch) score = 10; // Contains in location
-
-        return { project, score };
-      })
+      .map((project) => ({
+        project,
+        score: calculateProjectScore(lowerQuery, project),
+      }))
       .filter((match) => match.score > 0) // Only include matches
       .sort((a, b) => b.score - a.score) // Sort by relevance
       .slice(0, maxSuggestions) // Limit results
@@ -83,16 +101,16 @@ export function SearchSuggestions({
       borderColor: theme.colors.border.secondary,
       zIndex: 1002,
       overflow: "hidden",
-      maxHeight: 400,
+      maxHeight: SEARCH_SUGGESTIONS_CONSTANTS.DROPDOWN_MAX_HEIGHT,
     },
     header: {
       paddingHorizontal: DesignTokens.spacing[4],
       paddingVertical: DesignTokens.spacing[2],
       borderBottomWidth: 1,
-      borderBottomColor: "rgba(0, 0, 0, 0.1)",
+      borderBottomColor: theme.colors.border.secondary,
     },
     suggestionsList: {
-      maxHeight: 350,
+      maxHeight: SEARCH_SUGGESTIONS_CONSTANTS.SUGGESTIONS_LIST_MAX_HEIGHT,
     },
     suggestionItem: {
       paddingHorizontal: DesignTokens.spacing[4],
@@ -141,7 +159,7 @@ export function SearchSuggestions({
           >
             <MaterialIcons
               name="search"
-              size={16}
+              size={SEARCH_SUGGESTIONS_CONSTANTS.ICON_SIZE}
               color={theme.colors.text.tertiary}
               style={styles.searchIcon}
             />
@@ -153,7 +171,10 @@ export function SearchSuggestions({
               {project.name}
             </ThemedText>
             <View style={styles.categoryBadge}>
-              <ThemedText variant="caption" style={{ fontSize: 11 }}>
+              <ThemedText
+                variant="caption"
+                style={{ fontSize: DesignTokens.typography.fontSize.xs }}
+              >
                 {project.category}
               </ThemedText>
             </View>

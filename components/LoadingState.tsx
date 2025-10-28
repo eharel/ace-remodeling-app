@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { ActivityIndicator, StyleSheet, ViewStyle } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 
 interface LoadingStateProps {

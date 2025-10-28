@@ -205,7 +205,8 @@ export function MyComponent() {
 ```typescript
 // ❌ AVOID - Deprecated string-based access
 const color = getThemeColor("background.primary");
-const componentColor = getComponentColor("card", "background");
+// REMOVED: Deprecated componentColor function
+// Use theme.colors.components.card.background directly
 ```
 
 ### **Wrapper Utilities**

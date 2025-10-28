@@ -10,8 +10,7 @@ import {
 } from "react-native";
 
 import { ThemedText } from "@/components/themed";
-import { useProjects } from "@/contexts/ProjectsContext";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useProjects, useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 import { Document } from "@/types/Document";
 
@@ -71,15 +70,15 @@ export default function DocumentsPage({}: DocumentsPageProps) {
       case "contract":
         return theme.colors.interactive.primary;
       case "invoice":
-        return "#10B981"; // Green
+        return theme.colors.status.success;
       case "permit":
-        return "#F59E0B"; // Amber
+        return theme.colors.status.warning;
       case "specification":
-        return "#8B5CF6"; // Purple
+        return theme.colors.status.info;
       case "warranty":
-        return "#06B6D4"; // Cyan
+        return theme.colors.status.info;
       case "manual":
-        return "#EF4444"; // Red
+        return theme.colors.status.error;
       default:
         return theme.colors.text.secondary;
     }
@@ -136,14 +135,16 @@ export default function DocumentsPage({}: DocumentsPageProps) {
     },
     documentName: {
       fontSize: DesignTokens.typography.fontSize.base,
-      fontWeight: "600",
+      fontWeight: DesignTokens.typography.fontWeight.semibold,
       color: theme.colors.text.primary,
       marginBottom: DesignTokens.spacing[2],
-      lineHeight: 20,
+      lineHeight:
+        DesignTokens.typography.fontSize.base *
+        DesignTokens.typography.lineHeight.normal,
     },
     documentType: {
       fontSize: DesignTokens.typography.fontSize.xs,
-      fontWeight: "500",
+      fontWeight: DesignTokens.typography.fontWeight.medium,
       color: theme.colors.text.secondary,
       textTransform: "uppercase",
       letterSpacing: 0.5,
@@ -152,7 +153,9 @@ export default function DocumentsPage({}: DocumentsPageProps) {
     documentDescription: {
       fontSize: DesignTokens.typography.fontSize.sm,
       color: theme.colors.text.secondary,
-      lineHeight: 18,
+      lineHeight:
+        DesignTokens.typography.fontSize.sm *
+        DesignTokens.typography.lineHeight.normal,
       marginBottom: DesignTokens.spacing[3],
     },
     documentMeta: {
@@ -167,7 +170,7 @@ export default function DocumentsPage({}: DocumentsPageProps) {
     documentSize: {
       fontSize: DesignTokens.typography.fontSize.xs,
       color: theme.colors.text.tertiary,
-      fontWeight: "500",
+      fontWeight: DesignTokens.typography.fontWeight.medium,
     },
     emptyState: {
       flex: 1,

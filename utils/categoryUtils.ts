@@ -1,21 +1,15 @@
-import { ProjectCategory } from "@/types/Category";
+import {
+  CATEGORY_LABELS,
+  PROJECT_CATEGORIES,
+  ProjectCategory,
+} from "@/types/Category";
 
 /**
  * Get the display name for a category
+ * Uses the centralized category labels from types
  */
 export function getCategoryDisplayName(category: ProjectCategory): string {
-  const names: Record<ProjectCategory, string> = {
-    bathroom: "Bathrooms",
-    kitchen: "Kitchens",
-    deck: "Decks",
-    pool: "Pools",
-    "full-house": "Full House",
-    "general-remodeling": "General Remodeling",
-    outdoor: "Outdoor",
-    basement: "Basement",
-    attic: "Attic",
-  };
-  return names[category] || category;
+  return CATEGORY_LABELS[category] || category;
 }
 
 /**
@@ -23,32 +17,20 @@ export function getCategoryDisplayName(category: ProjectCategory): string {
  */
 export function getCategoryIcon(category: ProjectCategory): string {
   const icons: Record<ProjectCategory, string> = {
-    bathroom: "bathroom",
-    kitchen: "kitchen",
-    deck: "deck",
-    pool: "pool",
-    "full-house": "home",
-    "general-remodeling": "build",
-    outdoor: "yard",
-    basement: "basement",
-    attic: "attic",
+    [PROJECT_CATEGORIES.BATHROOM]: "bathroom",
+    [PROJECT_CATEGORIES.KITCHEN]: "kitchen",
+    [PROJECT_CATEGORIES.GENERAL_REMODELING]: "build",
+    [PROJECT_CATEGORIES.OUTDOOR]: "yard",
+    [PROJECT_CATEGORIES.BASEMENT]: "basement",
+    [PROJECT_CATEGORIES.ATTIC]: "attic",
   };
   return icons[category] || "folder";
 }
 
 /**
  * Get all available categories
+ * Uses the centralized category constants from types
  */
 export function getAllCategories(): ProjectCategory[] {
-  return [
-    "bathroom",
-    "kitchen",
-    "deck",
-    "pool",
-    "full-house",
-    "general-remodeling",
-    "outdoor",
-    "basement",
-    "attic",
-  ];
+  return Object.values(PROJECT_CATEGORIES);
 }

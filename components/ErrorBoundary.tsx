@@ -6,7 +6,7 @@ import {
 import { StyleSheet } from "react-native";
 
 import { ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 import { logError } from "@/utils/errorLogger";
 

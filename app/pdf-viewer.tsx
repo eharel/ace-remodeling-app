@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 import { PdfDisplay } from "@/components/PdfDisplay";
 import { ThemedText } from "@/components/themed";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 
 export default function PdfViewer() {
@@ -76,7 +76,9 @@ export default function PdfViewer() {
       fontSize: DesignTokens.typography.fontSize.base,
       textAlign: "center",
       opacity: 0.7,
-      lineHeight: 22,
+      lineHeight:
+        DesignTokens.typography.fontSize.base *
+        DesignTokens.typography.lineHeight.normal,
       marginBottom: DesignTokens.spacing[6],
     },
     backButtonError: {

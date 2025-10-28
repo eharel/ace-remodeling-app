@@ -2,7 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens, ThemeSetting } from "@/themes";
 import { ThemedText } from "./themed";
 
@@ -51,8 +51,8 @@ export function ThemeToggle() {
           height: 60,
           alignItems: "center",
           justifyContent: "center",
-          borderRadius: 30,
-          borderWidth: 2,
+          borderRadius: DesignTokens.borderRadius.full,
+          borderWidth: DesignTokens.borderRadius.sm,
           borderColor: theme.colors.border.primary,
           backgroundColor: theme.colors.background.card,
         },
@@ -122,6 +122,9 @@ export function ThemeToggle() {
 const styles = StyleSheet.create({
   buttonLabel: {
     fontSize: DesignTokens.typography.fontSize.xs,
+    lineHeight:
+      DesignTokens.typography.fontSize.xs *
+      DesignTokens.typography.lineHeight.tight,
     fontWeight: DesignTokens.typography.fontWeight.medium,
     textAlign: "center",
   },

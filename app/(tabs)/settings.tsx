@@ -2,9 +2,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
+import { PageHeader } from "@/components";
 import { ThemedText, ThemedView } from "@/components/themed";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts";
 import { DesignTokens } from "@/themes";
 
 export default function SettingsScreen() {
@@ -22,7 +23,6 @@ export default function SettingsScreen() {
         },
         content: {
           padding: DesignTokens.spacing[4],
-          paddingTop: DesignTokens.spacing[10],
         },
         section: {
           marginBottom: DesignTokens.spacing[6],
@@ -153,6 +153,7 @@ export default function SettingsScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <PageHeader title="Settings" />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}

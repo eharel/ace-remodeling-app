@@ -3,11 +3,12 @@ import React from "react";
 
 import { CategoryPage } from "@/components/CategoryPage";
 import { EmptyState } from "@/components/EmptyState";
-import { CategoryKey, getCategoryConfig } from "@/config/categoryConfig";
-import { useProjects } from "@/contexts/ProjectsContext";
+import { CategoryKey, getCategoryConfig } from "@/constants/categoryConfig";
+import { useProjects } from "@/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { getProjectSummariesByCategory } from "@/data/mockProjects";
-import { ProjectSummary } from "@/types";
+import { ProjectSummary, getProjectCompletionDate } from "@/types";
+import { MaterialIcons } from "@expo/vector-icons";
 
 interface CategoryScreenProps {
   category: CategoryKey;
@@ -31,8 +32,8 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
     briefDescription: project.briefDescription,
     thumbnail: project.thumbnail,
     status: project.status,
-    completedAt: project.projectDates?.completionDate,
-    pmNames: project.pms?.map((pm) => pm.name) || [],
+    completedAt: getProjectCompletionDate(project),
+    // REMOVED: pmNames - computed field no longer stored
   }));
 
   const handleProjectPress = (project: ProjectSummary) => {
@@ -71,7 +72,7 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
       <EmptyState
         title={config.emptyTitle}
         message={config.emptyMessage}
-        icon={config.emptyIcon}
+        icon={config.emptyIcon as keyof typeof MaterialIcons.glyphMap}
         testID={`${category}-empty-state`}
       />
     );

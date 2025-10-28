@@ -4,17 +4,21 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
-import { ProjectGallery } from "@/components/ProjectGallery";
-import { ErrorState } from "@/components/error-states";
+import { ErrorState, PageHeader, ProjectGallery } from "@/components";
 import {
   SearchFiltersBar,
   SearchInputWithHistory,
   useSearchFilters,
 } from "@/components/search";
-import { DesignTokens, ThemedText, ThemedView } from "@/components/themed";
-import { useProjects } from "@/contexts/ProjectsContext";
-import { useTheme } from "@/contexts/ThemeContext";
-import { Project, ProjectSummary } from "@/types/Project";
+import { ThemedText, ThemedView } from "@/components/themed";
+import { useProjects, useTheme } from "@/contexts";
+import { DesignTokens } from "@/themes";
+import {
+  Project,
+  ProjectSummary,
+  getProjectCompletionDate,
+  getProjectPMNames,
+} from "@/types/Project";
 import { logError, logWarning } from "@/utils/errorLogger";
 import { useSearchHistory } from "@/utils/useSearchHistory";
 
@@ -27,7 +31,6 @@ const styles = StyleSheet.create({
     // Remove padding from here since ProjectGallery has its own
   },
   header: {
-    marginTop: DesignTokens.spacing[16], // Match other category pages
     marginBottom: DesignTokens.spacing[8],
     gap: DesignTokens.spacing[2],
     // Add padding only to the header
@@ -98,7 +101,7 @@ export default function SearchScreen() {
 
   // Memoized function to create searchable text from a project
   const createSearchableText = useCallback((project: Project) => {
-    const pmNames = project.pms?.map((pm) => pm.name) || [];
+    const pmNames = getProjectPMNames(project);
     return [
       project.name,
       project.briefDescription,
@@ -156,8 +159,8 @@ export default function SearchScreen() {
           briefDescription: project.briefDescription,
           thumbnail: project.thumbnail,
           status: project.status,
-          completedAt: project.completionDate,
-          pmNames: project.pms?.map((pm) => pm.name) || [],
+          completedAt: getProjectCompletionDate(project),
+          // REMOVED: pmNames - computed field no longer stored
         }));
       } catch (error) {
         logError("Search operation failed", { query, error: error });
@@ -230,10 +233,7 @@ export default function SearchScreen() {
       style={styles.container}
       accessibilityLabel="Search Projects Screen"
     >
-      <ThemedView style={styles.header} accessibilityLabel="Search header">
-        <ThemedText variant="title" accessibilityRole="header">
-          Search Projects
-        </ThemedText>
+      <PageHeader title="Search Projects">
         <SearchInputWithHistory
           placeholder={isLoading ? "Searching..." : "Search projects"}
           value={searchQuery}
@@ -247,7 +247,7 @@ export default function SearchScreen() {
           projects={searchResults}
           onSelectProject={(id) => router.push(`/project/${id}`)}
         />
-      </ThemedView>
+      </PageHeader>
 
       <SearchFiltersBar
         categoryValues={getCategoryFilters()}

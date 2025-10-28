@@ -24,9 +24,9 @@ components/
 ├── ThemedText.tsx          # Theme-aware Text wrapper
 ├── ThemeToggle.tsx         # Theme switching component
 ├── themed/
-│   ├── ThemedButton.tsx    # Theme-aware Button
-│   ├── ThemedCard.tsx      # Theme-aware Card
 │   ├── ThemedInput.tsx     # Theme-aware Input
+│   ├── ThemedText.tsx      # Theme-aware Text
+│   ├── ThemedView.tsx      # Theme-aware View
 │   └── index.ts            # Exports all themed components
 utils/
 ├── styling.ts              # Enhanced styling utilities
@@ -79,19 +79,16 @@ function MyComponent() {
 ### **Themed Components**
 
 ```typescript
-import { ThemedButton, ThemedCard, ThemedText } from "@/components/themed";
+import { ThemedText, ThemedView } from "@/components/themed";
 
 function MyScreen() {
   return (
-    <ThemedCard variant="elevated" padding="lg">
+    <ThemedView variant="elevated">
       <ThemedText variant="title">Welcome</ThemedText>
       <ThemedText variant="body">
-        This card automatically adapts to the current theme.
+        This view automatically adapts to the current theme.
       </ThemedText>
-      <ThemedButton variant="primary" size="lg">
-        Get Started
-      </ThemedButton>
-    </ThemedCard>
+    </ThemedView>
   );
 }
 ```
@@ -99,10 +96,10 @@ function MyScreen() {
 ### **Custom Styling with Theme**
 
 ```typescript
-import { useThemeStyling } from "@/utils/styling";
+import { useTheme } from "@/contexts/ThemeContext";
 
 function MyCustomComponent() {
-  const { themeColor, spacing, fontSize } = useThemeStyling();
+  const { theme } = useTheme();
 
   const styles = StyleSheet.create({
     container: {
@@ -149,23 +146,29 @@ function MyCustomComponent() {
 <ThemedText variant="success" />      // Success text
 ```
 
-### **ThemedButton Variants**
+### **ThemedText Variants**
 
 ```typescript
-<ThemedButton variant="primary" size="md" />
-<ThemedButton variant="secondary" size="lg" />
-<ThemedButton variant="outline" size="sm" />
-<ThemedButton variant="ghost" />
-<ThemedButton variant="elevated" />
+<ThemedText variant="title" />
+<ThemedText variant="subtitle" />
+<ThemedText variant="body" />
+<ThemedText variant="caption" />
+<ThemedText variant="link" />
+<ThemedText variant="error" />
+<ThemedText variant="success" />
+<ThemedText variant="warning" />
+<ThemedText variant="info" />
 ```
 
-### **ThemedCard Variants**
+### **ThemedView Variants**
 
 ```typescript
-<ThemedCard variant="default" padding="md" />
-<ThemedCard variant="elevated" padding="lg" />
-<ThemedCard variant="outlined" padding="sm" />
-<ThemedCard variant="filled" />
+<ThemedView variant="primary" />
+<ThemedView variant="secondary" />
+<ThemedView variant="card" />
+<ThemedView variant="elevated" />
+<ThemedView variant="outlined" />
+<ThemedView variant="ghost" />
 ```
 
 ## 🎨 **Color System**
@@ -267,7 +270,7 @@ function MyComponent() {
   Title
 </ThemedText>
 
-// NEW
+// NEW (current)
 <ThemedText variant="title">
   Title
 </ThemedText>
@@ -277,15 +280,21 @@ function MyComponent() {
 
 ```typescript
 // OLD (deprecated)
-<ThemedView lightColor="#f0f0f0" darkColor="#333">
+<ThemedView {...ThemedViewVariants.card}>
   Content
 </ThemedView>
 
-// NEW
-<ThemedView variant="secondary">
+// NEW (current)
+<ThemedView variant="card">
   Content
 </ThemedView>
 ```
+
+### **Breaking Changes**
+
+- **ThemedText**: Removed `type` and `color` props - use `variant` instead
+- **ThemedView**: Removed `ThemedViewVariants` export - use `variant` prop directly
+- **Typography**: All font sizes now use DesignTokens for consistency
 
 ### **From Hardcoded Colors**
 
@@ -338,8 +347,8 @@ getThemeColor("backgrounds.ffffff");
 
 ```typescript
 // ✅ Good
-<ThemedButton variant="primary" size="lg" />
-<ThemedCard variant="elevated" padding="lg" />
+<ThemedText variant="title" />
+<ThemedView variant="elevated" />
 
 // ❌ Avoid
 <Button style={{ backgroundColor: getThemeColor('components.button.primary') }} />
@@ -349,7 +358,7 @@ getThemeColor("backgrounds.ffffff");
 
 ```typescript
 // ✅ Good
-const { themeColor, spacing, fontSize } = useThemeStyling();
+const { theme } = useTheme();
 
 // ❌ Avoid
 const { color } = styling; // Legacy approach
@@ -412,4 +421,3 @@ const backgroundColor = "#ffffff"; // Hardcoded
 ---
 
 **Need Help?** Check the component examples or create an issue for specific problems.
-

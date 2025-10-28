@@ -11,6 +11,16 @@ import { MAX_PAGINATION_DOTS } from "./constants/gestureConstants";
 import { ImageGalleryFooterProps, ThumbnailProps } from "./types/gallery.types";
 
 /**
+ * Constants for ImageGalleryFooter component
+ */
+const FOOTER_CONSTANTS = {
+  /** Pagination dot size - small indicator dots */
+  PAGINATION_DOT_SIZE: 8,
+  /** Minimum touch target size for accessibility */
+  MIN_TOUCH_TARGET: 44,
+} as const;
+
+/**
  * Thumbnail - Individual thumbnail component for the gallery footer
  *
  * This component renders a single thumbnail image with active state styling
@@ -62,7 +72,10 @@ const Thumbnail = React.memo<ThumbnailProps>(
         style={[
           styles.thumbnail,
           isActive && styles.thumbnailActive,
-          { minWidth: 44, minHeight: 44 }, // Ensure minimum touch target size
+          {
+            minWidth: FOOTER_CONSTANTS.MIN_TOUCH_TARGET,
+            minHeight: FOOTER_CONSTANTS.MIN_TOUCH_TARGET,
+          }, // Ensure minimum touch target size
         ]}
       >
         <Image
@@ -177,13 +190,13 @@ export const ImageGalleryFooter = React.memo<ImageGalleryFooterProps>(
             justifyContent: "center",
             alignItems: "center",
             marginBottom: DesignTokens.spacing[4],
-            gap: 12,
+            gap: DesignTokens.spacing[3],
           },
           paginationDot: {
-            width: 8,
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: "#ffffff",
+            width: FOOTER_CONSTANTS.PAGINATION_DOT_SIZE,
+            height: FOOTER_CONSTANTS.PAGINATION_DOT_SIZE,
+            borderRadius: DesignTokens.borderRadius.sm,
+            backgroundColor: theme.colors.text.inverse,
             opacity: 0.4,
           },
           paginationDotActive: {
