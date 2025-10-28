@@ -4,23 +4,27 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
-import { ErrorState, PageHeader, ProjectGallery } from "@/components";
+import { ProjectGallery } from "@/features/projects";
 import {
   SearchFiltersBar,
   SearchInputWithHistory,
   useSearchFilters,
-} from "@/components/search";
-import { ThemedText, ThemedView } from "@/components/themed";
-import { useProjects, useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
+} from "@/features/search";
+import {
+  ErrorState,
+  PageHeader,
+  ThemedText,
+  ThemedView,
+} from "@/shared/components";
+import { useProjects, useTheme } from "@/shared/contexts";
+import { logError, logWarning, useSearchHistory } from "@/shared/utils";
+import { DesignTokens } from "@/core/themes";
 import {
   Project,
   ProjectSummary,
   getProjectCompletionDate,
   getProjectPMNames,
-} from "@/types/Project";
-import { logError, logWarning } from "@/utils/errorLogger";
-import { useSearchHistory } from "@/utils/useSearchHistory";
+} from "@/core/types";
 
 // Constants
 const SEARCH_DEBOUNCE_MS = 500;

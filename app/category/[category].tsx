@@ -2,21 +2,22 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { CategoryPicker } from "@/features/category";
+import { ProjectGallery } from "@/features/projects";
 import {
-  CategoryPicker,
   EmptyState,
   LoadingState,
   PageHeader,
-  ProjectGallery,
-} from "@/components";
-import { ThemedText, ThemedView } from "@/components/themed";
-import { useProjects, useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
-import { ProjectCategory } from "@/types/Category";
+  ThemedText,
+  ThemedView,
+} from "@/shared/components";
+import { useProjects, useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/core/themes";
+import { ProjectCategory } from "@/core/types";
 import {
   getAllCategories,
   getCategoryDisplayName,
-} from "@/utils/categoryUtils";
+} from "@/shared/utils";
 
 export default function CategoryScreen() {
   const { theme } = useTheme();

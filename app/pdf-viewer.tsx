@@ -3,10 +3,10 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { PdfDisplay } from "@/components/PdfDisplay";
-import { ThemedText } from "@/components/themed";
-import { useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
+import { PdfDisplay } from "@/features/pdf";
+import { ThemedText } from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/core/themes";
 
 export default function PdfViewer() {
   const { theme } = useTheme();

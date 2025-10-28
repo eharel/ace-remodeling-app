@@ -1,10 +1,9 @@
 import { router } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { PageHeader } from "@/components";
-import { ThemedText, ThemedView } from "@/components/themed";
-import { useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
+import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/core/themes";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
