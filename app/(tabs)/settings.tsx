@@ -2,11 +2,14 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { PageHeader } from "@/components";
-import { ThemedText, ThemedView } from "@/components/themed";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
+import { DesignTokens } from "@/core/themes";
+import {
+  PageHeader,
+  ThemedText,
+  ThemedView,
+  ThemeToggle,
+} from "@/shared/components";
+import { useTheme } from "@/shared/contexts";
 
 export default function SettingsScreen() {
   const { theme } = useTheme();

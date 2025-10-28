@@ -12,9 +12,9 @@ import "react-native-reanimated";
 // Disable development error overlay to test ErrorBoundary
 import { LogBox } from "react-native";
 
-import { FloatingChecklistButton } from "@/components/checklist";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { ProjectsProvider, ThemeProvider, useTheme } from "@/contexts";
+import { FloatingChecklistButton } from "@/features/checklist";
+import { ErrorBoundary } from "@/shared/components";
+import { ProjectsProvider, ThemeProvider, useTheme } from "@/shared/contexts";
 LogBox.ignoreAllLogs(true);
 
 // Disable error overlay in development

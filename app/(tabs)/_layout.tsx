@@ -3,7 +3,7 @@ import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
 
-import { useTheme } from "@/contexts";
+import { useTheme } from "@/shared/contexts";
 
 export default function TabLayout() {
   const { theme } = useTheme();

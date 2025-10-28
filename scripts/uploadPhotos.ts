@@ -22,7 +22,7 @@
 import { getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage";
 import * as fs from "fs";
 import * as path from "path";
-import { storage } from "../config/firebase";
+import { storage } from "../core/config";
 import {
   DEFAULT_OUTPUT_PATH,
   DOCUMENT_CATEGORY_MAPPINGS,

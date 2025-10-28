@@ -3,12 +3,17 @@ import { router } from "expo-router";
 import { useMemo } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
-import { EmptyState, LoadingState, PageHeader } from "@/components";
-import { ThemedText, ThemedView } from "@/components/themed";
-import { useProjects, useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
-import { ProjectCategory } from "@/types/Category";
-import { getCategoryDisplayName, getCategoryIcon } from "@/utils/categoryUtils";
+import { DesignTokens } from "@/core/themes";
+import { ProjectCategory } from "@/core/types";
+import {
+  EmptyState,
+  LoadingState,
+  PageHeader,
+  ThemedText,
+  ThemedView,
+} from "@/shared/components";
+import { useProjects, useTheme } from "@/shared/contexts";
+import { getCategoryDisplayName, getCategoryIcon } from "@/shared/utils";
 
 interface CategoryItem {
   id: ProjectCategory;

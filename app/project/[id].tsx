@@ -10,14 +10,14 @@ import {
   View,
 } from "react-native";
 
-import { ImageGalleryModal } from "@/components/gallery";
-import { ThemedText, ThemedView } from "@/components/themed";
-import { useProjects, useTheme } from "@/contexts";
+import { ImageGalleryModal } from "@/features/gallery";
+import { ThemedText, ThemedView } from "@/shared/components";
+import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
-import { DesignTokens } from "@/themes";
-import { Project } from "@/types";
-import { getProjectDuration } from "@/utils/duration";
+import { DesignTokens } from "@/core/themes";
+import { Project } from "@/core/types";
+import { getProjectDuration } from "@/shared/utils";
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

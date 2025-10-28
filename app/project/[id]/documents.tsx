@@ -9,10 +9,10 @@ import {
   View,
 } from "react-native";
 
-import { ThemedText } from "@/components/themed";
-import { useProjects, useTheme } from "@/contexts";
-import { DesignTokens } from "@/themes";
-import { Document } from "@/types/Document";
+import { DesignTokens } from "@/core/themes";
+import { Document } from "@/core/types";
+import { ThemedText } from "@/shared/components";
+import { useProjects, useTheme } from "@/shared/contexts";
 
 const { width: screenWidth } = Dimensions.get("window");
 
