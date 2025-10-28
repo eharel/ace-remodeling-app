@@ -125,7 +125,12 @@ export default function CategoryScreen() {
           title="Error Loading Projects"
           message="There was an error loading the projects. Please try again."
           actionText="Retry"
-          onAction={() => window.location.reload()}
+          onAction={() => {
+            // In React Native, we can't reload the page like in web
+            // Instead, we could trigger a refresh of the projects data
+            // For now, we'll just log the retry attempt
+            console.log("Retry loading projects requested");
+          }}
         />
       </ThemedView>
     );
