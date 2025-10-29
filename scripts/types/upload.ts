@@ -13,6 +13,7 @@ export interface ProjectInfo {
   slug: string; // URL-friendly identifier: "104-luxe-revival"
   displayName: string; // Human-readable name: "Luxe Revival"
   category: string; // Project category: "kitchen", "bathroom", etc.
+  subcategory?: string; // Project subcategory: "adu", "addition" (only for adu-addition category)
 }
 
 /**
@@ -21,6 +22,7 @@ export interface ProjectInfo {
 export interface LocalFile {
   projectInfo: ProjectInfo;
   category: string; // Standardized category: "after", "before", "progress", etc.
+  subcategory?: string; // Project subcategory: "adu", "addition" (only for adu-addition category)
   fileType: "image" | "document";
   filename: string; // Original filename with extension
   localPath: string; // Full path on local filesystem
@@ -118,6 +120,7 @@ export interface FirestoreProject {
   slug: string;
   name: string;
   category: string;
+  subcategory?: string; // Project subcategory: "adu", "addition" (only for adu-addition category)
   photos: FirestorePhoto[];
   documents: FirestoreDocument[];
 }

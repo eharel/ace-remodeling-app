@@ -21,10 +21,16 @@ export const VALID_CATEGORIES = [
   "kitchen",
   "bathroom",
   "full-home", // Full home remodels
+  "adu-addition", // Combined category with subcategories (adu, addition)
   "outdoor", // Outdoor living spaces
-  "adu", // ADU (Accessory Dwelling Unit) and additions
   "pools", // Pool projects (future)
 ] as const;
+
+/**
+ * Valid subcategories for adu-addition category
+ * These match the subfolder names within ace-remodeling-assets/adu-addition/
+ */
+export const ADU_ADDITION_SUBCATEGORIES = ["adu", "addition"] as const;
 
 /**
  * Supported image file extensions

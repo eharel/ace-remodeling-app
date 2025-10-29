@@ -205,20 +205,71 @@ function scanLocalFolder(basePath: string): ScanResult {
       throw new Error(`Folder not found: ${basePath}`);
     }
 
-    // Get all project folders
-    const projectDirs = fs
-      .readdirSync(basePath, { withFileTypes: true })
-      .filter((dirent) => dirent.isDirectory())
-      .filter((dirent) => !shouldSkipFile(dirent.name));
+    // Detect if this is adu-addition category (has subcategories)
+    const categoryName = path.basename(basePath);
+    const isAduAddition = categoryName === 'adu-addition';
+
+    // Build list of folders to scan (with optional subcategory)
+    let foldersToScan: Array<{ path: string; name: string; subcategory?: string }> = [];
+
+    if (isAduAddition) {
+      // Two-level nesting: adu-addition/subcategory/project
+      console.log(`   Detected adu-addition category - scanning for subcategories...`);
+      
+      const subcategoryDirs = fs
+        .readdirSync(basePath, { withFileTypes: true })
+        .filter((dirent) => dirent.isDirectory())
+        .filter((dirent) => !shouldSkipFile(dirent.name));
+
+      for (const subcatDir of subcategoryDirs) {
+        const subcatPath = path.join(basePath, subcatDir.name);
+        const subcategoryName = subcatDir.name.toLowerCase();
+
+        console.log(`   Found subcategory: ${subcategoryName}`);
+
+        // Get project folders within subcategory
+        const projectsInSubcat = fs
+          .readdirSync(subcatPath, { withFileTypes: true })
+          .filter((dirent) => dirent.isDirectory())
+          .filter((dirent) => !shouldSkipFile(dirent.name));
+
+        for (const projDir of projectsInSubcat) {
+          foldersToScan.push({
+            path: subcatPath,
+            name: projDir.name,
+            subcategory: subcategoryName,
+          });
+        }
+      }
+    } else {
+      // Single-level: category/project
+      const projectDirs = fs
+        .readdirSync(basePath, { withFileTypes: true })
+        .filter((dirent) => dirent.isDirectory())
+        .filter((dirent) => !shouldSkipFile(dirent.name));
+
+      for (const projDir of projectDirs) {
+        foldersToScan.push({
+          path: basePath,
+          name: projDir.name,
+          subcategory: undefined,
+        });
+      }
+    }
 
     // Process each project folder
-    for (const projectDir of projectDirs) {
-      const projectPath = path.join(basePath, projectDir.name);
-      const projectInfo = parseProjectFolder(projectDir.name);
+    for (const { path: parentPath, name: projectName, subcategory } of foldersToScan) {
+      const projectPath = path.join(parentPath, projectName);
+      const projectInfo = parseProjectFolder(projectName);
 
       if (!projectInfo) {
-        console.warn(`⚠️  Skipping invalid project folder: ${projectDir.name}`);
+        console.warn(`⚠️  Skipping invalid project folder: ${projectName}`);
         continue;
+      }
+
+      // Add subcategory to projectInfo
+      if (subcategory) {
+        projectInfo.subcategory = subcategory;
       }
 
       projectFolders.add(projectInfo.slug);
@@ -273,6 +324,7 @@ function scanLocalFolder(basePath: string): ScanResult {
           files.push({
             projectInfo,
             category,
+            subcategory,
             fileType,
             filename: fileEntry.name,
             localPath: filePath,
@@ -670,6 +722,7 @@ function generateFirestoreData(
       slug: projectSlug,
       name: firstFile.projectName,
       category,
+      subcategory: projectFiles[0].projectInfo.subcategory,
       photos,
       documents,
     });

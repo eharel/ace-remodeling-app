@@ -1,4 +1,4 @@
-import { ProjectCategory } from "./Category";
+import { ProjectCategory, ProjectSubcategory } from "./Category";
 import { Document } from "./Document";
 import { Log } from "./Log";
 import { Picture } from "./Picture";
@@ -14,6 +14,7 @@ export interface Project {
   projectNumber: string; // ACE project tracking number (e.g., "217", "311B")
   name: string; // Descriptive design-focused name
   category: ProjectCategory;
+  subcategory?: ProjectSubcategory; // Only used for adu-addition category
   briefDescription: string;
   longDescription: string;
   thumbnail: string;
