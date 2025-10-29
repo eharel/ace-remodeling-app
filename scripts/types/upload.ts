@@ -38,12 +38,14 @@ export interface UploadedFile {
   projectSlug: string; // URL-friendly identifier: "104-luxe-revival"
   projectName: string; // Human-readable name: "Luxe Revival"
   category: string; // Standardized category
+  subcategory?: string; // Project subcategory: "adu", "addition" (only for adu-addition category)
   fileType: "image" | "document";
   filename: string; // Filename in storage
   url: string; // Permanent download URL from Firebase
   storagePath: string; // Full path in Firebase Storage
   size: number; // File size in bytes
   uploadedAt: string; // ISO timestamp of upload
+  wasNewlyUploaded?: boolean; // true if uploaded, false if already existed
 }
 
 /**

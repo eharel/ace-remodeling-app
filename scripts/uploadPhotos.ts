@@ -430,7 +430,29 @@ async function uploadFile(
 
   // Check if file already exists
   if (existingFiles.has(storagePath) && !options.force) {
-    return null; // Will be tracked as skipped
+    // File exists - fetch its URL for JSON generation
+    try {
+      const storageRef = ref(storage, storagePath);
+      const downloadURL = await getDownloadURL(storageRef);
+
+      return {
+        projectId: projectInfo.id,
+        projectSlug: projectInfo.slug,
+        projectName: projectInfo.displayName,
+        category,
+        subcategory: projectInfo.subcategory,
+        fileType,
+        filename,
+        url: downloadURL,
+        storagePath,
+        size,
+        uploadedAt: new Date().toISOString(),
+        wasNewlyUploaded: false,
+      };
+    } catch (error) {
+      console.warn(`⚠️  Could not get URL for ${filename}, skipping from JSON`);
+      return null;
+    }
   }
 
   // Dry run mode - don't actually upload
@@ -440,12 +462,14 @@ async function uploadFile(
       projectSlug: projectInfo.slug,
       projectName: projectInfo.displayName,
       category,
+      subcategory: projectInfo.subcategory,
       fileType,
       filename,
       url: `[DRY RUN] ${storagePath}`,
       storagePath,
       size,
       uploadedAt: new Date().toISOString(),
+      wasNewlyUploaded: true,
     };
   }
 
@@ -474,12 +498,14 @@ async function uploadFile(
         projectSlug: projectInfo.slug,
         projectName: projectInfo.displayName,
         category,
+        subcategory: projectInfo.subcategory,
         fileType,
         filename,
         url: downloadURL,
         storagePath,
         size,
         uploadedAt: new Date().toISOString(),
+        wasNewlyUploaded: true,
       };
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
@@ -568,9 +594,16 @@ async function uploadFiles(
             if (result.value) {
               uploaded.push(result.value);
               const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-              console.log(
-                `    ✅ Uploaded: ${file.category}/${file.filename} (${sizeMB} MB)`
-              );
+
+              if (result.value.wasNewlyUploaded) {
+                console.log(
+                  `    ✅ Uploaded: ${file.category}/${file.filename} (${sizeMB} MB)`
+                );
+              } else {
+                console.log(
+                  `    ✓  Exists: ${file.category}/${file.filename} (${sizeMB} MB)`
+                );
+              }
             } else {
               skipped.push({
                 path: `${file.projectInfo.slug}/${file.fileType}s/${file.category}/${file.filename}`,
@@ -612,9 +645,16 @@ async function uploadFiles(
             if (result.value) {
               uploaded.push(result.value);
               const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-              console.log(
-                `    ✅ Uploaded: ${file.category}/${file.filename} (${sizeMB} MB)`
-              );
+
+              if (result.value.wasNewlyUploaded) {
+                console.log(
+                  `    ✅ Uploaded: ${file.category}/${file.filename} (${sizeMB} MB)`
+                );
+              } else {
+                console.log(
+                  `    ✓  Exists: ${file.category}/${file.filename} (${sizeMB} MB)`
+                );
+              }
             } else {
               skipped.push({
                 path: `${file.projectInfo.slug}/${file.fileType}s/${file.category}/${file.filename}`,
@@ -722,7 +762,7 @@ function generateFirestoreData(
       slug: projectSlug,
       name: firstFile.projectName,
       category,
-      subcategory: projectFiles[0].projectInfo.subcategory,
+      subcategory: firstFile.subcategory,
       photos,
       documents,
     });
@@ -908,11 +948,15 @@ async function main(): Promise<void> {
     const uploadResult = await uploadFiles(filesToUpload, options);
 
     // Print summary
+    const newlyUploaded = uploadResult.uploaded.filter(f => f.wasNewlyUploaded);
+    const existing = uploadResult.uploaded.filter(f => !f.wasNewlyUploaded);
+
     console.log("=====================================");
     console.log("📊 Upload Summary");
     console.log("=====================================");
     console.log(`✅ Total files processed: ${uploadResult.summary.totalFiles}`);
-    console.log(`✅ Files uploaded: ${uploadResult.summary.uploadedCount}`);
+    console.log(`✅ Files uploaded: ${newlyUploaded.length}`);
+    console.log(`✓  Files already existed: ${existing.length}`);
     console.log(`   - Images: ${uploadResult.summary.imageCount}`);
     console.log(`   - Documents: ${uploadResult.summary.documentCount}`);
     console.log(`⏭️  Files skipped: ${uploadResult.summary.skippedCount}`);

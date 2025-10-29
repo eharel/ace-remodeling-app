@@ -17,12 +17,12 @@ export function getCategoryDisplayName(category: ProjectCategory): string {
  */
 export function getCategoryIcon(category: ProjectCategory): string {
   const icons: Record<ProjectCategory, string> = {
-    [PROJECT_CATEGORIES.BATHROOM]: "bathroom",
     [PROJECT_CATEGORIES.KITCHEN]: "kitchen",
-    [PROJECT_CATEGORIES.GENERAL_REMODELING]: "build",
+    [PROJECT_CATEGORIES.BATHROOM]: "bathroom",
+    [PROJECT_CATEGORIES.FULL_HOME]: "home",
+    [PROJECT_CATEGORIES.ADU_ADDITION]: "home-work",
     [PROJECT_CATEGORIES.OUTDOOR]: "yard",
-    [PROJECT_CATEGORIES.BASEMENT]: "basement",
-    [PROJECT_CATEGORIES.ATTIC]: "attic",
+    [PROJECT_CATEGORIES.POOLS]: "pool",
   };
   return icons[category] || "folder";
 }

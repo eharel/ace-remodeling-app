@@ -13,7 +13,7 @@ import {
   ThemedView,
 } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
-import { getCategoryDisplayName, getCategoryIcon } from "@/shared/utils";
+import { getAllCategories, getCategoryDisplayName, getCategoryIcon } from "@/shared/utils";
 
 interface CategoryItem {
   id: ProjectCategory;
@@ -30,38 +30,14 @@ export default function PortfolioScreen() {
   const categories = useMemo(() => {
     if (!projects) return [];
 
-    const categoryData: CategoryItem[] = [
-      {
-        id: "bathroom",
-        name: getCategoryDisplayName("bathroom"),
-        icon: getCategoryIcon("bathroom"),
-        count: projects.filter((p) => p.category === "bathroom").length,
-      },
-      {
-        id: "kitchen",
-        name: getCategoryDisplayName("kitchen"),
-        icon: getCategoryIcon("kitchen"),
-        count: projects.filter((p) => p.category === "kitchen").length,
-      },
-      {
-        id: "deck",
-        name: getCategoryDisplayName("deck"),
-        icon: getCategoryIcon("deck"),
-        count: projects.filter((p) => p.category === "deck").length,
-      },
-      {
-        id: "pool",
-        name: getCategoryDisplayName("pool"),
-        icon: getCategoryIcon("pool"),
-        count: projects.filter((p) => p.category === "pool").length,
-      },
-      {
-        id: "full-house",
-        name: getCategoryDisplayName("full-house"),
-        icon: getCategoryIcon("full-house"),
-        count: projects.filter((p) => p.category === "full-house").length,
-      },
-    ];
+    // Dynamically build category list from all available categories
+    const allCategories = getAllCategories();
+    const categoryData: CategoryItem[] = allCategories.map((category) => ({
+      id: category,
+      name: getCategoryDisplayName(category),
+      icon: getCategoryIcon(category),
+      count: projects.filter((p) => p.category === category).length,
+    }));
 
     // Only show categories that have projects
     return categoryData.filter((category) => category.count > 0);
