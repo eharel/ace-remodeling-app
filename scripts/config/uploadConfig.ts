@@ -15,14 +15,15 @@ export const BASE_ASSETS_PATH =
 
 /**
  * Valid project categories
+ * These match the local folder names in ace-remodeling-assets/
  */
 export const VALID_CATEGORIES = [
   "kitchen",
   "bathroom",
-  "pools",
-  "outdoor",
-  "adu",
-  "addition",
+  "full-home", // Full home remodels
+  "outdoor", // Outdoor living spaces
+  "adu", // ADU (Accessory Dwelling Unit) and additions
+  "pools", // Pool projects (future)
 ] as const;
 
 /**
