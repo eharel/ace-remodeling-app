@@ -15,7 +15,7 @@ import { ThemeName, themes, ThemeSetting } from "@/core/themes";
 const THEME_NAMES: ThemeName[] = Object.keys(themes) as ThemeName[];
 const SYSTEM_THEME = "system" as const;
 const DEFAULT_THEME: ThemeName = "main"; // Design decision: main as default
-const DEFAULT_SETTING: ThemeSetting = SYSTEM_THEME;
+const DEFAULT_SETTING: ThemeSetting = "main"; // Start with main theme by default
 const THEME_SETTING_KEY = "@theme_setting";
 
 // Theme Context Types

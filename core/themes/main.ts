@@ -15,7 +15,7 @@ export const mainTheme: Theme = {
     background: {
       primary: "#F7F4EF", // Warm off-white from website
       secondary: "#ffffff", // Pure white for contrast
-      tertiary: "#323B4A", // Dark blue-gray for headers/footers (like website footer)
+      tertiary: "#323b4a", // Dark blue-gray for headers/footers (like website footer)
       accent: "#e2e8f0", // Medium light gray for separators
       card: "#ffffff", // White for cards and elevated elements
       section: "#F7F4EF", // Warm off-white for content sections

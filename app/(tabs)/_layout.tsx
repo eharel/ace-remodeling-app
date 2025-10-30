@@ -29,18 +29,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "Projects",
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="home" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="portfolio"
-        options={{
-          title: "Portfolio",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="business" size={size} color={color} />
+            <MaterialIcons name="grid-view" size={size} color={color} />
           ),
         }}
       />
