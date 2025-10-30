@@ -31,7 +31,12 @@ export default function CategoryScreen() {
             headerShown: false, // Hide React Navigation header
           }}
         />
-        <PageHeader title="Category Not Found" showBack={true} backLabel="Portfolio" />
+        <PageHeader
+          title="Category Not Found"
+          showBack={true}
+          backLabel="Portfolio"
+          layoutMode="inline"
+        />
         <EmptyState
           title="Category Not Found"
           message="The requested category does not exist."
@@ -100,6 +105,7 @@ export default function CategoryScreen() {
           }
           showBack={true}
           backLabel="Portfolio"
+          layoutMode="inline"
         />
         <LoadingState />
       </ThemedView>
@@ -123,6 +129,7 @@ export default function CategoryScreen() {
           }
           showBack={true}
           backLabel="Portfolio"
+          layoutMode="inline"
         />
         <EmptyState
           title="Error Loading Projects"
@@ -156,6 +163,7 @@ export default function CategoryScreen() {
           }
           showBack={true}
           backLabel="Portfolio"
+          layoutMode="inline"
         />
         <EmptyState
           title={`No ${categoryDisplayName} Projects`}
@@ -183,6 +191,7 @@ export default function CategoryScreen() {
         }
         showBack={true}
         backLabel="Portfolio"
+        layoutMode="inline"
         subtitle={`Explore our ${categoryDisplayName.toLowerCase()} portfolio`}
       >
         <ThemedText style={styles.projectCount}>

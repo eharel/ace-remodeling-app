@@ -17,6 +17,8 @@ interface PageHeaderProps {
   showBack?: boolean; // Whether to show back button
   backLabel?: string; // Optional label next to back button
   onBack?: () => void; // Custom back handler (defaults to router.back())
+  // Layout mode
+  layoutMode?: "stacked" | "inline"; // Layout pattern (stacked for content, inline for control bars)
 }
 
 /**
@@ -24,15 +26,21 @@ interface PageHeaderProps {
  *
  * Single source of truth for all page headers across the app.
  * Supports both simple text titles and complex custom components.
+ * Supports two layout modes for different header patterns.
  *
  * Features:
  * - Consistent top spacing (64px default, 32px compact)
  * - Standardized typography
  * - Optional back button with custom labels
  * - Support for custom title components (dropdowns, filters, etc.)
+ * - Two layout modes: stacked (default) and inline
  * - Optional subtitle
  * - Optional custom content below header
  * - Theme-aware styling
+ *
+ * Layout Modes:
+ * - stacked (default): Back button above title, for content pages
+ * - inline: Back button and title side-by-side, for control bars
  *
  * Variants:
  * - default: 64px top spacing (for pages without nav bars)
@@ -40,17 +48,27 @@ interface PageHeaderProps {
  *
  * Usage Examples:
  *
- * // Simple text title:
- * <PageHeader title="About Us" showBack backLabel="Settings" />
+ * // Content page (stacked layout - default):
+ * <PageHeader
+ *   title="About Us"
+ *   subtitle="Our story"
+ *   showBack
+ *   backLabel="Settings"
+ * />
  *
- * // Custom interactive title:
- * <PageHeader customTitle={<CategoryPicker />} showBack backLabel="Portfolio" />
+ * // Control bar (inline layout):
+ * <PageHeader
+ *   customTitle={<CategoryPicker />}
+ *   showBack
+ *   backLabel="Portfolio"
+ *   layoutMode="inline"
+ * />
  *
- * // With subtitle:
+ * // Simple text with inline layout:
  * <PageHeader
  *   title="Projects"
- *   subtitle="Browse our portfolio"
  *   showBack
+ *   layoutMode="inline"
  * />
  */
 export function PageHeader({
@@ -62,6 +80,7 @@ export function PageHeader({
   showBack = false,
   backLabel,
   onBack,
+  layoutMode = "stacked", // Default to stacked for backward compatibility
 }: PageHeaderProps) {
   const { theme } = useTheme();
   const router = useRouter();
@@ -74,6 +93,67 @@ export function PageHeader({
     }
   };
 
+  // Render inline layout (control bar pattern)
+  if (layoutMode === "inline") {
+    return (
+      <View
+        style={[
+          styles.container,
+          variant === "compact" && styles.containerCompact,
+        ]}
+      >
+        {/* Control Bar: Back button and title on same line */}
+        <View style={styles.controlBar}>
+          {/* Back Button - Left Side */}
+          {showBack && (
+            <TouchableOpacity
+              onPress={handleBackPress}
+              style={styles.controlBarBackButton}
+              activeOpacity={DesignTokens.interactions.activeOpacity}
+              accessibilityLabel={`Go back to ${
+                backLabel || "previous screen"
+              }`}
+              accessibilityRole="button"
+            >
+              <MaterialIcons
+                name="chevron-left"
+                size={28}
+                color={theme.colors.text.primary}
+              />
+              {backLabel && (
+                <ThemedText variant="body" style={styles.backLabel}>
+                  {backLabel}
+                </ThemedText>
+              )}
+            </TouchableOpacity>
+          )}
+
+          {/* Title - Right Side (custom or text) */}
+          {customTitle ? (
+            <View style={styles.controlBarTitle}>{customTitle}</View>
+          ) : title ? (
+            <View style={styles.controlBarTitle}>
+              <ThemedText variant="title" style={styles.title}>
+                {title}
+              </ThemedText>
+            </View>
+          ) : null}
+        </View>
+
+        {/* Subtitle (appears below control bar) */}
+        {subtitle && (
+          <ThemedText variant="body" style={styles.subtitle}>
+            {subtitle}
+          </ThemedText>
+        )}
+
+        {/* Custom Children */}
+        {children && <View style={styles.children}>{children}</View>}
+      </View>
+    );
+  }
+
+  // Render stacked layout (content page pattern) - DEFAULT
   return (
     <View
       style={[
@@ -81,7 +161,7 @@ export function PageHeader({
         variant === "compact" && styles.containerCompact,
       ]}
     >
-      {/* Back Button */}
+      {/* Back Button (on its own line above title) */}
       {showBack && (
         <TouchableOpacity
           onPress={handleBackPress}
@@ -134,6 +214,7 @@ const styles = StyleSheet.create({
   containerCompact: {
     paddingTop: DesignTokens.spacing[8], // 32px - for pages WITH nav bar
   },
+  // STACKED LAYOUT STYLES
   backButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -160,5 +241,24 @@ const styles = StyleSheet.create({
   },
   children: {
     marginTop: DesignTokens.spacing[4], // 16px between header content and children
+  },
+  // INLINE LAYOUT STYLES
+  controlBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: DesignTokens.spacing[4], // 16px space below control bar
+  },
+  controlBarBackButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: DesignTokens.spacing[2], // 8px vertical padding for touch target
+    paddingRight: DesignTokens.spacing[3], // 12px right padding
+    marginLeft: -DesignTokens.spacing[1], // -4px optical alignment
+  },
+  controlBarTitle: {
+    flex: 1,
+    alignItems: "flex-end", // Align to right side
+    paddingLeft: DesignTokens.spacing[4], // 16px space from back button
   },
 });
