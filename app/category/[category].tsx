@@ -28,11 +28,10 @@ export default function CategoryScreen() {
       <ThemedView style={styles.container}>
         <Stack.Screen
           options={{
-            title: "Category Not Found",
-            headerShown: true,
-            headerBackTitle: "Portfolio",
+            headerShown: false, // Hide React Navigation header
           }}
         />
+        <PageHeader title="Category Not Found" showBack={true} backLabel="Portfolio" />
         <EmptyState
           title="Category Not Found"
           message="The requested category does not exist."
@@ -78,7 +77,7 @@ export default function CategoryScreen() {
             DesignTokens.typography.fontSize.sm *
             DesignTokens.typography.lineHeight.tight,
           fontFamily: DesignTokens.typography.fontFamily.medium,
-          color: theme.colors.text.tertiary,
+          color: theme.colors.text.secondary,
         },
       }),
     [theme]
@@ -89,15 +88,18 @@ export default function CategoryScreen() {
       <ThemedView style={styles.container}>
         <Stack.Screen
           options={{
-            headerShown: true,
-            headerTitle: () => (
-              <CategoryPicker
-                currentCategory={validCategory}
-                onCategoryChange={handleCategoryChange}
-              />
-            ),
-            headerBackTitle: "Portfolio",
+            headerShown: false, // Hide React Navigation header
           }}
+        />
+        <PageHeader
+          customTitle={
+            <CategoryPicker
+              currentCategory={validCategory}
+              onCategoryChange={handleCategoryChange}
+            />
+          }
+          showBack={true}
+          backLabel="Portfolio"
         />
         <LoadingState />
       </ThemedView>
@@ -109,15 +111,18 @@ export default function CategoryScreen() {
       <ThemedView style={styles.container}>
         <Stack.Screen
           options={{
-            headerShown: true,
-            headerTitle: () => (
-              <CategoryPicker
-                currentCategory={validCategory}
-                onCategoryChange={handleCategoryChange}
-              />
-            ),
-            headerBackTitle: "Portfolio",
+            headerShown: false, // Hide React Navigation header
           }}
+        />
+        <PageHeader
+          customTitle={
+            <CategoryPicker
+              currentCategory={validCategory}
+              onCategoryChange={handleCategoryChange}
+            />
+          }
+          showBack={true}
+          backLabel="Portfolio"
         />
         <EmptyState
           title="Error Loading Projects"
@@ -139,15 +144,18 @@ export default function CategoryScreen() {
       <ThemedView style={styles.container}>
         <Stack.Screen
           options={{
-            headerShown: true,
-            headerTitle: () => (
-              <CategoryPicker
-                currentCategory={validCategory}
-                onCategoryChange={handleCategoryChange}
-              />
-            ),
-            headerBackTitle: "Portfolio",
+            headerShown: false, // Hide React Navigation header
           }}
+        />
+        <PageHeader
+          customTitle={
+            <CategoryPicker
+              currentCategory={validCategory}
+              onCategoryChange={handleCategoryChange}
+            />
+          }
+          showBack={true}
+          backLabel="Portfolio"
         />
         <EmptyState
           title={`No ${categoryDisplayName} Projects`}
@@ -163,20 +171,19 @@ export default function CategoryScreen() {
     <ThemedView style={styles.container}>
       <Stack.Screen
         options={{
-          headerShown: true,
-          headerTitle: () => (
-            <CategoryPicker
-              currentCategory={validCategory}
-              onCategoryChange={handleCategoryChange}
-            />
-          ),
-          headerBackTitle: "Portfolio",
+          headerShown: false, // Hide React Navigation header
         }}
       />
       <PageHeader
-        title={categoryDisplayName}
+        customTitle={
+          <CategoryPicker
+            currentCategory={validCategory}
+            onCategoryChange={handleCategoryChange}
+          />
+        }
+        showBack={true}
+        backLabel="Portfolio"
         subtitle={`Explore our ${categoryDisplayName.toLowerCase()} portfolio`}
-        variant="compact"
       >
         <ThemedText style={styles.projectCount}>
           {categoryProjects.length} project

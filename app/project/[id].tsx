@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { ImageGalleryModal } from "@/features/gallery";
-import { ThemedText, ThemedView } from "@/shared/components";
+import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
@@ -135,6 +135,9 @@ export default function ProjectDetailScreen() {
         container: {
           flex: 1,
           backgroundColor: theme.colors.background.primary,
+        },
+        scrollView: {
+          flex: 1,
         },
         errorState: {
           flex: 1,
@@ -562,11 +565,11 @@ export default function ProjectDetailScreen() {
       <>
         <Stack.Screen
           options={{
-            title: "Project Details",
-            headerBackTitle: "Back",
+            headerShown: false, // Hide React Navigation's header
           }}
         />
         <ThemedView style={styles.container}>
+          <PageHeader title="Project Details" showBack={true} backLabel="Back" />
           <ThemedView style={styles.errorState}>
             <ThemedText style={styles.errorText}>Project not found</ThemedText>
           </ThemedView>
@@ -670,20 +673,21 @@ export default function ProjectDetailScreen() {
     <>
       <Stack.Screen
         options={{
-          title: project.name,
-          headerBackTitle: "Back",
+          headerShown: false, // Hide React Navigation's header
         }}
       />
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={{ paddingBottom: DesignTokens.spacing[20] }}
-      >
-        {/* Hero Image */}
-        <Image
-          source={{ uri: project.thumbnail }}
-          style={styles.heroImage}
-          contentFit="cover"
-        />
+      <ThemedView style={styles.container}>
+        <PageHeader title={project.name} showBack={true} backLabel="Back" variant="compact" />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={{ paddingBottom: DesignTokens.spacing[20] }}
+        >
+          {/* Hero Image */}
+          <Image
+            source={{ uri: project.thumbnail }}
+            style={styles.heroImage}
+            contentFit="cover"
+          />
 
         {/* Project Header */}
         <ThemedView style={styles.header}>
@@ -986,7 +990,8 @@ export default function ProjectDetailScreen() {
             </ThemedView>
           </ThemedView>
         )}
-      </ScrollView>
+        </ScrollView>
+      </ThemedView>
 
       {/* Image Gallery Modal */}
       {project && project.pictures && project.pictures.length > 0 && (
