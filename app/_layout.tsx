@@ -32,7 +32,17 @@ function Navigation() {
       <NavigationThemeProvider
         value={currentTheme === "dark" ? DarkTheme : DefaultTheme}
       >
-        <Stack>
+        {/* 
+          Centralized Stack navigation configuration
+          Headers are managed by PageHeader component for full styling control
+          Individual screens can still use native headers if needed by setting headerShown: true
+        */}
+        <Stack
+          screenOptions={{
+            headerShown: false, // Hide all navigation headers by default
+            animation: "slide_from_right", // Smooth page transitions
+          }}
+        >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
             name="category/[category]"
