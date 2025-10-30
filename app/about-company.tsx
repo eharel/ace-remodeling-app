@@ -1,4 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { Stack } from "expo-router";
 import React, { useMemo } from "react";
 import {
   Linking,
@@ -78,6 +79,10 @@ export default function AboutCompanyScreen() {
         valueTitle: {
           marginBottom: DesignTokens.spacing[1],
         },
+        buttonContainer: {
+          alignItems: "center",
+          paddingHorizontal: DesignTokens.spacing[4],
+        },
         button: {
           flexDirection: "row",
           alignItems: "center",
@@ -88,6 +93,8 @@ export default function AboutCompanyScreen() {
           borderRadius: DesignTokens.borderRadius.md,
           ...DesignTokens.shadows.sm,
           gap: DesignTokens.spacing[2],
+          maxWidth: 400,
+          width: "100%",
         },
         buttonText: {
           color: theme.colors.text.inverse,
@@ -127,15 +134,25 @@ export default function AboutCompanyScreen() {
   ];
 
   return (
-    <ThemedView style={styles.container}>
-      <PageHeader
-        title="About ACE Remodeling"
-        subtitle="Transforming Austin, One Home at a Time!"
+    <>
+      <Stack.Screen
+        options={{
+          title: "About ACE Remodeling",
+          headerBackTitle: "Settings",
+        }}
       />
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-      >
+      <ThemedView style={styles.container}>
+        <PageHeader
+          title="About ACE Remodeling"
+          subtitle="Transforming Austin, One Home at a Time!"
+        />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={[
+            styles.content,
+            { paddingBottom: DesignTokens.spacing[24] },
+          ]}
+        >
         {/* Our Story Section */}
         <View style={styles.section}>
           <ThemedText variant="subtitle" style={styles.sectionTitle}>
@@ -205,21 +222,26 @@ export default function AboutCompanyScreen() {
           <ThemedText variant="body" style={styles.contactText}>
             We look forward to meeting you.
           </ThemedText>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleWebsiteLinkPress}
-            activeOpacity={DesignTokens.interactions.activeOpacity}
-          >
-            <MaterialIcons
-              name="public"
-              size={20}
-              color={theme.colors.text.inverse}
-            />
-            <ThemedText style={styles.buttonText}>Visit Our Website</ThemedText>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleWebsiteLinkPress}
+              activeOpacity={DesignTokens.interactions.activeOpacity}
+            >
+              <MaterialIcons
+                name="public"
+                size={20}
+                color={theme.colors.text.inverse}
+              />
+              <ThemedText style={styles.buttonText}>
+                Visit Our Website
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
-    </ThemedView>
+      </ThemedView>
+    </>
   );
 }
 
