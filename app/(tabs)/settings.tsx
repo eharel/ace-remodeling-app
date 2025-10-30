@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
 import {
@@ -13,6 +14,7 @@ import { useTheme } from "@/shared/contexts";
 
 export default function SettingsScreen() {
   const { theme } = useTheme();
+  const router = useRouter();
 
   const styles = useMemo(
     () =>
@@ -60,6 +62,9 @@ export default function SettingsScreen() {
         },
         infoItemDescription: {
           opacity: 0.7,
+        },
+        infoItemChevron: {
+          marginLeft: DesignTokens.spacing[2],
         },
         versionInfo: {
           textAlign: "center",
@@ -112,7 +117,11 @@ export default function SettingsScreen() {
               </View>
             </View>
 
-            <View style={styles.infoItem}>
+            <TouchableOpacity
+              style={styles.infoItem}
+              onPress={() => router.push("/about-company")}
+              activeOpacity={DesignTokens.interactions.activeOpacity}
+            >
               <MaterialIcons
                 name="business"
                 size={24}
@@ -130,7 +139,13 @@ export default function SettingsScreen() {
                   About ACE Remodeling TX
                 </ThemedText>
               </View>
-            </View>
+              <MaterialIcons
+                name="chevron-right"
+                size={24}
+                color={theme.colors.text.secondary}
+                style={styles.infoItemChevron}
+              />
+            </TouchableOpacity>
 
             <ThemedText variant="caption" style={styles.versionInfo}>
               Built for ACE Remodeling TX • Transforming Austin Homes
