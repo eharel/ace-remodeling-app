@@ -60,8 +60,12 @@ export function CategoryPicker({
         trigger: {
           flexDirection: "row",
           alignItems: "center",
-          paddingHorizontal: DesignTokens.spacing[2],
-          paddingVertical: DesignTokens.spacing[1],
+          paddingHorizontal: DesignTokens.spacing[3], // 12px horizontal padding
+          paddingVertical: DesignTokens.spacing[2], // 8px vertical padding
+          backgroundColor: theme.colors.interactive.secondary, // Sage green (full solid color from theme)
+          borderRadius: DesignTokens.borderRadius.md, // 8px rounded corners
+          minHeight: 44, // iOS minimum touch target
+          justifyContent: "center",
         },
         triggerText: {
           fontSize: DesignTokens.typography.fontSize.lg,
@@ -70,7 +74,7 @@ export function CategoryPicker({
             DesignTokens.typography.lineHeight.tight,
           fontWeight: DesignTokens.typography.fontWeight.semibold,
           fontFamily: DesignTokens.typography.fontFamily.semibold,
-          color: theme.colors.text.primary,
+          color: theme.colors.text.inverse, // White text for contrast on sage green
           marginRight: DesignTokens.spacing[1],
         },
         modalOverlay: {
@@ -173,7 +177,10 @@ export function CategoryPicker({
     <>
       <Pressable
         onPress={() => setIsOpen(true)}
-        style={styles.trigger}
+        style={({ pressed }) => [
+          styles.trigger,
+          pressed && { opacity: DesignTokens.interactions.activeOpacity },
+        ]}
         accessibilityRole="button"
         accessibilityLabel={`Current category: ${getCategoryDisplayName(
           currentCategory
@@ -186,7 +193,7 @@ export function CategoryPicker({
         <MaterialIcons
           name="arrow-drop-down"
           size={24}
-          color={theme.colors.text.primary}
+          color={theme.colors.text.inverse}
         />
       </Pressable>
 
