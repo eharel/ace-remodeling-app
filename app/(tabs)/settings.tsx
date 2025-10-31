@@ -1,4 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -97,26 +98,6 @@ export default function SettingsScreen() {
           </ThemedText>
 
           <ThemedView style={styles.aboutContainer}>
-            <View style={styles.infoItem}>
-              <MaterialIcons
-                name="info"
-                size={24}
-                color={theme.colors.text.secondary}
-                style={styles.infoItemIcon}
-              />
-              <View style={styles.infoItemContent}>
-                <ThemedText variant="body" style={styles.infoItemTitle}>
-                  App Version
-                </ThemedText>
-                <ThemedText
-                  variant="caption"
-                  style={styles.infoItemDescription}
-                >
-                  ACE Remodeling App v1.0.0
-                </ThemedText>
-              </View>
-            </View>
-
             <TouchableOpacity
               style={styles.infoItem}
               onPress={() => router.push("/about-company")}
@@ -146,6 +127,26 @@ export default function SettingsScreen() {
                 style={styles.infoItemChevron}
               />
             </TouchableOpacity>
+
+            <View style={styles.infoItem}>
+              <MaterialIcons
+                name="info"
+                size={24}
+                color={theme.colors.text.secondary}
+                style={styles.infoItemIcon}
+              />
+              <View style={styles.infoItemContent}>
+                <ThemedText variant="body" style={styles.infoItemTitle}>
+                  App Version
+                </ThemedText>
+                <ThemedText
+                  variant="caption"
+                  style={styles.infoItemDescription}
+                >
+                  ACE Remodeling App v{Constants.expoConfig?.version || "1.0.0"}
+                </ThemedText>
+              </View>
+            </View>
 
             <ThemedText variant="caption" style={styles.versionInfo}>
               Built for ACE Remodeling TX • Transforming Austin Homes
