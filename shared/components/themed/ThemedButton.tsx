@@ -116,7 +116,10 @@ export function ThemedButton({
         textColor: theme.colors.text.tertiary,
         borderColor:
           variant === "secondary" ? theme.colors.border.primary : undefined,
-        borderWidth: variant === "secondary" ? 1 : 0,
+        borderWidth:
+          variant === "secondary"
+            ? DesignTokens.borderWidth.thin
+            : DesignTokens.borderWidth.none,
         pressedOpacity: 1, // No press effect when disabled
       };
     }
@@ -127,7 +130,7 @@ export function ThemedButton({
           backgroundColor: theme.colors.interactive.primary,
           textColor: theme.colors.text.inverse,
           borderColor: undefined,
-          borderWidth: 0,
+          borderWidth: DesignTokens.borderWidth.none,
           pressedOpacity: DesignTokens.interactions.activeOpacity,
         };
       case "secondary":
@@ -135,7 +138,7 @@ export function ThemedButton({
           backgroundColor: theme.colors.background.elevated,
           textColor: theme.colors.text.primary,
           borderColor: theme.colors.border.primary,
-          borderWidth: 1,
+          borderWidth: DesignTokens.borderWidth.thin,
           pressedOpacity: DesignTokens.interactions.activeOpacity,
         };
       case "ghost":
@@ -143,7 +146,7 @@ export function ThemedButton({
           backgroundColor: "transparent",
           textColor: theme.colors.text.primary,
           borderColor: undefined,
-          borderWidth: 0,
+          borderWidth: DesignTokens.borderWidth.none,
           pressedOpacity: DesignTokens.interactions.activeOpacity,
         };
       default:
@@ -151,7 +154,7 @@ export function ThemedButton({
           backgroundColor: theme.colors.interactive.primary,
           textColor: theme.colors.text.inverse,
           borderColor: undefined,
-          borderWidth: 0,
+          borderWidth: DesignTokens.borderWidth.none,
           pressedOpacity: DesignTokens.interactions.activeOpacity,
         };
     }
@@ -242,4 +245,3 @@ export function ThemedButton({
     </Pressable>
   );
 }
-

@@ -155,6 +155,15 @@ export const DesignTokens = {
     full: 9999,
   },
 
+  // Border Width
+  borderWidth: {
+    none: 0, // No border
+    thin: 1, // Thin border (most common)
+    base: 2, // Base border
+    thick: 3, // Thick border
+    heavy: 4, // Heavy border
+  },
+
   // Shadows - Universal shadow structures (themes provide shadowColor and shadowOpacity)
   shadows: {
     sm: {
@@ -221,14 +230,12 @@ export const DesignTokens = {
     },
     modal: {
       borderRadius: 12,
-      borderWidth: 1,
       maxWidth: 500,
       maxHeightPercent: 70,
       minHeight: 500,
     },
     card: {
       borderRadius: 16,
-      borderWidth: 1,
     },
     button: {
       borderRadius: 12,
@@ -236,7 +243,6 @@ export const DesignTokens = {
     },
     input: {
       borderRadius: 8,
-      borderWidth: 1,
       minHeight: 44,
     },
     header: {
@@ -254,8 +260,15 @@ export const DesignTokens = {
 
   // Component Size Constants - Universal dimensions only
   componentSizes: {
-    // Icon Button - universal dimensions
-    iconButton: 40,
+    // Icon Buttons - universal dimensions (touch-friendly sizes)
+    iconButton: 44, // Default size (iOS minimum touch target)
+    iconButtonSmall: 32, // Compact size for dense UIs
+    iconButtonLarge: 56, // Large size for prominent actions (matches FAB)
+
+    // Icon Sizes - for icons within buttons
+    iconSize: 24, // Default icon size
+    iconSizeSmall: 18, // Small icon size
+    iconSizeLarge: 28, // Large icon size
 
     // Thumbnail - universal dimensions
     thumbnail: 40,

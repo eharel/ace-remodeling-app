@@ -1,11 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
-import {
-  Pressable,
-  PressableProps,
-  StyleSheet,
-  ViewStyle,
-} from "react-native";
+import { Pressable, PressableProps, StyleSheet, ViewStyle } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
 import { useTheme } from "@/shared/contexts";
@@ -54,16 +49,16 @@ export interface ThemedIconButtonProps extends Omit<PressableProps, "style"> {
 
 const SIZE_CONFIG = {
   small: {
-    containerSize: 32,
-    iconSize: 18,
+    containerSize: DesignTokens.componentSizes.iconButtonSmall,
+    iconSize: DesignTokens.componentSizes.iconSizeSmall,
   },
   medium: {
-    containerSize: DesignTokens.componentSizes.iconButton, // 44
-    iconSize: 24,
+    containerSize: DesignTokens.componentSizes.iconButton,
+    iconSize: DesignTokens.componentSizes.iconSize,
   },
   large: {
-    containerSize: 56,
-    iconSize: 28,
+    containerSize: DesignTokens.componentSizes.iconButtonLarge,
+    iconSize: DesignTokens.componentSizes.iconSizeLarge,
   },
 } as const;
 
@@ -93,35 +88,35 @@ export function ThemedIconButton({
             backgroundColor: theme.colors.background.overlay,
             iconColor: theme.colors.text.inverse,
             borderColor: undefined,
-            borderWidth: 0,
+            borderWidth: DesignTokens.borderWidth.none,
           };
         case "primary":
           return {
             backgroundColor: theme.colors.interactive.primary,
             iconColor: theme.colors.text.inverse,
             borderColor: undefined,
-            borderWidth: 0,
+            borderWidth: DesignTokens.borderWidth.none,
           };
         case "secondary":
           return {
             backgroundColor: theme.colors.interactive.secondary,
             iconColor: theme.colors.text.inverse,
             borderColor: undefined,
-            borderWidth: 0,
+            borderWidth: DesignTokens.borderWidth.none,
           };
         case "ghost":
           return {
             backgroundColor: "transparent",
             iconColor: theme.colors.text.primary,
             borderColor: undefined,
-            borderWidth: 0,
+            borderWidth: DesignTokens.borderWidth.none,
           };
         default:
           return {
             backgroundColor: theme.colors.interactive.primary,
             iconColor: theme.colors.text.inverse,
             borderColor: undefined,
-            borderWidth: 0,
+            borderWidth: DesignTokens.borderWidth.none,
           };
       }
     }, [variant, theme]);
@@ -165,4 +160,3 @@ export function ThemedIconButton({
     </Pressable>
   );
 }
-
