@@ -1,258 +1,282 @@
-# ACE Remodeling App - Design System
+# ACE Remodeling App - Design System Overview
+
+> **📖 Documentation Hub**: This is a high-level overview of the design system. For detailed implementation guidance, see:
+>
+> - **[THEMING_SYSTEM.md](./THEMING_SYSTEM.md)** - Complete theming architecture and usage
+> - **[STYLING_CONVENTIONS.md](./STYLING_CONVENTIONS.md)** - Best practices and patterns
 
 ## Overview
 
-This document outlines the comprehensive design system implemented for the ACE Remodeling app. The system follows modern design principles and engineering best practices to ensure consistency, maintainability, and scalability.
+The ACE Remodeling app implements a comprehensive design system built on modern principles to ensure consistency, maintainability, and scalability. The system includes design tokens, a flexible theming architecture, and reusable component patterns.
 
-## Architecture
+## Core Architecture
 
-### 1. Design Tokens (`constants/DesignTokens.ts`)
+### 🎨 Design Tokens
 
-**Single source of truth** for all design values including:
+**Location**: `core/themes/base/tokens.ts`
 
-- **Colors**: Primary, secondary, neutral, semantic, and status colors
-- **Typography**: Font sizes, weights, line heights, and families
-- **Spacing**: 8px base unit scale (4, 8, 12, 16, 20, 24, 32, 48, 64, 80, 96, 128)
-- **Shadows**: Consistent elevation system with proper opacity values
-- **Border Radius**: Standardized corner radius values
-- **Transitions**: Animation duration constants
-- **Z-Index**: Layering system for components
+Single source of truth for all design values:
 
-### 2. Styling Utilities (`utils/styling.ts`)
+- **Spacing**: 8px base unit scale (4, 8, 12, 16, 20, 24, 32, 48, 64, 128...)
+- **Typography**: Font sizes, weights, line heights, and families (Inter, SpaceMono)
+- **Layout**: Border radius, shadows, z-index, component dimensions
+- **Interactions**: Opacity values, animation durations, touch targets
+- **Reference Colors**: Base color palettes for themes to use
 
-**Helper functions** for consistent styling:
+### 🌓 Theme System
 
-- **Dynamic access** to design tokens
-- **Predefined style combinations** for common patterns
-- **Status-specific styles** for project states
-- **Type-safe** styling utilities
+**Locations**: `core/themes/`, `shared/contexts/ThemeContext.tsx`
 
-### 3. Component Library
+Flexible theming with full light/dark mode support:
 
-**Enhanced components** using the design system:
+- **Multiple Themes**: Light, dark, and custom theme variants
+- **Theme Context**: React Context for theme state management
+- **Automatic Switching**: System theme detection with manual override
+- **Theme Persistence**: Saves user preference using AsyncStorage
+- **Semantic Colors**: Background, text, border, interactive, status colors
+- **Component-Specific Colors**: Pre-defined color schemes for buttons, cards, inputs, etc.
 
-- **ProjectCard**: Professional card design with improved shadows and spacing
-- **ProjectGallery**: Responsive grid with consistent spacing
-- **Home Screen**: Enhanced typography and visual hierarchy
+### 🧩 Component Library
+
+**Locations**: `shared/components/`, `features/*/components/`
+
+Theme-aware, reusable components:
+
+- **Themed Components**: `ThemedView`, `ThemedText`, `ThemedInput`
+- **Feature Components**: `ProjectCard`, `ProjectGallery`, `PageHeader`
+- **State Components**: `LoadingState`, `ErrorState`, `EmptyState`
+- **UI Components**: Buttons, modals, inputs with consistent styling
 
 ## Design Principles
 
-### 1. **Consistency**
+### 1. Consistency
 
 - All spacing uses the 8px base unit
-- Consistent color palette throughout the app
-- Unified typography scale
-- Standardized shadows and borders
+- Unified color palette with semantic naming
+- Standardized typography scale
+- Consistent shadows and borders across components
 
-### 2. **Accessibility**
+### 2. Accessibility
 
-- High contrast color combinations
+- High contrast color combinations for readability
 - Proper text sizing and line heights
 - Semantic color usage for status indicators
-- Touch-friendly spacing and sizing
+- Touch-friendly spacing (minimum 44px touch targets)
 
-### 3. **Modern Aesthetics**
+### 3. Theming
 
-- Subtle shadows for depth
-- Rounded corners for friendliness
-- Professional color palette
-- Clean, uncluttered layouts
+- Automatic light/dark mode support
+- Theme-aware components that adapt automatically
+- No hardcoded colors in components
+- Flexible theme creation and extension
 
-### 4. **Responsiveness**
+### 4. Responsiveness
 
-- Adaptive spacing based on screen size
+- Adaptive layouts based on screen size
 - Flexible grid systems
-- Consistent margins and padding across devices
+- Consistent spacing across all devices
 
-## Usage Examples
+## Quick Start Guide
 
-### Basic Styling
+### Using Design Tokens
 
 ```typescript
-import { styling } from "@/utils/styling";
+import { DesignTokens } from "@/core/themes";
 
 const styles = StyleSheet.create({
   container: {
-    padding: styling.spacing(5), // 20px
-    backgroundColor: styling.color("background.primary"),
-    borderRadius: styling.borderRadius("lg"), // 16px
-    ...styling.shadow("base"), // Consistent shadow
+    padding: DesignTokens.spacing[4], // 16px
+    borderRadius: DesignTokens.borderRadius.lg, // 16px
+    gap: DesignTokens.spacing[2], // 8px
   },
   title: {
-    fontSize: styling.fontSize("2xl"), // 24px
-    color: styling.color("text.primary"),
-    fontWeight: styling.fontWeight("bold"),
+    fontSize: DesignTokens.typography.fontSize["2xl"], // 24px
+    fontWeight: DesignTokens.typography.fontWeight.bold,
+    lineHeight: DesignTokens.typography.lineHeight.tight,
   },
 });
 ```
 
-### Status Styles
+### Using the Theme System
 
 ```typescript
-import { statusStyles } from "@/utils/styling";
+import { useTheme } from "@/shared/contexts/ThemeContext";
 
-// Automatic status-based styling
-<View style={[styles.badge, statusStyles[project.status]]}>
-  {project.status}
-</View>;
+function MyComponent() {
+  const { theme, isDark, toggleTheme } = useTheme();
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          backgroundColor: theme.colors.background.card,
+          borderColor: theme.colors.border.primary,
+          padding: DesignTokens.spacing[4],
+        },
+        text: {
+          color: theme.colors.text.primary,
+        },
+      }),
+    [theme]
+  );
+
+  return <View style={styles.container}>...</View>;
+}
 ```
 
-### Common Patterns
+### Using Themed Components
 
 ```typescript
-import { commonStyles } from '@/utils/styling';
+import { ThemedView, ThemedText } from "@/shared/components";
 
-// Predefined card style
-<View style={commonStyles.card}>
-  {/* Card content */}
-</View>
-
-// Predefined text styles
-<Text style={commonStyles.text.heading}>Title</Text>
-<Text style={commonStyles.text.body}>Body text</Text>
+function MyScreen() {
+  return (
+    <ThemedView variant="elevated">
+      <ThemedText variant="title">Welcome</ThemedText>
+      <ThemedText variant="body">
+        This view automatically adapts to the current theme.
+      </ThemedText>
+    </ThemedView>
+  );
+}
 ```
 
-## Color System
+## Key Design Values
 
-### Primary Colors
+### Typography Scale
 
-- **Primary 500**: Main brand color (#3b82f6)
-- **Primary 100-400**: Lighter shades for backgrounds and accents
-- **Primary 600-900**: Darker shades for text and emphasis
+- **xs**: 12px | **sm**: 14px | **base**: 16px | **lg**: 18px | **xl**: 20px
+- **2xl**: 24px | **3xl**: 28px | **4xl**: 32px | **5xl**: 36px
 
-### Semantic Colors
+### Spacing Scale (8px base unit)
 
-- **Success**: #10b981 (Green)
-- **Warning**: #f59e0b (Yellow)
-- **Error**: #ef4444 (Red)
-- **Info**: #3b82f6 (Blue)
-
-### Status Colors
-
-- **Completed**: Green with 20% opacity background
-- **In Progress**: Yellow with 20% opacity background
-- **Planning**: Blue with 20% opacity background
-- **On Hold**: Red with 20% opacity background
-
-## Typography Scale
-
-### Font Family
-
-- **Primary**: Inter - Modern, highly readable, professional
-- **Secondary**: Inter - Consistent across all text elements
-- **Mono**: SpaceMono - For code and technical content
+- **1**: 4px | **2**: 8px | **3**: 12px | **4**: 16px | **5**: 20px
+- **6**: 24px | **8**: 32px | **10**: 40px | **12**: 48px | **16**: 64px
 
 ### Font Weights
 
-- **Regular**: Inter-Regular (400) - Body text and general content
-- **Medium**: Inter-Medium (500) - Subtle emphasis and captions
-- **Semibold**: Inter-SemiBold (600) - Subheadings and important text
-- **Bold**: Inter-Bold (700) - Main headings and titles
+- **Normal**: 400 | **Medium**: 500 | **Semibold**: 600 | **Bold**: 700
 
-### Font Sizes
+### Shadow Levels
 
-- **xs**: 12px (Captions, labels)
-- **sm**: 14px (Small text)
-- **base**: 16px (Body text)
-- **lg**: 18px (Large body)
-- **xl**: 20px (Subheadings)
-- **2xl**: 24px (Section titles)
-- **3xl**: 28px (Page titles)
-- **4xl**: 32px (Hero titles)
-- **5xl**: 36px (Large displays)
+- **sm**: Subtle elevation | **base**: Standard elevation
+- **md**: Medium elevation | **lg**: High elevation
 
-## Spacing System
+## Theme Color Categories
 
-### Base Unit: 8px
+### Background Colors
 
-- **1**: 4px (Tiny spacing)
-- **2**: 8px (Small spacing)
-- **3**: 12px (Medium spacing)
-- **4**: 16px (Standard spacing)
-- **5**: 20px (Large spacing)
-- **6**: 24px (Section spacing)
-- **8**: 32px (Major spacing)
-- **10**: 40px (Page spacing)
-- **16**: 128px (Hero spacing)
+`background.primary`, `background.secondary`, `background.card`, `background.elevated`
 
-## Shadow System
+### Text Colors
 
-### Elevation Levels
+`text.primary`, `text.secondary`, `text.tertiary`, `text.inverse`, `text.accent`
 
-- **sm**: Subtle elevation (1px)
-- **base**: Standard elevation (2px)
-- **md**: Medium elevation (4px)
-- **lg**: High elevation (8px)
+### Border Colors
+
+`border.primary`, `border.secondary`, `border.accent`, `border.error`, `border.success`
+
+### Interactive Colors
+
+`interactive.primary`, `interactive.primaryHover`, `interactive.disabled`
+
+### Status Colors
+
+`status.success`, `status.warning`, `status.error`, `status.info` (with `*Light` variants)
 
 ## Best Practices
 
-### 1. **Always use design tokens**
+### ✅ Do This
 
-- Never hardcode colors, spacing, or typography values
-- Use the styling utilities for consistency
+```typescript
+// Use DesignTokens for dimensions
+padding: DesignTokens.spacing[4]
 
-### 2. **Maintain the spacing scale**
+// Use theme for colors
+backgroundColor: theme.colors.background.card
 
-- Stick to the 8px base unit
-- Use predefined spacing values from the system
+// Use themed components when possible
+<ThemedText variant="title">Hello</ThemedText>
 
-### 3. **Leverage common styles**
+// Memoize theme-dependent styles
+const styles = useMemo(() => StyleSheet.create({...}), [theme]);
+```
 
-- Use predefined patterns for cards, buttons, and text
-- Extend common styles rather than creating new ones
+### ❌ Avoid This
 
-### 4. **Think in systems**
+```typescript
+// Don't hardcode values
+padding: 16  // Use DesignTokens.spacing[4] instead
 
-- Consider how changes affect the overall design
-- Maintain consistency across similar components
+// Don't hardcode colors
+backgroundColor: "#ffffff"  // Use theme.colors instead
 
-### 5. **Test on multiple devices**
+// Don't create styles on every render (without useMemo)
+const styles = StyleSheet.create({...})  // Inside component body
+```
 
-- Ensure spacing and typography work across screen sizes
-- Verify touch targets meet accessibility guidelines
+## File Structure
 
-## Future Enhancements
+```
+core/themes/
+├── base/
+│   ├── tokens.ts          # Design tokens (dimensions, spacing, typography)
+│   ├── types.ts           # TypeScript types for themes
+│   └── utils.ts           # Theme utility functions
+├── light.ts               # Light theme color definitions
+├── dark.ts                # Dark theme color definitions
+├── main.ts                # Main theme variant
+└── index.ts               # Theme exports
 
-### 1. **Dark Mode Support**
+shared/
+├── components/
+│   ├── themed/            # Theme-aware components
+│   └── ui/                # Reusable UI components
+├── contexts/
+│   └── ThemeContext.tsx   # Theme state management
+└── utils/
+    └── styling.ts         # Styling utilities (legacy support)
+```
 
-- Add dark theme color variants
-- Implement theme switching
+## Current Features
 
-### 2. **Animation System**
+✅ **Implemented**:
 
-- Define standard animation curves
-- Create reusable transition components
+- Full light/dark theme support
+- Theme switching with persistence
+- System theme detection
+- Theme-aware component library
+- Semantic color system
+- Responsive layouts
+- Design token system
+- TypeScript type safety
 
-### 3. **Component Variants**
+🚧 **Future Enhancements**:
 
-- Add more predefined component styles
-- Create configurable component themes
+- Additional theme presets (high contrast, colorblind-friendly)
+- Theme animation transitions
+- Custom theme creation interface
+- Reduced motion preferences
+- Extended component variant library
 
-### 4. **Accessibility Improvements**
+## Detailed Documentation
 
-- Add high contrast mode
-- Implement reduced motion preferences
+For comprehensive implementation details, code examples, and migration guides:
 
-## Maintenance
+- **[THEMING_SYSTEM.md](./THEMING_SYSTEM.md)** - Complete theming system documentation
 
-### 1. **Adding New Tokens**
+  - Theme architecture and context usage
+  - Component variants and examples
+  - Theme switching and persistence
+  - Migration guides and breaking changes
 
-- Add to `DesignTokens.ts`
-- Update types if necessary
-- Document in this file
-
-### 2. **Modifying Existing Tokens**
-
-- Consider impact on all components
-- Update related utilities
-- Test across the app
-
-### 3. **Component Updates**
-
-- Use the design system consistently
-- Maintain backward compatibility
-- Update documentation
+- **[STYLING_CONVENTIONS.md](./STYLING_CONVENTIONS.md)** - Best practices and patterns
+  - Performance optimization techniques
+  - StyleSheet usage patterns
+  - Common anti-patterns to avoid
+  - Migration from legacy systems
 
 ---
 
-_This design system ensures the ACE Remodeling app maintains a professional, consistent appearance while being easy to maintain and extend._
+**Last Updated**: November 2024  
+**Status**: ✅ Active - See linked documentation for complete details

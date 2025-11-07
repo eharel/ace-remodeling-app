@@ -1,10 +1,10 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
-import { Pressable, StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet, ViewStyle } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
 import { useTheme } from "../contexts";
-import { ThemedText, ThemedView } from "./themed";
+import { ThemedButton, ThemedText, ThemedView } from "./themed";
 
 interface EmptyStateProps {
   title?: string;
@@ -59,22 +59,10 @@ export function EmptyState({
           marginBottom: DesignTokens.spacing[4],
         },
         actionButton: {
-          backgroundColor: theme.colors.interactive.primary,
-          paddingHorizontal: DesignTokens.spacing[6],
-          paddingVertical: DesignTokens.spacing[3],
-          borderRadius: DesignTokens.borderRadius.md,
           marginTop: DesignTokens.spacing[2],
         },
-        actionText: {
-          color: theme.colors.text.inverse,
-          fontSize: DesignTokens.typography.fontSize.base,
-          lineHeight:
-            DesignTokens.typography.fontSize.base *
-            DesignTokens.typography.lineHeight.normal,
-          fontWeight: DesignTokens.typography.fontWeight.medium,
-        },
       }),
-    [theme]
+    []
   );
 
   return (
@@ -97,14 +85,15 @@ export function EmptyState({
       <ThemedText style={styles.message}>{message}</ThemedText>
 
       {onAction && actionText && (
-        <Pressable
-          style={styles.actionButton}
+        <ThemedButton
+          variant="primary"
+          size="medium"
           onPress={onAction}
           accessibilityLabel={actionText}
-          accessibilityRole="button"
+          style={styles.actionButton}
         >
-          <ThemedText style={styles.actionText}>{actionText}</ThemedText>
-        </Pressable>
+          {actionText}
+        </ThemedButton>
       )}
     </ThemedView>
   );
