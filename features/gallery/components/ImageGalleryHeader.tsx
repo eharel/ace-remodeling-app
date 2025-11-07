@@ -1,9 +1,8 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ThemedText } from "@/shared/components";
+import { ThemedIconButton, ThemedText } from "@/shared/components";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { accessibilityStrings } from "../constants/accessibilityStrings";
@@ -62,14 +61,6 @@ export const ImageGalleryHeader = React.memo<ImageGalleryHeaderProps>(
             paddingHorizontal: DesignTokens.spacing[4],
             paddingBottom: DesignTokens.spacing[4],
           },
-          closeButton: {
-            backgroundColor: theme.colors.background.overlay,
-            borderRadius: DesignTokens.borderRadius.full,
-            width: DesignTokens.componentSizes.iconButton,
-            height: DesignTokens.componentSizes.iconButton,
-            justifyContent: "center",
-            alignItems: "center",
-          },
           imageCounter: {
             backgroundColor: "transparent",
             paddingHorizontal: DesignTokens.spacing[3],
@@ -81,19 +72,14 @@ export const ImageGalleryHeader = React.memo<ImageGalleryHeaderProps>(
 
     return (
       <View style={styles.header}>
-        <Pressable
-          style={styles.closeButton}
+        <ThemedIconButton
+          icon="close"
+          variant="overlay"
+          size="medium"
           onPress={onClose}
           accessibilityLabel={accessibilityStrings.closeButton.label}
           accessibilityHint={accessibilityStrings.closeButton.hint}
-          accessibilityRole="button"
-        >
-          <MaterialIcons
-            name="close"
-            size={DesignTokens.typography.fontSize.lg}
-            color={theme.colors.text.inverse}
-          />
-        </Pressable>
+        />
 
         <View
           style={styles.imageCounter}

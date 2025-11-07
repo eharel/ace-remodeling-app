@@ -1,10 +1,11 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
 import { useTheme } from "../contexts";
+import { ThemedIconButton } from "./themed/ThemedIconButton";
 import { ThemedText } from "./themed/ThemedText";
 
 interface PageHeaderProps {
@@ -106,26 +107,23 @@ export function PageHeader({
         <View style={styles.controlBar}>
           {/* Back Button - Left Side */}
           {showBack && (
-            <TouchableOpacity
-              onPress={handleBackPress}
-              style={styles.controlBarBackButton}
-              activeOpacity={DesignTokens.interactions.activeOpacity}
-              accessibilityLabel={`Go back to ${
-                backLabel || "previous screen"
-              }`}
-              accessibilityRole="button"
-            >
-              <MaterialIcons
-                name="chevron-left"
-                size={28}
-                color={theme.colors.text.primary}
+            <View style={styles.controlBarBackButton}>
+              <ThemedIconButton
+                icon="chevron-left"
+                variant="ghost"
+                size="medium"
+                onPress={handleBackPress}
+                accessibilityLabel={`Go back to ${
+                  backLabel || "previous screen"
+                }`}
+                iconSize={28}
               />
               {backLabel && (
                 <ThemedText variant="body" style={styles.backLabel}>
                   {backLabel}
                 </ThemedText>
               )}
-            </TouchableOpacity>
+            </View>
           )}
 
           {/* Title - Right Side (custom or text) */}
@@ -163,24 +161,21 @@ export function PageHeader({
     >
       {/* Back Button (on its own line above title) */}
       {showBack && (
-        <TouchableOpacity
-          onPress={handleBackPress}
-          style={styles.backButton}
-          activeOpacity={DesignTokens.interactions.activeOpacity}
-          accessibilityLabel={`Go back to ${backLabel || "previous screen"}`}
-          accessibilityRole="button"
-        >
-          <MaterialIcons
-            name="chevron-left"
-            size={28}
-            color={theme.colors.text.primary}
+        <View style={styles.backButton}>
+          <ThemedIconButton
+            icon="chevron-left"
+            variant="ghost"
+            size="medium"
+            onPress={handleBackPress}
+            accessibilityLabel={`Go back to ${backLabel || "previous screen"}`}
+            iconSize={28}
           />
           {backLabel && (
             <ThemedText variant="body" style={styles.backLabel}>
               {backLabel}
             </ThemedText>
           )}
-        </TouchableOpacity>
+        </View>
       )}
 
       {/* Title - Render customTitle if provided, otherwise use text title */}

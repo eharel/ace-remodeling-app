@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ThemedText, ThemedView } from "@/shared/components";
+import { ThemedButton, ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 
 import { FilterDropdownProps } from "../types/types";
@@ -247,22 +247,6 @@ export function FilterDropdown<T extends string>({
       flexDirection: "row",
       gap: DesignTokens.spacing[2],
     },
-    quickActionButton: {
-      paddingHorizontal: DesignTokens.spacing[2],
-      paddingVertical: DesignTokens.spacing[1],
-      borderRadius: DesignTokens.borderRadius.sm,
-      backgroundColor: theme.colors.background.elevated,
-      borderWidth: 1,
-      borderColor: theme.colors.border.primary,
-    },
-    quickActionText: {
-      fontSize: DesignTokens.typography.fontSize.xs,
-      lineHeight:
-        DesignTokens.typography.fontSize.xs *
-        DesignTokens.typography.lineHeight.tight,
-      color: theme.colors.text.secondary,
-      fontWeight: "500",
-    },
     optionsScrollContainer: {
       flex: 1,
       minHeight: 200,
@@ -307,34 +291,6 @@ export function FilterDropdown<T extends string>({
       borderTopColor: theme.colors.border.primary,
       flexDirection: "row",
       gap: DesignTokens.spacing[3],
-    },
-    footerButton: {
-      flex: 1,
-      paddingVertical: DesignTokens.spacing[3],
-      borderRadius: DesignTokens.borderRadius.md,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    cancelButton: {
-      backgroundColor: theme.colors.background.elevated,
-      borderWidth: 1,
-      borderColor: theme.colors.border.primary,
-    },
-    applyButton: {
-      backgroundColor: theme.colors.interactive.primary,
-    },
-    buttonText: {
-      fontSize: DesignTokens.typography.fontSize.base,
-      lineHeight:
-        DesignTokens.typography.fontSize.base *
-        DesignTokens.typography.lineHeight.normal,
-      fontWeight: "600",
-    },
-    cancelButtonText: {
-      color: theme.colors.text.primary,
-    },
-    applyButtonText: {
-      color: theme.colors.text.inverse,
     },
     scrollIndicator: {
       position: "absolute",
@@ -414,26 +370,22 @@ export function FilterDropdown<T extends string>({
                     Filter by {label}
                   </ThemedText>
                   <View style={styles.quickActions}>
-                    <TouchableOpacity
-                      style={styles.quickActionButton}
+                    <ThemedButton
+                      variant="secondary"
+                      size="small"
                       onPress={handleSelectAll}
                       accessibilityLabel="Select all options"
-                      accessibilityRole="button"
                     >
-                      <ThemedText style={styles.quickActionText}>
-                        All
-                      </ThemedText>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.quickActionButton}
+                      All
+                    </ThemedButton>
+                    <ThemedButton
+                      variant="secondary"
+                      size="small"
                       onPress={handleClearAll}
                       accessibilityLabel="Clear all selections"
-                      accessibilityRole="button"
                     >
-                      <ThemedText style={styles.quickActionText}>
-                        None
-                      </ThemedText>
-                    </TouchableOpacity>
+                      None
+                    </ThemedButton>
                   </View>
                 </View>
               </ThemedView>
@@ -522,34 +474,28 @@ export function FilterDropdown<T extends string>({
               </View>
 
               <ThemedView style={styles.modalFooter}>
-                <TouchableOpacity
-                  style={[styles.footerButton, styles.cancelButton]}
+                <ThemedButton
+                  variant="secondary"
+                  size="medium"
                   onPress={handleCancel}
                   accessibilityLabel="Cancel"
-                  accessibilityRole="button"
+                  style={{ flex: 1 }}
                 >
-                  <ThemedText
-                    style={[styles.buttonText, styles.cancelButtonText]}
-                  >
-                    Cancel
-                  </ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.footerButton, styles.applyButton]}
+                  Cancel
+                </ThemedButton>
+                <ThemedButton
+                  variant="primary"
+                  size="medium"
                   onPress={handleApply}
                   accessibilityLabel={`Apply ${
                     tempSelectedValues.length
                   } filter${tempSelectedValues.length === 1 ? "" : "s"}`}
-                  accessibilityRole="button"
+                  style={{ flex: 1 }}
                 >
-                  <ThemedText
-                    style={[styles.buttonText, styles.applyButtonText]}
-                  >
-                    Apply
-                    {tempSelectedValues.length > 0 &&
-                      ` (${tempSelectedValues.length})`}
-                  </ThemedText>
-                </TouchableOpacity>
+                  Apply
+                  {tempSelectedValues.length > 0 &&
+                    ` (${tempSelectedValues.length})`}
+                </ThemedButton>
               </ThemedView>
             </ThemedView>
           </Pressable>
