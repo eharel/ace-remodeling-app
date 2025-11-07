@@ -1,8 +1,8 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
+import { ThemedIconButton } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 
 interface ChecklistHeaderProps {
@@ -49,38 +49,22 @@ export function ChecklistHeader({
         </Text>
       </View>
       <View style={styles.headerActions}>
-        <TouchableOpacity
+        <ThemedIconButton
+          icon="refresh"
+          variant="ghost"
+          size="small"
           onPress={onReset}
-          style={[
-            styles.actionButton,
-            { backgroundColor: theme.colors.background.card },
-          ]}
-          accessibilityRole="button"
           accessibilityLabel="Reset checklist"
           accessibilityHint="Immediately resets all checklist items to unchecked state"
-        >
-          <MaterialIcons
-            name="refresh"
-            size={20}
-            color={theme.colors.text.secondary}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
+        />
+        <ThemedIconButton
+          icon="close"
+          variant="ghost"
+          size="small"
           onPress={onClose}
-          style={[
-            styles.actionButton,
-            { backgroundColor: theme.colors.background.card },
-          ]}
-          accessibilityRole="button"
           accessibilityLabel="Close checklist"
           accessibilityHint="Closes the meeting checklist modal"
-        >
-          <MaterialIcons
-            name="close"
-            size={20}
-            color={theme.colors.text.secondary}
-          />
-        </TouchableOpacity>
+        />
       </View>
     </View>
   );
@@ -112,12 +96,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: DesignTokens.spacing[2],
-  },
-  actionButton: {
-    padding: DesignTokens.spacing[2],
-    borderRadius: DesignTokens.borderRadius.sm,
-    borderWidth: 1,
-    borderColor: "transparent",
-    ...DesignTokens.shadows.sm,
   },
 });

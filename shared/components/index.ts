@@ -12,6 +12,8 @@ export { PageHeader } from "./PageHeader";
 export { ThemeToggle } from "./ThemeToggle";
 
 // Themed Components
+export { ThemedButton } from "./themed/ThemedButton";
+export { ThemedIconButton } from "./themed/ThemedIconButton";
 export { ThemedInput } from "./themed/ThemedInput";
 export { ThemedText } from "./themed/ThemedText";
 export { ThemedView } from "./themed/ThemedView";

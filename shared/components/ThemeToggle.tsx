@@ -1,10 +1,9 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { DesignTokens, ThemeSetting } from "@/core/themes";
 import { useTheme } from "../contexts";
-import { ThemedText } from "./themed";
+import { ThemedIconButton, ThemedText } from "./themed";
 
 type ThemeOption = ThemeSetting;
 
@@ -46,23 +45,6 @@ export function ThemeToggle() {
           alignItems: "center",
           paddingHorizontal: DesignTokens.spacing[6],
         },
-        themeButton: {
-          width: 60,
-          height: 60,
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: DesignTokens.borderRadius.full,
-          borderWidth: DesignTokens.borderRadius.sm,
-          borderColor: theme.colors.border.primary,
-          backgroundColor: theme.colors.background.card,
-        },
-        activeButton: {
-          backgroundColor: theme.colors.interactive.primary,
-          borderColor: theme.colors.interactive.primary,
-        },
-        buttonIcon: {
-          // No margin needed for circular buttons
-        },
         buttonContainer: {
           alignItems: "center",
           gap: DesignTokens.spacing[1],
@@ -78,26 +60,15 @@ export function ThemeToggle() {
           const active = isActive(option.key);
           return (
             <View key={option.key} style={dynamicStyles.buttonContainer}>
-              <TouchableOpacity
-                style={[
-                  dynamicStyles.themeButton,
-                  active && dynamicStyles.activeButton,
-                ]}
+              <ThemedIconButton
+                icon={option.icon as any}
+                variant={active ? "primary" : "secondary"}
+                size="large"
                 onPress={() => handleThemeSelect(option.key)}
-                activeOpacity={0.7}
                 disabled={active}
-              >
-                <MaterialIcons
-                  name={option.icon as any}
-                  size={24}
-                  color={
-                    active
-                      ? theme.colors.text.inverse
-                      : theme.colors.text.primary
-                  }
-                  style={dynamicStyles.buttonIcon}
-                />
-              </TouchableOpacity>
+                accessibilityLabel={`${option.label} theme`}
+                accessibilityState={{ selected: active }}
+              />
               <ThemedText
                 variant="caption"
                 style={[

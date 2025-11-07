@@ -1,10 +1,10 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
-import { Pressable, StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet, ViewStyle } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
 import { useTheme } from "../contexts";
-import { ThemedText, ThemedView } from "./themed";
+import { ThemedButton, ThemedText, ThemedView } from "./themed";
 
 interface ErrorStateProps {
   title?: string;
@@ -56,19 +56,10 @@ export function ErrorState({
           marginBottom: DesignTokens.spacing[4],
         },
         retryButton: {
-          backgroundColor: theme.colors.interactive.primary,
-          paddingHorizontal: DesignTokens.spacing[6],
-          paddingVertical: DesignTokens.spacing[3],
-          borderRadius: DesignTokens.borderRadius.md,
           marginTop: DesignTokens.spacing[2],
         },
-        retryText: {
-          color: theme.colors.text.inverse,
-          fontSize: DesignTokens.typography.fontSize.base,
-          fontWeight: DesignTokens.typography.fontWeight.medium,
-        },
       }),
-    [theme]
+    []
   );
 
   return (
@@ -91,14 +82,15 @@ export function ErrorState({
       <ThemedText style={styles.message}>{message}</ThemedText>
 
       {onRetry && (
-        <Pressable
-          style={styles.retryButton}
+        <ThemedButton
+          variant="primary"
+          size="medium"
           onPress={onRetry}
           accessibilityLabel={retryText}
-          accessibilityRole="button"
+          style={styles.retryButton}
         >
-          <ThemedText style={styles.retryText}>{retryText}</ThemedText>
-        </Pressable>
+          {retryText}
+        </ThemedButton>
       )}
     </ThemedView>
   );

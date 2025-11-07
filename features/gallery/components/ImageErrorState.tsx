@@ -1,9 +1,9 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ThemedText } from "@/shared/components";
+import { ThemedButton, ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 
 interface ImageErrorStateProps {
@@ -79,20 +79,6 @@ export const ImageErrorState = React.memo<ImageErrorStateProps>(
               DesignTokens.typography.fontSize.base,
             marginBottom: DesignTokens.spacing[4],
           },
-          retryButton: {
-            flexDirection: "row",
-            alignItems: "center",
-            gap: DesignTokens.spacing[2],
-            backgroundColor: theme.colors.interactive.primary,
-            paddingHorizontal: DesignTokens.spacing[4],
-            paddingVertical: DesignTokens.spacing[3],
-            borderRadius: DesignTokens.borderRadius.md,
-          },
-          retryText: {
-            color: theme.colors.text.inverse,
-            fontSize: DesignTokens.typography.fontSize.base,
-            fontWeight: DesignTokens.typography.fontWeight.medium,
-          },
         }),
       [theme]
     );
@@ -109,19 +95,15 @@ export const ImageErrorState = React.memo<ImageErrorStateProps>(
           <ThemedText style={styles.title}>Image Load Error</ThemedText>
           <ThemedText style={styles.message}>{error}</ThemedText>
           {onRetry && (
-            <Pressable
-              style={styles.retryButton}
+            <ThemedButton
+              variant="primary"
+              size="medium"
+              icon="refresh"
               onPress={onRetry}
               accessibilityLabel="Retry loading image"
-              accessibilityRole="button"
             >
-              <MaterialIcons
-                name="refresh"
-                size={20}
-                color={theme.colors.text.inverse}
-              />
-              <ThemedText style={styles.retryText}>Retry</ThemedText>
-            </Pressable>
+              Retry
+            </ThemedButton>
           )}
         </View>
       </View>
