@@ -55,9 +55,7 @@
     "updates": {
       "url": "https://u.expo.dev/ccb81db1-d023-4ef7-bcb9-b8c536378d91"
     },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.0.0",
     "extra": {
       "router": {},
       "eas": {
