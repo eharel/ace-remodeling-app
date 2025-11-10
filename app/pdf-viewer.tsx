@@ -2,6 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DesignTokens } from "@/core/themes";
 import { PdfDisplay } from "@/features/pdf";
@@ -11,6 +12,7 @@ import { useTheme } from "@/shared/contexts";
 export default function PdfViewer() {
   const { theme } = useTheme();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{
     url: string;
     name?: string;
@@ -31,8 +33,9 @@ export default function PdfViewer() {
     header: {
       flexDirection: "row",
       alignItems: "center",
+      paddingTop: insets.top + DesignTokens.spacing[3],
+      paddingBottom: DesignTokens.spacing[3],
       paddingHorizontal: DesignTokens.spacing[4],
-      paddingVertical: DesignTokens.spacing[3],
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border.primary,
       backgroundColor: theme.colors.background.secondary,

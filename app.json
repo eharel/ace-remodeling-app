@@ -17,6 +17,7 @@
       }
     },
     "android": {
+      "displayName": "ACE Remodeling",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon.png",
         "backgroundColor": "#ffffff"

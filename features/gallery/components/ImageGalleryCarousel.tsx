@@ -51,18 +51,18 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
  */
 export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
   ({ images, currentIndex, translateX, panGesture, theme }) => {
-    const { isLoading, hasError, getImageError, onImageLoad, onImageError } =
+    const { hasError, getImageError, onImageLoad, onImageError } =
       useImageLoading({ images });
 
-    // Performance optimizations - gradually re-enabling
-    const { isPreloaded, isPreloadFailed } = useImagePreloading({
+    // Performance optimizations - preloading happens in background
+    useImagePreloading({
       images,
       currentIndex,
       preloadRadius: 2,
     });
 
     // Only use lazy loading for galleries with more than 10 images
-    const { shouldRenderImage, isImageLoaded } = useLazyLoading({
+    const { shouldRenderImage } = useLazyLoading({
       images,
       currentIndex,
       visibleRange: images.length > 10 ? 5 : images.length, // Render all images for small galleries
@@ -133,19 +133,14 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
           >
             {visibleImages.map((image, index) => {
               const isCurrentImage = index === currentIndex;
-              const imageLoading = isLoading(image.id);
               const imageError = hasError(image.id);
               const errorMessage = getImageError(image.id);
 
               // Performance optimizations - testing preloading + lazy loading
               const shouldRender = shouldRenderImage(index);
-              const isPreloadedImage = isPreloaded(image.id);
 
-              // Don't render if not in visible range
-              if (!shouldRender) {
-                return null;
-              }
-
+              // Always render a container to maintain carousel positioning
+              // but only load the actual image if in visible range
               return (
                 <View
                   key={image.id}
@@ -162,7 +157,7 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
                     isCurrentImage
                   )}
                 >
-                  {imageError && (
+                  {shouldRender && imageError && (
                     <ImageErrorState
                       error={errorMessage}
                       onRetry={() => {
@@ -172,7 +167,7 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
                     />
                   )}
 
-                  {!imageError && (
+                  {shouldRender && !imageError && (
                     <Image
                       source={{ uri: image.url }}
                       style={styles.image}

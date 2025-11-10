@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
 import { useTheme } from "../contexts";
@@ -107,23 +107,25 @@ export function PageHeader({
         <View style={styles.controlBar}>
           {/* Back Button - Left Side */}
           {showBack && (
-            <View style={styles.controlBarBackButton}>
-              <ThemedIconButton
-                icon="chevron-left"
-                variant="ghost"
-                size="medium"
-                onPress={handleBackPress}
-                accessibilityLabel={`Go back to ${
-                  backLabel || "previous screen"
-                }`}
-                iconSize={28}
+            <Pressable
+              style={styles.controlBarBackButton}
+              onPress={handleBackPress}
+              accessibilityLabel={`Go back to ${
+                backLabel || "previous screen"
+              }`}
+              accessibilityRole="button"
+            >
+              <MaterialIcons
+                name="chevron-left"
+                size={28}
+                color={theme.colors.text.primary}
               />
               {backLabel && (
                 <ThemedText variant="body" style={styles.backLabel}>
                   {backLabel}
                 </ThemedText>
               )}
-            </View>
+            </Pressable>
           )}
 
           {/* Title - Right Side (custom or text) */}
@@ -161,21 +163,23 @@ export function PageHeader({
     >
       {/* Back Button (on its own line above title) */}
       {showBack && (
-        <View style={styles.backButton}>
-          <ThemedIconButton
-            icon="chevron-left"
-            variant="ghost"
-            size="medium"
-            onPress={handleBackPress}
-            accessibilityLabel={`Go back to ${backLabel || "previous screen"}`}
-            iconSize={28}
+        <Pressable
+          style={styles.backButton}
+          onPress={handleBackPress}
+          accessibilityLabel={`Go back to ${backLabel || "previous screen"}`}
+          accessibilityRole="button"
+        >
+          <MaterialIcons
+            name="chevron-left"
+            size={28}
+            color={theme.colors.text.primary}
           />
           {backLabel && (
             <ThemedText variant="body" style={styles.backLabel}>
               {backLabel}
             </ThemedText>
           )}
-        </View>
+        </Pressable>
       )}
 
       {/* Title - Render customTitle if provided, otherwise use text title */}

@@ -11,7 +11,7 @@ import {
 
 import { DesignTokens } from "@/core/themes";
 import { Document } from "@/core/types";
-import { ThemedText } from "@/shared/components";
+import { PageHeader, ThemedText } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -103,7 +103,8 @@ export default function DocumentsPage({}: DocumentsPageProps) {
     },
     content: {
       flex: 1,
-      padding: DesignTokens.spacing[6],
+      paddingHorizontal: DesignTokens.spacing[6],
+      paddingBottom: DesignTokens.spacing[6],
     },
     documentsGrid: {
       flexDirection: "row",
@@ -206,12 +207,17 @@ export default function DocumentsPage({}: DocumentsPageProps) {
     <>
       <Stack.Screen
         options={{
-          title: "Documents",
-          headerBackTitle: project?.name || "Back",
+          headerShown: false,
           presentation: "card",
         }}
       />
       <View style={styles.container}>
+        <PageHeader
+          title="Documents"
+          showBack
+          backLabel={project?.name}
+          variant="compact"
+        />
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {documents.length > 0 ? (
             <View style={styles.documentsGrid}>
