@@ -142,6 +142,7 @@ export function SearchFiltersBar({
           options={projectManagerOptions}
           onChange={onProjectManagerChange}
           testID="pm-filter"
+          disabled={true}
         />
         <FilterButton
           label="Tags"

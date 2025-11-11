@@ -78,4 +78,6 @@ export interface FilterDropdownProps<T = string> {
   onChange: (values: T[]) => void;
   /** Optional test ID for automated testing */
   testID?: string;
+  /** Whether the filter is disabled (prevents interaction) */
+  disabled?: boolean;
 }

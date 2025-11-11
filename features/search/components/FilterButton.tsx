@@ -22,6 +22,8 @@ interface FilterButtonProps<T extends string> {
   onChange: (values: T[]) => void;
   /** Test ID for testing purposes */
   testID?: string;
+  /** Whether the filter is disabled (prevents interaction) */
+  disabled?: boolean;
 }
 
 /**
@@ -41,6 +43,7 @@ export function FilterButton<T extends string>({
   options,
   onChange,
   testID,
+  disabled,
 }: FilterButtonProps<T>) {
   return (
     <View style={styles.filterItem}>
@@ -50,6 +53,7 @@ export function FilterButton<T extends string>({
         options={options}
         onChange={onChange}
         testID={testID}
+        disabled={disabled}
       />
     </View>
   );

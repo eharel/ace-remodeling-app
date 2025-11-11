@@ -65,6 +65,7 @@ export function FilterDropdown<T extends string>({
   options,
   onChange,
   testID,
+  disabled = false,
 }: FilterDropdownProps<T>) {
   const { theme } = useTheme();
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
@@ -189,6 +190,10 @@ export function FilterDropdown<T extends string>({
     triggerActive: {
       borderColor: theme.colors.border.accent,
       backgroundColor: theme.colors.background.elevated,
+    },
+    triggerDisabled: {
+      opacity: 0.5,
+      backgroundColor: theme.colors.background.secondary,
     },
     triggerText: {
       fontSize: DesignTokens.typography.fontSize.sm,
@@ -328,11 +333,14 @@ export function FilterDropdown<T extends string>({
         style={[
           styles.trigger,
           selectedValues.length > 0 && styles.triggerActive,
+          disabled && styles.triggerDisabled,
         ]}
-        onPress={handleOpen}
+        onPress={disabled ? undefined : handleOpen}
+        disabled={disabled}
         accessibilityLabel={`${label} filter: ${displayValue}`}
-        accessibilityHint={`Opens ${label.toLowerCase()} filter menu`}
+        accessibilityHint={disabled ? "Filter is currently disabled" : `Opens ${label.toLowerCase()} filter menu`}
         accessibilityRole="button"
+        accessibilityState={{ disabled }}
         testID={testID}
       >
         <View
