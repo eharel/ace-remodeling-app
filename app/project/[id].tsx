@@ -218,6 +218,7 @@ export default function ProjectDetailScreen() {
         section: {
           backgroundColor: theme.colors.background.card,
           marginBottom: DesignTokens.spacing[4],
+          marginHorizontal: DesignTokens.spacing[4],
           padding: DesignTokens.spacing[6],
           borderRadius: DesignTokens.borderRadius.xl,
           borderWidth: 1,
@@ -426,8 +427,8 @@ export default function ProjectDetailScreen() {
           marginRight: DesignTokens.spacing[1],
         },
         documentsPreview: {
-          backgroundColor: theme.colors.background.card,
-          borderRadius: DesignTokens.borderRadius.lg,
+          backgroundColor: theme.colors.background.secondary,
+          borderRadius: DesignTokens.borderRadius.md,
           padding: DesignTokens.spacing[4],
           borderWidth: 1,
           borderColor: theme.colors.border.primary,
@@ -485,7 +486,7 @@ export default function ProjectDetailScreen() {
           marginBottom: DesignTokens.spacing[3],
           padding: DesignTokens.spacing[4],
           backgroundColor: theme.colors.background.secondary,
-          borderRadius: DesignTokens.borderRadius.lg,
+          borderRadius: DesignTokens.borderRadius.md,
           borderWidth: 1,
           borderColor: theme.colors.border.primary,
           flexDirection: "row",
@@ -515,6 +516,8 @@ export default function ProjectDetailScreen() {
           padding: DesignTokens.spacing[8],
           alignItems: "center",
           justifyContent: "center",
+          backgroundColor: theme.colors.background.secondary,
+          borderRadius: DesignTokens.borderRadius.md,
         },
         emptyStateText: {
           fontSize: DesignTokens.typography.fontSize.base,
@@ -817,7 +820,9 @@ export default function ProjectDetailScreen() {
                 { color: theme.colors.text.primary },
               ]}
             >
-              Documents
+              Documents{project.documents && project.documents.length >= 1
+                ? ` (${project.documents.length})`
+                : ""}
             </ThemedText>
             {project.documents && project.documents.length > 0 && (
               <Pressable
@@ -885,7 +890,9 @@ export default function ProjectDetailScreen() {
           <ThemedText
             style={[styles.sectionTitle, { color: theme.colors.text.primary }]}
           >
-            Project Logs
+            Project Logs{project.logs && project.logs.length >= 1
+              ? ` (${project.logs.length})`
+              : ""}
           </ThemedText>
           {project.logs && project.logs.length > 0 ? (
             <ThemedView style={styles.logsList}>
@@ -949,7 +956,7 @@ export default function ProjectDetailScreen() {
               style={{
                 backgroundColor: theme.colors.background.secondary,
                 padding: DesignTokens.spacing[6],
-                borderRadius: DesignTokens.borderRadius.xl,
+                borderRadius: DesignTokens.borderRadius.md,
                 borderLeftWidth: 4,
                 borderLeftColor: theme.colors.text.accent,
               }}
