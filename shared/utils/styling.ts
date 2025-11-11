@@ -135,31 +135,129 @@ export const commonStyles = {
     },
   },
 
-  // Text styles - UPDATED to use new theme system
+  // Text styles - Semantic typography presets
+  // Note: lineHeight is calculated as absolute pixel values (fontSize * multiplier)
+  // for predictable rendering and to prevent text clipping in bold/large text
   text: {
+    // Hero/Page-level titles (largest)
+    pageTitle: {
+      fontSize: DesignTokens.typography.fontSize["4xl"], // 32px
+      fontWeight: DesignTokens.typography.fontWeight.extrabold, // 800
+      lineHeight:
+        DesignTokens.typography.fontSize["4xl"] *
+        DesignTokens.typography.lineHeight.tight, // 32 * 1.2 = 38.4px
+      // Note: color should come from theme
+    },
+
+    // Section headings (e.g., "Project Photos", "Documents")
+    sectionTitle: {
+      fontSize: DesignTokens.typography.fontSize["2xl"], // 24px
+      fontWeight: DesignTokens.typography.fontWeight.bold, // 700
+      lineHeight:
+        DesignTokens.typography.fontSize["2xl"] *
+        DesignTokens.typography.lineHeight.normal, // 24 * 1.4 = 33.6px
+      // Note: color should come from theme
+    },
+
+    // Card titles and prominent headings
+    cardTitle: {
+      fontSize: DesignTokens.typography.fontSize.lg, // 18px
+      fontWeight: DesignTokens.typography.fontWeight.semibold, // 600
+      lineHeight:
+        DesignTokens.typography.fontSize.lg *
+        DesignTokens.typography.lineHeight.normal, // 18 * 1.4 = 25.2px
+      // Note: color should come from theme
+    },
+
+    // Large descriptive text (e.g., project descriptions)
+    description: {
+      fontSize: DesignTokens.typography.fontSize.lg, // 18px
+      fontWeight: DesignTokens.typography.fontWeight.normal, // 400
+      lineHeight:
+        DesignTokens.typography.fontSize.lg *
+        DesignTokens.typography.lineHeight.normal, // 18 * 1.4 = 25.2px
+      // Note: color should come from theme
+    },
+
+    // Standard body text
+    body: {
+      fontSize: DesignTokens.typography.fontSize.base, // 16px
+      fontWeight: DesignTokens.typography.fontWeight.normal, // 400
+      lineHeight:
+        DesignTokens.typography.fontSize.base *
+        DesignTokens.typography.lineHeight.normal, // 16 * 1.4 = 22.4px
+      // Note: color should come from theme
+    },
+
+    // Smaller body text and secondary descriptions
+    smallText: {
+      fontSize: DesignTokens.typography.fontSize.sm, // 14px
+      fontWeight: DesignTokens.typography.fontWeight.normal, // 400
+      lineHeight:
+        DesignTokens.typography.fontSize.sm *
+        DesignTokens.typography.lineHeight.normal, // 14 * 1.4 = 19.6px
+      // Note: color should come from theme
+    },
+
+    // Meta labels (e.g., "STATUS", "CATEGORY", "LOCATION")
+    label: {
+      fontSize: DesignTokens.typography.fontSize.xs, // 12px
+      fontWeight: DesignTokens.typography.fontWeight.semibold, // 600
+      lineHeight:
+        DesignTokens.typography.fontSize.xs *
+        DesignTokens.typography.lineHeight.normal, // 12 * 1.4 = 16.8px
+      textTransform: "uppercase" as const,
+      // Note: color should come from theme
+    },
+
+    // Stat values and emphasized data
+    value: {
+      fontSize: DesignTokens.typography.fontSize.lg, // 18px
+      fontWeight: DesignTokens.typography.fontWeight.bold, // 700
+      lineHeight:
+        DesignTokens.typography.fontSize.lg *
+        DesignTokens.typography.lineHeight.normal, // 18 * 1.4 = 25.2px
+      // Note: color should come from theme
+    },
+
+    // Status badges and chips
+    badge: {
+      fontSize: DesignTokens.typography.fontSize.xs, // 12px
+      fontWeight: DesignTokens.typography.fontWeight.bold, // 700
+      lineHeight:
+        DesignTokens.typography.fontSize.xs *
+        DesignTokens.typography.lineHeight.tight, // 12 * 1.2 = 14.4px
+      textTransform: "uppercase" as const,
+      letterSpacing: 0.5,
+      // Note: color should come from theme
+    },
+
+    // Captions and timestamps
+    caption: {
+      fontSize: DesignTokens.typography.fontSize.xs, // 12px
+      fontWeight: DesignTokens.typography.fontWeight.normal, // 400
+      lineHeight:
+        DesignTokens.typography.fontSize.xs *
+        DesignTokens.typography.lineHeight.normal, // 12 * 1.4 = 16.8px
+      // Note: color should come from theme
+    },
+
+    // DEPRECATED: Legacy presets (for backward compatibility)
     heading: {
       fontSize: DesignTokens.typography.fontSize["2xl"],
       fontWeight: DesignTokens.typography.fontWeight.bold,
-      lineHeight: DesignTokens.typography.lineHeight.tight,
-      // Note: color should come from theme
+      lineHeight:
+        DesignTokens.typography.fontSize["2xl"] *
+        DesignTokens.typography.lineHeight.tight,
+      // Note: Use 'sectionTitle' or 'pageTitle' instead
     },
     subheading: {
       fontSize: DesignTokens.typography.fontSize.xl,
       fontWeight: DesignTokens.typography.fontWeight.semibold,
-      lineHeight: DesignTokens.typography.lineHeight.normal,
-      // Note: color should come from theme
-    },
-    body: {
-      fontSize: DesignTokens.typography.fontSize.base,
-      fontWeight: DesignTokens.typography.fontWeight.normal,
-      lineHeight: DesignTokens.typography.lineHeight.relaxed,
-      // Note: color should come from theme
-    },
-    caption: {
-      fontSize: DesignTokens.typography.fontSize.sm,
-      fontWeight: DesignTokens.typography.fontWeight.normal,
-      lineHeight: DesignTokens.typography.lineHeight.normal,
-      // Note: color should come from theme
+      lineHeight:
+        DesignTokens.typography.fontSize.xl *
+        DesignTokens.typography.lineHeight.normal,
+      // Note: Use 'cardTitle' instead
     },
   },
 

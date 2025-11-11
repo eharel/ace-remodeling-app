@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
+import { commonStyles } from "@/shared/utils";
 import { ProjectCategory, ProjectSummary } from "@/core/types";
 import { ProjectGallery } from "@/features/projects";
 import { ThemedText, ThemedView } from "@/shared/components";
@@ -103,9 +104,11 @@ const styles = StyleSheet.create({
     gap: DesignTokens.spacing[2],
   },
   galleryTitle: {
-    fontSize: DesignTokens.typography.fontSize["2xl"],
-    fontWeight: DesignTokens.typography.fontWeight.bold,
-    lineHeight: DesignTokens.typography.lineHeight.tight,
+    ...commonStyles.text.sectionTitle,
+    // Override lineHeight to tight for compact layout
+    lineHeight:
+      DesignTokens.typography.fontSize["2xl"] *
+      DesignTokens.typography.lineHeight.tight,
   },
   gallerySubtitle: {
     fontSize: DesignTokens.typography.fontSize.lg,

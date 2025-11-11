@@ -13,6 +13,7 @@ import { DesignTokens } from "@/core/themes";
 import { Document } from "@/core/types";
 import { PageHeader, ThemedText } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
+import { commonStyles } from "@/shared/utils";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -144,11 +145,9 @@ export default function DocumentsPage({}: DocumentsPageProps) {
         DesignTokens.typography.lineHeight.normal,
     },
     documentType: {
-      fontSize: DesignTokens.typography.fontSize.xs,
-      fontWeight: DesignTokens.typography.fontWeight.medium,
+      ...commonStyles.text.badge,
+      fontWeight: DesignTokens.typography.fontWeight.medium, // Override to medium weight
       color: theme.colors.text.secondary,
-      textTransform: "uppercase",
-      letterSpacing: 0.5,
       marginBottom: DesignTokens.spacing[2],
     },
     documentDescription: {

@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
 import { DesignTokens } from "@/core/themes";
+import { commonStyles } from "@/shared/utils";
 import {
   Project,
   ProjectSummary,
@@ -52,12 +53,12 @@ const styles = StyleSheet.create({
     gap: DesignTokens.spacing[4],
   },
   placeholderText: {
-    fontSize: DesignTokens.typography.fontSize["2xl"],
+    ...commonStyles.text.sectionTitle,
     textAlign: "center",
     opacity: 0.8,
   },
   descriptionText: {
-    fontSize: DesignTokens.typography.fontSize.base,
+    ...commonStyles.text.body,
     textAlign: "center",
     opacity: 0.6,
     maxWidth: 300,
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: DesignTokens.spacing[5],
   },
   resultsSubtitle: {
-    fontSize: DesignTokens.typography.fontSize.lg,
+    ...commonStyles.text.description,
     opacity: 0.8,
   },
 });

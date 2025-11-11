@@ -17,7 +17,7 @@ import { useProjects, useTheme } from "@/shared/contexts";
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/core/themes";
 import { Project } from "@/core/types";
-import { getProjectDuration } from "@/shared/utils";
+import { commonStyles, getProjectDuration } from "@/shared/utils";
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -181,24 +181,14 @@ export default function ProjectDetailScreen() {
           alignItems: "center",
         },
         statusBadgeText: {
-          fontSize: DesignTokens.typography.fontSize.xs,
-          fontWeight: DesignTokens.typography.fontWeight.bold,
-          textTransform: "uppercase",
-          letterSpacing: 0.5,
+          ...commonStyles.text.badge,
         },
         projectName: {
-          fontSize: DesignTokens.typography.fontSize["4xl"],
-          fontWeight: DesignTokens.typography.fontWeight.extrabold,
+          ...commonStyles.text.pageTitle,
           marginBottom: DesignTokens.spacing[2],
-          lineHeight:
-            DesignTokens.typography.fontSize["4xl"] *
-            DesignTokens.typography.lineHeight.tight,
         },
         projectDescription: {
-          fontSize: DesignTokens.typography.fontSize.lg,
-          lineHeight:
-            DesignTokens.typography.fontSize.lg *
-            DesignTokens.typography.lineHeight.normal,
+          ...commonStyles.text.description,
           marginBottom: DesignTokens.spacing[6],
         },
         metaGrid: {
@@ -216,15 +206,12 @@ export default function ProjectDetailScreen() {
           borderBottomWidth: 0,
         },
         metaLabel: {
-          fontSize: DesignTokens.typography.fontSize.xs,
+          ...commonStyles.text.label,
           marginBottom: 0,
-          textTransform: "uppercase",
-          fontWeight: DesignTokens.typography.fontWeight.semibold,
           flex: 1,
         },
         metaValue: {
-          fontSize: DesignTokens.typography.fontSize.lg,
-          fontWeight: DesignTokens.typography.fontWeight.bold,
+          ...commonStyles.text.value,
           flex: 1,
           textAlign: "right",
         },
@@ -238,8 +225,7 @@ export default function ProjectDetailScreen() {
           ...DesignTokens.shadows.md,
         },
         sectionTitle: {
-          fontSize: DesignTokens.typography.fontSize["2xl"],
-          fontWeight: DesignTokens.typography.fontWeight.bold,
+          ...commonStyles.text.sectionTitle,
           marginBottom: DesignTokens.spacing[6],
         },
         picturesGrid: {
@@ -282,7 +268,7 @@ export default function ProjectDetailScreen() {
           textAlign: "center",
         },
         sectionSubtitle: {
-          fontSize: DesignTokens.typography.fontSize.sm,
+          ...commonStyles.text.smallText,
           marginTop: DesignTokens.spacing[1],
           opacity: 0.7,
         },
@@ -342,7 +328,7 @@ export default function ProjectDetailScreen() {
           textTransform: "capitalize",
         },
         pictureDescription: {
-          fontSize: DesignTokens.typography.fontSize.sm,
+          ...commonStyles.text.smallText,
           opacity: 0.7,
         },
         documentsList: {
@@ -546,15 +532,12 @@ export default function ProjectDetailScreen() {
           marginBottom: 0,
         },
         logDate: {
-          fontSize: DesignTokens.typography.fontSize.xs,
+          ...commonStyles.text.caption,
           opacity: 0.6,
           marginBottom: DesignTokens.spacing[1],
         },
         logDescription: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          lineHeight:
-            DesignTokens.typography.fontSize.sm *
-            DesignTokens.typography.lineHeight.normal,
+          ...commonStyles.text.smallText,
         },
       }),
     [theme]
