@@ -411,9 +411,28 @@ async function addSeedProjects(): Promise<{
 async function main(): Promise<SeedResult> {
   const startTime = Date.now();
 
+  // Log which Firebase we're targeting
   console.log("\n🌱 Starting Firebase Database Seeding");
-  console.log("=====================================\n");
-  console.log(`⏰ Started at: ${new Date().toLocaleString()}`);
+  console.log("=====================================");
+
+  // Detect environment (same logic as firebase.ts)
+  const isProduction = process.env.NODE_ENV === "production";
+  const environment = isProduction ? "production" : "development";
+
+  console.log(`🔧 Environment: ${environment}`);
+  console.log(
+    `🗄️  Target Database: ${
+      isProduction ? "ace-remodeling" : "ace-remodeling-dev"
+    }`
+  );
+
+  if (isProduction) {
+    console.log("\n⚠️  WARNING: You are about to modify PRODUCTION database!");
+    console.log("Press Ctrl+C within 5 seconds to cancel...\n");
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+  }
+
+  console.log(`⏰ Started at: ${new Date().toLocaleString()}\n`);
 
   const result: SeedResult = {
     success: false,
