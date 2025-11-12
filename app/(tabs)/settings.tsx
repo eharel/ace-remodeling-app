@@ -3,6 +3,7 @@ import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { currentEnvironment, currentProjectId } from "@/core/config";
 
 import { DesignTokens } from "@/core/themes";
 import {
@@ -153,6 +154,13 @@ export default function SettingsScreen() {
             </ThemedText>
           </ThemedView>
         </View>
+
+        {__DEV__ && (
+          <ThemedText variant="caption" style={{ marginTop: 20, opacity: 0.6 }}>
+            Environment: {currentEnvironment}
+            {"\n"}Project: {currentProjectId}
+          </ThemedText>
+        )}
       </ScrollView>
     </ThemedView>
   );

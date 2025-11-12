@@ -187,7 +187,7 @@ export default function ProjectsScreen() {
     <ThemedView style={styles.container}>
       <PageHeader
         title="Projects"
-        subtitle="Browse our projects by category"
+        subtitle="Browse our various projects by category"
       />
 
       <FlatList

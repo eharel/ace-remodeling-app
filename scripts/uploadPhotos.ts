@@ -26,10 +26,10 @@ import * as path from "path";
 import { storage } from "../core/config";
 import {
   BASE_ASSETS_PATH,
-  DEFAULT_OUTPUT_PATH,
   DOCUMENT_CATEGORY_MAPPINGS,
   DOCUMENT_EXTENSIONS,
   DOCUMENT_TYPE_NAMES,
+  getOutputPath,
   IMAGE_CATEGORY_MAPPINGS,
   IMAGE_EXTENSIONS,
   MAX_FILE_SIZE_MB,
@@ -207,15 +207,18 @@ function scanLocalFolder(basePath: string): ScanResult {
 
     // Detect if this is adu-addition category (has subcategories)
     const categoryName = path.basename(basePath);
-    const isAduAddition = categoryName === 'adu-addition';
+    const isAduAddition = categoryName === "adu-addition";
 
     // Build list of folders to scan (with optional subcategory)
-    let foldersToScan: Array<{ path: string; name: string; subcategory?: string }> = [];
+    let foldersToScan: { path: string; name: string; subcategory?: string }[] =
+      [];
 
     if (isAduAddition) {
       // Two-level nesting: adu-addition/subcategory/project
-      console.log(`   Detected adu-addition category - scanning for subcategories...`);
-      
+      console.log(
+        `   Detected adu-addition category - scanning for subcategories...`
+      );
+
       const subcategoryDirs = fs
         .readdirSync(basePath, { withFileTypes: true })
         .filter((dirent) => dirent.isDirectory())
@@ -258,7 +261,11 @@ function scanLocalFolder(basePath: string): ScanResult {
     }
 
     // Process each project folder
-    for (const { path: parentPath, name: projectName, subcategory } of foldersToScan) {
+    for (const {
+      path: parentPath,
+      name: projectName,
+      subcategory,
+    } of foldersToScan) {
       const projectPath = path.join(parentPath, projectName);
       const projectInfo = parseProjectFolder(projectName);
 
@@ -822,7 +829,7 @@ function parseArguments(args: string[]): UploadOptions {
   const options: UploadOptions = {
     dryRun: false,
     force: false,
-    outputPath: DEFAULT_OUTPUT_PATH,
+    outputPath: getOutputPath(),
     batchSize: UPLOAD_BATCH_SIZE,
   };
 
@@ -880,7 +887,26 @@ function formatDuration(ms: number): string {
  */
 async function main(): Promise<void> {
   console.log("\n🚀 Firebase Storage Upload Script");
-  console.log("=====================================\n");
+  console.log("=====================================");
+
+  // Log environment
+  const isProduction = process.env.NODE_ENV === "production";
+  const environment = isProduction ? "production" : "development";
+  console.log(`🔧 Environment: ${environment}`);
+  console.log(
+    `🗄️  Target Storage: ${
+      isProduction ? "ace-remodeling" : "ace-remodeling-dev"
+    }`
+  );
+
+  if (isProduction) {
+    console.log(
+      "\n⚠️  WARNING: You are about to upload to PRODUCTION storage!"
+    );
+    console.log("Press Ctrl+C within 5 seconds to cancel...\n");
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+  }
+  console.log(""); // Empty line
 
   // Parse command-line arguments to get category FIRST
   const args = process.argv.slice(2);
@@ -948,8 +974,10 @@ async function main(): Promise<void> {
     const uploadResult = await uploadFiles(filesToUpload, options);
 
     // Print summary
-    const newlyUploaded = uploadResult.uploaded.filter(f => f.wasNewlyUploaded);
-    const existing = uploadResult.uploaded.filter(f => !f.wasNewlyUploaded);
+    const newlyUploaded = uploadResult.uploaded.filter(
+      (f) => f.wasNewlyUploaded
+    );
+    const existing = uploadResult.uploaded.filter((f) => !f.wasNewlyUploaded);
 
     console.log("=====================================");
     console.log("📊 Upload Summary");

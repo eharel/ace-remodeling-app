@@ -66,16 +66,23 @@ interface UploadedProject {
 
 /**
  * Load uploaded projects from JSON files
- * Looks for all *-projects.json files in scripts/output/
+ * Looks for all *-projects.json files in environment-specific output folder
+ * - Development: scripts/output/dev/
+ * - Production: scripts/output/prod/
  */
 function loadUploadedProjects(): UploadedProject[] {
   const uploadedProjects: UploadedProject[] = [];
 
   try {
-    const outputDir = path.join(__dirname, "output");
+    // Determine environment-specific folder
+    const isProduction = process.env.NODE_ENV === "production";
+    const envFolder = isProduction ? "prod" : "dev";
+    const outputDir = path.join(__dirname, "output", envFolder);
+
+    console.log(`📂 Loading from: output/${envFolder}/`);
 
     if (!fs.existsSync(outputDir)) {
-      console.log("ℹ️  No output directory found, no projects to seed");
+      console.log(`ℹ️  No ${envFolder} output directory found, no projects to seed`);
       return [];
     }
 
@@ -85,7 +92,7 @@ function loadUploadedProjects(): UploadedProject[] {
       .filter((f) => f.endsWith("-projects.json"));
 
     if (files.length === 0) {
-      console.log("ℹ️  No uploaded project files found in output directory");
+      console.log(`ℹ️  No uploaded project files found in ${envFolder} output directory`);
       return [];
     }
 
@@ -411,9 +418,28 @@ async function addSeedProjects(): Promise<{
 async function main(): Promise<SeedResult> {
   const startTime = Date.now();
 
+  // Log which Firebase we're targeting
   console.log("\n🌱 Starting Firebase Database Seeding");
-  console.log("=====================================\n");
-  console.log(`⏰ Started at: ${new Date().toLocaleString()}`);
+  console.log("=====================================");
+
+  // Detect environment (same logic as firebase.ts)
+  const isProduction = process.env.NODE_ENV === "production";
+  const environment = isProduction ? "production" : "development";
+
+  console.log(`🔧 Environment: ${environment}`);
+  console.log(
+    `🗄️  Target Database: ${
+      isProduction ? "ace-remodeling" : "ace-remodeling-dev"
+    }`
+  );
+
+  if (isProduction) {
+    console.log("\n⚠️  WARNING: You are about to modify PRODUCTION database!");
+    console.log("Press Ctrl+C within 5 seconds to cancel...\n");
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+  }
+
+  console.log(`⏰ Started at: ${new Date().toLocaleString()}\n`);
 
   const result: SeedResult = {
     success: false,

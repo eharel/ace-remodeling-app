@@ -1,0 +1,1122 @@
+{
+  "uploadDate": "2025-11-12T21:04:10.044Z",
+  "category": "adu-addition",
+  "totalProjects": 4,
+  "projects": [
+    {
+      "id": "104",
+      "slug": "104-luxe-revival",
+      "name": "Luxe Revival",
+      "category": "adu-addition",
+      "subcategory": "addition",
+      "photos": [
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fafter%2FIMG_0355.jpg?alt=media&token=acf71595-df37-4958-8051-29bc1d1d743c",
+          "category": "after",
+          "filename": "IMG_0355.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/after/IMG_0355.jpg",
+          "size": 723731,
+          "order": 1
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fafter%2FIMG_0357.jpg?alt=media&token=20585c00-4f7f-4ef1-b0c6-291eb775cda4",
+          "category": "after",
+          "filename": "IMG_0357.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/after/IMG_0357.jpg",
+          "size": 994759,
+          "order": 2
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fafter%2FIMG_0360.jpg?alt=media&token=45174a78-2c2b-4d53-9f0d-f4fddd14b8c3",
+          "category": "after",
+          "filename": "IMG_0360.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/after/IMG_0360.jpg",
+          "size": 1014030,
+          "order": 3
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F1.jpg?alt=media&token=d68356f6-308c-44f0-ba0c-c1844227d3ac",
+          "category": "progress",
+          "filename": "1.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/1.jpg",
+          "size": 879510,
+          "order": 4
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F10.jpg?alt=media&token=3c929a17-00ac-4cfa-bf27-8aabb23d4462",
+          "category": "progress",
+          "filename": "10.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/10.jpg",
+          "size": 382268,
+          "order": 5
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F11.jpg?alt=media&token=c0a415c3-2501-491f-8f5b-b91148c0fb64",
+          "category": "progress",
+          "filename": "11.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/11.jpg",
+          "size": 550270,
+          "order": 6
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F12.jpg?alt=media&token=8b9e83a7-4eaa-4e41-9c99-fb2bd62d48ae",
+          "category": "progress",
+          "filename": "12.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/12.jpg",
+          "size": 283395,
+          "order": 7
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F13.jpg?alt=media&token=1268683e-80a2-42f6-b594-d1b3c81b3dd5",
+          "category": "progress",
+          "filename": "13.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/13.jpg",
+          "size": 295460,
+          "order": 8
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F14.jpg?alt=media&token=854cd110-e797-46b3-8286-122269b85c89",
+          "category": "progress",
+          "filename": "14.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/14.jpg",
+          "size": 369246,
+          "order": 9
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F15.jpg?alt=media&token=2ad1f45e-7dd3-4635-95b9-0d5537f14378",
+          "category": "progress",
+          "filename": "15.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/15.jpg",
+          "size": 1100270,
+          "order": 10
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F16.jpg?alt=media&token=61ef1145-8cf5-4207-951c-2ffd240f61e8",
+          "category": "progress",
+          "filename": "16.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/16.jpg",
+          "size": 709271,
+          "order": 11
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F17.jpg?alt=media&token=f519aad0-e5f0-4562-96ca-64735aff9bb5",
+          "category": "progress",
+          "filename": "17.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/17.jpg",
+          "size": 436372,
+          "order": 12
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F18.jpg?alt=media&token=219c7447-4d28-4b56-8ea3-6f18f78ded85",
+          "category": "progress",
+          "filename": "18.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/18.jpg",
+          "size": 222681,
+          "order": 13
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F2.jpg?alt=media&token=ee46ad80-b028-4001-b30b-e9517f936d4a",
+          "category": "progress",
+          "filename": "2.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/2.jpg",
+          "size": 303763,
+          "order": 14
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F3.jpg?alt=media&token=b889c02d-4806-40f0-b542-a0ac799a4485",
+          "category": "progress",
+          "filename": "3.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/3.jpg",
+          "size": 629103,
+          "order": 15
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F4.jpg?alt=media&token=ff2cb05b-be97-4ba8-b553-9d70b0101298",
+          "category": "progress",
+          "filename": "4.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/4.jpg",
+          "size": 312373,
+          "order": 16
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F5.jpg?alt=media&token=65f2b9b8-f8bf-4570-9fb6-46909a2fc989",
+          "category": "progress",
+          "filename": "5.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/5.jpg",
+          "size": 347817,
+          "order": 17
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F6.jpg?alt=media&token=ed8374d2-4874-408d-aef7-d15ae9b63fe4",
+          "category": "progress",
+          "filename": "6.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/6.jpg",
+          "size": 613397,
+          "order": 18
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F7.jpg?alt=media&token=8d3209d1-c2a1-41fb-b352-30d4622f26f9",
+          "category": "progress",
+          "filename": "7.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/7.jpg",
+          "size": 560074,
+          "order": 19
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F8.jpg?alt=media&token=52994792-93f2-4d7a-9408-47465722117b",
+          "category": "progress",
+          "filename": "8.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/8.jpg",
+          "size": 582553,
+          "order": 20
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fphotos%2Fprogress%2F9.jpg?alt=media&token=a698a6dc-48a5-4991-aeff-aaa433bd6737",
+          "category": "progress",
+          "filename": "9.jpg",
+          "storagePath": "projects/104-luxe-revival/photos/progress/9.jpg",
+          "size": 747338,
+          "order": 21
+        }
+      ],
+      "documents": [
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fdocuments%2Fplans%2F2023-08-23_7710%20Gault%20St%20-%20Stamped%20Structural%20Set.pdf?alt=media&token=59b8bf65-f9df-4a42-9d3c-5abe905eb4c6",
+          "category": "plans",
+          "filename": "2023-08-23_7710 Gault St - Stamped Structural Set.pdf",
+          "storagePath": "projects/104-luxe-revival/documents/plans/2023-08-23_7710 Gault St - Stamped Structural Set.pdf",
+          "size": 687451,
+          "type": "Floor Plan"
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fdocuments%2Fplans%2F2023-09-19_7710%20Gault%20St%20-%20Stamped%20Structural%20Set.pdf?alt=media&token=90e312dc-e010-4d0c-932d-b0df3e5b59eb",
+          "category": "plans",
+          "filename": "2023-09-19_7710 Gault St - Stamped Structural Set.pdf",
+          "storagePath": "projects/104-luxe-revival/documents/plans/2023-09-19_7710 Gault St - Stamped Structural Set.pdf",
+          "size": 688230,
+          "type": "Floor Plan"
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fdocuments%2Fplans%2F7710%20Gault%20Street-Permit%20Set-08.01.2023.pdf?alt=media&token=f6f10f9a-d89e-4607-81ad-4701d5711a57",
+          "category": "plans",
+          "filename": "7710 Gault Street-Permit Set-08.01.2023.pdf",
+          "storagePath": "projects/104-luxe-revival/documents/plans/7710 Gault Street-Permit Set-08.01.2023.pdf",
+          "size": 8182126,
+          "type": "Floor Plan"
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F104-luxe-revival%2Fdocuments%2Fplans%2F7710%20Gault%20Street-Permit%20Set-09.22.2023.pdf?alt=media&token=108e5975-9702-4f19-a3b4-30ae26541df0",
+          "category": "plans",
+          "filename": "7710 Gault Street-Permit Set-09.22.2023.pdf",
+          "storagePath": "projects/104-luxe-revival/documents/plans/7710 Gault Street-Permit Set-09.22.2023.pdf",
+          "size": 8341053,
+          "type": "Floor Plan"
+        }
+      ]
+    },
+    {
+      "id": "117",
+      "slug": "117-quiet-elegance",
+      "name": "Quiet Elegance",
+      "category": "adu-addition",
+      "subcategory": "addition",
+      "photos": [
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fafter%2FExterior%20paint-2.jpg?alt=media&token=0e16f5d2-872b-4444-a47b-427ee2f9e152",
+          "category": "after",
+          "filename": "Exterior paint-2.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/after/Exterior paint-2.jpg",
+          "size": 340219,
+          "order": 1
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fafter%2FExterior%20paint-3.jpg?alt=media&token=a0cd9037-b894-4182-bb41-8adb2c14c80a",
+          "category": "after",
+          "filename": "Exterior paint-3.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/after/Exterior paint-3.jpg",
+          "size": 181848,
+          "order": 2
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fafter%2FExterior%20paint-4.jpg?alt=media&token=8a80819f-8fb8-4c85-a6d1-19f4778303cc",
+          "category": "after",
+          "filename": "Exterior paint-4.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/after/Exterior paint-4.jpg",
+          "size": 197403,
+          "order": 3
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fafter%2FExterior%20paint.jpg?alt=media&token=8936624f-183e-41a3-8591-2e55d11b5fff",
+          "category": "after",
+          "filename": "Exterior paint.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/after/Exterior paint.jpg",
+          "size": 241397,
+          "order": 4
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fafter%2F_99A0492.jpg?alt=media&token=497a10f0-8e32-4d31-8672-380e3b99bd60",
+          "category": "after",
+          "filename": "_99A0492.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/after/_99A0492.jpg",
+          "size": 11815563,
+          "order": 5
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fafter%2F_99A0514.jpg?alt=media&token=0e487218-6d6f-41b1-97c0-9e0d0c1941a1",
+          "category": "after",
+          "filename": "_99A0514.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/after/_99A0514.jpg",
+          "size": 4658304,
+          "order": 6
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fafter%2F_99A0530.jpg?alt=media&token=31ca97b3-a902-4eea-97ec-19893cc18c61",
+          "category": "after",
+          "filename": "_99A0530.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/after/_99A0530.jpg",
+          "size": 6536877,
+          "order": 7
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fbefore%2F2be89d7f-bc94-465a-af07-d61738492cc7.jpg?alt=media&token=b649386e-b4c9-4f33-b833-fcaf1f34a9b5",
+          "category": "before",
+          "filename": "2be89d7f-bc94-465a-af07-d61738492cc7.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/before/2be89d7f-bc94-465a-af07-d61738492cc7.jpg",
+          "size": 445602,
+          "order": 8
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fbefore%2FIMG_5072.heic?alt=media&token=699a50ab-e6b3-4490-9a11-c87b48bedf96",
+          "category": "before",
+          "filename": "IMG_5072.heic",
+          "storagePath": "projects/117-quiet-elegance/photos/before/IMG_5072.heic",
+          "size": 4235112,
+          "order": 9
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fbefore%2FIMG_5074.heic?alt=media&token=df8f066f-aec3-4414-8dda-376fdb357b4b",
+          "category": "before",
+          "filename": "IMG_5074.heic",
+          "storagePath": "projects/117-quiet-elegance/photos/before/IMG_5074.heic",
+          "size": 2907067,
+          "order": 10
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fbefore%2FIMG_5076.heic?alt=media&token=c23f1446-1753-4173-bda8-c9f7820f2c5d",
+          "category": "before",
+          "filename": "IMG_5076.heic",
+          "storagePath": "projects/117-quiet-elegance/photos/before/IMG_5076.heic",
+          "size": 3710381,
+          "order": 11
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F1.jpg?alt=media&token=91f6191f-651b-4e59-94d9-882d5ca45389",
+          "category": "progress",
+          "filename": "1.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/1.jpg",
+          "size": 373792,
+          "order": 12
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F10.jpg?alt=media&token=a5ca8121-8e5a-486e-83eb-90b17571271e",
+          "category": "progress",
+          "filename": "10.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/10.jpg",
+          "size": 4855426,
+          "order": 13
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F11.jpg?alt=media&token=c0b1c742-7621-47b9-9b7b-0fa9bd853052",
+          "category": "progress",
+          "filename": "11.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/11.jpg",
+          "size": 420738,
+          "order": 14
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F12.jpg?alt=media&token=3853d5a2-fd81-4243-8eb6-35ebe9225a93",
+          "category": "progress",
+          "filename": "12.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/12.jpg",
+          "size": 6050757,
+          "order": 15
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F13.jpg?alt=media&token=ba284ffa-1e9b-4f08-96b9-14c42341d9ce",
+          "category": "progress",
+          "filename": "13.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/13.jpg",
+          "size": 5470677,
+          "order": 16
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F14.jpg?alt=media&token=9d9ff16b-95a0-4c4f-8281-9e5ef398f872",
+          "category": "progress",
+          "filename": "14.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/14.jpg",
+          "size": 413079,
+          "order": 17
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F15.jpg?alt=media&token=ccd70649-23d3-482a-ac5c-ffe6dec2771c",
+          "category": "progress",
+          "filename": "15.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/15.jpg",
+          "size": 368569,
+          "order": 18
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F16.jpg?alt=media&token=72dbd632-a21e-4a81-b880-518c1cb0d684",
+          "category": "progress",
+          "filename": "16.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/16.jpg",
+          "size": 640025,
+          "order": 19
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F2(1).jpg?alt=media&token=37ad0672-5779-4f3f-8144-dcfd3796159d",
+          "category": "progress",
+          "filename": "2(1).jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/2(1).jpg",
+          "size": 879780,
+          "order": 20
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F2.jpg?alt=media&token=589ca397-c013-4ae7-b7aa-01db8d17e129",
+          "category": "progress",
+          "filename": "2.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/2.jpg",
+          "size": 437473,
+          "order": 21
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F3.jpg?alt=media&token=0a07361e-14e4-4624-96df-9d7d3cd6b472",
+          "category": "progress",
+          "filename": "3.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/3.jpg",
+          "size": 404566,
+          "order": 22
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F4.jpg?alt=media&token=8373ca02-dbf4-46fe-9b55-86010b61378a",
+          "category": "progress",
+          "filename": "4.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/4.jpg",
+          "size": 877662,
+          "order": 23
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F5.jpg?alt=media&token=cc76fc28-40f5-4bc0-97b1-5b08e67a2643",
+          "category": "progress",
+          "filename": "5.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/5.jpg",
+          "size": 690887,
+          "order": 24
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F6.jpg?alt=media&token=ce579942-71fa-4ba7-8628-0a4016086545",
+          "category": "progress",
+          "filename": "6.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/6.jpg",
+          "size": 673313,
+          "order": 25
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F7.jpg?alt=media&token=a841fd55-7dec-452e-bd79-c345ddeeb003",
+          "category": "progress",
+          "filename": "7.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/7.jpg",
+          "size": 214662,
+          "order": 26
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F8.jpg?alt=media&token=ba9e4e7a-ffd2-45c3-badd-953a19492e68",
+          "category": "progress",
+          "filename": "8.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/8.jpg",
+          "size": 224077,
+          "order": 27
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F8c216056-400c-4126-a14b-59634953174a.jpeg?alt=media&token=400d0d92-9203-432f-975b-3431ff270daa",
+          "category": "progress",
+          "filename": "8c216056-400c-4126-a14b-59634953174a.jpeg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/8c216056-400c-4126-a14b-59634953174a.jpeg",
+          "size": 435048,
+          "order": 28
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F8eee2aab-2b92-43ff-bfb4-0db53982ed67.jpeg?alt=media&token=2398dd16-4e51-45f7-bd4c-e79dfab526a4",
+          "category": "progress",
+          "filename": "8eee2aab-2b92-43ff-bfb4-0db53982ed67.jpeg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/8eee2aab-2b92-43ff-bfb4-0db53982ed67.jpeg",
+          "size": 296285,
+          "order": 29
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fphotos%2Fprogress%2F9.jpg?alt=media&token=58d26577-5d6b-4fcf-b70e-2b0c62d4cad3",
+          "category": "progress",
+          "filename": "9.jpg",
+          "storagePath": "projects/117-quiet-elegance/photos/progress/9.jpg",
+          "size": 624273,
+          "order": 30
+        }
+      ],
+      "documents": [
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fdocuments%2Fplans%2F200%20Rowland_Structural%20Set_SEALED_102423%20(2).pdf?alt=media&token=8b0b162c-fb5e-4746-9fec-78e150cd4c25",
+          "category": "plans",
+          "filename": "200 Rowland_Structural Set_SEALED_102423 (2).pdf",
+          "storagePath": "projects/117-quiet-elegance/documents/plans/200 Rowland_Structural Set_SEALED_102423 (2).pdf",
+          "size": 4283305,
+          "type": "Floor Plan"
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F117-quiet-elegance%2Fdocuments%2Fplans%2FA7264403.pdf?alt=media&token=6a643a87-b1dc-4711-9eb7-9d834f616eeb",
+          "category": "plans",
+          "filename": "A7264403.pdf",
+          "storagePath": "projects/117-quiet-elegance/documents/plans/A7264403.pdf",
+          "size": 4140532,
+          "type": "Floor Plan"
+        }
+      ]
+    },
+    {
+      "id": "126",
+      "slug": "126-second-story-showcase",
+      "name": "Second Story Showcase",
+      "category": "adu-addition",
+      "subcategory": "addition",
+      "photos": [
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fafter%2FWhatsApp%20Image%202025-02-21%20at%2015.28.31.jpeg?alt=media&token=7030b749-2bea-462d-98ca-1b907f9fbc5f",
+          "category": "after",
+          "filename": "WhatsApp Image 2025-02-21 at 15.28.31.jpeg",
+          "storagePath": "projects/126-second-story-showcase/photos/after/WhatsApp Image 2025-02-21 at 15.28.31.jpeg",
+          "size": 282779,
+          "order": 1
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fafter%2FWhatsApp%20Image%202025-02-21%20at%2015.28.32%20(1).jpeg?alt=media&token=ffc5ebc1-94b3-4dcd-b49c-5df1ccfda08b",
+          "category": "after",
+          "filename": "WhatsApp Image 2025-02-21 at 15.28.32 (1).jpeg",
+          "storagePath": "projects/126-second-story-showcase/photos/after/WhatsApp Image 2025-02-21 at 15.28.32 (1).jpeg",
+          "size": 190990,
+          "order": 2
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fafter%2FWhatsApp%20Image%202025-02-21%20at%2015.28.32.jpeg?alt=media&token=626a4d50-66c9-4c77-a60e-c843e3fa3b2e",
+          "category": "after",
+          "filename": "WhatsApp Image 2025-02-21 at 15.28.32.jpeg",
+          "storagePath": "projects/126-second-story-showcase/photos/after/WhatsApp Image 2025-02-21 at 15.28.32.jpeg",
+          "size": 310141,
+          "order": 3
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fafter%2FWhatsApp%20Image%202025-05-20%20at%2012.25.28.jpeg?alt=media&token=b6349e9c-788d-40b7-99c4-24ccc00c0133",
+          "category": "after",
+          "filename": "WhatsApp Image 2025-05-20 at 12.25.28.jpeg",
+          "storagePath": "projects/126-second-story-showcase/photos/after/WhatsApp Image 2025-05-20 at 12.25.28.jpeg",
+          "size": 370651,
+          "order": 4
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fafter%2FWhatsApp%20Image%202025-05-20%20at%2012.25.29.jpeg?alt=media&token=77ffdf29-956c-4c2c-9238-a44fb27bb5c9",
+          "category": "after",
+          "filename": "WhatsApp Image 2025-05-20 at 12.25.29.jpeg",
+          "storagePath": "projects/126-second-story-showcase/photos/after/WhatsApp Image 2025-05-20 at 12.25.29.jpeg",
+          "size": 230047,
+          "order": 5
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fafter%2FWhatsApp%20Image%202025-05-20%20at%2012.40.03.jpeg?alt=media&token=548e1531-bab1-48f6-95fb-66dc1eb7648d",
+          "category": "after",
+          "filename": "WhatsApp Image 2025-05-20 at 12.40.03.jpeg",
+          "storagePath": "projects/126-second-story-showcase/photos/after/WhatsApp Image 2025-05-20 at 12.40.03.jpeg",
+          "size": 331985,
+          "order": 6
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fbefore%2FArun.jpeg?alt=media&token=2f43bcb7-97e0-42cc-9786-bd4fee9aa228",
+          "category": "before",
+          "filename": "Arun.jpeg",
+          "storagePath": "projects/126-second-story-showcase/photos/before/Arun.jpeg",
+          "size": 395175,
+          "order": 7
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fbefore%2FIMG_3631.jpeg?alt=media&token=19372830-7dc5-410d-9f79-162b1d745465",
+          "category": "before",
+          "filename": "IMG_3631.jpeg",
+          "storagePath": "projects/126-second-story-showcase/photos/before/IMG_3631.jpeg",
+          "size": 7159923,
+          "order": 8
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fprogress%2F1.jpg?alt=media&token=32ace18d-0e8d-4087-a087-cb8b34fa9843",
+          "category": "progress",
+          "filename": "1.jpg",
+          "storagePath": "projects/126-second-story-showcase/photos/progress/1.jpg",
+          "size": 8245248,
+          "order": 9
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fprogress%2F2.jpg?alt=media&token=01bb0f70-09f6-489e-a47b-5ed1748031f0",
+          "category": "progress",
+          "filename": "2.jpg",
+          "storagePath": "projects/126-second-story-showcase/photos/progress/2.jpg",
+          "size": 7946240,
+          "order": 10
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fprogress%2F3.jpg?alt=media&token=696ee215-62ed-4e89-b128-ebd0dd24561b",
+          "category": "progress",
+          "filename": "3.jpg",
+          "storagePath": "projects/126-second-story-showcase/photos/progress/3.jpg",
+          "size": 7307264,
+          "order": 11
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fprogress%2F4.jpg?alt=media&token=5588b6e2-b3a5-4f88-93d0-2cb619db20fe",
+          "category": "progress",
+          "filename": "4.jpg",
+          "storagePath": "projects/126-second-story-showcase/photos/progress/4.jpg",
+          "size": 553255,
+          "order": 12
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fprogress%2F5.jpg?alt=media&token=e9b235ca-49fb-4f65-bfd9-834253c87dfe",
+          "category": "progress",
+          "filename": "5.jpg",
+          "storagePath": "projects/126-second-story-showcase/photos/progress/5.jpg",
+          "size": 637999,
+          "order": 13
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fprogress%2F6.jpg?alt=media&token=b89c9166-02e5-4542-b223-826e83bb794b",
+          "category": "progress",
+          "filename": "6.jpg",
+          "storagePath": "projects/126-second-story-showcase/photos/progress/6.jpg",
+          "size": 487023,
+          "order": 14
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fprogress%2F7.jpg?alt=media&token=18c77963-7b37-464a-a9ab-0e187b5c8a8b",
+          "category": "progress",
+          "filename": "7.jpg",
+          "storagePath": "projects/126-second-story-showcase/photos/progress/7.jpg",
+          "size": 460189,
+          "order": 15
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fprogress%2F8.jpg?alt=media&token=cf86f564-e55c-494c-856d-528db74164d4",
+          "category": "progress",
+          "filename": "8.jpg",
+          "storagePath": "projects/126-second-story-showcase/photos/progress/8.jpg",
+          "size": 595668,
+          "order": 16
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fphotos%2Fprogress%2F9.jpg?alt=media&token=4f33f21f-ecfc-411a-ae5f-80dab26f794b",
+          "category": "progress",
+          "filename": "9.jpg",
+          "storagePath": "projects/126-second-story-showcase/photos/progress/9.jpg",
+          "size": 511993,
+          "order": 17
+        }
+      ],
+      "documents": [
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fdocuments%2Fplans%2F9908%20Bundoran%20Drive-7-16-24%20(1).pdf?alt=media&token=85da1add-083e-4771-96fb-7b714531e5a2",
+          "category": "plans",
+          "filename": "9908 Bundoran Drive-7-16-24 (1).pdf",
+          "storagePath": "projects/126-second-story-showcase/documents/plans/9908 Bundoran Drive-7-16-24 (1).pdf",
+          "size": 1095467,
+          "type": "Floor Plan"
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F126-second-story-showcase%2Fdocuments%2Fplans%2F9908%20Bundoran%20Drive-Permit%20Set-07.14.2024.pdf?alt=media&token=cee55128-9cda-4386-b834-6a16e49fd853",
+          "category": "plans",
+          "filename": "9908 Bundoran Drive-Permit Set-07.14.2024.pdf",
+          "storagePath": "projects/126-second-story-showcase/documents/plans/9908 Bundoran Drive-Permit Set-07.14.2024.pdf",
+          "size": 3303611,
+          "type": "Floor Plan"
+        }
+      ]
+    },
+    {
+      "id": "148",
+      "slug": "148-rustic-roots",
+      "name": "Rustic Roots",
+      "category": "adu-addition",
+      "subcategory": "adu",
+      "photos": [
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fafter%2FDSC09958.jpg?alt=media&token=38f565ee-e751-440b-9075-283906e79d0e",
+          "category": "after",
+          "filename": "DSC09958.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/after/DSC09958.jpg",
+          "size": 5024410,
+          "order": 1
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fafter%2FDSC09963.jpg?alt=media&token=25e889ad-5cc8-4bda-9ffd-d26f8592e981",
+          "category": "after",
+          "filename": "DSC09963.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/after/DSC09963.jpg",
+          "size": 6171465,
+          "order": 2
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fafter%2FDSC09973.jpg?alt=media&token=dbae1034-4195-4692-86f9-f374f108ba40",
+          "category": "after",
+          "filename": "DSC09973.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/after/DSC09973.jpg",
+          "size": 6978706,
+          "order": 3
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fafter%2FDSC09978.jpg?alt=media&token=845e4a9c-cc11-4fa6-b15c-dd807da2d462",
+          "category": "after",
+          "filename": "DSC09978.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/after/DSC09978.jpg",
+          "size": 5493823,
+          "order": 4
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fafter%2FDSC09988.jpg?alt=media&token=8e08900e-9c2b-4fb2-82fe-5a0e0bc2e48b",
+          "category": "after",
+          "filename": "DSC09988.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/after/DSC09988.jpg",
+          "size": 5958661,
+          "order": 5
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fbefore%2FIMG_1823.jpeg?alt=media&token=dea79654-1e6e-47aa-83c3-e85027e6ed77",
+          "category": "before",
+          "filename": "IMG_1823.jpeg",
+          "storagePath": "projects/148-rustic-roots/photos/before/IMG_1823.jpeg",
+          "size": 372675,
+          "order": 6
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fbefore%2FIMG_1824.jpeg?alt=media&token=e8f79623-4c45-40ae-a6d8-2e27aaf3a527",
+          "category": "before",
+          "filename": "IMG_1824.jpeg",
+          "storagePath": "projects/148-rustic-roots/photos/before/IMG_1824.jpeg",
+          "size": 429130,
+          "order": 7
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fbefore%2FIMG_1825.jpeg?alt=media&token=1b119f3a-110f-436b-a7ab-e2fa9cf0c3ef",
+          "category": "before",
+          "filename": "IMG_1825.jpeg",
+          "storagePath": "projects/148-rustic-roots/photos/before/IMG_1825.jpeg",
+          "size": 459406,
+          "order": 8
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fbefore%2FIMG_1826.jpeg?alt=media&token=cbdd24c5-b269-4d06-815e-5bb0eb4d24db",
+          "category": "before",
+          "filename": "IMG_1826.jpeg",
+          "storagePath": "projects/148-rustic-roots/photos/before/IMG_1826.jpeg",
+          "size": 355763,
+          "order": 9
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F1.jpg?alt=media&token=5a617296-46bb-4696-b9bd-e63fd8a9efa5",
+          "category": "progress",
+          "filename": "1.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/1.jpg",
+          "size": 2730118,
+          "order": 10
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F10.jpg?alt=media&token=cee043a6-4272-4265-9204-e286fac32822",
+          "category": "progress",
+          "filename": "10.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/10.jpg",
+          "size": 331040,
+          "order": 11
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F11.jpg?alt=media&token=dabf3f5f-f8ff-4061-840b-270690e29a30",
+          "category": "progress",
+          "filename": "11.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/11.jpg",
+          "size": 334650,
+          "order": 12
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F12.jpg?alt=media&token=94e72323-bb6d-4ee4-b92c-0b2bd64c8185",
+          "category": "progress",
+          "filename": "12.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/12.jpg",
+          "size": 1330092,
+          "order": 13
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F13.jpg?alt=media&token=6d66ed4c-d2cd-47ca-a823-217fac3f2354",
+          "category": "progress",
+          "filename": "13.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/13.jpg",
+          "size": 362448,
+          "order": 14
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F14.jpg?alt=media&token=e99b131f-4d02-465e-97e7-5dd5e092ee54",
+          "category": "progress",
+          "filename": "14.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/14.jpg",
+          "size": 250604,
+          "order": 15
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F15.jpg?alt=media&token=fe57f61e-7d28-4586-a962-c24408908999",
+          "category": "progress",
+          "filename": "15.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/15.jpg",
+          "size": 1509643,
+          "order": 16
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F16.jpg?alt=media&token=f782d19d-6d92-4ca4-b364-cdf0796a1c64",
+          "category": "progress",
+          "filename": "16.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/16.jpg",
+          "size": 1330289,
+          "order": 17
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F17.jpg?alt=media&token=243d75eb-1738-4521-b4b1-e0ee3b4a20e3",
+          "category": "progress",
+          "filename": "17.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/17.jpg",
+          "size": 2129135,
+          "order": 18
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F18.jpg?alt=media&token=17e17c67-da79-4037-9098-d323e195adda",
+          "category": "progress",
+          "filename": "18.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/18.jpg",
+          "size": 223300,
+          "order": 19
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F19.jpg?alt=media&token=fcfcf7a4-0b05-4c57-95f4-0fa916a92405",
+          "category": "progress",
+          "filename": "19.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/19.jpg",
+          "size": 2045109,
+          "order": 20
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F2.jpg?alt=media&token=4db0423b-0e34-46b3-bad8-264b4ecd51f7",
+          "category": "progress",
+          "filename": "2.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/2.jpg",
+          "size": 2437129,
+          "order": 21
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F20.jpg?alt=media&token=b60f9133-a1af-4ee4-8f8b-f812d0e6a307",
+          "category": "progress",
+          "filename": "20.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/20.jpg",
+          "size": 245908,
+          "order": 22
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F21.jpg?alt=media&token=fbf699dc-2076-45f5-b5cd-c201be77e104",
+          "category": "progress",
+          "filename": "21.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/21.jpg",
+          "size": 2325676,
+          "order": 23
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F22.jpg?alt=media&token=5aad701d-8b2b-4815-8a30-64b8eea66b44",
+          "category": "progress",
+          "filename": "22.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/22.jpg",
+          "size": 293883,
+          "order": 24
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F23.jpg?alt=media&token=cdbd6677-7f50-4674-8b48-161db1550b8d",
+          "category": "progress",
+          "filename": "23.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/23.jpg",
+          "size": 435206,
+          "order": 25
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F24.jpg?alt=media&token=993c649f-06dc-41f0-9263-21e74ba88c31",
+          "category": "progress",
+          "filename": "24.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/24.jpg",
+          "size": 229669,
+          "order": 26
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F25.jpg?alt=media&token=952f5652-115f-47b8-a114-f326feb029f7",
+          "category": "progress",
+          "filename": "25.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/25.jpg",
+          "size": 410234,
+          "order": 27
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F26.jpg?alt=media&token=66c68a5a-603c-472c-915a-9e419b04cca4",
+          "category": "progress",
+          "filename": "26.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/26.jpg",
+          "size": 367264,
+          "order": 28
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F27.jpg?alt=media&token=d0b7e97e-1697-457f-87fa-cb9c1f1320d9",
+          "category": "progress",
+          "filename": "27.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/27.jpg",
+          "size": 199561,
+          "order": 29
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F28.jpg?alt=media&token=3fa7e33d-cf6a-49f4-9e15-5db483fbfe2b",
+          "category": "progress",
+          "filename": "28.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/28.jpg",
+          "size": 215649,
+          "order": 30
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F29.jpg?alt=media&token=09604704-47a3-4c4d-8991-a2c44180ab8f",
+          "category": "progress",
+          "filename": "29.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/29.jpg",
+          "size": 3472616,
+          "order": 31
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F3.jpg?alt=media&token=f7ba53b0-9d5e-44b7-a1e6-316eecaca602",
+          "category": "progress",
+          "filename": "3.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/3.jpg",
+          "size": 480433,
+          "order": 32
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F30.jpg?alt=media&token=7d7a8865-3e81-4dad-8ee6-38cb5c279688",
+          "category": "progress",
+          "filename": "30.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/30.jpg",
+          "size": 410392,
+          "order": 33
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F32.jpg?alt=media&token=9c45cf03-ba35-4e1e-abe0-e4963fc87ff5",
+          "category": "progress",
+          "filename": "32.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/32.jpg",
+          "size": 393223,
+          "order": 34
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F33.jpg?alt=media&token=23389aa4-3b3f-44fb-b897-85a204d472b8",
+          "category": "progress",
+          "filename": "33.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/33.jpg",
+          "size": 4813535,
+          "order": 35
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F34.jpg?alt=media&token=d554072b-a793-432f-b5c8-55be3ac98acc",
+          "category": "progress",
+          "filename": "34.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/34.jpg",
+          "size": 5187010,
+          "order": 36
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F35.jpg?alt=media&token=8a3dc6e9-bd06-44c8-b41b-46a328082816",
+          "category": "progress",
+          "filename": "35.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/35.jpg",
+          "size": 894777,
+          "order": 37
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F36.jpg?alt=media&token=e8dd3216-58f0-4e7f-a217-eda5534ab8f4",
+          "category": "progress",
+          "filename": "36.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/36.jpg",
+          "size": 4440847,
+          "order": 38
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F37.jpg?alt=media&token=7ebae726-2711-4fe1-bc05-78786b645445",
+          "category": "progress",
+          "filename": "37.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/37.jpg",
+          "size": 4756374,
+          "order": 39
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F38.jpg?alt=media&token=0c03c0ef-8ca8-4cfe-b4f1-c3544b760ab0",
+          "category": "progress",
+          "filename": "38.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/38.jpg",
+          "size": 3931611,
+          "order": 40
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F39.jpg?alt=media&token=6382f5b2-ae34-49d2-a7fe-2194fba5a2b2",
+          "category": "progress",
+          "filename": "39.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/39.jpg",
+          "size": 681727,
+          "order": 41
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F4.jpg?alt=media&token=542e1fc2-5797-48e5-b4db-883f856c335e",
+          "category": "progress",
+          "filename": "4.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/4.jpg",
+          "size": 407474,
+          "order": 42
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F40.jpg?alt=media&token=b3761f17-b187-4287-aa2c-5ea56b5169cb",
+          "category": "progress",
+          "filename": "40.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/40.jpg",
+          "size": 4199230,
+          "order": 43
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F41.jpg?alt=media&token=f14872c1-78bf-4321-aaa4-fc83f890ab9b",
+          "category": "progress",
+          "filename": "41.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/41.jpg",
+          "size": 5367474,
+          "order": 44
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F42.jpg?alt=media&token=b25af788-25c0-4245-8ca6-0f11dc1df05e",
+          "category": "progress",
+          "filename": "42.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/42.jpg",
+          "size": 452612,
+          "order": 45
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F43.jpg?alt=media&token=4b77a65a-92cc-4522-9639-9eb8ebb8d1be",
+          "category": "progress",
+          "filename": "43.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/43.jpg",
+          "size": 5011708,
+          "order": 46
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F44.jpg?alt=media&token=6ff35001-1aa9-48e7-968f-d87c176b5cdb",
+          "category": "progress",
+          "filename": "44.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/44.jpg",
+          "size": 4045172,
+          "order": 47
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F5.jpg?alt=media&token=001fe52b-2095-4606-ba0d-2938f37ac434",
+          "category": "progress",
+          "filename": "5.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/5.jpg",
+          "size": 450726,
+          "order": 48
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F6.jpg?alt=media&token=6141ad70-43ea-41d7-a7ed-51413899b9cd",
+          "category": "progress",
+          "filename": "6.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/6.jpg",
+          "size": 341829,
+          "order": 49
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F7.jpg?alt=media&token=bcbdd84f-d18d-453d-a948-8258f5ddf97d",
+          "category": "progress",
+          "filename": "7.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/7.jpg",
+          "size": 320414,
+          "order": 50
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F8.jpg?alt=media&token=56c538e1-c9bb-4442-ba16-b6859ed678f2",
+          "category": "progress",
+          "filename": "8.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/8.jpg",
+          "size": 450745,
+          "order": 51
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fprogress%2F9.jpg?alt=media&token=d3a5b1e4-feea-49f7-bcb1-3d012aa3fcf2",
+          "category": "progress",
+          "filename": "9.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/progress/9.jpg",
+          "size": 440401,
+          "order": 52
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fmaterials%2FIMG_0331.jpeg?alt=media&token=645dcb19-2487-4ebb-b888-0c02829582a0",
+          "category": "materials",
+          "filename": "IMG_0331.jpeg",
+          "storagePath": "projects/148-rustic-roots/photos/materials/IMG_0331.jpeg",
+          "size": 510849,
+          "order": 53
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fmaterials%2FIMG_0334.jpeg?alt=media&token=5b25c659-e9e4-4cc6-a602-40e116d7521a",
+          "category": "materials",
+          "filename": "IMG_0334.jpeg",
+          "storagePath": "projects/148-rustic-roots/photos/materials/IMG_0334.jpeg",
+          "size": 450745,
+          "order": 54
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fmaterials%2FIMG_2790.jpeg?alt=media&token=9265a6ef-cdf1-400e-9489-2c3089625bb8",
+          "category": "materials",
+          "filename": "IMG_2790.jpeg",
+          "storagePath": "projects/148-rustic-roots/photos/materials/IMG_2790.jpeg",
+          "size": 451053,
+          "order": 55
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fmaterials%2FPlumbing.jpg?alt=media&token=d1c7e013-5dad-4a77-b02f-47d310d8c980",
+          "category": "materials",
+          "filename": "Plumbing.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/materials/Plumbing.jpg",
+          "size": 374951,
+          "order": 56
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fmaterials%2FScreenshot%202024-11-05%20at%2011.20.58.png.jpg?alt=media&token=6bc77097-3c58-452e-aac0-4241b5daabe8",
+          "category": "materials",
+          "filename": "Screenshot 2024-11-05 at 11.20.58.png.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/materials/Screenshot 2024-11-05 at 11.20.58.png.jpg",
+          "size": 63026,
+          "order": 57
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F148-rustic-roots%2Fphotos%2Fmaterials%2FScreenshot%202024-11-05%20at%2011.21.06.png.jpg?alt=media&token=70479859-ca82-49ab-b284-09322d3e0ac8",
+          "category": "materials",
+          "filename": "Screenshot 2024-11-05 at 11.21.06.png.jpg",
+          "storagePath": "projects/148-rustic-roots/photos/materials/Screenshot 2024-11-05 at 11.21.06.png.jpg",
+          "size": 57631,
+          "order": 58
+        }
+      ],
+      "documents": []
+    }
+  ]
+}
