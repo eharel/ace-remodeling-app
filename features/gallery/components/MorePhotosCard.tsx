@@ -1,7 +1,9 @@
+import { Image } from "expo-image";
 import React, { useMemo } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
+import { Picture } from "@/core/types";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 
@@ -11,6 +13,8 @@ import { useTheme } from "@/shared/contexts";
 export interface MorePhotosCardProps {
   /** Number of additional photos not shown in preview */
   count: number;
+  /** Background photo to show beneath overlay */
+  backgroundPhoto?: Picture;
   /** Callback when card is pressed */
   onPress: () => void;
   /** Optional test ID */
@@ -40,6 +44,7 @@ export interface MorePhotosCardProps {
  */
 export const MorePhotosCard: React.FC<MorePhotosCardProps> = ({
   count,
+  backgroundPhoto,
   onPress,
   testID = "more-photos-card",
 }) => {
@@ -52,14 +57,26 @@ export const MorePhotosCard: React.FC<MorePhotosCardProps> = ({
           flex: 1, // Takes equal space with photo items
           aspectRatio: 4 / 3,
           borderRadius: DesignTokens.borderRadius.lg,
-          backgroundColor: "rgba(0, 0, 0, 0.65)", // Dark semi-transparent overlay
-          justifyContent: "center",
-          alignItems: "center",
           overflow: "hidden",
           ...DesignTokens.shadows.sm, // Match photo item shadows
         },
         cardPressed: {
           opacity: DesignTokens.interactions.activeOpacity,
+        },
+        backgroundImage: {
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+        },
+        overlay: {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: theme.colors.background.overlay, // Match gallery modal overlay
+          justifyContent: "center",
+          alignItems: "center",
         },
         text: {
           fontSize: DesignTokens.typography.fontSize.lg,
@@ -80,10 +97,18 @@ export const MorePhotosCard: React.FC<MorePhotosCardProps> = ({
       accessibilityHint="Opens the full photo gallery"
       testID={testID}
     >
-      <ThemedText style={styles.text}>
-        +{count} more photo{count === 1 ? "" : "s"}
-      </ThemedText>
+      {backgroundPhoto && (
+        <Image
+          source={{ uri: backgroundPhoto.url }}
+          style={styles.backgroundImage}
+          contentFit="cover"
+        />
+      )}
+      <View style={styles.overlay}>
+        <ThemedText style={styles.text}>
+          +{count} more photo{count === 1 ? "" : "s"}
+        </ThemedText>
+      </View>
     </Pressable>
   );
 };
-

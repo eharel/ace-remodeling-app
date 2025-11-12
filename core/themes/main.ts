@@ -21,7 +21,7 @@ export const mainTheme: Theme = {
       section: "#F7F4EF", // Warm off-white for content sections
       separator: "#e2e8f0", // Light gray for borders and dividers
       elevated: "#ffffff", // White for elevated elements
-      overlay: "rgba(50, 59, 74, 0.95)", // Dark blue-gray overlay for modals
+      overlay: "rgba(50, 59, 74, 0.92)", // Dark blue-gray overlay for modals
     },
 
     // Text colors - Professional, readable text

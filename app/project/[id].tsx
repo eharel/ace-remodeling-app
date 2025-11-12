@@ -862,6 +862,10 @@ export default function ProjectDetailScreen() {
                     {hasMorePhotos && (
                       <MorePhotosCard
                         count={remainingCount}
+                        backgroundPhoto={
+                          galleryImages[previewPhotos.length] ||
+                          galleryImages[0]
+                        }
                         onPress={() => {
                           // Open gallery starting from first photo in filtered set
                           setSelectedImageIndex(0);
