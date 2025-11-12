@@ -82,6 +82,20 @@ export default function ProjectDetailScreen() {
     return photoCounts[activePhotoTab] - previewPhotos.length;
   }, [photoCounts, activePhotoTab, previewPhotos.length]);
 
+  // Get filtered images for gallery based on active tab
+  const galleryImages = useMemo(() => {
+    if (!project?.pictures) return [];
+
+    if (activePhotoTab === "all") {
+      return project.pictures;
+    }
+
+    // Map tab value to photo type (note: 'progress' tab maps to 'process' type)
+    const photoType =
+      activePhotoTab === "progress" ? "process" : activePhotoTab;
+    return project.pictures.filter((p) => p.type === photoType);
+  }, [project?.pictures, activePhotoTab]);
+
   const closeGallery = () => {
     setGalleryVisible(false);
   };
@@ -838,25 +852,19 @@ export default function ProjectDetailScreen() {
                 {previewPhotos.length > 0 ? (
                   <ThemedView variant="ghost" style={styles.picturesGrid}>
                     {previewPhotos.map((item) => {
-                      // Find the original index in the full pictures array for gallery navigation
-                      const fullIndex = project.pictures.findIndex(
+                      // Find the index in the filtered gallery images for correct navigation
+                      const galleryIndex = galleryImages.findIndex(
                         (p) => p.id === item.id
                       );
-                      return renderGridImage(item, fullIndex);
+                      return renderGridImage(item, galleryIndex);
                     })}
                     {/* "+X more" card */}
                     {hasMorePhotos && (
                       <MorePhotosCard
                         count={remainingCount}
                         onPress={() => {
-                          // Open gallery starting from first photo beyond preview
-                          const firstPhoto = previewPhotos[0];
-                          const startIndex = project.pictures.findIndex(
-                            (p) => p.id === firstPhoto?.id
-                          );
-                          setSelectedImageIndex(
-                            startIndex >= 0 ? startIndex : 0
-                          );
+                          // Open gallery starting from first photo in filtered set
+                          setSelectedImageIndex(0);
                           setGalleryVisible(true);
                         }}
                       />
@@ -1080,10 +1088,10 @@ export default function ProjectDetailScreen() {
       </ThemedView>
 
       {/* Image Gallery Modal */}
-      {project && project.pictures && project.pictures.length > 0 && (
+      {galleryImages.length > 0 && (
         <ImageGalleryModal
           visible={galleryVisible}
-          images={project.pictures}
+          images={galleryImages}
           initialIndex={selectedImageIndex}
           onClose={closeGallery}
         />
