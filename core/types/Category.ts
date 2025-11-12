@@ -8,6 +8,8 @@ export const PROJECT_CATEGORIES = {
   ADU_ADDITION: "adu-addition",
   OUTDOOR: "outdoor",
   POOLS: "pools",
+  COMMERCIAL: "commercial",
+  NEW_CONSTRUCTION: "new-construction",
 } as const;
 
 /**
@@ -41,6 +43,8 @@ export const CATEGORY_LABELS: Record<ProjectCategory, string> = {
   [PROJECT_CATEGORIES.ADU_ADDITION]: "ADU/Addition",
   [PROJECT_CATEGORIES.OUTDOOR]: "Outdoor Living",
   [PROJECT_CATEGORIES.POOLS]: "Pools",
+  [PROJECT_CATEGORIES.COMMERCIAL]: "Commercial",
+  [PROJECT_CATEGORIES.NEW_CONSTRUCTION]: "New Construction",
 };
 
 /**

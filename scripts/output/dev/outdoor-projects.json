@@ -1,0 +1,136 @@
+{
+  "uploadDate": "2025-11-12T21:05:10.994Z",
+  "category": "outdoor",
+  "totalProjects": 1,
+  "projects": [
+    {
+      "id": "185",
+      "slug": "185-poolside-cabana",
+      "name": "Poolside Cabana",
+      "category": "outdoor",
+      "photos": [
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fafter%2FD001Logo.jpg?alt=media&token=3c85a461-c67b-487f-9f0b-45eaa3a52fbf",
+          "category": "after",
+          "filename": "D001Logo.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/after/D001Logo.jpg",
+          "size": 537383,
+          "order": 1
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fafter%2FD002Logo.jpg?alt=media&token=c412e05f-9ccc-4a09-999b-654d0569761f",
+          "category": "after",
+          "filename": "D002Logo.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/after/D002Logo.jpg",
+          "size": 288160,
+          "order": 2
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fafter%2FD005Logo.jpg?alt=media&token=dff9af0d-8d80-4419-8d45-639e3248d977",
+          "category": "after",
+          "filename": "D005Logo.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/after/D005Logo.jpg",
+          "size": 513528,
+          "order": 3
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fafter%2FD010Logo.jpg?alt=media&token=8e523822-7c1a-45e7-b6a6-bba37e546b40",
+          "category": "after",
+          "filename": "D010Logo.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/after/D010Logo.jpg",
+          "size": 569651,
+          "order": 4
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fafter%2FD013Logo.jpg?alt=media&token=2ae3b571-bd86-411f-b7e9-19a47b8b1cbe",
+          "category": "after",
+          "filename": "D013Logo.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/after/D013Logo.jpg",
+          "size": 287788,
+          "order": 5
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fafter%2FD014Logo.jpg?alt=media&token=4fc82ff9-bf11-4d2e-8812-efc8024adcf6",
+          "category": "after",
+          "filename": "D014Logo.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/after/D014Logo.jpg",
+          "size": 272191,
+          "order": 6
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fafter%2FD016Logo.jpg?alt=media&token=1c86aaae-932d-45f2-8caf-74f3bd807a4a",
+          "category": "after",
+          "filename": "D016Logo.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/after/D016Logo.jpg",
+          "size": 262934,
+          "order": 7
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fafter%2FD017Logo.jpg?alt=media&token=280ac4e6-8ef7-4a67-83e5-ec22ddf3879a",
+          "category": "after",
+          "filename": "D017Logo.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/after/D017Logo.jpg",
+          "size": 573222,
+          "order": 8
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fbefore%2FPergola%20space%20determined.jpg?alt=media&token=69de1e93-84a9-4a7d-86d2-7a9ada46c104",
+          "category": "before",
+          "filename": "Pergola space determined.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/before/Pergola space determined.jpg",
+          "size": 4537248,
+          "order": 9
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fprogress%2F1.jpg?alt=media&token=a9928afd-54c8-4a81-b2e8-b112d25da977",
+          "category": "progress",
+          "filename": "1.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/progress/1.jpg",
+          "size": 767926,
+          "order": 10
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fprogress%2F2.jpg?alt=media&token=745e7390-9fa3-4e79-8624-c3217b6cec79",
+          "category": "progress",
+          "filename": "2.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/progress/2.jpg",
+          "size": 574154,
+          "order": 11
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fprogress%2F3.jpg?alt=media&token=9fc1b71d-1ffa-436c-84f6-c485e816f5bd",
+          "category": "progress",
+          "filename": "3.jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/progress/3.jpg",
+          "size": 587438,
+          "order": 12
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fprogress%2Foutside%20(1).jpg?alt=media&token=106052a5-f3f7-4e36-afe1-d1ec090faf14",
+          "category": "progress",
+          "filename": "outside (1).jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/progress/outside (1).jpg",
+          "size": 3987456,
+          "order": 13
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fprogress%2Foutside%20(2).jpg?alt=media&token=206d8b29-2876-48c4-9024-cac1be2f39e1",
+          "category": "progress",
+          "filename": "outside (2).jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/progress/outside (2).jpg",
+          "size": 4882957,
+          "order": 14
+        },
+        {
+          "url": "https://firebasestorage.googleapis.com/v0/b/ace-remodeling-dev.firebasestorage.app/o/projects%2F185-poolside-cabana%2Fphotos%2Fprogress%2Foutside%20(3).jpg?alt=media&token=91127d45-967a-4861-862f-20284b163355",
+          "category": "progress",
+          "filename": "outside (3).jpg",
+          "storagePath": "projects/185-poolside-cabana/photos/progress/outside (3).jpg",
+          "size": 6246839,
+          "order": 15
+        }
+      ],
+      "documents": []
+    }
+  ]
+}
