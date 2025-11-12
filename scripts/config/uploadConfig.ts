@@ -23,7 +23,12 @@ export const VALID_CATEGORIES = [
   "full-home", // Full home remodels
   "adu-addition", // Combined category with subcategories (adu, addition)
   "outdoor", // Outdoor living spaces
-  "pools", // Pool projects (future)
+  "pools", // Pool projects
+  "commercial", // Commercial projects
+  "new-construction", // New construction projects
+  // Future categories:
+  // "miscellaneous" - Structure TBD
+  // "management-tools" - Will have subcategories
 ] as const;
 
 /**
@@ -69,7 +74,18 @@ export const MAX_RETRY_ATTEMPTS = 3;
 export const RETRY_DELAY_MS = 1000;
 
 /**
+ * Get environment-specific output path for generated Firestore data
+ * - Development: ./scripts/output/dev/
+ * - Production: ./scripts/output/prod/
+ */
+export function getOutputPath(): string {
+  const isProduction = process.env.NODE_ENV === "production";
+  return isProduction ? "./scripts/output/prod/" : "./scripts/output/dev/";
+}
+
+/**
  * Default output path for generated Firestore data
+ * @deprecated Use getOutputPath() instead for environment-aware paths
  */
 export const DEFAULT_OUTPUT_PATH = "./scripts/output/";
 

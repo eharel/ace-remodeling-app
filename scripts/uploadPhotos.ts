@@ -26,10 +26,10 @@ import * as path from "path";
 import { storage } from "../core/config";
 import {
   BASE_ASSETS_PATH,
-  DEFAULT_OUTPUT_PATH,
   DOCUMENT_CATEGORY_MAPPINGS,
   DOCUMENT_EXTENSIONS,
   DOCUMENT_TYPE_NAMES,
+  getOutputPath,
   IMAGE_CATEGORY_MAPPINGS,
   IMAGE_EXTENSIONS,
   MAX_FILE_SIZE_MB,
@@ -829,7 +829,7 @@ function parseArguments(args: string[]): UploadOptions {
   const options: UploadOptions = {
     dryRun: false,
     force: false,
-    outputPath: DEFAULT_OUTPUT_PATH,
+    outputPath: getOutputPath(),
     batchSize: UPLOAD_BATCH_SIZE,
   };
 

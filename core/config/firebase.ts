@@ -63,6 +63,12 @@ try {
 export { db, storage };
 export default app;
 
-// Export for debugging which environment is active
-export const currentEnvironment = __DEV__ ? "development" : "production";
+function getCurrentEnvironment(): "development" | "production" {
+  if (typeof __DEV__ !== "undefined") {
+    return __DEV__ ? "development" : "production";
+  }
+  return process.env.NODE_ENV === "production" ? "production" : "development";
+}
+
+export const currentEnvironment = getCurrentEnvironment();
 export const currentProjectId = firebaseConfig.projectId;

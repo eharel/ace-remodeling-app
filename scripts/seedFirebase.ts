@@ -66,16 +66,23 @@ interface UploadedProject {
 
 /**
  * Load uploaded projects from JSON files
- * Looks for all *-projects.json files in scripts/output/
+ * Looks for all *-projects.json files in environment-specific output folder
+ * - Development: scripts/output/dev/
+ * - Production: scripts/output/prod/
  */
 function loadUploadedProjects(): UploadedProject[] {
   const uploadedProjects: UploadedProject[] = [];
 
   try {
-    const outputDir = path.join(__dirname, "output");
+    // Determine environment-specific folder
+    const isProduction = process.env.NODE_ENV === "production";
+    const envFolder = isProduction ? "prod" : "dev";
+    const outputDir = path.join(__dirname, "output", envFolder);
+
+    console.log(`📂 Loading from: output/${envFolder}/`);
 
     if (!fs.existsSync(outputDir)) {
-      console.log("ℹ️  No output directory found, no projects to seed");
+      console.log(`ℹ️  No ${envFolder} output directory found, no projects to seed`);
       return [];
     }
 
@@ -85,7 +92,7 @@ function loadUploadedProjects(): UploadedProject[] {
       .filter((f) => f.endsWith("-projects.json"));
 
     if (files.length === 0) {
-      console.log("ℹ️  No uploaded project files found in output directory");
+      console.log(`ℹ️  No uploaded project files found in ${envFolder} output directory`);
       return [];
     }
 
