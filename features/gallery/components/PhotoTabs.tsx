@@ -104,28 +104,30 @@ export const PhotoTabs: React.FC<PhotoTabsProps> = ({
       StyleSheet.create({
         container: {
           borderBottomWidth: 1,
-          borderBottomColor: theme.colors.border.primary,
-          backgroundColor: theme.colors.background.primary,
+          borderBottomColor: theme.colors.border.secondary,
+          marginBottom: DesignTokens.spacing[4],
+          // NO background color - float on card background
         },
         scrollView: {
           flexGrow: 0,
         },
         tabsContainer: {
           flexDirection: "row",
-          paddingHorizontal: DesignTokens.spacing[4],
+          gap: DesignTokens.spacing[6],
+          // NO padding - let tabs breathe
         },
         tab: {
-          paddingHorizontal: DesignTokens.spacing[4],
+          paddingHorizontal: DesignTokens.spacing[2],
           paddingVertical: DesignTokens.spacing[3],
-          marginRight: DesignTokens.spacing[2],
           minHeight: 44, // iPad touch target minimum
           justifyContent: "center",
           alignItems: "center",
           borderBottomWidth: 3,
           borderBottomColor: "transparent",
+          marginBottom: -1, // Overlap with container border for clean look
         },
         tabActive: {
-          borderBottomColor: theme.colors.interactive.primary,
+          borderBottomColor: theme.colors.components.button.primary,
         },
         tabContent: {
           flexDirection: "row",
@@ -134,20 +136,21 @@ export const PhotoTabs: React.FC<PhotoTabsProps> = ({
         },
         tabLabel: {
           fontSize: DesignTokens.typography.fontSize.base,
-          fontWeight: DesignTokens.typography.fontWeight.medium,
+          fontWeight: DesignTokens.typography.fontWeight.regular,
           color: theme.colors.text.secondary,
         },
         tabLabelActive: {
-          color: theme.colors.interactive.primary,
+          color: theme.colors.components.button.primary,
           fontWeight: DesignTokens.typography.fontWeight.semibold,
         },
         tabCount: {
           fontSize: DesignTokens.typography.fontSize.sm,
-          fontWeight: DesignTokens.typography.fontWeight.medium,
-          color: theme.colors.text.secondary,
+          fontWeight: DesignTokens.typography.fontWeight.regular,
+          color: theme.colors.text.secondary, // Match label color for visibility
         },
         tabCountActive: {
-          color: theme.colors.interactive.primary,
+          color: theme.colors.components.button.primary, // Match active label color
+          fontWeight: DesignTokens.typography.fontWeight.medium,
         },
       }),
     [theme]

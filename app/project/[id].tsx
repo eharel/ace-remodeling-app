@@ -263,22 +263,19 @@ export default function ProjectDetailScreen() {
         },
         sectionTitle: {
           ...commonStyles.text.sectionTitle,
-          marginBottom: DesignTokens.spacing[6],
+          marginBottom: DesignTokens.spacing[2], // Tight spacing to instruction text
         },
         picturesGrid: {
           flexDirection: "row",
           gap: DesignTokens.spacing[3],
-          marginTop: DesignTokens.spacing[4],
+          // NO marginTop - PhotoTabs component handles spacing above grid
         },
         gridImageContainer: {
           flex: 1, // Each item takes equal space
           aspectRatio: 4 / 3,
           borderRadius: DesignTokens.borderRadius.lg,
           overflow: "hidden",
-          backgroundColor: theme.colors.background.secondary,
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          ...DesignTokens.shadows.sm,
+          ...DesignTokens.shadows.sm, // Subtle shadow for depth
         },
         gridImageContainerPressed: {
           transform: [{ scale: 0.95 }],
@@ -306,8 +303,7 @@ export default function ProjectDetailScreen() {
         },
         sectionSubtitle: {
           ...commonStyles.text.smallText,
-          marginTop: DesignTokens.spacing[1],
-          opacity: 0.7,
+          marginBottom: DesignTokens.spacing[5], // Space before tabs
         },
         pictureContainer: {
           width: 280,
@@ -840,7 +836,7 @@ export default function ProjectDetailScreen() {
 
                 {/* Photo Grid */}
                 {previewPhotos.length > 0 ? (
-                  <ThemedView style={styles.picturesGrid}>
+                  <ThemedView variant="ghost" style={styles.picturesGrid}>
                     {previewPhotos.map((item) => {
                       // Find the original index in the full pictures array for gallery navigation
                       const fullIndex = project.pictures.findIndex(

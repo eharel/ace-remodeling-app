@@ -52,21 +52,19 @@ export const MorePhotosCard: React.FC<MorePhotosCardProps> = ({
           flex: 1, // Takes equal space with photo items
           aspectRatio: 4 / 3,
           borderRadius: DesignTokens.borderRadius.lg,
-          backgroundColor: theme.colors.background.elevated,
-          borderWidth: 2,
-          borderColor: theme.colors.border.primary,
-          borderStyle: "dashed",
+          backgroundColor: "rgba(0, 0, 0, 0.65)", // Dark semi-transparent overlay
           justifyContent: "center",
           alignItems: "center",
           overflow: "hidden",
+          ...DesignTokens.shadows.sm, // Match photo item shadows
         },
         cardPressed: {
           opacity: DesignTokens.interactions.activeOpacity,
         },
         text: {
-          fontSize: DesignTokens.typography.fontSize.xl,
+          fontSize: DesignTokens.typography.fontSize.lg,
           fontWeight: DesignTokens.typography.fontWeight.semibold,
-          color: theme.colors.text.primary,
+          color: theme.colors.text.inverse, // White text on dark background
           textAlign: "center",
         },
       }),
