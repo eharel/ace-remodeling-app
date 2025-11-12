@@ -10,6 +10,9 @@ export { ImageGalleryFooter } from "./components/ImageGalleryFooter";
 export { ImageGalleryHeader } from "./components/ImageGalleryHeader";
 export { ImageGalleryModal } from "./components/ImageGalleryModal";
 export { ImageLoadingSkeleton } from "./components/ImageLoadingSkeleton";
+export { MorePhotosCard } from "./components/MorePhotosCard";
+export { PhotoTabs } from "./components/PhotoTabs";
+export type { PhotoTabValue, PhotoCounts } from "./components/PhotoTabs";
 
 // Constants
 export * from "./constants/accessibilityStrings";
