@@ -3,6 +3,8 @@
  * Business logic and content only - styling values moved to DesignTokens
  */
 
+import type { ChecklistItem } from "@/features/checklist/utils/checklistHelpers";
+
 /**
  * Checklist behavior configuration interface
  */
@@ -35,19 +37,150 @@ export interface ChecklistFeatures {
 
 /**
  * Main checklist configuration
- * Uses satisfies for type safety and better autocomplete
+ * Uses hierarchical structure for parent-child relationships
  */
 export const CHECKLIST_CONFIG = {
-  // Checklist content - the actual meeting agenda items
+  // Hierarchical checklist content - meeting agenda with nested items
   ITEMS: [
-    "Introduce company overview",
-    "Show similar past projects",
-    "Discuss timeline & budget",
-    "Review material options",
-    "Address client concerns",
-    "Explain next steps",
-    "Schedule follow-up",
-  ] as const,
+    {
+      id: "introduction",
+      text: "Introduction",
+      subItems: [
+        {
+          id: "introduction-rapport",
+          text: "Build rapport with client",
+        },
+        {
+          id: "introduction-personal",
+          text: "Share something personal about yourself",
+        },
+        {
+          id: "introduction-bag",
+          text: "Place your bag where you can sit with the client after",
+        },
+      ],
+    },
+    {
+      id: "company-presentation",
+      text: "Company Presentation",
+      subItems: [
+        {
+          id: "company-departments",
+          text: "Introduce all company departments",
+        },
+        {
+          id: "company-under-one-roof",
+          text: "Explain design-permit-build under one roof",
+        },
+        {
+          id: "company-in-house",
+          text: "Highlight that all teams are in-house (aside from MEP)",
+        },
+      ],
+    },
+    {
+      id: "product-introduction",
+      text: "Product Introduction",
+      subItems: [
+        {
+          id: "product-drafter",
+          text: "Drafter",
+        },
+        {
+          id: "product-plans",
+          text: "Plans",
+        },
+        {
+          id: "product-3d-model",
+          text: "3D model",
+        },
+        {
+          id: "product-materials",
+          text: "Materials procurement",
+        },
+        {
+          id: "product-preconstruction",
+          text: "Pre-construction meeting",
+        },
+        {
+          id: "product-demo",
+          text: "Cover & demo",
+        },
+        {
+          id: "product-framing",
+          text: "Framing",
+        },
+        {
+          id: "product-rough-ins",
+          text: "Rough-ins",
+        },
+        {
+          id: "product-inspection",
+          text: "3rd party inspection",
+        },
+        {
+          id: "product-waterproofing",
+          text: "Walls closing / waterproofing",
+        },
+        {
+          id: "product-cabinets",
+          text: "Cabinets / countertops / tiles",
+        },
+        {
+          id: "product-final-install",
+          text: "Final install (plumbing / electrical / HVAC)",
+        },
+        {
+          id: "product-walkthrough",
+          text: "Final walkthrough and punch list",
+        },
+      ],
+    },
+    {
+      id: "intro-finish",
+      text: "Intro Finish",
+      subItems: [
+        {
+          id: "intro-finish-warranty",
+          text: "Warranty coverage",
+        },
+        {
+          id: "intro-finish-insurance",
+          text: "Insurance up to $5 million",
+        },
+      ],
+    },
+    {
+      id: "rebuttals-exit",
+      text: "Rebuttals & Exit Strategy",
+      subItems: [
+        {
+          id: "rebuttals-signing-benefits",
+          text: "Emphasize signing on-site benefits (guarantees quality oversight)",
+        },
+        {
+          id: "rebuttals-check-license",
+          text: "Check license of other contractors being considered",
+        },
+        {
+          id: "rebuttals-photos",
+          text: "Ask for photos of their previous projects",
+        },
+        {
+          id: "rebuttals-work-sites",
+          text: "Verify if other GCs can take you to open work sites",
+        },
+        {
+          id: "rebuttals-office",
+          text: "Confirm if other GCs have a physical office",
+        },
+        {
+          id: "rebuttals-recommendations",
+          text: "Request recommendations from their past clients",
+        },
+      ],
+    },
+  ] as const satisfies readonly ChecklistItem[],
 
   // Business behavior configuration
   BEHAVIOR: {
@@ -66,7 +199,3 @@ export const CHECKLIST_CONFIG = {
     TEMPLATES_ENABLED: false,
   } satisfies ChecklistFeatures,
 } as const;
-
-// Type exports for better TypeScript support
-export type ChecklistItem = (typeof CHECKLIST_CONFIG.ITEMS)[number];
-export type ChecklistItems = readonly ChecklistItem[];

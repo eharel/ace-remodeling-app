@@ -5,22 +5,33 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { DesignTokens } from "@/core/themes";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
-import { useChecklist } from "../hooks/useChecklist";
+import { ChecklistProvider, useChecklistContext } from "../contexts/ChecklistContext";
 import { ChecklistModal } from "./ChecklistModal";
 
 /**
- * Floating Action Button component for the meeting checklist
- * Provides a floating button that opens a modal with interactive checklist items
- * Shows a badge with uncompleted item count
+ * Internal FAB component that uses the checklist context
  */
-export function FloatingChecklistButton() {
+function FloatingChecklistButtonInternal() {
   const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Use the custom hook for checklist state management
-  const { checkedStates, toggleItem, resetItems, progress } = useChecklist();
+  // Use the context for progress tracking
+  const { getTotalProgress } = useChecklistContext();
+  const progress = getTotalProgress();
 
-  // Calculate uncompleted items count
+  // Calculate state for badge
+  const isComplete = progress.completed === progress.total;
+  const hasProgress = progress.completed > 0;
+
+  // Badge content: checkmark if complete, otherwise count
+  const badgeContent = isComplete ? "✓" : progress.completed.toString();
+
+  // Badge background color: green if progress, gray with opacity if none
+  const badgeBackgroundColor = hasProgress
+    ? theme.colors.status.success
+    : `${theme.colors.text.secondary}80`; // 50% opacity (80 in hex)
+
+  // Calculate uncompleted items count for accessibility
   const uncompletedCount = useMemo(() => {
     return progress.total - progress.completed;
   }, [progress]);
@@ -36,12 +47,6 @@ export function FloatingChecklistButton() {
         fab: {
           backgroundColor: theme.colors.interactive.primary,
           shadowColor: theme.colors.text.primary,
-        },
-        badge: {
-          backgroundColor: theme.colors.status.error,
-        },
-        badgeText: {
-          color: theme.colors.text.inverse, // Theme-aware white/inverse color
         },
       }),
     [theme]
@@ -69,24 +74,16 @@ export function FloatingChecklistButton() {
           />
         </TouchableOpacity>
 
-        {/* Badge - Only show when there are uncompleted items */}
-        {uncompletedCount > 0 && (
-          <View style={[styles.badge, dynamicStyles.badge]}>
-            <ThemedText style={[styles.badgeText, dynamicStyles.badgeText]}>
-              {uncompletedCount}
-            </ThemedText>
-          </View>
-        )}
+        {/* Badge - Always visible with color-coded background */}
+        <View style={[styles.badge, { backgroundColor: badgeBackgroundColor }]}>
+          <ThemedText style={styles.badgeText}>
+            {badgeContent}
+          </ThemedText>
+        </View>
       </View>
 
       {/* Checklist Modal */}
-      <ChecklistModal
-        visible={modalVisible}
-        checkedStates={checkedStates}
-        onToggleItem={toggleItem}
-        onReset={resetItems}
-        onClose={closeModal}
-      />
+      <ChecklistModal visible={modalVisible} onClose={closeModal} />
     </>
   );
 }
@@ -111,20 +108,34 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: "absolute",
-    top: -DesignTokens.spacing[1], // -4px offset
-    right: -DesignTokens.spacing[1], // -4px offset
-    minWidth: DesignTokens.spacing[5], // 20px
-    height: DesignTokens.spacing[5], // 20px
-    borderRadius: DesignTokens.borderRadius.full,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: DesignTokens.spacing[2], // 8px - allows width to grow for 2-digit numbers
+    top: -4, // -4px offset
+    right: -4, // -4px offset
+    minWidth: 24, // Minimum 24px (perfect circle for single digits)
+    height: 24, // Fixed height
+    borderRadius: 12, // Half of height for perfect circle
+    justifyContent: "center", // Center vertically
+    alignItems: "center", // Center horizontally
+    paddingHorizontal: 6, // Allows width to grow for 2-digit numbers
     ...DesignTokens.shadows.sm,
   },
   badgeText: {
-    fontSize: DesignTokens.typography.fontSize.xs,
-    fontWeight: DesignTokens.typography.fontWeight.bold,
-    fontFamily: DesignTokens.typography.fontFamily.bold,
+    color: "#FFFFFF", // White text on colored background
+    fontSize: 12, // Smaller, crisp text
+    fontWeight: "700", // Bold
+    lineHeight: 12, // Match fontSize for perfect vertical centering
     textAlign: "center",
   },
 });
+
+/**
+ * Floating Action Button component for the meeting checklist (with provider)
+ * Wraps the internal component with ChecklistProvider to ensure state persistence
+ * State persists when modal closes/opens - only resets on explicit reset action
+ */
+export function FloatingChecklistButton() {
+  return (
+    <ChecklistProvider>
+      <FloatingChecklistButtonInternal />
+    </ChecklistProvider>
+  );
+}

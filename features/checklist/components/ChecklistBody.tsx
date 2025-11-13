@@ -1,56 +1,83 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { CHECKLIST_CONFIG } from "@/core/constants";
 import { DesignTokens } from "@/core/themes";
+import { hasChildren } from "@/features/checklist/utils/checklistHelpers";
+import { useChecklistContext } from "@/features/checklist/contexts/ChecklistContext";
 import { ChecklistItem as ChecklistItemComponent } from "./ChecklistItem";
-
-interface ChecklistBodyProps {
-  /** Array of checked states for each item */
-  checkedStates: boolean[];
-  /** Callback when an item is toggled */
-  onToggleItem: (index: number) => void;
-}
+import { ChecklistItemWithChildren } from "./ChecklistItemWithChildren";
 
 /**
  * Body component for the checklist modal
- * Renders the list of checklist items
+ * Renders the hierarchical list of checklist items with scrolling support
+ * No props needed - uses context for shared state
  */
-export function ChecklistBody({
-  checkedStates,
-  onToggleItem,
-}: ChecklistBodyProps) {
+export function ChecklistBody() {
+  const {
+    checkedStates,
+    toggleItem,
+    toggleExpanded,
+    isItemExpanded,
+  } = useChecklistContext();
+
   return (
     <View style={styles.body}>
-      <View style={styles.checklistContainer}>
-        {CHECKLIST_CONFIG.ITEMS.map((item, index) => (
-          <ChecklistItemComponent
-            key={`checklist-item-${index}`}
-            text={item}
-            isChecked={checkedStates[index] || false}
-            onPress={() => onToggleItem(index)}
-            accessibilityLabel={`${item} checklist item`}
-            accessibilityHint={
-              checkedStates[index]
-                ? "Tap to uncheck this item"
-                : "Tap to check this item"
-            }
-            accessibilityState={{
-              checked: checkedStates[index] || false,
-            }}
-          />
-        ))}
-      </View>
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={true}
+      >
+        {CHECKLIST_CONFIG.ITEMS.map((item) => {
+          if (hasChildren(item)) {
+            // Render parent item with expandable children
+            return (
+              <ChecklistItemWithChildren
+                key={item.id}
+                item={item}
+                isExpanded={isItemExpanded(item.id)}
+                checkedStates={checkedStates}
+                onToggleExpanded={toggleExpanded}
+                onToggleItem={toggleItem}
+              />
+            );
+          } else {
+            // Render standalone item (no children)
+            return (
+              <ChecklistItemComponent
+                key={item.id}
+                text={item.text}
+                isChecked={checkedStates[item.id] || false}
+                onPress={() => toggleItem(item.id)}
+                accessibilityLabel={`${item.text} checklist item`}
+                accessibilityHint={
+                  checkedStates[item.id]
+                    ? "Tap to uncheck this item"
+                    : "Tap to check this item"
+                }
+                accessibilityState={{
+                  checked: checkedStates[item.id] || false,
+                }}
+              />
+            );
+          }
+        })}
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   body: {
-    padding: DesignTokens.spacing[5], // 20px padding
     flex: 1,
   },
-  checklistContainer: {
+  scrollContainer: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: DesignTokens.spacing[5], // 20px horizontal padding for container
+    paddingVertical: DesignTokens.spacing[4], // 16px vertical padding
+    paddingBottom: DesignTokens.spacing[5], // Extra padding at bottom
   },
 });
