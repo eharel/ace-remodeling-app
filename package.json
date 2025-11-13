@@ -29,7 +29,12 @@
     "seed:prod": "NODE_ENV=production tsx scripts/seedFirebase.ts",
     
     "upload": "tsx scripts/uploadPhotos.ts",            
-    "upload:prod": "NODE_ENV=production tsx scripts/uploadPhotos.ts"
+    "upload:prod": "NODE_ENV=production tsx scripts/uploadPhotos.ts",
+    
+    "version:patch": "npm version patch && node scripts/sync-version.js",
+    "version:minor": "npm version minor && node scripts/sync-version.js",
+    "version:major": "npm version major && node scripts/sync-version.js",
+    "version:info": "echo 'Current version:' && grep '\"version\":' package.json"
   },
   "dependencies": {
     "@expo/metro-config": "^54.0.3",
