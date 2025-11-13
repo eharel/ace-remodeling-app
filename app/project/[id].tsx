@@ -2,22 +2,27 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Dimensions,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
-import { ImageGalleryModal } from "@/features/gallery";
+import {
+  ImageGalleryModal,
+  MorePhotosCard,
+  PhotoTabs,
+  type PhotoTabValue,
+} from "@/features/gallery";
 import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/core/themes";
 import { Project } from "@/core/types";
-import { commonStyles, getProjectDuration } from "@/shared/utils";
+import {
+  commonStyles,
+  getPhotoCounts,
+  getPreviewPhotos,
+  getProjectDuration,
+  samplePreviewPhotos,
+} from "@/shared/utils";
 
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -28,12 +33,11 @@ export default function ProjectDetailScreen() {
   const [pressedImageIndex, setPressedImageIndex] = useState<number | null>(
     null
   );
+  const [activePhotoTab, setActivePhotoTab] = useState<PhotoTabValue>("after");
   const { theme } = useTheme();
 
-  const screenWidth = Dimensions.get("window").width;
-  const gridPadding = DesignTokens.spacing[6] * 2; // left + right padding
-  const gridGap = DesignTokens.spacing[3];
-  const imageWidth = (screenWidth - gridPadding - gridGap * 2) / 3; // 3 columns with 2 gaps
+  // Show 3 preview photos (Flexbox will handle equal sizing)
+  const previewCount = 3;
 
   useEffect(() => {
     if (id) {
@@ -45,6 +49,52 @@ export default function ProjectDetailScreen() {
       // const foundProject = mockProjects.find((p) => p.id === id);
     }
   }, [id, projects]);
+
+  // Calculate photo counts for each category
+  const photoCounts = useMemo(() => {
+    return getPhotoCounts(project?.pictures || []);
+  }, [project?.pictures]);
+
+  // Get preview photos based on active tab
+  const previewPhotos = useMemo(() => {
+    if (!project?.pictures) return [];
+
+    if (activePhotoTab === "all") {
+      // Use intelligent sampling for "All Photos" tab
+      return samplePreviewPhotos(project.pictures, previewCount);
+    } else {
+      // Filter by specific category and take first N
+      const filtered = project.pictures.filter(
+        (p) => p.type === activePhotoTab
+      );
+      return getPreviewPhotos(filtered, previewCount);
+    }
+  }, [project?.pictures, activePhotoTab, previewCount]);
+
+  // Check if there are more photos beyond the preview
+  const hasMorePhotos = useMemo(() => {
+    const totalCount = photoCounts[activePhotoTab];
+    return totalCount > previewPhotos.length;
+  }, [photoCounts, activePhotoTab, previewPhotos.length]);
+
+  // Calculate remaining photo count
+  const remainingCount = useMemo(() => {
+    return photoCounts[activePhotoTab] - previewPhotos.length;
+  }, [photoCounts, activePhotoTab, previewPhotos.length]);
+
+  // Get filtered images for gallery based on active tab
+  const galleryImages = useMemo(() => {
+    if (!project?.pictures) return [];
+
+    if (activePhotoTab === "all") {
+      return project.pictures;
+    }
+
+    // Map tab value to photo type (note: 'progress' tab maps to 'process' type)
+    const photoType =
+      activePhotoTab === "progress" ? "process" : activePhotoTab;
+    return project.pictures.filter((p) => p.type === photoType);
+  }, [project?.pictures, activePhotoTab]);
 
   const closeGallery = () => {
     setGalleryVisible(false);
@@ -227,22 +277,19 @@ export default function ProjectDetailScreen() {
         },
         sectionTitle: {
           ...commonStyles.text.sectionTitle,
-          marginBottom: DesignTokens.spacing[6],
+          marginBottom: DesignTokens.spacing[2], // Tight spacing to instruction text
         },
         picturesGrid: {
           flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: DesignTokens.spacing[4],
+          gap: DesignTokens.spacing[3],
+          // NO marginTop - PhotoTabs component handles spacing above grid
         },
         gridImageContainer: {
+          flex: 1, // Each item takes equal space
           aspectRatio: 4 / 3,
-          marginBottom: DesignTokens.spacing[3],
           borderRadius: DesignTokens.borderRadius.lg,
           overflow: "hidden",
-          backgroundColor: theme.colors.background.secondary,
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          ...DesignTokens.shadows.sm,
+          ...DesignTokens.shadows.sm, // Subtle shadow for depth
         },
         gridImageContainerPressed: {
           transform: [{ scale: 0.95 }],
@@ -270,8 +317,7 @@ export default function ProjectDetailScreen() {
         },
         sectionSubtitle: {
           ...commonStyles.text.smallText,
-          marginTop: DesignTokens.spacing[1],
-          opacity: 0.7,
+          marginBottom: DesignTokens.spacing[5], // Space before tabs
         },
         pictureContainer: {
           width: 280,
@@ -555,7 +601,11 @@ export default function ProjectDetailScreen() {
           }}
         />
         <ThemedView style={styles.container}>
-          <PageHeader title="Project Details" showBack={true} backLabel="Back" />
+          <PageHeader
+            title="Project Details"
+            showBack={true}
+            backLabel="Back"
+          />
           <ThemedView style={styles.errorState}>
             <ThemedText style={styles.errorText}>Project not found</ThemedText>
           </ThemedView>
@@ -572,10 +622,7 @@ export default function ProjectDetailScreen() {
     const isPressed = pressedImageIndex === index;
 
     return (
-      <ThemedView
-        key={`grid-image-${index}`}
-        style={[styles.gridImageContainer, { width: imageWidth }]}
-      >
+      <ThemedView key={`grid-image-${index}`} style={styles.gridImageContainer}>
         <Pressable
           onPress={() =>
             isMoreCell ? handleMoreImagesPress() : handleImagePress(index)
@@ -663,7 +710,12 @@ export default function ProjectDetailScreen() {
         }}
       />
       <ThemedView style={styles.container}>
-        <PageHeader title={project.name} showBack={true} backLabel="Back" variant="compact" />
+        <PageHeader
+          title={project.name}
+          showBack={true}
+          backLabel="Back"
+          variant="compact"
+        />
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={{ paddingBottom: DesignTokens.spacing[20] }}
@@ -675,274 +727,269 @@ export default function ProjectDetailScreen() {
             contentFit="cover"
           />
 
-        {/* Project Header */}
-        <ThemedView style={styles.header}>
-          <ThemedView style={styles.headerContent}>
-            <ThemedText style={styles.projectName}>{project.name}</ThemedText>
-            <ThemedText
-              style={[
-                styles.projectDescription,
-                { color: theme.colors.text.secondary },
-              ]}
-            >
-              {project.longDescription}
-            </ThemedText>
-          </ThemedView>
-
-          {/* Status Badge */}
-          <ThemedView
-            style={[
-              styles.statusBadge,
-              {
-                backgroundColor: getStatusBadgeStyle(project.status)
-                  .backgroundColor,
-              },
-            ]}
-          >
-            <ThemedText
-              style={[
-                styles.statusBadgeText,
-                { color: getStatusBadgeStyle(project.status).color },
-              ]}
-            >
-              {project.status.replace("-", " ").toUpperCase()}
-            </ThemedText>
-          </ThemedView>
-
-          {/* Project Meta */}
-          <ThemedView style={styles.metaGrid}>
-            <ThemedView style={styles.metaItem}>
+          {/* Project Header */}
+          <ThemedView style={styles.header}>
+            <ThemedView style={styles.headerContent}>
+              <ThemedText style={styles.projectName}>{project.name}</ThemedText>
               <ThemedText
                 style={[
-                  styles.metaLabel,
+                  styles.projectDescription,
                   { color: theme.colors.text.secondary },
                 ]}
               >
-                Status
+                {project.longDescription}
               </ThemedText>
-              <ThemedText style={styles.metaValue}>
+            </ThemedView>
+
+            {/* Status Badge */}
+            <ThemedView
+              style={[
+                styles.statusBadge,
+                {
+                  backgroundColor: getStatusBadgeStyle(project.status)
+                    .backgroundColor,
+                },
+              ]}
+            >
+              <ThemedText
+                style={[
+                  styles.statusBadgeText,
+                  { color: getStatusBadgeStyle(project.status).color },
+                ]}
+              >
                 {project.status.replace("-", " ").toUpperCase()}
               </ThemedText>
             </ThemedView>
-            <ThemedView style={styles.metaItem}>
-              <ThemedText
-                style={[
-                  styles.metaLabel,
-                  { color: theme.colors.text.secondary },
-                ]}
-              >
-                Category
-              </ThemedText>
-              <ThemedText style={styles.metaValue}>
-                {project.category.charAt(0).toUpperCase() +
-                  project.category.slice(1)}
-              </ThemedText>
-            </ThemedView>
-            <ThemedView style={styles.metaItem}>
-              <ThemedText
-                style={[
-                  styles.metaLabel,
-                  { color: theme.colors.text.secondary },
-                ]}
-              >
-                Location
-              </ThemedText>
-              <ThemedText style={styles.metaValue}>
-                {project.location?.neighborhood || "Austin, TX"}{" "}
-                {project.location?.zipCode || ""}
-              </ThemedText>
-            </ThemedView>
-            <ThemedView style={[styles.metaItem, styles.metaItemLast]}>
-              <ThemedText
-                style={[
-                  styles.metaLabel,
-                  { color: theme.colors.text.secondary },
-                ]}
-              >
-                Duration
-              </ThemedText>
-              <ThemedText style={styles.metaValue}>
-                {getProjectDuration(project)}
-              </ThemedText>
+
+            {/* Project Meta */}
+            <ThemedView style={styles.metaGrid}>
+              <ThemedView style={styles.metaItem}>
+                <ThemedText
+                  style={[
+                    styles.metaLabel,
+                    { color: theme.colors.text.secondary },
+                  ]}
+                >
+                  Status
+                </ThemedText>
+                <ThemedText style={styles.metaValue}>
+                  {project.status.replace("-", " ").toUpperCase()}
+                </ThemedText>
+              </ThemedView>
+              <ThemedView style={styles.metaItem}>
+                <ThemedText
+                  style={[
+                    styles.metaLabel,
+                    { color: theme.colors.text.secondary },
+                  ]}
+                >
+                  Category
+                </ThemedText>
+                <ThemedText style={styles.metaValue}>
+                  {project.category.charAt(0).toUpperCase() +
+                    project.category.slice(1)}
+                </ThemedText>
+              </ThemedView>
+              <ThemedView style={styles.metaItem}>
+                <ThemedText
+                  style={[
+                    styles.metaLabel,
+                    { color: theme.colors.text.secondary },
+                  ]}
+                >
+                  Location
+                </ThemedText>
+                <ThemedText style={styles.metaValue}>
+                  {project.location?.neighborhood || "Austin, TX"}{" "}
+                  {project.location?.zipCode || ""}
+                </ThemedText>
+              </ThemedView>
+              <ThemedView style={[styles.metaItem, styles.metaItemLast]}>
+                <ThemedText
+                  style={[
+                    styles.metaLabel,
+                    { color: theme.colors.text.secondary },
+                  ]}
+                >
+                  Duration
+                </ThemedText>
+                <ThemedText style={styles.metaValue}>
+                  {getProjectDuration(project)}
+                </ThemedText>
+              </ThemedView>
             </ThemedView>
           </ThemedView>
-        </ThemedView>
 
-        {/* Pictures Section */}
-        <ThemedView style={styles.section}>
-          <ThemedText
-            style={[styles.sectionTitle, { color: theme.colors.text.primary }]}
-          >
-            Project Photos ({project.pictures?.length || 0})
-          </ThemedText>
-          <ThemedText
-            style={[
-              styles.sectionSubtitle,
-              { color: theme.colors.text.secondary },
-            ]}
-          >
-            Tap any photo to view gallery
-          </ThemedText>
-
-          {project.pictures && project.pictures.length > 0 ? (
-            <ThemedView style={styles.picturesGrid}>
-              {project.pictures
-                .slice(0, 2)
-                .map((item, index) => renderGridImage(item, index))}
-              {project.pictures.length > 2 &&
-                renderGridImage(project.pictures[2], 2, true)}
-            </ThemedView>
-          ) : (
-            <ThemedView style={styles.emptyState}>
-              <MaterialIcons
-                name="photo-library"
-                size={48}
-                color={theme.colors.text.tertiary}
-              />
-              <ThemedText
-                style={[
-                  styles.emptyStateText,
-                  { color: theme.colors.text.secondary },
-                ]}
-              >
-                No pictures available
-              </ThemedText>
-            </ThemedView>
-          )}
-        </ThemedView>
-
-        {/* Documents Section */}
-        <ThemedView style={styles.section}>
-          <View style={styles.sectionHeader}>
+          {/* Pictures Section */}
+          <ThemedView style={styles.section}>
             <ThemedText
               style={[
                 styles.sectionTitle,
                 { color: theme.colors.text.primary },
               ]}
             >
-              Documents{project.documents && project.documents.length >= 1
-                ? ` (${project.documents.length})`
-                : ""}
+              Project Photos ({project.pictures?.length || 0})
             </ThemedText>
-            {project.documents && project.documents.length > 0 && (
-              <Pressable
-                style={styles.viewAllButton}
-                onPress={() => router.push(`/project/${project.id}/documents`)}
-                accessible={true}
-                accessibilityLabel="View all documents"
-                accessibilityRole="button"
-              >
-                <ThemedText style={styles.viewAllButtonText}>
-                  View All
-                </ThemedText>
-                <MaterialIcons
-                  name="chevron-right"
-                  size={16}
-                  color={theme.colors.interactive.primary}
+            <ThemedText
+              style={[
+                styles.sectionSubtitle,
+                { color: theme.colors.text.secondary },
+              ]}
+            >
+              Tap any photo to view gallery
+            </ThemedText>
+
+            {project.pictures && project.pictures.length > 0 ? (
+              <>
+                {/* Photo Category Tabs */}
+                <PhotoTabs
+                  activeTab={activePhotoTab}
+                  onTabChange={setActivePhotoTab}
+                  photoCounts={photoCounts}
                 />
-              </Pressable>
+
+                {/* Photo Grid */}
+                {previewPhotos.length > 0 ? (
+                  <ThemedView variant="ghost" style={styles.picturesGrid}>
+                    {previewPhotos.map((item) => {
+                      // Find the index in the filtered gallery images for correct navigation
+                      const galleryIndex = galleryImages.findIndex(
+                        (p) => p.id === item.id
+                      );
+                      return renderGridImage(item, galleryIndex);
+                    })}
+                    {/* "+X more" card */}
+                    {hasMorePhotos && (
+                      <MorePhotosCard
+                        count={remainingCount}
+                        backgroundPhoto={
+                          galleryImages[previewPhotos.length] ||
+                          galleryImages[0]
+                        }
+                        onPress={() => {
+                          // Open gallery starting from first photo in filtered set
+                          setSelectedImageIndex(0);
+                          setGalleryVisible(true);
+                        }}
+                      />
+                    )}
+                  </ThemedView>
+                ) : (
+                  <ThemedView style={styles.emptyState}>
+                    <MaterialIcons
+                      name="photo-library"
+                      size={48}
+                      color={theme.colors.text.tertiary}
+                    />
+                    <ThemedText
+                      style={[
+                        styles.emptyStateText,
+                        { color: theme.colors.text.secondary },
+                      ]}
+                    >
+                      No {activePhotoTab === "all" ? "" : activePhotoTab} photos
+                      available
+                    </ThemedText>
+                  </ThemedView>
+                )}
+              </>
+            ) : (
+              <ThemedView style={styles.emptyState}>
+                <MaterialIcons
+                  name="photo-library"
+                  size={48}
+                  color={theme.colors.text.tertiary}
+                />
+                <ThemedText
+                  style={[
+                    styles.emptyStateText,
+                    { color: theme.colors.text.secondary },
+                  ]}
+                >
+                  No pictures available
+                </ThemedText>
+              </ThemedView>
             )}
-          </View>
-          {project.documents && project.documents.length > 0 ? (
-            <ThemedView style={styles.documentsPreview}>
-              {project.documents
-                .slice(0, 2)
-                .map((item, index) => renderDocumentPreview(item, index))}
-              {project.documents.length > 2 && (
+          </ThemedView>
+
+          {/* Documents Section */}
+          <ThemedView style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <ThemedText
+                style={[
+                  styles.sectionTitle,
+                  { color: theme.colors.text.primary },
+                ]}
+              >
+                Documents
+                {project.documents && project.documents.length >= 1
+                  ? ` (${project.documents.length})`
+                  : ""}
+              </ThemedText>
+              {project.documents && project.documents.length > 0 && (
                 <Pressable
-                  style={styles.moreDocumentsButton}
+                  style={styles.viewAllButton}
                   onPress={() =>
                     router.push(`/project/${project.id}/documents`)
                   }
                   accessible={true}
-                  accessibilityLabel={`View ${
-                    project.documents.length - 2
-                  } more documents`}
+                  accessibilityLabel="View all documents"
                   accessibilityRole="button"
                 >
-                  <ThemedText style={styles.moreDocumentsText}>
-                    +{project.documents.length - 2} more
+                  <ThemedText style={styles.viewAllButtonText}>
+                    View All
                   </ThemedText>
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={16}
+                    color={theme.colors.interactive.primary}
+                  />
                 </Pressable>
               )}
-            </ThemedView>
-          ) : (
-            <ThemedView style={[styles.emptyState, { marginTop: 0 }]}>
-              <MaterialIcons
-                name="description"
-                size={48}
-                color={theme.colors.text.tertiary}
-              />
-              <ThemedText
-                style={[
-                  styles.emptyStateText,
-                  { color: theme.colors.text.secondary },
-                ]}
-              >
-                No documents available
-              </ThemedText>
-            </ThemedView>
-          )}
-        </ThemedView>
-
-        {/* Logs Section */}
-        <ThemedView style={styles.section}>
-          <ThemedText
-            style={[styles.sectionTitle, { color: theme.colors.text.primary }]}
-          >
-            Project Logs{project.logs && project.logs.length >= 1
-              ? ` (${project.logs.length})`
-              : ""}
-          </ThemedText>
-          {project.logs && project.logs.length > 0 ? (
-            <ThemedView style={styles.logsList}>
-              {project.logs.map((item, index) =>
-                renderLog(item, index, index === project.logs.length - 1)
-              )}
-            </ThemedView>
-          ) : (
-            <ThemedView style={styles.emptyState}>
-              <MaterialIcons
-                name="timeline"
-                size={48}
-                color={theme.colors.text.tertiary}
-              />
-              <ThemedText
-                style={[
-                  styles.emptyStateText,
-                  { color: theme.colors.text.secondary },
-                ]}
-              >
-                No project logs available
-              </ThemedText>
-            </ThemedView>
-          )}
-        </ThemedView>
-
-        {/* Scope Section */}
-        {project.scope && (
-          <ThemedView style={styles.section}>
-            <ThemedText
-              style={[
-                styles.sectionTitle,
-                { color: theme.colors.text.primary },
-              ]}
-            >
-              Project Scope
-            </ThemedText>
-            <ThemedText
-              style={[
-                styles.projectDescription,
-                { color: theme.colors.text.secondary },
-              ]}
-            >
-              {project.scope}
-            </ThemedText>
+            </View>
+            {project.documents && project.documents.length > 0 ? (
+              <ThemedView style={styles.documentsPreview}>
+                {project.documents
+                  .slice(0, 2)
+                  .map((item, index) => renderDocumentPreview(item, index))}
+                {project.documents.length > 2 && (
+                  <Pressable
+                    style={styles.moreDocumentsButton}
+                    onPress={() =>
+                      router.push(`/project/${project.id}/documents`)
+                    }
+                    accessible={true}
+                    accessibilityLabel={`View ${
+                      project.documents.length - 2
+                    } more documents`}
+                    accessibilityRole="button"
+                  >
+                    <ThemedText style={styles.moreDocumentsText}>
+                      +{project.documents.length - 2} more
+                    </ThemedText>
+                  </Pressable>
+                )}
+              </ThemedView>
+            ) : (
+              <ThemedView style={[styles.emptyState, { marginTop: 0 }]}>
+                <MaterialIcons
+                  name="description"
+                  size={48}
+                  color={theme.colors.text.tertiary}
+                />
+                <ThemedText
+                  style={[
+                    styles.emptyStateText,
+                    { color: theme.colors.text.secondary },
+                  ]}
+                >
+                  No documents available
+                </ThemedText>
+              </ThemedView>
+            )}
           </ThemedView>
-        )}
 
-        {/* Testimonial Section */}
-        {project.testimonial && (
+          {/* Logs Section */}
           <ThemedView style={styles.section}>
             <ThemedText
               style={[
@@ -950,44 +997,105 @@ export default function ProjectDetailScreen() {
                 { color: theme.colors.text.primary },
               ]}
             >
-              Client Testimonial
+              Project Logs
+              {project.logs && project.logs.length >= 1
+                ? ` (${project.logs.length})`
+                : ""}
             </ThemedText>
-            <ThemedView
-              style={{
-                backgroundColor: theme.colors.background.secondary,
-                padding: DesignTokens.spacing[6],
-                borderRadius: DesignTokens.borderRadius.md,
-                borderLeftWidth: 4,
-                borderLeftColor: theme.colors.text.accent,
-              }}
-            >
+            {project.logs && project.logs.length > 0 ? (
+              <ThemedView style={styles.logsList}>
+                {project.logs.map((item, index) =>
+                  renderLog(item, index, index === project.logs.length - 1)
+                )}
+              </ThemedView>
+            ) : (
+              <ThemedView style={styles.emptyState}>
+                <MaterialIcons
+                  name="timeline"
+                  size={48}
+                  color={theme.colors.text.tertiary}
+                />
+                <ThemedText
+                  style={[
+                    styles.emptyStateText,
+                    { color: theme.colors.text.secondary },
+                  ]}
+                >
+                  No project logs available
+                </ThemedText>
+              </ThemedView>
+            )}
+          </ThemedView>
+
+          {/* Scope Section */}
+          {project.scope && (
+            <ThemedView style={styles.section}>
+              <ThemedText
+                style={[
+                  styles.sectionTitle,
+                  { color: theme.colors.text.primary },
+                ]}
+              >
+                Project Scope
+              </ThemedText>
               <ThemedText
                 style={[
                   styles.projectDescription,
-                  { color: theme.colors.text.secondary, fontStyle: "italic" },
+                  { color: theme.colors.text.secondary },
                 ]}
               >
-                &ldquo;{project.testimonial.text}&rdquo;
-              </ThemedText>
-              <ThemedText
-                style={[
-                  styles.metaValue,
-                  { marginTop: DesignTokens.spacing[4], textAlign: "right" },
-                ]}
-              >
-                — {project.testimonial.author}
+                {project.scope}
               </ThemedText>
             </ThemedView>
-          </ThemedView>
-        )}
+          )}
+
+          {/* Testimonial Section */}
+          {project.testimonial && (
+            <ThemedView style={styles.section}>
+              <ThemedText
+                style={[
+                  styles.sectionTitle,
+                  { color: theme.colors.text.primary },
+                ]}
+              >
+                Client Testimonial
+              </ThemedText>
+              <ThemedView
+                style={{
+                  backgroundColor: theme.colors.background.secondary,
+                  padding: DesignTokens.spacing[6],
+                  borderRadius: DesignTokens.borderRadius.md,
+                  borderLeftWidth: 4,
+                  borderLeftColor: theme.colors.text.accent,
+                }}
+              >
+                <ThemedText
+                  style={[
+                    styles.projectDescription,
+                    { color: theme.colors.text.secondary, fontStyle: "italic" },
+                  ]}
+                >
+                  &ldquo;{project.testimonial.text}&rdquo;
+                </ThemedText>
+                <ThemedText
+                  style={[
+                    styles.metaValue,
+                    { marginTop: DesignTokens.spacing[4], textAlign: "right" },
+                  ]}
+                >
+                  — {project.testimonial.author}
+                </ThemedText>
+              </ThemedView>
+            </ThemedView>
+          )}
         </ScrollView>
       </ThemedView>
 
       {/* Image Gallery Modal */}
-      {project && project.pictures && project.pictures.length > 0 && (
+      {galleryImages.length > 0 && (
         <ImageGalleryModal
           visible={galleryVisible}
-          images={project.pictures}
+          images={galleryImages}
           initialIndex={selectedImageIndex}
           onClose={closeGallery}
         />

@@ -17,6 +17,13 @@
     "lint": "expo lint",
     "upload:dry-run": "tsx scripts/uploadPhotos.ts --dry-run",
     "upload:force": "tsx scripts/uploadPhotos.ts --force",
+    "extract-projects": "tsx scripts/extractProjectList.ts",
+    "build:ios": "eas build --platform ios --profile production",
+    "build:ios:submit": "eas build --platform ios --profile production --auto-submit",
+    "build:preview": "eas build --platform ios --profile preview",
+    "build:status": "eas build:list",
+    "deploy:update": "eas update --branch production --platform ios",
+    "deploy:full": "eas build --platform ios --profile production --auto-submit",
     
     "seed": "tsx scripts/seedFirebase.ts",       
     "seed:prod": "NODE_ENV=production tsx scripts/seedFirebase.ts",
