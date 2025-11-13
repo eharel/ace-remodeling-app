@@ -19,6 +19,18 @@ function FloatingChecklistButtonInternal() {
   const { getTotalProgress } = useChecklistContext();
   const progress = getTotalProgress();
 
+  // Calculate state for badge
+  const isComplete = progress.completed === progress.total;
+  const hasProgress = progress.completed > 0;
+
+  // Badge content: checkmark if complete, otherwise count
+  const badgeContent = isComplete ? "✓" : progress.completed.toString();
+
+  // Badge background color: green if progress, gray with opacity if none
+  const badgeBackgroundColor = hasProgress
+    ? theme.colors.status.success
+    : `${theme.colors.text.secondary}80`; // 50% opacity (80 in hex)
+
   // Calculate uncompleted items count for accessibility
   const uncompletedCount = useMemo(() => {
     return progress.total - progress.completed;
@@ -35,12 +47,6 @@ function FloatingChecklistButtonInternal() {
         fab: {
           backgroundColor: theme.colors.interactive.primary,
           shadowColor: theme.colors.text.primary,
-        },
-        badge: {
-          backgroundColor: theme.colors.status.error,
-        },
-        badgeText: {
-          color: theme.colors.text.inverse, // Theme-aware white/inverse color
         },
       }),
     [theme]
@@ -68,14 +74,12 @@ function FloatingChecklistButtonInternal() {
           />
         </TouchableOpacity>
 
-        {/* Badge - Show completed item count when there are any completed items */}
-        {progress.completed > 0 && (
-          <View style={[styles.badge, dynamicStyles.badge]}>
-            <ThemedText style={[styles.badgeText, dynamicStyles.badgeText]}>
-              {progress.completed}
-            </ThemedText>
-          </View>
-        )}
+        {/* Badge - Always visible with color-coded background */}
+        <View style={[styles.badge, { backgroundColor: badgeBackgroundColor }]}>
+          <ThemedText style={styles.badgeText}>
+            {badgeContent}
+          </ThemedText>
+        </View>
       </View>
 
       {/* Checklist Modal */}
@@ -104,20 +108,21 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: "absolute",
-    top: -DesignTokens.spacing[1], // -4px offset
-    right: -DesignTokens.spacing[1], // -4px offset
-    minWidth: DesignTokens.spacing[5], // 20px
-    height: DesignTokens.spacing[5], // 20px
-    borderRadius: DesignTokens.borderRadius.full,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: DesignTokens.spacing[2], // 8px - allows width to grow for 2-digit numbers
+    top: -4, // -4px offset
+    right: -4, // -4px offset
+    minWidth: 24, // Minimum 24px (perfect circle for single digits)
+    height: 24, // Fixed height
+    borderRadius: 12, // Half of height for perfect circle
+    justifyContent: "center", // Center vertically
+    alignItems: "center", // Center horizontally
+    paddingHorizontal: 6, // Allows width to grow for 2-digit numbers
     ...DesignTokens.shadows.sm,
   },
   badgeText: {
-    fontSize: DesignTokens.typography.fontSize.xs,
-    fontWeight: DesignTokens.typography.fontWeight.bold,
-    fontFamily: DesignTokens.typography.fontFamily.bold,
+    color: "#FFFFFF", // White text on colored background
+    fontSize: 12, // Smaller, crisp text
+    fontWeight: "700", // Bold
+    lineHeight: 12, // Match fontSize for perfect vertical centering
     textAlign: "center",
   },
 });

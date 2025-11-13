@@ -149,22 +149,20 @@ export function ChecklistItemWithChildren({
           {item.text}
         </Text>
 
-        {/* Column 4: Progress Badge (only when collapsed) */}
-        {!isExpanded && (
-          <View
-            style={styles.progressBadge}
-            accessibilityLabel={`${childProgress.completed} of ${childProgress.total} items completed`}
+        {/* Column 4: Progress Badge (always visible) */}
+        <View
+          style={styles.progressBadge}
+          accessibilityLabel={`${childProgress.completed} of ${childProgress.total} items completed`}
+        >
+          <Text
+            style={[
+              styles.progressBadgeText,
+              { color: theme.colors.text.secondary },
+            ]}
           >
-            <Text
-              style={[
-                styles.progressBadgeText,
-                { color: theme.colors.text.secondary },
-              ]}
-            >
-              [{childProgress.completed}/{childProgress.total}]
-            </Text>
-          </View>
-        )}
+            [{childProgress.completed}/{childProgress.total}]
+          </Text>
+        </View>
       </TouchableOpacity>
 
       {/* CHILD ROWS - Same column structure with empty spacer in icon column */}
@@ -258,7 +256,7 @@ const styles = StyleSheet.create({
 
   // === PARENT TEXT ===
   parentText: {
-    fontSize: DesignTokens.typography.fontSize.base,
+    fontSize: DesignTokens.typography.fontSize.lg, // 18px for stronger hierarchy
     fontWeight: DesignTokens.typography.fontWeight.semibold,
     flex: 1, // Flexible width
   },
