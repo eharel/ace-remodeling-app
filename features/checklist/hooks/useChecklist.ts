@@ -1,113 +1,326 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { CHECKLIST_CONFIG } from "@/core/constants";
+import {
+  flattenItems,
+  findItemById,
+  getChildIds,
+  hasChildren,
+  findParentOfItem,
+  validateUniqueIds,
+  type ChecklistItem,
+  type ChecklistProgress,
+} from "@/features/checklist/utils/checklistHelpers";
 
 /**
- * Custom hook for managing checklist state and operations
- * Provides reusable logic for checklist functionality
+ * Custom hook for managing hierarchical checklist state and operations
+ * Provides reusable logic for nested checklist functionality with cascade behavior
  */
 export function useChecklist(
-  itemCount: number = CHECKLIST_CONFIG.ITEMS.length
+  items: readonly ChecklistItem[] = CHECKLIST_CONFIG.ITEMS,
+  initialCheckedStates?: Record<string, boolean>,
+  initialExpandedStates?: Record<string, boolean>
 ) {
-  const [checkedStates, setCheckedStates] = useState<boolean[]>(
-    new Array(itemCount).fill(false)
+  // Validate unique IDs on initialization
+  useMemo(() => {
+    const validation = validateUniqueIds([...items]);
+    if (!validation.isValid) {
+      console.error(
+        `Checklist contains duplicate IDs: ${validation.duplicates.join(", ")}`
+      );
+    }
+  }, [items]);
+
+  // Flatten items for easier access and iteration
+  const flatItems = useMemo(() => flattenItems([...items]), [items]);
+
+  // Initialize checked states - keyed by item ID
+  const [checkedStates, setCheckedStates] = useState<Record<string, boolean>>(
+    () => {
+      if (initialCheckedStates) {
+        return initialCheckedStates;
+      }
+      const initial: Record<string, boolean> = {};
+      flatItems.forEach((item) => {
+        initial[item.id] = false;
+      });
+      return initial;
+    }
+  );
+
+  // Initialize expanded states - keyed by item ID (only for parents)
+  const [expandedStates, setExpandedStates] = useState<Record<string, boolean>>(
+    () => {
+      if (initialExpandedStates) {
+        return initialExpandedStates;
+      }
+      const initial: Record<string, boolean> = {};
+      flatItems.forEach((item) => {
+        if (hasChildren(item)) {
+          initial[item.id] = false; // Default to collapsed
+        }
+      });
+      return initial;
+    }
   );
 
   /**
-   * Toggle the checked state of a specific item
+   * Check if all children of a parent are checked
+   */
+  const areAllChildrenChecked = useCallback(
+    (parentId: string): boolean => {
+      const childIds = getChildIds([...items], parentId);
+      if (childIds.length === 0) return false;
+      return childIds.every((childId) => checkedStates[childId] === true);
+    },
+    [items, checkedStates]
+  );
+
+  /**
+   * Update parent checked state based on children
+   * Auto-checks parent when all children are checked
+   * Auto-unchecks parent when any child is unchecked
+   */
+  const updateParentState = useCallback(
+    (childId: string, newStates: Record<string, boolean>) => {
+      const parent = findParentOfItem([...items], childId);
+      if (!parent) return newStates;
+
+      const childIds = getChildIds([...items], parent.id);
+      const allChildrenChecked = childIds.every(
+        (id) => newStates[id] === true
+      );
+
+      // Update parent based on children state
+      newStates[parent.id] = allChildrenChecked;
+
+      return newStates;
+    },
+    [items]
+  );
+
+  /**
+   * Set the checked state of a specific item programmatically
+   * Does not trigger cascade logic - use for internal state updates
+   */
+  const setItemChecked = useCallback(
+    (id: string, checked: boolean) => {
+      const item = findItemById([...items], id);
+      if (!item) {
+        console.warn(`setItemChecked: Item with id "${id}" not found`);
+        return;
+      }
+
+      setCheckedStates((prev) => ({
+        ...prev,
+        [id]: checked,
+      }));
+    },
+    [items]
+  );
+
+  /**
+   * Toggle the checked state of a specific item with cascade logic
+   * Handles parent-child relationships according to hybrid behavior:
+   * - Parent with no children: Acts as regular checkbox
+   * - Parent with children (unchecked → checked): Checks all children
+   * - Parent with children (checked → unchecked): Unchecks all children
+   * - Child state change: Auto-updates parent based on all children state
    */
   const toggleItem = useCallback(
-    (index: number) => {
-      // Bounds checking to prevent array index errors
-      if (index < 0 || index >= itemCount) {
-        console.warn(
-          `toggleItem: Index ${index} is out of bounds (0-${itemCount - 1})`
-        );
+    (id: string) => {
+      const item = findItemById([...items], id);
+      if (!item) {
+        console.warn(`toggleItem: Item with id "${id}" not found`);
         return;
       }
 
       setCheckedStates((prev) => {
-        const newState = [...prev];
-        newState[index] = !newState[index];
-        return newState;
+        const newStates = { ...prev };
+        const currentState = prev[id] || false;
+        const newState = !currentState;
+
+        // Update the item itself
+        newStates[id] = newState;
+
+        // If item has children, update them all to match parent's new state
+        if (hasChildren(item)) {
+          const childIds = getChildIds([...items], id);
+          childIds.forEach((childId) => {
+            newStates[childId] = newState;
+          });
+        } else {
+          // If item is a child, update parent based on all children
+          updateParentState(id, newStates);
+        }
+
+        return newStates;
       });
     },
-    [itemCount]
+    [items, updateParentState]
   );
 
   /**
-   * Reset all items to unchecked state
+   * Toggle the expanded/collapsed state of a parent item
+   * Only applicable to items with sub-items
    */
-  const resetItems = useCallback(() => {
-    setCheckedStates(new Array(itemCount).fill(false));
-  }, [itemCount]);
+  const toggleExpanded = useCallback(
+    (id: string) => {
+      const item = findItemById([...items], id);
+      if (!item) {
+        console.warn(`toggleExpanded: Item with id "${id}" not found`);
+        return;
+      }
+
+      if (!hasChildren(item)) {
+        console.warn(
+          `toggleExpanded: Item "${id}" has no children and cannot be expanded`
+        );
+        return;
+      }
+
+      setExpandedStates((prev) => ({
+        ...prev,
+        [id]: !prev[id],
+      }));
+    },
+    [items]
+  );
 
   /**
-   * Calculate progress statistics
+   * Reset all items to unchecked state and collapse all parents
    */
-  const progress = useMemo(() => {
-    const completed = checkedStates.filter(Boolean).length;
-    const total = checkedStates.length;
-    const percentage = total > 0 ? (completed / total) * 100 : 0;
+  const resetItems = useCallback(() => {
+    const newCheckedStates: Record<string, boolean> = {};
+    const newExpandedStates: Record<string, boolean> = {};
 
-    return {
-      completed,
-      total,
-      percentage: Math.round(percentage),
-      isComplete: completed === total,
-      isEmpty: completed === 0,
-    };
-  }, [checkedStates]);
+    flatItems.forEach((item) => {
+      newCheckedStates[item.id] = false;
+      if (hasChildren(item)) {
+        newExpandedStates[item.id] = false;
+      }
+    });
+
+    setCheckedStates(newCheckedStates);
+    setExpandedStates(newExpandedStates);
+  }, [flatItems]);
 
   /**
    * Get the checked state of a specific item
    */
   const isItemChecked = useCallback(
-    (index: number) => {
-      if (index < 0 || index >= itemCount) {
-        console.warn(
-          `isItemChecked: Index ${index} is out of bounds (0-${itemCount - 1})`
-        );
+    (id: string): boolean => {
+      const item = findItemById([...items], id);
+      if (!item) {
+        console.warn(`isItemChecked: Item with id "${id}" not found`);
         return false;
       }
-      return checkedStates[index] || false;
+      return checkedStates[id] || false;
     },
-    [checkedStates, itemCount]
+    [items, checkedStates]
   );
 
   /**
-   * Set the checked state of a specific item
+   * Get the expanded state of a parent item
    */
-  const setItemChecked = useCallback(
-    (index: number, checked: boolean) => {
-      // Bounds checking to prevent array index errors
-      if (index < 0 || index >= itemCount) {
-        console.warn(
-          `setItemChecked: Index ${index} is out of bounds (0-${itemCount - 1})`
-        );
-        return;
+  const isItemExpanded = useCallback(
+    (id: string): boolean => {
+      const item = findItemById([...items], id);
+      if (!item) {
+        console.warn(`isItemExpanded: Item with id "${id}" not found`);
+        return false;
+      }
+      if (!hasChildren(item)) {
+        return false; // Non-parent items are never "expanded"
+      }
+      return expandedStates[id] || false;
+    },
+    [items, expandedStates]
+  );
+
+  /**
+   * Get progress for a specific parent item (completed children / total children)
+   */
+  const getItemProgress = useCallback(
+    (id: string): ChecklistProgress => {
+      const item = findItemById([...items], id);
+      if (!item) {
+        console.warn(`getItemProgress: Item with id "${id}" not found`);
+        return { completed: 0, total: 0 };
       }
 
-      setCheckedStates((prev) => {
-        const newState = [...prev];
-        newState[index] = checked;
-        return newState;
-      });
+      if (!hasChildren(item)) {
+        console.warn(
+          `getItemProgress: Item "${id}" has no children to track progress`
+        );
+        return { completed: 0, total: 0 };
+      }
+
+      const childIds = getChildIds([...items], id);
+      const completed = childIds.filter((childId) => checkedStates[childId])
+        .length;
+
+      return {
+        completed,
+        total: childIds.length,
+      };
     },
-    [itemCount]
+    [items, checkedStates]
   );
+
+  /**
+   * Get overall progress counting ALL items (parents + children)
+   */
+  const getTotalProgress = useCallback((): ChecklistProgress => {
+    const total = flatItems.length;
+    const completed = flatItems.filter((item) => checkedStates[item.id])
+      .length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    return {
+      completed,
+      total,
+      percentage,
+    };
+  }, [flatItems, checkedStates]);
+
+  /**
+   * Get progress counting only parent items
+   */
+  const getParentProgress = useCallback((): ChecklistProgress => {
+    const parentItems = flatItems.filter((item) => hasChildren(item));
+    const total = parentItems.length;
+    const completed = parentItems.filter((item) => checkedStates[item.id])
+      .length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    return {
+      completed,
+      total,
+      percentage,
+    };
+  }, [flatItems, checkedStates]);
 
   return {
     // State
     checkedStates,
+    expandedStates,
 
     // Actions
     toggleItem,
+    toggleExpanded,
     resetItems,
     setItemChecked,
 
-    // Computed values
-    progress,
+    // Queries
     isItemChecked,
+    isItemExpanded,
+    getItemProgress,
+    getTotalProgress,
+    getParentProgress,
+
+    // Utility access
+    items: [...items],
+    flatItems,
   };
 }

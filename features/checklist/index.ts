@@ -12,3 +12,16 @@ export { FloatingChecklistButton } from "./components/FloatingChecklistButton";
 
 // Hooks
 export { useChecklist } from "./hooks/useChecklist";
+
+// Utilities and Types
+export {
+  flattenItems,
+  hasChildren,
+  getChildIds,
+  findItemById,
+  findParentOfItem,
+  validateUniqueIds,
+  getAllDescendantIds,
+  type ChecklistItem as ChecklistItemType,
+  type ChecklistProgress,
+} from "./utils/checklistHelpers";
