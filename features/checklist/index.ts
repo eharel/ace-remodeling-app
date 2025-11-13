@@ -7,6 +7,7 @@
 export { ChecklistBody } from "./components/ChecklistBody";
 export { ChecklistHeader } from "./components/ChecklistHeader";
 export { ChecklistItem } from "./components/ChecklistItem";
+export { ChecklistItemWithChildren } from "./components/ChecklistItemWithChildren";
 export { ChecklistModal } from "./components/ChecklistModal";
 export { FloatingChecklistButton } from "./components/FloatingChecklistButton";
 

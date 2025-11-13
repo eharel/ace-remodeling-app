@@ -11,16 +11,17 @@ import { ChecklistModal } from "./ChecklistModal";
 /**
  * Floating Action Button component for the meeting checklist
  * Provides a floating button that opens a modal with interactive checklist items
- * Shows a badge with uncompleted item count
+ * Shows a badge with completed item count
  */
 export function FloatingChecklistButton() {
   const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Use the custom hook for checklist state management
-  const { checkedStates, toggleItem, resetItems, progress } = useChecklist();
+  // Use the custom hook for progress tracking
+  const { getTotalProgress } = useChecklist();
+  const progress = getTotalProgress();
 
-  // Calculate uncompleted items count
+  // Calculate uncompleted items count for accessibility
   const uncompletedCount = useMemo(() => {
     return progress.total - progress.completed;
   }, [progress]);
@@ -69,24 +70,18 @@ export function FloatingChecklistButton() {
           />
         </TouchableOpacity>
 
-        {/* Badge - Only show when there are uncompleted items */}
-        {uncompletedCount > 0 && (
+        {/* Badge - Show completed item count when there are any completed items */}
+        {progress.completed > 0 && (
           <View style={[styles.badge, dynamicStyles.badge]}>
             <ThemedText style={[styles.badgeText, dynamicStyles.badgeText]}>
-              {uncompletedCount}
+              {progress.completed}
             </ThemedText>
           </View>
         )}
       </View>
 
       {/* Checklist Modal */}
-      <ChecklistModal
-        visible={modalVisible}
-        checkedStates={checkedStates}
-        onToggleItem={toggleItem}
-        onReset={resetItems}
-        onClose={closeModal}
-      />
+      <ChecklistModal visible={modalVisible} onClose={closeModal} />
     </>
   );
 }

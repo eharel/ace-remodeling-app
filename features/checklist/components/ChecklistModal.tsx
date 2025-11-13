@@ -3,18 +3,13 @@ import { Modal, StyleSheet, TouchableOpacity } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
 import { useTheme } from "@/shared/contexts";
+import { useChecklist } from "@/features/checklist/hooks/useChecklist";
 import { ChecklistBody } from "./ChecklistBody";
 import { ChecklistHeader } from "./ChecklistHeader";
 
 interface ChecklistModalProps {
   /** Whether the modal is visible */
   visible: boolean;
-  /** Array of checked states for each item */
-  checkedStates: boolean[];
-  /** Callback when an item is toggled */
-  onToggleItem: (index: number) => void;
-  /** Callback when reset button is pressed */
-  onReset: () => void;
   /** Callback when modal should be closed */
   onClose: () => void;
 }
@@ -22,20 +17,13 @@ interface ChecklistModalProps {
 /**
  * Modal component for the meeting checklist
  * Contains the header and body components
+ * Uses hook directly for state management
  */
-export function ChecklistModal({
-  visible,
-  checkedStates,
-  onToggleItem,
-  onReset,
-  onClose,
-}: ChecklistModalProps) {
+export function ChecklistModal({ visible, onClose }: ChecklistModalProps) {
   const { theme } = useTheme();
+  const { getTotalProgress, resetItems } = useChecklist();
 
-  const progress = {
-    completed: checkedStates.filter(Boolean).length,
-    total: checkedStates.length,
-  };
+  const progress = getTotalProgress();
 
   return (
     <Modal
@@ -68,13 +56,10 @@ export function ChecklistModal({
         >
           <ChecklistHeader
             progress={progress}
-            onReset={onReset}
+            onReset={resetItems}
             onClose={onClose}
           />
-          <ChecklistBody
-            checkedStates={checkedStates}
-            onToggleItem={onToggleItem}
-          />
+          <ChecklistBody />
         </TouchableOpacity>
       </TouchableOpacity>
     </Modal>

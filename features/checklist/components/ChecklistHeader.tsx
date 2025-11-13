@@ -4,13 +4,11 @@ import { StyleSheet, Text, View } from "react-native";
 import { DesignTokens } from "@/core/themes";
 import { ThemedIconButton } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
+import type { ChecklistProgress } from "@/features/checklist/utils/checklistHelpers";
 
 interface ChecklistHeaderProps {
-  /** Progress information for the checklist */
-  progress: {
-    completed: number;
-    total: number;
-  };
+  /** Progress information for the checklist (from getTotalProgress) */
+  progress: ChecklistProgress;
   /** Callback when reset button is pressed */
   onReset: () => void;
   /** Callback when close button is pressed */
