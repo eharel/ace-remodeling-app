@@ -1,17 +1,17 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { CHECKLIST_CONFIG } from "@/core/constants";
 import { DesignTokens } from "@/core/themes";
 import { hasChildren } from "@/features/checklist/utils/checklistHelpers";
-import { useChecklist } from "@/features/checklist/hooks/useChecklist";
+import { useChecklistContext } from "@/features/checklist/contexts/ChecklistContext";
 import { ChecklistItem as ChecklistItemComponent } from "./ChecklistItem";
 import { ChecklistItemWithChildren } from "./ChecklistItemWithChildren";
 
 /**
  * Body component for the checklist modal
- * Renders the hierarchical list of checklist items
- * No props needed - uses hook directly
+ * Renders the hierarchical list of checklist items with scrolling support
+ * No props needed - uses context for shared state
  */
 export function ChecklistBody() {
   const {
@@ -19,11 +19,15 @@ export function ChecklistBody() {
     toggleItem,
     toggleExpanded,
     isItemExpanded,
-  } = useChecklist();
+  } = useChecklistContext();
 
   return (
     <View style={styles.body}>
-      <View style={styles.checklistContainer}>
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={true}
+      >
         {CHECKLIST_CONFIG.ITEMS.map((item) => {
           if (hasChildren(item)) {
             // Render parent item with expandable children
@@ -58,17 +62,22 @@ export function ChecklistBody() {
             );
           }
         })}
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   body: {
-    padding: DesignTokens.spacing[5], // 20px padding
     flex: 1,
   },
-  checklistContainer: {
+  scrollContainer: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: DesignTokens.spacing[5], // 20px horizontal padding for container
+    paddingVertical: DesignTokens.spacing[4], // 16px vertical padding
+    paddingBottom: DesignTokens.spacing[5], // Extra padding at bottom
   },
 });

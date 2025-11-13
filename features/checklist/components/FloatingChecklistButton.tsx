@@ -5,20 +5,18 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { DesignTokens } from "@/core/themes";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
-import { useChecklist } from "../hooks/useChecklist";
+import { ChecklistProvider, useChecklistContext } from "../contexts/ChecklistContext";
 import { ChecklistModal } from "./ChecklistModal";
 
 /**
- * Floating Action Button component for the meeting checklist
- * Provides a floating button that opens a modal with interactive checklist items
- * Shows a badge with completed item count
+ * Internal FAB component that uses the checklist context
  */
-export function FloatingChecklistButton() {
+function FloatingChecklistButtonInternal() {
   const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Use the custom hook for progress tracking
-  const { getTotalProgress } = useChecklist();
+  // Use the context for progress tracking
+  const { getTotalProgress } = useChecklistContext();
   const progress = getTotalProgress();
 
   // Calculate uncompleted items count for accessibility
@@ -123,3 +121,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
+/**
+ * Floating Action Button component for the meeting checklist (with provider)
+ * Wraps the internal component with ChecklistProvider to ensure state persistence
+ * State persists when modal closes/opens - only resets on explicit reset action
+ */
+export function FloatingChecklistButton() {
+  return (
+    <ChecklistProvider>
+      <FloatingChecklistButtonInternal />
+    </ChecklistProvider>
+  );
+}

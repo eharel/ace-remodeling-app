@@ -3,9 +3,29 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { useTheme } from "@/shared/contexts";
 import type { ChecklistItem as ChecklistItemType } from "@/features/checklist/utils/checklistHelpers";
-import { ChecklistItem } from "./ChecklistItem";
+import { useTheme } from "@/shared/contexts";
+
+/**
+ * Layout constants for column-based grid structure
+ * Shared by both parent and child rows for consistent alignment
+ */
+const LAYOUT = {
+  ICON_SIZE: 24,
+  ICON_MARGIN_RIGHT: DesignTokens.spacing[2], // 8px
+  CHECKBOX_SIZE: 24,
+  CHECKBOX_MARGIN_RIGHT: DesignTokens.spacing[3], // 12px
+  ROW_PADDING_VERTICAL: DesignTokens.spacing[3], // 12px
+  ROW_PADDING_HORIZONTAL: DesignTokens.spacing[1], // 4px
+  MIN_TOUCH_TARGET: 44, // Minimum height for accessibility
+} as const;
+
+// Calculate icon column width (chevron + margin)
+const ICON_COLUMN_WIDTH = LAYOUT.ICON_SIZE + LAYOUT.ICON_MARGIN_RIGHT; // 32px
+
+// Calculate checkbox column width (checkbox + margin)
+const CHECKBOX_COLUMN_WIDTH =
+  LAYOUT.CHECKBOX_SIZE + LAYOUT.CHECKBOX_MARGIN_RIGHT; // 36px
 
 /**
  * Props for the ChecklistItemWithChildren component
@@ -25,7 +45,7 @@ interface ChecklistItemWithChildrenProps {
 
 /**
  * Component for rendering parent checklist items with expandable children
- * Displays chevron, checkbox, progress badge, and nested child items
+ * Uses column-based grid layout for robust alignment between parent and children
  */
 export function ChecklistItemWithChildren({
   item,
@@ -41,8 +61,9 @@ export function ChecklistItemWithChildren({
     if (!item.subItems || item.subItems.length === 0) {
       return { completed: 0, total: 0 };
     }
-    const completed = item.subItems.filter((child) => checkedStates[child.id])
-      .length;
+    const completed = item.subItems.filter(
+      (child) => checkedStates[child.id]
+    ).length;
     return { completed, total: item.subItems.length };
   }, [item.subItems, checkedStates]);
 
@@ -61,52 +82,57 @@ export function ChecklistItemWithChildren({
 
   return (
     <View style={styles.container}>
-      {/* Parent Row - Tappable for expand/collapse */}
+      {/* PARENT ROW - Column-based grid layout */}
       <TouchableOpacity
         style={styles.parentRow}
         onPress={handleToggleExpanded}
         activeOpacity={DesignTokens.interactions.activeOpacity}
         accessibilityRole="button"
-        accessibilityLabel={`${isExpanded ? "Collapse" : "Expand"} ${item.text} section`}
+        accessibilityLabel={`${isExpanded ? "Collapse" : "Expand"} ${
+          item.text
+        } section`}
         accessibilityState={{ expanded: isExpanded }}
         accessibilityHint={`${item.text} has ${childProgress.total} sub-items`}
       >
-        {/* Chevron Icon */}
-        <MaterialIcons
-          name={isExpanded ? "expand-more" : "chevron-right"}
-          size={24}
-          color={theme.colors.text.secondary}
-          style={styles.chevron}
-          accessibilityElementsHidden={true}
-        />
-
-        {/* Parent Checkbox - Separate tap target */}
-        <TouchableOpacity
-          onPress={handleToggleParent}
-          activeOpacity={DesignTokens.interactions.activeOpacity}
-          accessibilityRole="checkbox"
-          accessibilityLabel={`${item.text} parent checkbox`}
-          accessibilityHint={
-            isParentChecked
-              ? "Tap to uncheck parent and all children"
-              : "Tap to check parent and all children"
-          }
-          accessibilityState={{ checked: isParentChecked }}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
+        {/* Column 1: Icon Column (Chevron) */}
+        <View style={styles.iconColumn}>
           <MaterialIcons
-            name={isParentChecked ? "check-box" : "check-box-outline-blank"}
-            size={24}
-            color={
-              isParentChecked
-                ? theme.colors.interactive.primary
-                : theme.colors.text.secondary
-            }
+            name={isExpanded ? "expand-more" : "chevron-right"}
+            size={LAYOUT.ICON_SIZE}
+            color={theme.colors.text.secondary}
             accessibilityElementsHidden={true}
           />
-        </TouchableOpacity>
+        </View>
 
-        {/* Parent Text */}
+        {/* Column 2: Checkbox Column */}
+        <View style={styles.checkboxColumn}>
+          <TouchableOpacity
+            onPress={handleToggleParent}
+            activeOpacity={DesignTokens.interactions.activeOpacity}
+            accessibilityRole="checkbox"
+            accessibilityLabel={`${item.text} parent checkbox`}
+            accessibilityHint={
+              isParentChecked
+                ? "Tap to uncheck parent and all children"
+                : "Tap to check parent and all children"
+            }
+            accessibilityState={{ checked: isParentChecked }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <MaterialIcons
+              name={isParentChecked ? "check-box" : "check-box-outline-blank"}
+              size={LAYOUT.CHECKBOX_SIZE}
+              color={
+                isParentChecked
+                  ? theme.colors.interactive.primary
+                  : theme.colors.text.secondary
+              }
+              accessibilityElementsHidden={true}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Column 3: Text Column (flexible) */}
         <Text
           style={[
             styles.parentText,
@@ -123,7 +149,7 @@ export function ChecklistItemWithChildren({
           {item.text}
         </Text>
 
-        {/* Progress Badge - Only show when collapsed */}
+        {/* Column 4: Progress Badge (only when collapsed) */}
         {!isExpanded && (
           <View
             style={styles.progressBadge}
@@ -141,24 +167,64 @@ export function ChecklistItemWithChildren({
         )}
       </TouchableOpacity>
 
-      {/* Child Items - Indented, only visible when expanded */}
+      {/* CHILD ROWS - Same column structure with empty spacer in icon column */}
       {isExpanded && item.subItems && (
         <View style={styles.childrenContainer}>
-          {item.subItems.map((child) => (
-            <ChecklistItem
-              key={child.id}
-              text={child.text}
-              isChecked={checkedStates[child.id] || false}
-              onPress={() => onToggleItem(child.id)}
-              accessibilityLabel={`${child.text} checklist item`}
-              accessibilityHint={
-                checkedStates[child.id]
-                  ? "Tap to uncheck this item"
-                  : "Tap to check this item"
-              }
-              accessibilityState={{ checked: checkedStates[child.id] || false }}
-            />
-          ))}
+          {item.subItems.map((child) => {
+            const isChildChecked = checkedStates[child.id] || false;
+
+            return (
+              <TouchableOpacity
+                key={child.id}
+                style={styles.childRow}
+                onPress={() => onToggleItem(child.id)}
+                activeOpacity={DesignTokens.interactions.activeOpacity}
+                accessibilityRole="checkbox"
+                accessibilityLabel={`${child.text} checklist item`}
+                accessibilityHint={
+                  isChildChecked
+                    ? "Tap to uncheck this item"
+                    : "Tap to check this item"
+                }
+                accessibilityState={{ checked: isChildChecked }}
+              >
+                {/* Column 1: Checkbox Column (first column in child rows) */}
+                <View style={styles.checkboxColumn}>
+                  <MaterialIcons
+                    name={
+                      isChildChecked ? "check-box" : "check-box-outline-blank"
+                    }
+                    size={LAYOUT.CHECKBOX_SIZE}
+                    color={
+                      isChildChecked
+                        ? theme.colors.interactive.primary
+                        : theme.colors.text.secondary
+                    }
+                    accessibilityElementsHidden={true}
+                  />
+                </View>
+
+                {/* Column 3: Text Column (flexible) */}
+                <Text
+                  style={[
+                    styles.childText,
+                    {
+                      color: theme.colors.text.primary,
+                      textDecorationLine: isChildChecked
+                        ? "line-through"
+                        : "none",
+                      opacity: isChildChecked
+                        ? DesignTokens.interactions.disabledOpacity
+                        : 1,
+                    },
+                  ]}
+                  accessibilityElementsHidden={true}
+                >
+                  {child.text}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       )}
     </View>
@@ -169,32 +235,63 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: DesignTokens.spacing[1], // 4px spacing between sections
   },
+
+  // === PARENT ROW STYLES ===
   parentRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: DesignTokens.spacing[3], // 12px
-    paddingHorizontal: DesignTokens.spacing[1], // 4px
+    paddingVertical: LAYOUT.ROW_PADDING_VERTICAL,
+    // No paddingHorizontal - scrollContent handles container boundary
+    minHeight: LAYOUT.MIN_TOUCH_TARGET,
   },
-  chevron: {
-    marginRight: DesignTokens.spacing[2], // 8px
+
+  // === COLUMN DEFINITIONS (shared by parent and children) ===
+  iconColumn: {
+    width: ICON_COLUMN_WIDTH, // 32px (24px icon + 8px margin)
+    justifyContent: "center", // Ensures column maintains width even when empty
   },
+
+  checkboxColumn: {
+    width: CHECKBOX_COLUMN_WIDTH, // 36px (24px checkbox + 12px margin)
+    justifyContent: "center", // Ensures column maintains width even when empty
+  },
+
+  // === PARENT TEXT ===
   parentText: {
     fontSize: DesignTokens.typography.fontSize.base,
     fontWeight: DesignTokens.typography.fontWeight.semibold,
-    marginLeft: DesignTokens.spacing[3], // 12px
-    flex: 1,
+    flex: 1, // Flexible width
   },
+
+  // === PROGRESS BADGE ===
   progressBadge: {
-    paddingHorizontal: DesignTokens.spacing[2], // 8px
+    paddingHorizontal: DesignTokens.spacing[2], // 8px internal padding
+    marginLeft: DesignTokens.spacing[2], // 8px spacing from text
   },
+
   progressBadgeText: {
     fontSize: DesignTokens.typography.fontSize.sm,
     fontWeight: DesignTokens.typography.fontWeight.medium,
   },
+
+  // === CHILDREN CONTAINER ===
   childrenContainer: {
-    marginLeft: DesignTokens.spacing[6], // 24px indentation
+    marginLeft: ICON_COLUMN_WIDTH + CHECKBOX_COLUMN_WIDTH, // 68px (32px icon + 36px checkbox)
+    // This indents the entire child row container, aligning child checkboxes with parent text start
+  },
+
+  // === CHILD ROW STYLES ===
+  childRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: LAYOUT.ROW_PADDING_VERTICAL,
+    // No paddingHorizontal - scrollContent handles container boundary
+    minHeight: LAYOUT.MIN_TOUCH_TARGET,
+  },
+
+  // === CHILD TEXT ===
+  childText: {
+    fontSize: DesignTokens.typography.fontSize.base,
+    flex: 1, // Flexible width
   },
 });
-
-
-

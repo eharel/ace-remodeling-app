@@ -1,6 +1,6 @@
 /**
  * Checklist Feature Module
- * Exports all checklist-related components and hooks
+ * Exports all checklist-related components, hooks, and contexts
  */
 
 // Components
@@ -13,6 +13,9 @@ export { FloatingChecklistButton } from "./components/FloatingChecklistButton";
 
 // Hooks
 export { useChecklist } from "./hooks/useChecklist";
+
+// Contexts
+export { ChecklistProvider, useChecklistContext } from "./contexts/ChecklistContext";
 
 // Utilities and Types
 export {

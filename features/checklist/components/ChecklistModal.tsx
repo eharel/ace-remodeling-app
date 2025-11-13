@@ -3,7 +3,7 @@ import { Modal, StyleSheet, TouchableOpacity } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
 import { useTheme } from "@/shared/contexts";
-import { useChecklist } from "@/features/checklist/hooks/useChecklist";
+import { useChecklistContext } from "@/features/checklist/contexts/ChecklistContext";
 import { ChecklistBody } from "./ChecklistBody";
 import { ChecklistHeader } from "./ChecklistHeader";
 
@@ -17,11 +17,11 @@ interface ChecklistModalProps {
 /**
  * Modal component for the meeting checklist
  * Contains the header and body components
- * Uses hook directly for state management
+ * Uses context for shared state management
  */
 export function ChecklistModal({ visible, onClose }: ChecklistModalProps) {
   const { theme } = useTheme();
-  const { getTotalProgress, resetItems } = useChecklist();
+  const { getTotalProgress, resetItems } = useChecklistContext();
 
   const progress = getTotalProgress();
 
