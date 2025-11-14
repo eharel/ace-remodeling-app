@@ -69,6 +69,12 @@ export const darkTheme: Theme = {
       infoLight: "#1e3a8a", // Dark blue for info backgrounds
     },
 
+    // Notification colors - For badges, alerts, and attention-requiring UI elements
+    notification: {
+      badge: "#FF453A", // iOS system red for dark mode (slightly brighter for visibility)
+      background: "#2C1A1A", // Dark red tint for surfaces
+    },
+
     // Component colors - ONLY colors, NO dimensions
     components: {
       fab: {

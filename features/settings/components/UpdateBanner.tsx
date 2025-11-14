@@ -168,7 +168,7 @@ export function UpdateBanner({ updateRequired }: UpdateBannerProps) {
           <MaterialIcons
             name="notifications"
             size={NOTIFICATION_ICON_SIZE}
-            color={theme.colors.components.button.primary}
+            color={theme.colors.notification.badge}
           />
           <View style={staticStyles.textColumn}>
             <Text style={[staticStyles.mainMessage, dynamicStyles.mainMessage]}>

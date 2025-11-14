@@ -69,6 +69,12 @@ export const lightTheme: Theme = {
       infoLight: "#dbeafe", // Light blue for info backgrounds
     },
 
+    // Notification colors - For badges, alerts, and attention-requiring UI elements
+    notification: {
+      badge: "#FF3B30", // iOS system red for light mode
+      background: "#FFEBEE", // Very light red tint (10% opacity red over white)
+    },
+
     // Component colors - ONLY colors, NO dimensions
     components: {
       fab: {
