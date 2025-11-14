@@ -1,9 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
-import { Linking, Pressable, StyleSheet, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 
 /**
@@ -12,15 +11,24 @@ import { useTheme } from "@/shared/contexts";
 const TESTFLIGHT_URL = "https://testflight.apple.com/join/6755127370";
 
 /**
- * Icon sizes for UpdateBanner component
+ * Icon size for notification icon
  */
-const ICON_SIZE = DesignTokens.componentSizes.iconSize;
+const NOTIFICATION_ICON_SIZE = DesignTokens.typography.fontSize["2xl"];
+
+/**
+ * Arrow icon size for button
+ */
 const ARROW_ICON_SIZE = DesignTokens.componentSizes.iconSizeSmall;
 
 /**
- * Minimum touch target size for accessibility (iOS/Android standard)
+ * Left accent border width
  */
-const MIN_TOUCH_TARGET = DesignTokens.componentSizes.iconButton;
+const ACCENT_BORDER_WIDTH = DesignTokens.borderWidth.base;
+
+/**
+ * Minimum button width for adequate touch target
+ */
+const MIN_BUTTON_WIDTH = 160;
 
 /**
  * Props for the UpdateBanner component
@@ -31,12 +39,73 @@ interface UpdateBannerProps {
 }
 
 /**
- * Non-dismissible banner that prompts users to update the app via TestFlight.
+ * Static styles that don't depend on theme
+ * These are defined outside the component to avoid recreation on re-render
+ */
+const staticStyles = StyleSheet.create({
+  container: {
+    borderRadius: DesignTokens.borderRadius.lg,
+    padding: DesignTokens.spacing[5],
+    marginBottom: DesignTokens.spacing[6],
+    borderLeftWidth: ACCENT_BORDER_WIDTH,
+    ...DesignTokens.shadows.md,
+  },
+  content: {
+    gap: DesignTokens.spacing[3],
+  },
+  iconRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: DesignTokens.spacing[3],
+  },
+  textColumn: {
+    flex: 1,
+    gap: DesignTokens.spacing[1],
+  },
+  mainMessage: {
+    fontSize: DesignTokens.typography.fontSize.base,
+    fontFamily: DesignTokens.typography.fontFamily.regular,
+    lineHeight:
+      DesignTokens.typography.fontSize.base * DesignTokens.typography.lineHeight.relaxed,
+  },
+  secondaryMessage: {
+    fontSize: DesignTokens.typography.fontSize.base,
+    fontFamily: DesignTokens.typography.fontFamily.regular,
+    lineHeight:
+      DesignTokens.typography.fontSize.base * DesignTokens.typography.lineHeight.relaxed,
+  },
+  buttonContainer: {
+    marginTop: DesignTokens.spacing[4],
+    alignItems: "center",
+  },
+  button: {
+    paddingVertical: DesignTokens.spacing[3],
+    paddingHorizontal: DesignTokens.spacing[6],
+    borderRadius: DesignTokens.borderRadius.md,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: DesignTokens.spacing[2],
+    minWidth: MIN_BUTTON_WIDTH,
+    minHeight: DesignTokens.componentSizes.iconButton,
+    ...DesignTokens.shadows.sm,
+  },
+  buttonText: {
+    fontSize: DesignTokens.typography.fontSize.base,
+    fontFamily: DesignTokens.typography.fontFamily.semibold,
+    fontWeight: DesignTokens.typography.fontWeight.semibold,
+    color: "#FFFFFF", // Always white on primary button
+  },
+});
+
+/**
+ * Professional, elevated banner that prompts users to update the app via TestFlight.
  *
- * Displays when the current build number is below the minimum required build.
- * Opens TestFlight when the "Update Now" button is pressed.
+ * Features an elevated card design with a left accent border in the primary color.
+ * Uses clear visual hierarchy with icon, text, and action button. Displays when
+ * the current build number is below the minimum required build.
  *
- * Uses the app's design system (DesignTokens) and responds to theme changes.
+ * Uses the app's design system (DesignTokens) exclusively and responds to theme changes.
  *
  * @example
  * const { updateRequired } = useVersionCheck();
@@ -45,53 +114,26 @@ interface UpdateBannerProps {
 export function UpdateBanner({ updateRequired }: UpdateBannerProps) {
   const { theme } = useTheme();
 
-  const styles = useMemo(
+  // Dynamic styles that depend on theme colors
+  const dynamicStyles = useMemo(
     () =>
       StyleSheet.create({
         container: {
-          backgroundColor: theme.colors.status.warning,
-          borderRadius: DesignTokens.borderRadius.md,
-          padding: DesignTokens.spacing[4],
-          marginBottom: DesignTokens.spacing[4],
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          ...DesignTokens.shadows.md,
+          backgroundColor: theme.colors.background.elevated,
+          borderLeftColor: theme.colors.components.button.primary,
+          shadowColor: theme.colors.shadows.md.shadowColor,
+          shadowOpacity: theme.colors.shadows.md.shadowOpacity,
         },
-        content: {
-          flexDirection: "row",
-          alignItems: "flex-start",
-          gap: DesignTokens.spacing[3],
-        },
-        iconContainer: {
-          paddingTop: DesignTokens.spacing[1],
-        },
-        textContainer: {
-          flex: 1,
-          gap: DesignTokens.spacing[2],
-        },
-        message: {
+        mainMessage: {
           color: theme.colors.text.primary,
         },
-        buttonContainer: {
-          marginTop: DesignTokens.spacing[3],
+        secondaryMessage: {
+          color: theme.colors.text.primary,
         },
         button: {
           backgroundColor: theme.colors.components.button.primary,
-          paddingVertical: DesignTokens.spacing[3],
-          paddingHorizontal: DesignTokens.spacing[4],
-          borderRadius: DesignTokens.borderRadius.md,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: DesignTokens.spacing[2],
-          minHeight: MIN_TOUCH_TARGET,
-          ...DesignTokens.shadows.sm,
-        },
-        buttonText: {
-          color: theme.colors.text.inverse,
-          fontSize: DesignTokens.typography.fontSize.base,
-          fontFamily: DesignTokens.typography.fontFamily.semibold,
-          fontWeight: DesignTokens.typography.fontWeight.semibold,
+          shadowColor: theme.colors.shadows.sm.shadowColor,
+          shadowOpacity: theme.colors.shadows.sm.shadowOpacity,
         },
       }),
     [theme]
@@ -113,51 +155,59 @@ export function UpdateBanner({ updateRequired }: UpdateBannerProps) {
     }
   };
 
-  // Only render if update is required
+  // Early return if update is not required
   if (!updateRequired) {
     return null;
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.iconContainer}>
+    <View style={[staticStyles.container, dynamicStyles.container]}>
+      <View style={staticStyles.content}>
+        {/* Icon and Main Message Row */}
+        <View style={staticStyles.iconRow}>
           <MaterialIcons
-            name="system-update"
-            size={ICON_SIZE}
-            color={theme.colors.text.primary}
+            name="notifications"
+            size={NOTIFICATION_ICON_SIZE}
+            color={theme.colors.components.button.primary}
           />
-        </View>
-
-        <View style={styles.textContainer}>
-          <ThemedText variant="body" style={styles.message}>
-            A new version is available. Please update via TestFlight to
-            continue.
-          </ThemedText>
-
-          <View style={styles.buttonContainer}>
-            <Pressable
-              onPress={handleUpdatePress}
-              android_ripple={{
-                color: theme.colors.text.inverse,
-                borderless: false,
-              }}
-              style={({ pressed }) => [
-                styles.button,
-                { opacity: pressed ? DesignTokens.interactions.activeOpacity : 1 },
-              ]}
+          <View style={staticStyles.textColumn}>
+            <Text style={[staticStyles.mainMessage, dynamicStyles.mainMessage]}>
+              A new version is available.
+            </Text>
+            <Text
+              style={[staticStyles.secondaryMessage, dynamicStyles.secondaryMessage]}
             >
-              <MaterialIcons
-                name="arrow-forward"
-                size={ARROW_ICON_SIZE}
-                color={theme.colors.text.inverse}
-              />
-              <ThemedText style={styles.buttonText}>Update Now</ThemedText>
-            </Pressable>
+              Please update via TestFlight to continue receiving updates.
+            </Text>
           </View>
         </View>
+
+        {/* Action Button */}
+        <View style={staticStyles.buttonContainer}>
+          <Pressable
+            onPress={handleUpdatePress}
+            android_ripple={{
+              color: "#FFFFFF",
+              borderless: false,
+            }}
+            style={({ pressed }) => [
+              staticStyles.button,
+              dynamicStyles.button,
+              {
+                opacity: pressed ? DesignTokens.interactions.activeOpacity : 1,
+              },
+            ]}
+          >
+            <Text style={staticStyles.buttonText}>Update Now</Text>
+            <MaterialIcons
+              name="arrow-forward"
+              size={ARROW_ICON_SIZE}
+              color="#FFFFFF"
+            />
+          </Pressable>
+        </View>
       </View>
-    </ThemedView>
+    </View>
   );
 }
 
