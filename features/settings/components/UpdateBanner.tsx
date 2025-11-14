@@ -12,6 +12,17 @@ import { useTheme } from "@/shared/contexts";
 const TESTFLIGHT_URL = "https://testflight.apple.com/join/6755127370";
 
 /**
+ * Icon sizes for UpdateBanner component
+ */
+const ICON_SIZE = DesignTokens.componentSizes.iconSize;
+const ARROW_ICON_SIZE = DesignTokens.componentSizes.iconSizeSmall;
+
+/**
+ * Minimum touch target size for accessibility (iOS/Android standard)
+ */
+const MIN_TOUCH_TARGET = DesignTokens.componentSizes.iconButton;
+
+/**
  * Props for the UpdateBanner component
  */
 interface UpdateBannerProps {
@@ -73,7 +84,7 @@ export function UpdateBanner({ updateRequired }: UpdateBannerProps) {
           alignItems: "center",
           justifyContent: "center",
           gap: DesignTokens.spacing[2],
-          minHeight: 44, // Minimum touch target size
+          minHeight: MIN_TOUCH_TARGET,
           ...DesignTokens.shadows.sm,
         },
         buttonText: {
@@ -113,7 +124,7 @@ export function UpdateBanner({ updateRequired }: UpdateBannerProps) {
         <View style={styles.iconContainer}>
           <MaterialIcons
             name="system-update"
-            size={24}
+            size={ICON_SIZE}
             color={theme.colors.text.primary}
           />
         </View>
@@ -126,7 +137,6 @@ export function UpdateBanner({ updateRequired }: UpdateBannerProps) {
 
           <View style={styles.buttonContainer}>
             <Pressable
-              style={styles.button}
               onPress={handleUpdatePress}
               android_ripple={{
                 color: theme.colors.text.inverse,
@@ -139,7 +149,7 @@ export function UpdateBanner({ updateRequired }: UpdateBannerProps) {
             >
               <MaterialIcons
                 name="arrow-forward"
-                size={20}
+                size={ARROW_ICON_SIZE}
                 color={theme.colors.text.inverse}
               />
               <ThemedText style={styles.buttonText}>Update Now</ThemedText>

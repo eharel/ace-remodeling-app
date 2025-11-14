@@ -4,6 +4,17 @@ import { db } from "@/core/config";
 import type { VersionConfig } from "@/core/types/VersionConfig";
 
 /**
+ * Firestore collection and document paths for version configuration
+ */
+const FIRESTORE_COLLECTION = "config";
+const FIRESTORE_DOCUMENT = "appVersion";
+
+/**
+ * Base for parsing decimal numbers
+ */
+const DECIMAL_BASE = 10;
+
+/**
  * Gets the current build number from the app's native configuration.
  * 
  * @returns The current build number as a number, or null if unavailable
@@ -21,7 +32,7 @@ export function getCurrentBuildNumber(): number | null {
     return null;
   }
 
-  const buildNumber = parseInt(buildNumberString, 10);
+  const buildNumber = parseInt(buildNumberString, DECIMAL_BASE);
   
   // Validate that parsing succeeded and returned a valid number
   if (isNaN(buildNumber)) {
@@ -74,7 +85,7 @@ export function isUpdateRequired(
  */
 export async function fetchVersionConfig(): Promise<VersionConfig | null> {
   try {
-    const versionDocRef = doc(db, "config", "appVersion");
+    const versionDocRef = doc(db, FIRESTORE_COLLECTION, FIRESTORE_DOCUMENT);
     const versionDoc = await getDoc(versionDocRef);
 
     if (!versionDoc.exists()) {

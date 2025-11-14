@@ -162,7 +162,13 @@ export default function SettingsScreen() {
         </View>
 
         {__DEV__ && (
-          <ThemedText variant="caption" style={{ marginTop: 20, opacity: 0.6 }}>
+          <ThemedText
+            variant="caption"
+            style={{
+              marginTop: DesignTokens.spacing[5],
+              opacity: 0.6,
+            }}
+          >
             Environment: {currentEnvironment}
             {"\n"}Project: {currentProjectId}
           </ThemedText>
