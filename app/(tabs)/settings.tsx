@@ -6,6 +6,7 @@ import { currentEnvironment, currentProjectId } from "@/core/config";
 import packageJson from "../../package.json";
 
 import { DesignTokens } from "@/core/themes";
+import { UpdateBanner } from "@/features/settings";
 import {
   PageHeader,
   ThemedText,
@@ -13,10 +14,12 @@ import {
   ThemeToggle,
 } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
+import { useVersionCheck } from "@/shared/hooks";
 
 export default function SettingsScreen() {
   const { theme } = useTheme();
   const router = useRouter();
+  const { updateRequired, isLoading } = useVersionCheck();
 
   const styles = useMemo(
     () =>
@@ -84,6 +87,9 @@ export default function SettingsScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.content}
       >
+        {/* Update Banner - Shows when app needs updating */}
+        {updateRequired && <UpdateBanner updateRequired={updateRequired} />}
+
         {/* Appearance Section */}
         <View style={styles.section}>
           <ThemedText variant="subtitle" style={styles.sectionTitle}>
