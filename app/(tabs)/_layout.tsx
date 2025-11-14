@@ -4,9 +4,11 @@ import React from "react";
 import { Platform } from "react-native";
 
 import { useTheme } from "@/shared/contexts";
+import { useVersionCheck } from "@/shared/hooks";
 
 export default function TabLayout() {
   const { theme } = useTheme();
+  const { updateRequired } = useVersionCheck();
 
   return (
     <Tabs
@@ -51,6 +53,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="settings" size={size} color={color} />
           ),
+          tabBarBadge: updateRequired ? "!" : undefined,
         }}
       />
     </Tabs>
