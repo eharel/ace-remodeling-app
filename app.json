@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ACE Remodeling",
+    "name": "ACE Remodeling TX",
     "slug": "ace-remodeling-app",
     "version": "1.1.0",
     "orientation": "portrait",
@@ -13,11 +13,11 @@
       "bundleIdentifier": "com.aceremodelingtx.app",
       "buildNumber": "8",
       "infoPlist": {
-        "CFBundleDisplayName": "ACE Remodeling"
+        "CFBundleDisplayName": "ACE Remodeling TX"
       }
     },
     "android": {
-      "displayName": "ACE Remodeling",
+      "displayName": "ACE Remodeling TX",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon.png",
         "backgroundColor": "#ffffff"

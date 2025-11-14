@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">ACE Remodeling</string>
+  <string name="app_name">ACE Remodeling TX</string>
   <string name="expo_system_ui_user_interface_style" translatable="false">automatic</string>
   <string name="expo_runtime_version">1.0.0</string>
   <string name="blob_provider_authority">com.aceremodelingtx.app.blobs</string>

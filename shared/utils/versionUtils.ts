@@ -1,0 +1,99 @@
+import Constants from "expo-constants";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/core/config";
+import type { VersionConfig } from "@/core/types/VersionConfig";
+
+/**
+ * Gets the current build number from the app's native configuration.
+ * 
+ * @returns The current build number as a number, or null if unavailable
+ * 
+ * @example
+ * const buildNumber = getCurrentBuildNumber();
+ * if (buildNumber !== null) {
+ *   console.log(`Running build ${buildNumber}`);
+ * }
+ */
+export function getCurrentBuildNumber(): number | null {
+  const buildNumberString = Constants.expoConfig?.ios?.buildNumber;
+  
+  if (!buildNumberString) {
+    return null;
+  }
+
+  const buildNumber = parseInt(buildNumberString, 10);
+  
+  // Validate that parsing succeeded and returned a valid number
+  if (isNaN(buildNumber)) {
+    return null;
+  }
+
+  return buildNumber;
+}
+
+/**
+ * Determines if an app update is required based on build numbers.
+ * 
+ * Pure function with no side effects - performs simple comparison logic.
+ * Handles null current build gracefully by returning false (no update required).
+ * 
+ * @param currentBuild - The current build number, or null if unavailable
+ * @param minimumBuild - The minimum required build number
+ * @returns true if current build is less than minimum (update required), false otherwise
+ * 
+ * @example
+ * const updateNeeded = isUpdateRequired(8, 10); // returns true
+ * const upToDate = isUpdateRequired(10, 10);    // returns false
+ * const buildUnknown = isUpdateRequired(null, 10); // returns false (graceful fallback)
+ */
+export function isUpdateRequired(
+  currentBuild: number | null,
+  minimumBuild: number
+): boolean {
+  // If current build is unknown, don't force update
+  if (currentBuild === null) {
+    return false;
+  }
+
+  return currentBuild < minimumBuild;
+}
+
+/**
+ * Fetches the version configuration from Firestore.
+ * 
+ * Retrieves the minimum required build number from the 'config/appVersion' document.
+ * Uses proper error handling and returns null on failure.
+ * 
+ * @returns Promise resolving to VersionConfig object, or null if fetch fails
+ * 
+ * @example
+ * const config = await fetchVersionConfig();
+ * if (config) {
+ *   console.log(`Minimum build required: ${config.minimumBuildNumber}`);
+ * }
+ */
+export async function fetchVersionConfig(): Promise<VersionConfig | null> {
+  try {
+    const versionDocRef = doc(db, "config", "appVersion");
+    const versionDoc = await getDoc(versionDocRef);
+
+    if (!versionDoc.exists()) {
+      console.error("Version config document does not exist in Firestore");
+      return null;
+    }
+
+    const data = versionDoc.data() as VersionConfig;
+
+    // Validate that we got the expected data structure
+    if (typeof data.minimumBuildNumber !== "number") {
+      console.error("Invalid version config: minimumBuildNumber is not a number");
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching version config from Firestore:", error);
+    return null;
+  }
+}
+

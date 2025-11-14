@@ -1,9 +1,9 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { currentEnvironment, currentProjectId } from "@/core/config";
+import packageJson from "../../package.json";
 
 import { DesignTokens } from "@/core/themes";
 import {
@@ -144,7 +144,7 @@ export default function SettingsScreen() {
                   variant="caption"
                   style={styles.infoItemDescription}
                 >
-                  ACE Remodeling App v{Constants.expoConfig?.version || "1.0.0"}
+                  ACE Remodeling App v{packageJson.version}
                 </ThemedText>
               </View>
             </View>

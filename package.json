@@ -1,7 +1,7 @@
 {
   "name": "ace-remodeling-app",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "scripts": {
     "start": "expo start",
     "dev": "expo start --dev-client",
@@ -24,13 +24,10 @@
     "build:status": "eas build:list",
     "deploy:update": "eas update --branch production --platform ios",
     "deploy:full": "eas build --platform ios --profile production --auto-submit",
-    
-    "seed": "tsx scripts/seedFirebase.ts",       
+    "seed": "tsx scripts/seedFirebase.ts",
     "seed:prod": "NODE_ENV=production tsx scripts/seedFirebase.ts",
-    
-    "upload": "tsx scripts/uploadPhotos.ts",            
+    "upload": "tsx scripts/uploadPhotos.ts",
     "upload:prod": "NODE_ENV=production tsx scripts/uploadPhotos.ts",
-    
     "version:patch": "npm version patch && node scripts/sync-version.js",
     "version:minor": "npm version minor && node scripts/sync-version.js",
     "version:major": "npm version major && node scripts/sync-version.js",
