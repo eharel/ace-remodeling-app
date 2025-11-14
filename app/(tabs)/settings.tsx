@@ -1,11 +1,12 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { currentEnvironment, currentProjectId } from "@/core/config";
+import packageJson from "../../package.json";
 
 import { DesignTokens } from "@/core/themes";
+import { UpdateBanner } from "@/features/settings";
 import {
   PageHeader,
   ThemedText,
@@ -13,10 +14,12 @@ import {
   ThemeToggle,
 } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
+import { useVersionCheck } from "@/shared/hooks";
 
 export default function SettingsScreen() {
   const { theme } = useTheme();
   const router = useRouter();
+  const { updateRequired, isLoading } = useVersionCheck();
 
   const styles = useMemo(
     () =>
@@ -84,6 +87,9 @@ export default function SettingsScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.content}
       >
+        {/* Update Banner - Shows when app needs updating */}
+        {updateRequired && <UpdateBanner updateRequired={updateRequired} />}
+
         {/* Appearance Section */}
         <View style={styles.section}>
           <ThemedText variant="subtitle" style={styles.sectionTitle}>
@@ -144,7 +150,7 @@ export default function SettingsScreen() {
                   variant="caption"
                   style={styles.infoItemDescription}
                 >
-                  ACE Remodeling App v{Constants.expoConfig?.version || "1.0.0"}
+                  ACE Remodeling App v{packageJson.version}
                 </ThemedText>
               </View>
             </View>
@@ -156,7 +162,13 @@ export default function SettingsScreen() {
         </View>
 
         {__DEV__ && (
-          <ThemedText variant="caption" style={{ marginTop: 20, opacity: 0.6 }}>
+          <ThemedText
+            variant="caption"
+            style={{
+              marginTop: DesignTokens.spacing[5],
+              opacity: 0.6,
+            }}
+          >
             Environment: {currentEnvironment}
             {"\n"}Project: {currentProjectId}
           </ThemedText>

@@ -138,7 +138,7 @@ export default function AboutCompanyScreen() {
       />
       <ThemedView style={styles.container}>
         <PageHeader
-          title="About ACE Remodeling"
+          title="About ACE Remodeling TX"
           subtitle="Transforming Austin, One Home at a Time!"
           showBack={true}
           backLabel="Settings"

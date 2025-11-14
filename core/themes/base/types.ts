@@ -136,6 +136,18 @@ export interface StatusColors {
 }
 
 /**
+ * Notification color structure
+ * Defines colors for badges, alerts, and attention-requiring UI elements.
+ * Used for notification indicators that require user attention or action.
+ */
+export interface NotificationColors {
+  /** Primary notification color for badges and attention indicators */
+  badge: string;
+  /** Light tint for notification surfaces and backgrounds */
+  background: string;
+}
+
+/**
  * Component colors interface
  * Defines ONLY color-related properties for UI components
  * Dimensions and layout properties belong in DesignTokens
@@ -217,6 +229,8 @@ export interface ThemeColors {
   interactive: InteractiveColors;
   /** Status colors */
   status: StatusColors;
+  /** Notification and attention-requiring UI elements */
+  notification: NotificationColors;
   /** Component-specific colors */
   components: ComponentColors;
   /** Shadow definitions with theme-specific colors and opacity */

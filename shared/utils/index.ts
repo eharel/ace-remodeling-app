@@ -11,4 +11,5 @@ export * from "./photoUtils";
 export * from "./pmUtils";
 export * from "./styling";
 export * from "./useSearchHistory";
+export * from "./versionUtils";
 

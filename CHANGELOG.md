@@ -5,6 +5,27 @@ All notable changes to the ACE Remodeling app will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+
+---
+
+
+## [1.2.0] - TBD
+
+### Added
+
+- Build version checking system with TestFlight update notifications
+- App branding updated to "ACE Remodeling TX"
+
+### Changed
+
+- Settings version display now uses package.json for OTA compatibility
+
+
+---
+
+
 ## [1.1.0] - 2025-11-13
 
 ### Added
@@ -19,7 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+
 ---
+
 
 ## [1.0.0] - 2025-11-XX
 
@@ -34,7 +57,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dark mode support
 - Category-based project browsing
 
+
 ---
+
 
 ## How to Use This Changelog
 
