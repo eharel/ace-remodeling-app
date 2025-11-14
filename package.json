@@ -26,7 +26,7 @@
     "deploy:full": "eas build --platform ios --profile production --auto-submit",
     "seed": "tsx scripts/seedFirebase.ts",
     "seed:prod": "NODE_ENV=production tsx scripts/seedFirebase.ts",
-    "upload": "tsx scripts/uploadPhotos.ts",
+    "upload": "tsx scripts/uploadPhotos.ts",            
     "upload:prod": "NODE_ENV=production tsx scripts/uploadPhotos.ts",
     "version:patch": "npm version patch && node scripts/sync-version.js",
     "version:minor": "npm version minor && node scripts/sync-version.js",
