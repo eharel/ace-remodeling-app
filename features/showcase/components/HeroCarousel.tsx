@@ -138,6 +138,9 @@ export function HeroCarousel({ projects }: HeroCarouselProps) {
       height: CAROUSEL_HEIGHT,
       position: "relative",
     },
+    slidePressed: {
+      opacity: DesignTokens.interactions.activeOpacity,
+    },
     image: {
       width: "100%",
       height: "100%",
@@ -239,11 +242,27 @@ export function HeroCarousel({ projects }: HeroCarouselProps) {
   });
 
   /**
+   * Handle project slide press - navigate to project detail
+   */
+  const handleProjectPress = useCallback((projectId: string) => {
+    router.push(`/project/${projectId}`);
+  }, []);
+
+  /**
    * Render a single carousel slide
    */
   const renderSlide = useCallback(
     ({ item: project }: ListRenderItemInfo<Project>) => (
-      <View style={styles.slideContainer}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.slideContainer,
+          pressed && styles.slidePressed,
+        ]}
+        onPress={() => handleProjectPress(project.id)}
+        accessibilityRole="button"
+        accessibilityLabel={`View ${project.name} project details`}
+        accessibilityHint="Double tap to view full project details"
+      >
         {/* Project Image */}
         <Image
           source={{ uri: project.thumbnail }}
@@ -299,9 +318,9 @@ export function HeroCarousel({ projects }: HeroCarouselProps) {
             />
           ))}
         </View>
-      </View>
+      </Pressable>
     ),
-    [projects, currentIndex, theme, styles]
+    [projects, currentIndex, theme, styles, handleProjectPress]
   );
 
   // Empty state
