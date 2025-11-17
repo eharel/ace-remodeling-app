@@ -54,7 +54,12 @@ export interface Project {
   createdAt: string; // ISO date string format
   updatedAt: string; // ISO date string format
   tags?: string[];
-  featured?: boolean;
+  /**
+   * Whether this project is featured in the Showcase tab.
+   * Featured projects are curated, high-quality projects displayed prominently.
+   * @default false
+   */
+  featured: boolean;
   // REMOVED: completionDate - use projectDates.end instead
 }
 
