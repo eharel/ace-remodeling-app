@@ -7,9 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-
 ---
-
 
 ## [1.2.0] - TBD
 
@@ -17,14 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Build version checking system with TestFlight update notifications
 - App branding updated to "ACE Remodeling TX"
+- Add Showcase page of highlighted projects
 
 ### Changed
 
 - Settings version display now uses package.json for OTA compatibility
 
-
 ---
-
 
 ## [1.1.0] - 2025-11-13
 
@@ -40,9 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-
 ---
-
 
 ## [1.0.0] - 2025-11-XX
 
@@ -57,9 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dark mode support
 - Category-based project browsing
 
-
 ---
-
 
 ## How to Use This Changelog
 

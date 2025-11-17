@@ -83,31 +83,35 @@ export default function ShowcaseScreen() {
     },
     carouselContainer: {
       marginTop: DesignTokens.spacing[6],
+      marginBottom: DesignTokens.spacing[2],
     },
     emptyStateContainer: {
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: DesignTokens.spacing[16],
+      paddingVertical: DesignTokens.spacing[20],
       paddingHorizontal: DesignTokens.spacing[8],
+      minHeight: 300,
     },
     emptyStateIcon: {
-      marginBottom: DesignTokens.spacing[4],
+      marginBottom: DesignTokens.spacing[6],
+      opacity: 0.9,
     },
     emptyStateTitle: {
-      fontSize: DesignTokens.typography.fontSize.xl,
+      fontSize: DesignTokens.typography.fontSize["2xl"],
       fontWeight: DesignTokens.typography.fontWeight.semibold,
       fontFamily: DesignTokens.typography.fontFamily.semibold,
       color: theme.colors.text.primary,
       textAlign: "center",
-      marginBottom: DesignTokens.spacing[2],
+      marginBottom: DesignTokens.spacing[3],
     },
     emptyStateMessage: {
       fontSize: DesignTokens.typography.fontSize.base,
       lineHeight:
         DesignTokens.typography.fontSize.base *
-        DesignTokens.typography.lineHeight.normal,
+        DesignTokens.typography.lineHeight.relaxed,
       color: theme.colors.text.secondary,
       textAlign: "center",
+      maxWidth: 500,
     },
   });
 
@@ -180,7 +184,7 @@ export default function ShowcaseScreen() {
           <View style={styles.emptyStateContainer}>
             <MaterialIcons
               name="star-border"
-              size={64}
+              size={72}
               color={theme.colors.showcase.accent}
               style={styles.emptyStateIcon}
             />
@@ -188,7 +192,8 @@ export default function ShowcaseScreen() {
               Building our showcase
             </ThemedText>
             <ThemedText style={styles.emptyStateMessage}>
-              Featured projects will appear here as we curate our portfolio
+              Featured projects will appear here as we curate our finest work.
+              Check back soon to see our portfolio highlights.
             </ThemedText>
           </View>
         )}
