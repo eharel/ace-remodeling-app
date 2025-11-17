@@ -155,6 +155,15 @@ export default function ShowcaseScreen() {
               return null;
             }
 
+            // Skip internal categories (management tools, etc.)
+            if (
+              "internal" in categoryConfig &&
+              categoryConfig.internal === true
+            ) {
+              console.log(`⚠️  Skipping ${category}: internal category`);
+              return null;
+            }
+
             console.log(
               `✅ Rendering section for ${category} with ${projects.length} project(s)`
             );
