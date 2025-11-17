@@ -31,8 +31,11 @@ const PROJECTS_COLLECTION = "projects";
  * 
  * Edge cases handled:
  * - Missing or empty pictures array: returns empty array
+ * - Missing or empty projectNumber: returns project's own pictures (graceful degradation)
  * - No matching projects: returns only the Full Home project's pictures
  * - Duplicate URLs: first occurrence is kept, preserving type categorization
+ * - Pictures without URLs: safely skipped during deduplication
+ * - Large photo sets (30+ photos): uses efficient Set-based deduplication (O(n))
  */
 export function getAggregatedProjectPhotos(
   project: Project,
@@ -48,10 +51,19 @@ export function getAggregatedProjectPhotos(
     return project.pictures;
   }
 
+  // Handle missing or empty projectNumber - graceful degradation
+  if (!project.projectNumber || project.projectNumber.trim() === "") {
+    console.warn(
+      `Full Home project "${project.name}" (${project.id}) is missing projectNumber. Returning only its own pictures.`
+    );
+    return project.pictures;
+  }
+
   // For Full Home projects, aggregate photos from related projects
   // Find all projects with matching projectNumber (excluding the current project)
   const relatedProjects = allProjects.filter(
     (p) =>
+      p.projectNumber &&
       p.projectNumber === project.projectNumber &&
       p.id !== project.id &&
       p.pictures &&
