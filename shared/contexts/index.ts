@@ -3,5 +3,9 @@
  * Exports all React context providers and hooks
  */
 
-export { ProjectsProvider, useProjects } from "./ProjectsContext";
+export {
+  getAggregatedProjectPhotos,
+  ProjectsProvider,
+  useProjects,
+} from "./ProjectsContext";
 export { ThemeProvider, UnifiedTheme, useTheme } from "./ThemeContext";
