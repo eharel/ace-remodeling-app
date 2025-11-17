@@ -11,7 +11,11 @@ import {
   type PhotoTabValue,
 } from "@/features/gallery";
 import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
-import { useProjects, useTheme } from "@/shared/contexts";
+import {
+  getAggregatedProjectPhotos,
+  useProjects,
+  useTheme,
+} from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/core/themes";
@@ -50,26 +54,32 @@ export default function ProjectDetailScreen() {
     }
   }, [id, projects]);
 
+  // Get aggregated photos (includes related project photos for Full Home projects)
+  const aggregatedPictures = useMemo(() => {
+    if (!project) return [];
+    return getAggregatedProjectPhotos(project, projects);
+  }, [project, projects]);
+
   // Calculate photo counts for each category
   const photoCounts = useMemo(() => {
-    return getPhotoCounts(project?.pictures || []);
-  }, [project?.pictures]);
+    return getPhotoCounts(aggregatedPictures);
+  }, [aggregatedPictures]);
 
   // Get preview photos based on active tab
   const previewPhotos = useMemo(() => {
-    if (!project?.pictures) return [];
+    if (aggregatedPictures.length === 0) return [];
 
     if (activePhotoTab === "all") {
       // Use intelligent sampling for "All Photos" tab
-      return samplePreviewPhotos(project.pictures, previewCount);
+      return samplePreviewPhotos(aggregatedPictures, previewCount);
     } else {
       // Filter by specific category and take first N
-      const filtered = project.pictures.filter(
+      const filtered = aggregatedPictures.filter(
         (p) => p.type === activePhotoTab
       );
       return getPreviewPhotos(filtered, previewCount);
     }
-  }, [project?.pictures, activePhotoTab, previewCount]);
+  }, [aggregatedPictures, activePhotoTab, previewCount]);
 
   // Check if there are more photos beyond the preview
   const hasMorePhotos = useMemo(() => {
@@ -84,17 +94,17 @@ export default function ProjectDetailScreen() {
 
   // Get filtered images for gallery based on active tab
   const galleryImages = useMemo(() => {
-    if (!project?.pictures) return [];
+    if (aggregatedPictures.length === 0) return [];
 
     if (activePhotoTab === "all") {
-      return project.pictures;
+      return aggregatedPictures;
     }
 
     // Map tab value to photo type (note: 'progress' tab maps to 'process' type)
     const photoType =
       activePhotoTab === "progress" ? "process" : activePhotoTab;
-    return project.pictures.filter((p) => p.type === photoType);
-  }, [project?.pictures, activePhotoTab]);
+    return aggregatedPictures.filter((p) => p.type === photoType);
+  }, [aggregatedPictures, activePhotoTab]);
 
   const closeGallery = () => {
     setGalleryVisible(false);
@@ -639,7 +649,7 @@ export default function ProjectDetailScreen() {
           {isMoreCell && (
             <ThemedView style={styles.moreImagesOverlay}>
               <ThemedText style={styles.moreImagesText}>
-                +{project.pictures.length - 2} more photos
+                +{aggregatedPictures.length - 2} more photos
               </ThemedText>
             </ThemedView>
           )}
@@ -828,7 +838,7 @@ export default function ProjectDetailScreen() {
                 { color: theme.colors.text.primary },
               ]}
             >
-              Project Photos ({project.pictures?.length || 0})
+              Project Photos ({aggregatedPictures.length})
             </ThemedText>
             <ThemedText
               style={[
@@ -839,7 +849,7 @@ export default function ProjectDetailScreen() {
               Tap any photo to view gallery
             </ThemedText>
 
-            {project.pictures && project.pictures.length > 0 ? (
+            {aggregatedPictures.length > 0 ? (
               <>
                 {/* Photo Category Tabs */}
                 <PhotoTabs
