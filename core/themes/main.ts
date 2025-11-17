@@ -76,6 +76,14 @@ export const mainTheme: Theme = {
       background: "#FFEBEE", // Very light red tint (consistent with light theme)
     },
 
+    // Showcase colors - Premium colors for featured projects and Showcase tab
+    // Amber fits the existing warm blue/gold color scheme while standing out.
+    // These colors should only be used on Showcase tab features.
+    showcase: {
+      accent: "#F59E0B", // Amber accent for featured badges (complements existing gold)
+      accentLight: "#FEF3C7", // Light amber tint for backgrounds and subtle highlights
+    },
+
     // Component colors - ONLY colors, NO dimensions
     components: {
       fab: {
