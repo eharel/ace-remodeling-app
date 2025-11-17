@@ -76,9 +76,9 @@ export const PhotoTabs: React.FC<PhotoTabsProps> = ({
   const tabs: TabConfig[] = useMemo(
     () => [
       {
-        value: "all" as const,
-        label: "All Photos",
-        accessibilityLabel: `All Photos, ${photoCounts.all} total`,
+        value: "after" as const,
+        label: "After",
+        accessibilityLabel: `After photos, ${photoCounts.after} photos`,
       },
       {
         value: "before" as const,
@@ -91,9 +91,9 @@ export const PhotoTabs: React.FC<PhotoTabsProps> = ({
         accessibilityLabel: `In Progress photos, ${photoCounts.progress} photos`,
       },
       {
-        value: "after" as const,
-        label: "After",
-        accessibilityLabel: `After photos, ${photoCounts.after} photos`,
+        value: "all" as const,
+        label: "All Photos",
+        accessibilityLabel: `All Photos, ${photoCounts.all} total`,
       },
     ],
     [photoCounts]

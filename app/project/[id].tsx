@@ -923,20 +923,17 @@ export default function ProjectDetailScreen() {
           </ThemedView>
 
           {/* Documents Section */}
-          <ThemedView style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <ThemedText
-                style={[
-                  styles.sectionTitle,
-                  { color: theme.colors.text.primary },
-                ]}
-              >
-                Documents
-                {project.documents && project.documents.length >= 1
-                  ? ` (${project.documents.length})`
-                  : ""}
-              </ThemedText>
-              {project.documents && project.documents.length > 0 && (
+          {project.documents && project.documents.length > 0 && (
+            <ThemedView style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <ThemedText
+                  style={[
+                    styles.sectionTitle,
+                    { color: theme.colors.text.primary },
+                  ]}
+                >
+                  Documents ({project.documents.length})
+                </ThemedText>
                 <Pressable
                   style={styles.viewAllButton}
                   onPress={() =>
@@ -955,9 +952,7 @@ export default function ProjectDetailScreen() {
                     color={theme.colors.interactive.primary}
                   />
                 </Pressable>
-              )}
-            </View>
-            {project.documents && project.documents.length > 0 ? (
+              </View>
               <ThemedView style={styles.documentsPreview}>
                 {project.documents
                   .slice(0, 2)
@@ -980,65 +975,11 @@ export default function ProjectDetailScreen() {
                   </Pressable>
                 )}
               </ThemedView>
-            ) : (
-              <ThemedView style={[styles.emptyState, { marginTop: 0 }]}>
-                <MaterialIcons
-                  name="description"
-                  size={48}
-                  color={theme.colors.text.tertiary}
-                />
-                <ThemedText
-                  style={[
-                    styles.emptyStateText,
-                    { color: theme.colors.text.secondary },
-                  ]}
-                >
-                  No documents available
-                </ThemedText>
-              </ThemedView>
-            )}
-          </ThemedView>
+            </ThemedView>
+          )}
 
           {/* Logs Section */}
-          <ThemedView style={styles.section}>
-            <ThemedText
-              style={[
-                styles.sectionTitle,
-                { color: theme.colors.text.primary },
-              ]}
-            >
-              Project Logs
-              {project.logs && project.logs.length >= 1
-                ? ` (${project.logs.length})`
-                : ""}
-            </ThemedText>
-            {project.logs && project.logs.length > 0 ? (
-              <ThemedView style={styles.logsList}>
-                {project.logs.map((item, index) =>
-                  renderLog(item, index, index === project.logs.length - 1)
-                )}
-              </ThemedView>
-            ) : (
-              <ThemedView style={styles.emptyState}>
-                <MaterialIcons
-                  name="timeline"
-                  size={48}
-                  color={theme.colors.text.tertiary}
-                />
-                <ThemedText
-                  style={[
-                    styles.emptyStateText,
-                    { color: theme.colors.text.secondary },
-                  ]}
-                >
-                  No project logs available
-                </ThemedText>
-              </ThemedView>
-            )}
-          </ThemedView>
-
-          {/* Scope Section */}
-          {project.scope && (
+          {project.logs && project.logs.length > 0 && (
             <ThemedView style={styles.section}>
               <ThemedText
                 style={[
@@ -1046,16 +987,13 @@ export default function ProjectDetailScreen() {
                   { color: theme.colors.text.primary },
                 ]}
               >
-                Project Scope
+                Project Logs ({project.logs.length})
               </ThemedText>
-              <ThemedText
-                style={[
-                  styles.projectDescription,
-                  { color: theme.colors.text.secondary },
-                ]}
-              >
-                {project.scope}
-              </ThemedText>
+              <ThemedView style={styles.logsList}>
+                {project.logs.map((item, index) =>
+                  renderLog(item, index, index === project.logs.length - 1)
+                )}
+              </ThemedView>
             </ThemedView>
           )}
 
