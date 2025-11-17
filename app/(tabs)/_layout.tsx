@@ -29,7 +29,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="showcase"
+        name="index"
         options={{
           title: "Showcase",
           tabBarIcon: ({ color, size }) => (
@@ -38,7 +38,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="index"
+        name="categories"
         options={{
           title: "Categories",
           tabBarIcon: ({ color, size }) => (
