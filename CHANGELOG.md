@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+---
+
+## [1.2.0] - 2025-11-17
+
+### Added
+
 - Build version checking system with TestFlight update notifications
 - App branding updated to "ACE Remodeling TX"
 - Add Showcase page of highlighted projects
