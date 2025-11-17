@@ -75,6 +75,14 @@ export const lightTheme: Theme = {
       background: "#FFEBEE", // Very light red tint (10% opacity red over white)
     },
 
+    // Showcase colors - Premium colors for featured projects and Showcase tab
+    // Gold conveys premium quality, achievement, and elevated status.
+    // These colors should only be used on Showcase tab features.
+    showcase: {
+      accent: "#D4AF37", // Gold accent for featured badges and highlights
+      accentLight: "#F5E6C8", // Light gold tint for backgrounds and subtle highlights
+    },
+
     // Component colors - ONLY colors, NO dimensions
     components: {
       fab: {

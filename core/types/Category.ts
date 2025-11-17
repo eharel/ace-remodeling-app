@@ -1,15 +1,21 @@
 /**
  * Project category constants for type safety and consistency
+ * 
+ * IMPORTANT: These keys MUST match Firestore database values exactly (kebab-case).
+ * This is the single source of truth for all project categories.
+ * 
+ * Categories are ordered by importance/frequency for consistent display ordering.
  */
 export const PROJECT_CATEGORIES = {
-  KITCHEN: "kitchen",
   BATHROOM: "bathroom",
+  KITCHEN: "kitchen",
   FULL_HOME: "full-home",
   ADU_ADDITION: "adu-addition",
-  OUTDOOR: "outdoor",
-  POOLS: "pools",
-  COMMERCIAL: "commercial",
+  OUTDOOR_LIVING: "outdoor-living",
   NEW_CONSTRUCTION: "new-construction",
+  COMMERCIAL: "commercial",
+  MISCELLANEOUS: "miscellaneous",
+  MANAGEMENT_TOOLS: "management-tools",
 } as const;
 
 /**
@@ -37,14 +43,15 @@ export type ProjectSubcategory =
  * Maps category keys to display-friendly text
  */
 export const CATEGORY_LABELS: Record<ProjectCategory, string> = {
-  [PROJECT_CATEGORIES.KITCHEN]: "Kitchen",
-  [PROJECT_CATEGORIES.BATHROOM]: "Bathroom",
-  [PROJECT_CATEGORIES.FULL_HOME]: "Full Home",
-  [PROJECT_CATEGORIES.ADU_ADDITION]: "ADU/Addition",
-  [PROJECT_CATEGORIES.OUTDOOR]: "Outdoor Living",
-  [PROJECT_CATEGORIES.POOLS]: "Pools",
-  [PROJECT_CATEGORIES.COMMERCIAL]: "Commercial",
+  [PROJECT_CATEGORIES.BATHROOM]: "Bathrooms",
+  [PROJECT_CATEGORIES.KITCHEN]: "Kitchens",
+  [PROJECT_CATEGORIES.FULL_HOME]: "Full Home Renovations",
+  [PROJECT_CATEGORIES.ADU_ADDITION]: "ADUs & Additions",
+  [PROJECT_CATEGORIES.OUTDOOR_LIVING]: "Outdoor Living",
   [PROJECT_CATEGORIES.NEW_CONSTRUCTION]: "New Construction",
+  [PROJECT_CATEGORIES.COMMERCIAL]: "Commercial Projects",
+  [PROJECT_CATEGORIES.MISCELLANEOUS]: "Other Projects",
+  [PROJECT_CATEGORIES.MANAGEMENT_TOOLS]: "Management Tools",
 };
 
 /**

@@ -195,6 +195,53 @@ export const DesignTokens = {
     slow: 350,
   },
 
+  /**
+   * Animation timing values
+   * Used for consistent animation durations across the app.
+   * Slower animations convey sophistication and premium feel.
+   */
+  animations: {
+    /**
+     * Animation duration values (in milliseconds)
+     * - fast: Quick micro-interactions (200ms)
+     * - base: Standard animations (300ms)
+     * - slow: Deliberate, premium-feeling animations (500ms)
+     * - slower: Sophisticated, attention-grabbing animations (800ms)
+     */
+    duration: {
+      fast: 200,
+      base: 300,
+      slow: 500,
+      slower: 800,
+    },
+    /**
+     * Animation easing functions
+     * - standard: Smooth ease-in-out for most animations
+     * - spring: Uses react-native-reanimated's spring config for natural motion
+     */
+    easing: {
+      standard: "ease-in-out",
+      spring: "spring",
+    },
+  },
+
+  /**
+   * Carousel component configuration
+   * Values for auto-advancing carousels and smooth transitions
+   */
+  carousel: {
+    /**
+     * Auto-advance interval (in milliseconds)
+     * Time between automatic carousel slides when auto-play is enabled
+     */
+    autoAdvanceInterval: 5000, // 5 seconds
+    /**
+     * Transition duration (in milliseconds)
+     * Duration of the slide transition animation
+     */
+    transitionDuration: 800, // 800ms for smooth, premium feel
+  },
+
   // Universal Interaction Constants
   interactions: {
     activeOpacity: 0.7, // Standard press opacity

@@ -1,205 +1,203 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useMemo } from "react";
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import React, { useMemo } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { getCategoryConfig } from "@/core/constants/categoryConfig";
 import { DesignTokens } from "@/core/themes";
 import { ProjectCategory } from "@/core/types";
-import {
-  EmptyState,
-  LoadingState,
-  PageHeader,
-  ThemedText,
-  ThemedView,
-} from "@/shared/components";
+import { FeaturedCategorySection, HeroCarousel } from "@/features/showcase";
+import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
-import { getAllCategories, getCategoryDisplayName, getCategoryIcon } from "@/shared/utils";
 
-interface CategoryItem {
-  id: ProjectCategory;
-  name: string;
-  icon: string;
-  count: number;
-}
-
-export default function ProjectsScreen() {
+/**
+ * Showcase Tab - Portfolio Showcase Screen
+ *
+ * Primary entry point for the app, displaying featured projects.
+ * This is the new home screen that showcases our finest work.
+ */
+export default function ShowcaseScreen() {
   const { theme } = useTheme();
-  const { projects, loading, error } = useProjects();
+  const insets = useSafeAreaInsets();
+  const { featuredProjects } = useProjects();
 
-  // Get categories with projects
-  const categories = useMemo(() => {
-    if (!projects) return [];
+  /**
+   * Group featured projects by category dynamically
+   * Only includes categories that have at least 1 featured project
+   * Returns a Map for efficient lookups and iteration
+   */
+  const featuredByCategory = useMemo(() => {
+    const grouped = new Map<ProjectCategory, typeof featuredProjects>();
 
-    // Dynamically build category list from all available categories
-    const allCategories = getAllCategories();
-    const categoryData: CategoryItem[] = allCategories.map((category) => ({
-      id: category,
-      name: getCategoryDisplayName(category),
-      icon: getCategoryIcon(category),
-      count: projects.filter((p) => p.category === category).length,
-    }));
+    featuredProjects.forEach((project) => {
+      const existing = grouped.get(project.category) || [];
+      grouped.set(project.category, [...existing, project]);
+    });
 
-    // Only show categories that have projects
-    return categoryData.filter((category) => category.count > 0);
-  }, [projects]);
+    // Debug logging
+    console.log("🔍 Featured Projects Debug:");
+    console.log(`  Total featured projects: ${featuredProjects.length}`);
+    console.log("  Featured projects by category:");
+    grouped.forEach((projects, category) => {
+      console.log(`    ${category}: ${projects.length} project(s)`);
+      projects.forEach((p) => {
+        console.log(`      - ${p.name} (${p.id}) - featured: ${p.featured}`);
+      });
+    });
 
-  const handleCategoryPress = (category: CategoryItem) => {
-    router.push(`/category/${category.id}`);
-  };
+    return grouped;
+  }, [featuredProjects]);
 
-  const renderCategoryItem = ({ item }: { item: CategoryItem }) => (
-    <Pressable
-      style={({ pressed }) => [
-        styles.categoryItem,
-        { backgroundColor: theme.colors.background.card },
-        pressed && styles.categoryItemPressed,
-      ]}
-      onPress={() => handleCategoryPress(item)}
-      accessibilityRole="button"
-      accessibilityLabel={`${item.name}, ${item.count} projects`}
-      accessibilityHint={`View all ${item.name.toLowerCase()} projects`}
-    >
-      <View style={styles.categoryContent}>
-        <View style={styles.categoryLeft}>
-          <View
-            style={[
-              styles.iconContainer,
-              { backgroundColor: theme.colors.interactive.primary },
-            ]}
-          >
-            <MaterialIcons
-              name={item.icon as any}
-              size={24}
-              color={theme.colors.text.inverse}
-            />
-          </View>
-          <View style={styles.categoryInfo}>
-            <ThemedText style={styles.categoryName}>{item.name}</ThemedText>
-            <ThemedText style={styles.categoryCount}>
-              {item.count} project{item.count !== 1 ? "s" : ""}
-            </ThemedText>
-          </View>
-        </View>
-        <MaterialIcons
-          name="chevron-right"
-          size={24}
-          color={theme.colors.text.tertiary}
-        />
-      </View>
-    </Pressable>
-  );
+  /**
+   * Get sorted array of categories with featured projects
+   * Sorted by category name for consistent ordering
+   */
+  const categoriesWithFeatured = useMemo(() => {
+    const categories = Array.from(featuredByCategory.keys()).sort();
+    console.log("📋 Categories with featured projects:", categories);
+    return categories;
+  }, [featuredByCategory]);
 
-  const styles = useMemo(
-    () =>
-      StyleSheet.create({
-        container: {
-          flex: 1,
-          backgroundColor: theme.colors.background.primary,
-        },
-        categoryItem: {
-          borderRadius: DesignTokens.borderRadius.lg,
-          marginBottom: DesignTokens.spacing[3],
-          ...DesignTokens.shadows.sm,
-        },
-        categoryItemPressed: {
-          transform: [{ scale: 0.98 }],
-          ...DesignTokens.shadows.md,
-        },
-        categoryContent: {
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: DesignTokens.spacing[4],
-        },
-        categoryLeft: {
-          flexDirection: "row",
-          alignItems: "center",
-          flex: 1,
-        },
-        iconContainer: {
-          width: 48,
-          height: 48,
-          borderRadius: DesignTokens.borderRadius.lg,
-          alignItems: "center",
-          justifyContent: "center",
-          marginRight: DesignTokens.spacing[3],
-        },
-        categoryInfo: {
-          flex: 1,
-        },
-        categoryName: {
-          fontSize: DesignTokens.typography.fontSize.lg,
-          lineHeight:
-            DesignTokens.typography.fontSize.lg *
-            DesignTokens.typography.lineHeight.tight,
-          fontWeight: DesignTokens.typography.fontWeight.semibold,
-          fontFamily: DesignTokens.typography.fontFamily.semibold,
-          color: theme.colors.text.primary,
-          marginBottom: DesignTokens.spacing[1],
-        },
-        categoryCount: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          lineHeight:
-            DesignTokens.typography.fontSize.sm *
-            DesignTokens.typography.lineHeight.tight,
-          fontFamily: DesignTokens.typography.fontFamily.medium,
-          color: theme.colors.text.secondary,
-        },
-      }),
-    [theme]
-  );
-
-  if (loading) {
-    return (
-      <ThemedView style={styles.container}>
-        <LoadingState />
-      </ThemedView>
-    );
-  }
-
-  if (error) {
-    return (
-      <ThemedView style={styles.container}>
-        <EmptyState
-          title="Error Loading Projects"
-          message="There was an error loading the projects. Please try again."
-          actionText="Retry"
-          onAction={() => window.location.reload()}
-        />
-      </ThemedView>
-    );
-  }
-
-  if (categories.length === 0) {
-    return (
-      <ThemedView style={styles.container}>
-        <EmptyState
-          title="No Projects Available"
-          message="We don't have any projects to show at the moment."
-          actionText="Check Back Later"
-          onAction={() => {}}
-        />
-      </ThemedView>
-    );
-  }
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.primary,
+    },
+    content: {
+      paddingBottom: DesignTokens.spacing[8] + insets.bottom,
+    },
+    accentContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: DesignTokens.spacing[2],
+    },
+    accentLine: {
+      width: 40,
+      height: 3,
+      backgroundColor: theme.colors.showcase.accent,
+      borderRadius: DesignTokens.borderRadius.full,
+      marginRight: DesignTokens.spacing[2],
+    },
+    accentIcon: {
+      marginRight: DesignTokens.spacing[1],
+    },
+    carouselContainer: {
+      marginTop: DesignTokens.spacing[6],
+      marginBottom: DesignTokens.spacing[2],
+    },
+    emptyStateContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: DesignTokens.spacing[20],
+      paddingHorizontal: DesignTokens.spacing[8],
+      minHeight: 300,
+    },
+    emptyStateIcon: {
+      marginBottom: DesignTokens.spacing[6],
+      opacity: 0.9,
+    },
+    emptyStateTitle: {
+      fontSize: DesignTokens.typography.fontSize["2xl"],
+      fontWeight: DesignTokens.typography.fontWeight.semibold,
+      fontFamily: DesignTokens.typography.fontFamily.semibold,
+      color: theme.colors.text.primary,
+      textAlign: "center",
+      marginBottom: DesignTokens.spacing[3],
+    },
+    emptyStateMessage: {
+      fontSize: DesignTokens.typography.fontSize.base,
+      lineHeight:
+        DesignTokens.typography.fontSize.base *
+        DesignTokens.typography.lineHeight.relaxed,
+      color: theme.colors.text.secondary,
+      textAlign: "center",
+      maxWidth: 500,
+    },
+  });
 
   return (
     <ThemedView style={styles.container}>
       <PageHeader
-        title="Projects"
-        subtitle="Browse our various projects by category"
-      />
+        title="Portfolio Showcase"
+        subtitle="Our finest work"
+        variant="default"
+      >
+        {/* Subtle showcase accent - gold line with star icon */}
+        <View style={styles.accentContainer}>
+          <View style={styles.accentLine} />
+          <MaterialIcons
+            name="star"
+            size={16}
+            color={theme.colors.showcase.accent}
+            style={styles.accentIcon}
+          />
+        </View>
+      </PageHeader>
 
-      <FlatList
-        data={categories}
-        renderItem={renderCategoryItem}
-        keyExtractor={(item) => item.id}
+      <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: DesignTokens.spacing[4],
-          paddingBottom: DesignTokens.spacing[8],
-        }}
-      />
+        contentContainerStyle={styles.content}
+      >
+        {/* Hero Carousel - Auto-advancing featured projects */}
+        <View style={styles.carouselContainer}>
+          <HeroCarousel projects={featuredProjects} />
+        </View>
+
+        {/* Dynamic Category Sections - Only render if we have featured projects */}
+        {featuredProjects.length > 0 ? (
+          categoriesWithFeatured.map((category) => {
+            const projects = featuredByCategory.get(category);
+            if (!projects || projects.length === 0) {
+              console.log(`⚠️  Skipping ${category}: no projects`);
+              return null;
+            }
+
+            // Check if category has config, skip if not
+            const categoryConfig = getCategoryConfig(category);
+            if (!categoryConfig) {
+              console.log(`⚠️  Skipping ${category}: no category config found`);
+              return null;
+            }
+
+            // Skip internal categories (management tools, etc.)
+            if (
+              "internal" in categoryConfig &&
+              categoryConfig.internal === true
+            ) {
+              console.log(`⚠️  Skipping ${category}: internal category`);
+              return null;
+            }
+
+            console.log(
+              `✅ Rendering section for ${category} with ${projects.length} project(s)`
+            );
+            return (
+              <FeaturedCategorySection
+                key={category}
+                category={category}
+                projects={projects}
+              />
+            );
+          })
+        ) : (
+          /* Empty State - No featured projects at all */
+          <View style={styles.emptyStateContainer}>
+            <MaterialIcons
+              name="star-border"
+              size={72}
+              color={theme.colors.showcase.accent}
+              style={styles.emptyStateIcon}
+            />
+            <ThemedText style={styles.emptyStateTitle}>
+              Building our showcase
+            </ThemedText>
+            <ThemedText style={styles.emptyStateMessage}>
+              Featured projects will appear here as we curate our finest work.
+              Check back soon to see our portfolio highlights.
+            </ThemedText>
+          </View>
+        )}
+      </ScrollView>
     </ThemedView>
   );
 }

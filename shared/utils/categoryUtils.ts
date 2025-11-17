@@ -14,15 +14,19 @@ export function getCategoryDisplayName(category: ProjectCategory): string {
 
 /**
  * Get the icon name for a category
+ * Uses Material Icons names for React Native
  */
 export function getCategoryIcon(category: ProjectCategory): string {
   const icons: Record<ProjectCategory, string> = {
-    [PROJECT_CATEGORIES.KITCHEN]: "kitchen",
     [PROJECT_CATEGORIES.BATHROOM]: "bathroom",
+    [PROJECT_CATEGORIES.KITCHEN]: "kitchen",
     [PROJECT_CATEGORIES.FULL_HOME]: "home",
     [PROJECT_CATEGORIES.ADU_ADDITION]: "home-work",
-    [PROJECT_CATEGORIES.OUTDOOR]: "yard",
-    [PROJECT_CATEGORIES.POOLS]: "pool",
+    [PROJECT_CATEGORIES.OUTDOOR_LIVING]: "yard",
+    [PROJECT_CATEGORIES.NEW_CONSTRUCTION]: "foundation",
+    [PROJECT_CATEGORIES.COMMERCIAL]: "business",
+    [PROJECT_CATEGORIES.MISCELLANEOUS]: "folder",
+    [PROJECT_CATEGORIES.MANAGEMENT_TOOLS]: "build",
   };
   return icons[category] || "folder";
 }

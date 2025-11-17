@@ -20,6 +20,26 @@ interface ProjectsContextType {
   error: string | null;
   bathroomProjects: Project[];
   kitchenProjects: Project[];
+  /**
+   * All featured projects across all categories.
+   * Used for the Showcase tab to display curated, high-quality projects.
+   */
+  featuredProjects: Project[];
+  /**
+   * Featured bathroom projects.
+   * Subset of featuredProjects filtered by bathroom category.
+   */
+  featuredBathroomProjects: Project[];
+  /**
+   * Featured kitchen projects.
+   * Subset of featuredProjects filtered by kitchen category.
+   */
+  featuredKitchenProjects: Project[];
+  /**
+   * Featured projects from all other categories (excluding bathroom and kitchen).
+   * Includes full-home, adu-addition, outdoor, pools, commercial, new-construction.
+   */
+  featuredGeneralProjects: Project[];
 }
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(
@@ -52,6 +72,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
           projectsData.push({
             id: doc.id,
             ...data,
+            // Default featured to false if not present in Firestore
+            featured: data.featured ?? false,
           } as Project);
         });
 
@@ -85,6 +107,53 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
     [projects]
   );
 
+  /**
+   * All featured projects across all categories.
+   * Memoized to prevent unnecessary recalculations.
+   */
+  const featuredProjects = useMemo(
+    () => projects.filter((project) => project.featured === true),
+    [projects]
+  );
+
+  /**
+   * Featured bathroom projects.
+   * Memoized to prevent unnecessary recalculations.
+   */
+  const featuredBathroomProjects = useMemo(
+    () =>
+      featuredProjects.filter(
+        (project) => project.category === PROJECT_CATEGORIES.BATHROOM
+      ),
+    [featuredProjects]
+  );
+
+  /**
+   * Featured kitchen projects.
+   * Memoized to prevent unnecessary recalculations.
+   */
+  const featuredKitchenProjects = useMemo(
+    () =>
+      featuredProjects.filter(
+        (project) => project.category === PROJECT_CATEGORIES.KITCHEN
+      ),
+    [featuredProjects]
+  );
+
+  /**
+   * Featured projects from all other categories (excluding bathroom and kitchen).
+   * Memoized to prevent unnecessary recalculations.
+   */
+  const featuredGeneralProjects = useMemo(
+    () =>
+      featuredProjects.filter(
+        (project) =>
+          project.category !== PROJECT_CATEGORIES.BATHROOM &&
+          project.category !== PROJECT_CATEGORIES.KITCHEN
+      ),
+    [featuredProjects]
+  );
+
   const value: ProjectsContextType = useMemo(
     () => ({
       projects,
@@ -92,8 +161,22 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       error,
       bathroomProjects,
       kitchenProjects,
+      featuredProjects,
+      featuredBathroomProjects,
+      featuredKitchenProjects,
+      featuredGeneralProjects,
     }),
-    [projects, loading, error, bathroomProjects, kitchenProjects]
+    [
+      projects,
+      loading,
+      error,
+      bathroomProjects,
+      kitchenProjects,
+      featuredProjects,
+      featuredBathroomProjects,
+      featuredKitchenProjects,
+      featuredGeneralProjects,
+    ]
   );
 
   return (

@@ -75,6 +75,14 @@ export const darkTheme: Theme = {
       background: "#2C1A1A", // Dark red tint for surfaces
     },
 
+    // Showcase colors - Premium colors for featured projects and Showcase tab
+    // Brighter gold for dark theme to ensure proper contrast and visibility.
+    // These colors should only be used on Showcase tab features.
+    showcase: {
+      accent: "#FFD700", // Bright gold accent for featured badges (better contrast on dark)
+      accentLight: "#3D3420", // Dark gold tint for backgrounds (subtle on dark theme)
+    },
+
     // Component colors - ONLY colors, NO dimensions
     components: {
       fab: {

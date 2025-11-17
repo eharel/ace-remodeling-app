@@ -148,6 +148,27 @@ export interface NotificationColors {
 }
 
 /**
+ * Showcase color structure
+ * Defines premium colors for the Showcase tab and featured project elements.
+ * Gold/amber colors convey premium quality, achievement, and elevated status.
+ * These colors should only be used on Showcase tab features to maintain
+ * their special, elevated feel.
+ */
+export interface ShowcaseColors {
+  /**
+   * Premium accent color for featured badges and highlights.
+   * Gold/amber conveys premium quality and stands out from primary brand colors
+   * while remaining complementary to the overall design system.
+   */
+  accent: string;
+  /**
+   * Light variant of the accent color for backgrounds and subtle highlights.
+   * Used for featured project backgrounds and subtle emphasis areas.
+   */
+  accentLight: string;
+}
+
+/**
  * Component colors interface
  * Defines ONLY color-related properties for UI components
  * Dimensions and layout properties belong in DesignTokens
@@ -231,6 +252,8 @@ export interface ThemeColors {
   status: StatusColors;
   /** Notification and attention-requiring UI elements */
   notification: NotificationColors;
+  /** Showcase colors for premium featured content */
+  showcase: ShowcaseColors;
   /** Component-specific colors */
   components: ComponentColors;
   /** Shadow definitions with theme-specific colors and opacity */

@@ -186,6 +186,7 @@ function convertUploadedProject(
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     tags: [uploadedProject.category, "remodel", "completed"],
+    featured: false, // Default to not featured
   };
 }
 
