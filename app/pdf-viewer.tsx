@@ -135,7 +135,7 @@ export default function PdfViewer() {
           style={styles.backButton}
           onPress={handleBackPress}
           android_ripple={{
-            color: theme.colors.interactive.primaryLight,
+            color: theme.colors.interactive.primaryHover,
           }}
         >
           <MaterialIcons
