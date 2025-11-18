@@ -1,3 +1,5 @@
+import { FileAsset } from "./FileAsset";
+
 /**
  * Media type constants for distinguishing images from videos
  * 
