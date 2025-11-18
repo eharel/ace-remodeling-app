@@ -19,14 +19,16 @@ export type MediaType = (typeof MEDIA_TYPES)[keyof typeof MEDIA_TYPES];
  * Content stage constants for categorizing media by project phase
  *
  * Represents when in the project lifecycle the media was captured.
- * Note: IN_PROGRESS renamed from PROGRESS for consistency with status naming.
+ * These stages appear in the gallery showcase of transformation photos.
+ *
+ * RENDERINGS use plural form as they represent collections.
+ * MATERIALS moved to DOCUMENT_TYPES as reference material (not gallery content).
  */
 export const MEDIA_STAGES = {
   BEFORE: "before",
   AFTER: "after",
   IN_PROGRESS: "in-progress",
-  DETAIL: "detail",
-  RENDERING: "rendering",
+  RENDERINGS: "renderings",
   OTHER: "other",
 } as const;
 
@@ -39,7 +41,7 @@ export type MediaStage = (typeof MEDIA_STAGES)[keyof typeof MEDIA_STAGES];
  * MediaAsset represents images and videos for projects
  *
  * Extends FileAsset with media-specific fields for categorization and display.
- * Media assets are organized by project stage (before, after, in-progress, rendering)
+ * Media assets are organized by project stage (before, after, in-progress, renderings)
  * and can be either images or videos.
  *
  * INHERITANCE:
@@ -52,6 +54,7 @@ export type MediaStage = (typeof MEDIA_STAGES)[keyof typeof MEDIA_STAGES];
  * STAGES:
  * Media is categorized by project stage to enable timeline-based galleries
  * (before → in-progress → after → renderings).
+ * Materials and other reference photos belong in assets, not gallery.
  */
 export interface MediaAsset extends FileAsset {
   /**

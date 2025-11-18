@@ -2,10 +2,15 @@ import { FileAsset } from "./FileAsset";
 
 /**
  * Document types for better type safety
+ * 
+ * Documents represent reference materials and supporting assets.
+ * This includes PDFs (contracts, permits), images (floor plans, material samples),
+ * and other file types that support the project but aren't gallery showcase photos.
  */
 export const DOCUMENT_TYPES = {
   RENDERING_3D: "3D Rendering",
   FLOOR_PLAN: "Floor Plan",
+  MATERIALS: "Materials",
   PERMIT: "Permit",
   CONTRACT: "Contract",
   INVOICE: "Invoice",

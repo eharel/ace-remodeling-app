@@ -130,7 +130,7 @@ export interface Project {
    * SHARED RESOURCES - Available to all components
    */
 
-  /** Project-wide documents (contracts, permits) available to all components */
+  /** Project-wide assets available to all components (contracts, permits, shared plans) */
   sharedDocuments?: Document[];
 
   /** Project-wide media not specific to one component (site photos, drone footage) */

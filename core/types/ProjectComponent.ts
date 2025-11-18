@@ -74,7 +74,7 @@ export interface ProjectComponent {
   /** Images and videos for this component (required, can be empty array) */
   media: MediaAsset[];
 
-  /** Component-specific documents (contracts, permits, etc.) */
+  /** Component-specific assets (documents, renderings, materials, plans) */
   documents?: Document[];
 
   /** Component-specific activity logs and updates */
