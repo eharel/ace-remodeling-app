@@ -1,3 +1,5 @@
+import { FileAsset } from "./FileAsset";
+
 /**
  * Document types for better type safety
  */
@@ -13,18 +15,33 @@ export const DOCUMENT_TYPES = {
 export type DocumentType = (typeof DOCUMENT_TYPES)[keyof typeof DOCUMENT_TYPES];
 
 /**
- * Document interface representing project-related files
- * Supports various document types with Firebase Storage integration
+ * Document represents project-related files (contracts, permits, plans, etc.)
+ *
+ * Extends FileAsset with document-specific fields for categorization and display.
+ * Documents are organized by type (Floor Plan, Permit, Contract, etc.) and can
+ * be PDFs, images, or other file formats.
+ *
+ * INHERITANCE:
+ * Inherits common file fields (id, url, storagePath, etc.) from FileAsset.
+ *
+ * DOCUMENT TYPES:
+ * Categorized by purpose (Floor Plan, Permit, Contract, Invoice, etc.) to enable
+ * organized document sections and filtered views.
+ *
+ * FILE FORMATS:
+ * Documents can be any file type (PDF, PNG, JPG, etc.). The fileType field
+ * stores the MIME type for proper handling.
  */
-export interface Document {
-  id: string;
+export interface Document extends FileAsset {
+  /** Display name for the document */
   name: string;
-  type: DocumentType; // Type-safe document type
-  url: string;
-  fileSize?: number;
-  fileType: string; // MIME type (e.g., "application/pdf", "image/jpeg")
-  description?: string;
-  uploadedAt: string; // ISO date string format
-  category?: string; // For compatibility with uploaded Firebase data
-  storagePath?: string; // Firebase Storage path
+
+  /** Type-safe document type category */
+  type: DocumentType;
+
+  /** MIME type (e.g., "application/pdf", "image/jpeg") */
+  fileType: string;
+
+  /** @deprecated For compatibility with uploaded Firebase data */
+  category?: string;
 }

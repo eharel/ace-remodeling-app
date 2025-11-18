@@ -1,6 +1,7 @@
 // Core entity types
 export * from "./Status";
 export * from "./ProjectManager";
+export * from "./FileAsset";
 export * from "./Document";
 export * from "./Log";
 export * from "./MediaAsset";
