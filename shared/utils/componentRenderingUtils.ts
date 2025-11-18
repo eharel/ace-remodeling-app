@@ -37,6 +37,35 @@ export interface ComponentTab {
  * - Core categories appear first in CORE_CATEGORIES order
  * - Custom categories appear after, alphabetically
  *
+ * USAGE EXAMPLE:
+ *
+ * ```typescript
+ * function ProjectDetailScreen({ project }: { project: Project }) {
+ *   const tabs = getComponentTabs(project);
+ *   const [activeTab, setActiveTab] = useState(tabs[0]?.componentId);
+ *
+ *   const activeComponent = project.components.find(c => c.id === activeTab);
+ *
+ *   return (
+ *     <View>
+ *       <Tabs>
+ *         {tabs.map(tab => (
+ *           <Tab
+ *             key={tab.key}
+ *             active={activeTab === tab.componentId}
+ *             onPress={() => setActiveTab(tab.componentId)}
+ *           >
+ *             {tab.label}
+ *           </Tab>
+ *         ))}
+ *       </Tabs>
+ *
+ *       <ComponentContent component={activeComponent} />
+ *     </View>
+ *   );
+ * }
+ * ```
+ *
  * @param project - Project containing components
  * @returns Array of tab configurations
  */

@@ -67,6 +67,35 @@ const STAGE_ORDER: MediaStage[] = [
  * Media has before/after/renderings → Returns: [All, Before, After, Renderings]
  * Media has only after → Returns: [All, After]
  *
+ * USAGE EXAMPLE:
+ *
+ * ```typescript
+ * function ProjectGallery({ component }: { component: ProjectComponent }) {
+ *   const tabs = getGalleryTabs(component.media);
+ *   const [activeStage, setActiveStage] = useState<MediaStage | null>(null);
+ *
+ *   const filteredMedia = filterMediaByStage(component.media, activeStage);
+ *
+ *   return (
+ *     <View>
+ *       <Tabs>
+ *         {tabs.map(tab => (
+ *           <Tab
+ *             key={tab.key}
+ *             active={activeStage === tab.stage}
+ *             onPress={() => setActiveStage(tab.stage)}
+ *           >
+ *             {tab.label}
+ *           </Tab>
+ *         ))}
+ *       </Tabs>
+ *
+ *       <MediaGrid media={filteredMedia} />
+ *     </View>
+ *   );
+ * }
+ * ```
+ *
  * @param media - Array of media assets to scan
  * @returns Array of tab configurations
  */

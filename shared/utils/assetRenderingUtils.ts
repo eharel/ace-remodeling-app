@@ -100,6 +100,32 @@ const TYPE_ORDER: DocumentType[] = [
  *   { label: "Contracts", layout: "list", documents: [...] }
  * ]
  *
+ * USAGE EXAMPLE:
+ *
+ * ```typescript
+ * function ProjectAssets({ component }: { component: ProjectComponent }) {
+ *   const sections = getAssetSections(component.documents);
+ *
+ *   return (
+ *     <View>
+ *       {sections.map(section => (
+ *         <AssetSection
+ *           key={section.key}
+ *           title={section.label}
+ *           layout={section.layout}
+ *         >
+ *           {section.layout === 'grid' ? (
+ *             <ImageGrid documents={section.documents} />
+ *           ) : (
+ *             <DocumentList documents={section.documents} />
+ *           )}
+ *         </AssetSection>
+ *       ))}
+ *     </View>
+ *   );
+ * }
+ * ```
+ *
  * @param documents - Array of documents to organize
  * @returns Array of section configurations
  */
