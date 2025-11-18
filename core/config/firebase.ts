@@ -28,10 +28,21 @@ const DEV_FIREBASE_CONFIG = {
 
 /**
  * Determine which Firebase config to use
- * - In React Native (__DEV__ is defined): Use __DEV__ flag
- * - In Node.js scripts (__DEV__ is undefined): Use NODE_ENV, default to dev
+ * Priority:
+ * 1. EXPO_PUBLIC_FIREBASE_ENV environment variable (if set to "production" or "dev")
+ * 2. In React Native (__DEV__ is defined): Use __DEV__ flag
+ * 3. In Node.js scripts (__DEV__ is undefined): Use NODE_ENV, default to dev
  */
 function getFirebaseConfig() {
+  // Check for explicit environment override (useful for testing production in simulator)
+  const envOverride = process.env.EXPO_PUBLIC_FIREBASE_ENV;
+  if (envOverride === "production") {
+    return PROD_FIREBASE_CONFIG;
+  }
+  if (envOverride === "dev" || envOverride === "development") {
+    return DEV_FIREBASE_CONFIG;
+  }
+
   // React Native context - use __DEV__
   if (typeof __DEV__ !== "undefined") {
     return __DEV__ ? DEV_FIREBASE_CONFIG : PROD_FIREBASE_CONFIG;
@@ -64,6 +75,15 @@ export { db, storage };
 export default app;
 
 function getCurrentEnvironment(): "development" | "production" {
+  // Check for explicit environment override
+  const envOverride = process.env.EXPO_PUBLIC_FIREBASE_ENV;
+  if (envOverride === "production") {
+    return "production";
+  }
+  if (envOverride === "dev" || envOverride === "development") {
+    return "development";
+  }
+
   if (typeof __DEV__ !== "undefined") {
     return __DEV__ ? "development" : "production";
   }
