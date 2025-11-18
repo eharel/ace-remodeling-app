@@ -8,11 +8,12 @@ import { MediaAsset } from "./MediaAsset";
  *
  * Examples: bathroom remodel, kitchen renovation, home theater installation
  *
- * INHERITANCE PATTERN:
+ * FALLBACK PATTERN (Runtime):
  * Components can override project-level fields with more specific values.
- * All display override fields are optional - if not provided, the parent
- * project's values are used as defaults. This enables flexible data entry
- * while maintaining consistent fallback behavior.
+ * All display override fields are optional - if not provided, consuming code
+ * falls back to the parent project's values at runtime (via utility functions
+ * like getComponentDisplayData). This is not TypeScript inheritance - it's a
+ * data merge strategy implemented in runtime logic.
  *
  * CONTENT OWNERSHIP:
  * Each component owns its media, documents, and logs. These are never
@@ -123,4 +124,3 @@ export interface ProjectComponent {
   /** ISO format timestamp of last component update */
   updatedAt: string;
 }
-

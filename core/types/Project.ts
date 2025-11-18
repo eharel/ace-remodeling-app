@@ -1,79 +1,170 @@
-import { ProjectCategory, ProjectSubcategory } from "./Category";
 import { Document } from "./Document";
 import { Log } from "./Log";
-import { Picture } from "./Picture";
+import { MediaAsset } from "./MediaAsset";
+import { ProjectComponent } from "./ProjectComponent";
 import { ProjectManager } from "./ProjectManager";
 import { ProjectStatus } from "./Status";
 
 /**
- * Main project interface representing a complete remodeling project
- * Contains all project data including metadata, media, and tracking information
+ * Project represents a complete remodeling project that contains multiple components
+ *
+ * PROJECT STRUCTURE:
+ * A project is the top-level entity (identified by projectNumber like "187").
+ * It contains one or more components representing different aspects (bathroom, kitchen, etc.).
+ *
+ * FALLBACK PATTERN:
+ * Project-level fields (summary, description, scope, etc.) provide defaults that
+ * components inherit at runtime unless they specify their own values. This is
+ * implemented in utility functions, not through TypeScript inheritance.
+ *
+ * SHARED RESOURCES:
+ * Some resources (testimonials, shared documents/media/logs) are project-wide
+ * and available to all components.
+ *
+ * TIMELINE FLEXIBILITY:
+ * Timeline supports both precise dates (start/end) when available from JobTread,
+ * and display strings (duration) when only rough estimates exist.
  */
 export interface Project {
+  /**
+   * IDENTITY
+   */
+
+  /** Unique project identifier */
   id: string;
-  projectNumber: string; // ACE project tracking number (e.g., "217", "311B")
-  name: string; // Descriptive design-focused name
-  category: ProjectCategory;
-  subcategory?: ProjectSubcategory; // Only used for adu-addition category
-  briefDescription: string;
-  longDescription: string;
-  thumbnail: string;
 
-  // Location (public-facing: zip code + neighborhood only)
-  location: {
-    zipCode: string; // e.g., "78701"
-    neighborhood: string; // e.g., "Downtown Austin"
-  };
+  /** ACE project tracking number (e.g., "187", "311B") */
+  projectNumber: string;
 
-  // Project dates (duration calculated from these)
-  projectDates: {
-    start: string; // ISO date string: "2024-03-01T00:00:00.000Z"
-    end: string; // ISO date string: "2024-05-15T00:00:00.000Z"
-  };
+  /** Project name - descriptive, design-focused */
+  name: string;
 
-  // Scope with design aspects
+  /**
+   * DISPLAY DEFAULTS
+   */
+
+  /** Default short description (inherited by components unless overridden) */
+  summary: string;
+
+  /** Default full description (inherited by components unless overridden) */
+  description: string;
+
+  /** Default work scope (inherited by components unless overridden) */
   scope: string;
 
-  // Client testimonial (optional - will be added as received)
-  testimonial?: {
-    text: string;
-    author: string; // First name or initials
-    date: string; // ISO date string format
+  /** Default project image (inherited by components unless overridden) */
+  thumbnail: string;
+
+  /**
+   * LOCATION
+   */
+
+  /**
+   * Project location. All fields optional - fill what's available.
+   * street not displayed publicly.
+   */
+  location?: {
+    /** Street address (not displayed publicly) */
+    street?: string;
+    /** Zip code for public display */
+    zipCode?: string;
+    /** Neighborhood for public display */
+    neighborhood?: string;
+    /** City name */
+    city?: string;
+    /** State abbreviation or full name */
+    state?: string;
   };
 
-  // PM information - multiple PMs can work on a project
-  pms?: ProjectManager[];
-
-  // Media and documents
-  pictures: Picture[];
-  documents: Document[];
-  logs: Log[];
-
-  // Internal metadata (not shown to public)
-  status: ProjectStatus;
-  createdAt: string; // ISO date string format
-  updatedAt: string; // ISO date string format
-  tags?: string[];
   /**
-   * Whether this project is featured in the Showcase tab.
-   * Featured projects are curated, high-quality projects displayed prominently.
-   * @default false
+   * TIMELINE
    */
-  featured: boolean;
-  // REMOVED: completionDate - use projectDates.end instead
-}
 
-// Simplified version for list views
-export interface ProjectSummary {
-  id: string;
-  projectNumber: string; // ACE project tracking number
-  name: string;
-  category: ProjectCategory;
-  briefDescription: string;
-  thumbnail: string;
+  /**
+   * Project timeline. Supports precise dates (start/end) or display string (duration).
+   * Inherited by components unless overridden.
+   */
+  timeline?: {
+    /** Start date in ISO format */
+    start?: string;
+    /** End date in ISO format */
+    end?: string;
+    /** Duration string for display (e.g., "3 months") */
+    duration?: string;
+  };
+
+  /**
+   * PROJECT TEAM
+   */
+
+  /** Project managers assigned to this project */
+  projectManagers?: ProjectManager[];
+
+  /**
+   * CLIENT FEEDBACK
+   */
+
+  /**
+   * Client testimonial (always project-level, available to all components)
+   */
+  testimonial?: {
+    /** Testimonial text */
+    text: string;
+    /** Author name (first name or initials) */
+    author: string;
+    /** Date in ISO format */
+    date: string;
+  };
+
+  /**
+   * COMPONENTS
+   */
+
+  /**
+   * All aspects/components of this project (bathroom, kitchen, etc.).
+   * Required - every project has at least one component.
+   */
+  components: ProjectComponent[];
+
+  /**
+   * SHARED RESOURCES - Available to all components
+   */
+
+  /** Project-wide documents (contracts, permits) available to all components */
+  sharedDocuments?: Document[];
+
+  /** Project-wide media not specific to one component (site photos, drone footage) */
+  sharedMedia?: MediaAsset[];
+
+  /** Project-wide activity logs and updates */
+  sharedLogs?: Log[];
+
+  /**
+   * METADATA
+   */
+
+  /** Current project status */
   status: ProjectStatus;
-  completedAt?: string;
-  // REMOVED: pmNames - compute from pms array instead of storing
+
+  /**
+   * Project-wide tags (inherited by all components, merged with component tags)
+   */
+  tags?: string[];
+
+  /**
+   * Whether entire project is featured (separate from component.isFeatured)
+   */
+  isFeatured?: boolean;
+
+  /**
+   * TIMESTAMPS
+   */
+
+  /** ISO format timestamp of project creation */
+  createdAt: string;
+
+  /** ISO format timestamp of last project update */
+  updatedAt: string;
 }
 
 /**
@@ -81,21 +172,30 @@ export interface ProjectSummary {
  */
 
 /**
- * Get PM names from a project
+ * Get project manager names from a project
+ *
+ * @param project - The project to extract PM names from
+ * @returns Array of PM names, or empty array if none
  */
 export function getProjectPMNames(project: Project): string[] {
-  return project.pms?.map((pm) => pm.name) || [];
+  return project.projectManagers?.map((pm) => pm.name) || [];
 }
 
 /**
- * Get completion date from project dates
+ * Get project completion date from timeline
+ *
+ * @param project - The project to get completion date from
+ * @returns ISO date string of completion, or undefined if not available
  */
 export function getProjectCompletionDate(project: Project): string | undefined {
-  return project.projectDates?.end;
+  return project.timeline?.end;
 }
 
 /**
  * Check if project is completed
+ *
+ * @param project - The project to check
+ * @returns True if project status is "completed"
  */
 export function isProjectCompleted(project: Project): boolean {
   return project.status === "completed";
