@@ -166,37 +166,3 @@ export interface Project {
   /** ISO format timestamp of last project update */
   updatedAt: string;
 }
-
-/**
- * Utility functions for Project interfaces
- */
-
-/**
- * Get project manager names from a project
- *
- * @param project - The project to extract PM names from
- * @returns Array of PM names, or empty array if none
- */
-export function getProjectPMNames(project: Project): string[] {
-  return project.projectManagers?.map((pm) => pm.name) || [];
-}
-
-/**
- * Get project completion date from timeline
- *
- * @param project - The project to get completion date from
- * @returns ISO date string of completion, or undefined if not available
- */
-export function getProjectCompletionDate(project: Project): string | undefined {
-  return project.timeline?.end;
-}
-
-/**
- * Check if project is completed
- *
- * @param project - The project to check
- * @returns True if project status is "completed"
- */
-export function isProjectCompleted(project: Project): boolean {
-  return project.status === "completed";
-}

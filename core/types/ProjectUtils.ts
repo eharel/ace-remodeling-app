@@ -1,3 +1,9 @@
+import {
+  ComponentCategory,
+  CORE_CATEGORIES,
+  getCategoryLabel,
+  isCoreCategory,
+} from "./ComponentCategory";
 import { Document } from "./Document";
 import { Log } from "./Log";
 import { MediaAsset } from "./MediaAsset";
@@ -5,12 +11,6 @@ import { Project } from "./Project";
 import { ProjectComponent } from "./ProjectComponent";
 import { ProjectManager } from "./ProjectManager";
 import { ProjectStatus } from "./Status";
-import {
-  ComponentCategory,
-  CORE_CATEGORIES,
-  getCategoryLabel,
-  isCoreCategory,
-} from "./ComponentCategory";
 
 /**
  * Fully-resolved component display data with all fallbacks applied
@@ -135,11 +135,11 @@ export interface ComponentDisplayData {
   isMultiComponent: boolean;
 
   /** Other components in the same project (for navigation) */
-  siblingComponents: Array<{
+  siblingComponents: {
     id: string;
     category: ComponentCategory;
     name: string;
-  }>;
+  }[];
 }
 
 /**
@@ -235,7 +235,7 @@ export function getComponentDisplayData(
 export function getComponentsByCategory(
   projects: Project[],
   category: ComponentCategory
-): Array<{ project: Project; component: ProjectComponent }> {
+): { project: Project; component: ProjectComponent }[] {
   return projects.flatMap((project) =>
     project.components
       .filter((component) => component.category === category)
@@ -276,8 +276,10 @@ export function getAllUsedCategories(projects: Project[]): ComponentCategory[] {
 
     // Within core categories, maintain CORE_CATEGORIES order
     if (aIsCore && bIsCore) {
-      return coreValues.indexOf(a as (typeof coreValues)[number]) -
-        coreValues.indexOf(b as (typeof coreValues)[number]);
+      return (
+        coreValues.indexOf(a as (typeof coreValues)[number]) -
+        coreValues.indexOf(b as (typeof coreValues)[number])
+      );
     }
 
     // Custom categories alphabetically
@@ -301,9 +303,7 @@ export function isMultiComponentProject(project: Project): boolean {
  * @param project - The project to get completion date from
  * @returns ISO date string of completion, or undefined if not available
  */
-export function getProjectCompletionDate(
-  project: Project
-): string | undefined {
+export function getProjectCompletionDate(project: Project): string | undefined {
   return project.timeline?.end;
 }
 
@@ -381,4 +381,3 @@ export function getDisplayDuration(timeline?: {
   // Otherwise return the manual duration string if available
   return timeline.duration;
 }
-
