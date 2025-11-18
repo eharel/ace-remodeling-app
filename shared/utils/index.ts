@@ -3,6 +3,7 @@
  * Exports all shared utility functions
  */
 
+export * from "./assetRenderingUtils";
 export * from "./categoryUtils";
 export * from "./componentRenderingUtils";
 export * from "./dateUtils";
