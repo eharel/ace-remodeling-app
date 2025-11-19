@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import {
   ImageGalleryModal,
@@ -12,6 +13,7 @@ import {
 } from "@/features/gallery";
 import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme, getProjectMedia } from "@/shared/contexts";
+import { ComponentSelector } from "@/features/projects";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/core/themes";
@@ -64,6 +66,46 @@ export default function ProjectDetailScreen() {
       // const foundProject = mockProjects.find((p) => p.id === id);
     }
   }, [id, projects]);
+
+  // OPTIMIZATION 1: Preload all component images when project loads
+  useEffect(() => {
+    if (!project) return;
+
+    const preloadImages = async () => {
+      try {
+        // Preload hero images from all components
+        const allHeroImages = project.components
+          .map((c) => {
+            const thumbnail = getProjectThumbnail(project, c);
+            return thumbnail || c.media?.[0]?.url;
+          })
+          .filter(Boolean) as string[];
+
+        // Preload hero images
+        await Promise.all(
+          allHeroImages.map((url) => Image.prefetch(url))
+        );
+
+        // Preload first 6 thumbnails from each component
+        const allThumbnails = project.components.flatMap((c) =>
+          (c.media || [])
+            .slice(0, 6)
+            .map((m) => m.url)
+            .filter(Boolean)
+        ) as string[];
+
+        // Preload thumbnails
+        await Promise.all(
+          allThumbnails.map((url) => Image.prefetch(url))
+        );
+      } catch (error) {
+        // Silently fail - preloading is best effort
+        console.warn("Image preloading failed:", error);
+      }
+    };
+
+    preloadImages();
+  }, [project]);
 
   /**
    * Get display label for a component
@@ -120,6 +162,33 @@ export default function ProjectDetailScreen() {
     const componentDocuments = currentComponent?.documents || [];
     const sharedDocuments = project.sharedDocuments || [];
     return [...componentDocuments, ...sharedDocuments];
+  }, [project, currentComponent]);
+
+  /**
+   * Display description - component description with fallback to project description
+   * Uses nullish coalescing (??) to properly handle empty strings
+   */
+  const displayDescription = useMemo(() => {
+    if (!project) return "";
+    // Use component description if it exists, otherwise fall back to project description
+    return currentComponent?.description ?? project.description ?? "";
+  }, [currentComponent, project]);
+
+  /**
+   * Display timeline/duration - component timeline with fallback to project timeline
+   */
+  const displayTimeline = useMemo(() => {
+    if (!project) return null;
+    // Use component timeline if available, otherwise use project timeline
+    return currentComponent?.timeline || project.timeline || null;
+  }, [project, currentComponent]);
+
+  /**
+   * Hero image URL - component-specific thumbnail with fallback
+   */
+  const heroImageUrl = useMemo(() => {
+    if (!project) return "";
+    return getProjectThumbnail(project, currentComponent || undefined);
   }, [project, currentComponent]);
 
   // Legacy: Keep aggregatedPictures for backward compatibility during transition
@@ -187,24 +256,38 @@ export default function ProjectDetailScreen() {
     );
   }, [aggregatedPictures, activePhotoTab]);
 
-  // Debug logging for component selection (Stage 1 testing)
+  // Debug logging for component selection - verify state updates
   useEffect(() => {
-    if (project && currentComponent) {
-      console.log("🔍 Component Selection Debug:");
-      console.log(`  selectedComponentId: ${selectedComponentId}`);
-      console.log(`  currentComponent:`, {
-        id: currentComponent.id,
-        category: currentComponent.category,
-        subcategory: currentComponent.subcategory,
-        name: currentComponent.name,
-      });
-      console.log(`  currentMedia.length: ${currentMedia.length}`);
-      console.log(`  currentDocuments.length: ${currentDocuments.length}`);
-      console.log(
-        `  componentLabel: "${getComponentLabel(currentComponent)}"`
-      );
-    }
-  }, [project, currentComponent, selectedComponentId, currentMedia, currentDocuments]);
+    if (!project) return; // Don't log if project not loaded yet
+    
+    const heroUrl = currentComponent
+      ? getProjectThumbnail(project, currentComponent)
+      : getProjectThumbnail(project);
+    
+    console.log("🔴 STATE CHANGED:", {
+      selectedComponentId,
+      componentCategory: currentComponent?.category,
+      componentName: currentComponent?.name,
+      mediaCount: currentMedia?.length,
+      firstMediaUrl: currentMedia?.[0]?.url?.substring(0, 50),
+      description: displayDescription?.substring(0, 50),
+      heroImageUrl: heroUrl?.substring(0, 50),
+    });
+  }, [selectedComponentId, currentComponent, currentMedia, displayDescription, project]);
+
+  // Debug logging specifically for description changes
+  useEffect(() => {
+    if (!project) return;
+    
+    console.log("📝 DESCRIPTION CHECK:", {
+      componentId: selectedComponentId,
+      componentDesc: currentComponent?.description?.substring(0, 100),
+      projectDesc: project?.description?.substring(0, 100),
+      displayDesc: displayDescription?.substring(0, 100),
+      hasComponentDesc: !!currentComponent?.description,
+      hasProjectDesc: !!project?.description,
+    });
+  }, [selectedComponentId, currentComponent, displayDescription, project]);
 
   const closeGallery = () => {
     setGalleryVisible(false);
@@ -346,6 +429,13 @@ export default function ProjectDetailScreen() {
         projectName: {
           ...commonStyles.text.pageTitle,
           marginBottom: DesignTokens.spacing[2],
+        },
+        componentName: {
+          fontSize: DesignTokens.typography.fontSize.lg,
+          fontWeight: DesignTokens.typography.fontWeight.semibold,
+          fontFamily: DesignTokens.typography.fontFamily.semibold,
+          marginBottom: DesignTokens.spacing[2],
+          opacity: 0.9,
         },
         projectDescription: {
           ...commonStyles.text.description,
@@ -724,6 +814,7 @@ export default function ProjectDetailScreen() {
     );
   }
 
+  // OPTIMIZATION 3: Gallery image renderer with optimized image props
   const renderGridImage = (
     item: any,
     index: number,
@@ -745,6 +836,10 @@ export default function ProjectDetailScreen() {
             source={{ uri: item.url }}
             style={styles.gridImage}
             contentFit="cover"
+            transition={150}
+            cachePolicy="memory-disk"
+            priority="normal"
+            recyclingKey={item.url}
           />
           {isMoreCell && (
             <ThemedView style={styles.moreImagesOverlay}>
@@ -830,24 +925,59 @@ export default function ProjectDetailScreen() {
           style={styles.scrollView}
           contentContainerStyle={{ paddingBottom: DesignTokens.spacing[20] }}
         >
-          {/* Hero Image */}
-          <Image
-            source={{ uri: getProjectThumbnail(project) }}
-            style={styles.heroImage}
-            contentFit="cover"
-          />
+          {/* Hero Image - OPTIMIZED with caching and transitions */}
+          {heroImageUrl ? (
+            <Animated.View
+              key={`hero-container-${selectedComponentId || 'default'}`}
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(200)}
+            >
+              <Image
+                key={`hero-${selectedComponentId || 'default'}`}
+                source={{ uri: heroImageUrl }}
+                style={styles.heroImage}
+                contentFit="cover"
+                transition={200}
+                cachePolicy="memory-disk"
+                priority="high"
+                recyclingKey={heroImageUrl}
+              />
+            </Animated.View>
+          ) : null}
+
+          {/* Component Selector - only show if multiple components */}
+          {project.components.length > 1 && (
+            <ComponentSelector
+              components={project.components}
+              selectedComponentId={selectedComponentId}
+              onSelectComponent={setSelectedComponentId}
+              getComponentLabel={getComponentLabel}
+            />
+          )}
 
           {/* Project Header */}
           <ThemedView style={styles.header}>
             <ThemedView style={styles.headerContent}>
               <ThemedText style={styles.projectName}>{project.name}</ThemedText>
+              {/* Component Name - show if exists and multiple components */}
+              {project.components.length > 1 && currentComponent?.name && (
+                <ThemedText
+                  style={[
+                    styles.componentName,
+                    { color: theme.colors.text.primary },
+                  ]}
+                >
+                  {currentComponent.name}
+                </ThemedText>
+              )}
               <ThemedText
+                key={`description-${selectedComponentId || 'default'}`}
                 style={[
                   styles.projectDescription,
                   { color: theme.colors.text.secondary },
                 ]}
               >
-                {project.description}
+                {displayDescription}
               </ThemedText>
             </ThemedView>
 
@@ -896,11 +1026,8 @@ export default function ProjectDetailScreen() {
                   Category
                 </ThemedText>
                 <ThemedText style={styles.metaValue}>
-                  {project.components[0]?.category
-                    ? project.components[0].category
-                        .charAt(0)
-                        .toUpperCase() +
-                      project.components[0].category.slice(1)
+                  {currentComponent
+                    ? getCategoryLabel(currentComponent.category)
                     : "Miscellaneous"}
                 </ThemedText>
               </ThemedView>
@@ -928,7 +1055,9 @@ export default function ProjectDetailScreen() {
                   Duration
                 </ThemedText>
                 <ThemedText style={styles.metaValue}>
-                  {getProjectDuration(project)}
+                  {displayTimeline
+                    ? getProjectDuration({ timeline: displayTimeline })
+                    : getProjectDuration(project)}
                 </ThemedText>
               </ThemedView>
             </ThemedView>
@@ -942,7 +1071,7 @@ export default function ProjectDetailScreen() {
                 { color: theme.colors.text.primary },
               ]}
             >
-              Project Photos ({aggregatedPictures.length})
+              Project Photos ({currentMedia.length})
             </ThemedText>
             <ThemedText
               style={[

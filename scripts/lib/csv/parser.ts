@@ -30,8 +30,9 @@ interface CSVRow {
   componentName?: string;
   isFeatured?: string;
   projectManagers?: string;
-  summary: string;
-  description: string;
+  // Component-level descriptions (optional - each component can have its own)
+  summary?: string;
+  description?: string;
   "location.zipCode"?: string;
   "location.neighborhood"?: string;
   "timeline.duration"?: string;
@@ -252,19 +253,8 @@ function checkProjectFieldConsistency(
     );
   }
 
-  // Check summary consistency
-  const summaries = new Set(rows.map((r) => r.summary?.trim()).filter(Boolean));
-  if (summaries.size > 1) {
-    warnings.push(`Inconsistent "summary" field across rows`);
-  }
-
-  // Check description consistency
-  const descriptions = new Set(
-    rows.map((r) => r.description?.trim()).filter(Boolean)
-  );
-  if (descriptions.size > 1) {
-    warnings.push(`Inconsistent "description" field across rows`);
-  }
+  // Note: summary and description are component-level fields, so they can differ per row
+  // We don't check consistency for these fields since each component can have its own
 
   // Check status consistency (normalize before comparing)
   const statuses = new Set(
@@ -352,6 +342,8 @@ function convertRowsToProject(projectNumber: string, rows: CSVRow[]): Project {
 
       // Display overrides (optional - will fall back to project values)
       ...(row.componentName?.trim() && { name: row.componentName.trim() }),
+      ...(row.summary?.trim() && { summary: row.summary.trim() }),
+      ...(row.description?.trim() && { description: row.description.trim() }),
 
       // Content (required, can be empty)
       media: [],

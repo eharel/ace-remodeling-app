@@ -3,3 +3,4 @@
 
 export { ProjectCard } from "./components/ProjectCard";
 export { ProjectGallery } from "./components/ProjectGallery";
+export { ComponentSelector } from "./components/ComponentSelector";

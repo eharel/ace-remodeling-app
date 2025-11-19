@@ -153,12 +153,36 @@ export interface ComponentDisplayData {
  * @returns Thumbnail URL or empty string if no image found
  */
 export function getProjectThumbnail(
-  project: Project,
-  component?: ProjectComponent
+  project: Project | null | undefined,
+  component?: ProjectComponent | null
 ): string {
+  // Early return if project is null/undefined
+  if (!project) {
+    return "";
+  }
+
   // Check component thumbnail first
   if (component?.thumbnail) {
     return component.thumbnail;
+  }
+
+  // If component is specified, prioritize its media
+  if (component) {
+    // Find first "after" image from this component
+    const componentAfterImage = component.media.find(
+      (media) => media.stage === "after" && media.mediaType === "image"
+    );
+    if (componentAfterImage?.url) {
+      return componentAfterImage.url;
+    }
+
+    // Find any image from this component
+    const componentAnyImage = component.media.find(
+      (media) => media.mediaType === "image"
+    );
+    if (componentAnyImage?.url) {
+      return componentAnyImage.url;
+    }
   }
 
   // Check project thumbnail
@@ -166,21 +190,23 @@ export function getProjectThumbnail(
     return project.thumbnail;
   }
 
-  // Fallback: Find first "after" image from any component
-  for (const comp of project.components) {
-    const afterImage = comp.media.find(
-      (media) => media.stage === "after" && media.mediaType === "image"
-    );
-    if (afterImage?.url) {
-      return afterImage.url;
+  // Fallback: Find first "after" image from any component (only if no component specified)
+  if (!component) {
+    for (const comp of project.components) {
+      const afterImage = comp.media.find(
+        (media) => media.stage === "after" && media.mediaType === "image"
+      );
+      if (afterImage?.url) {
+        return afterImage.url;
+      }
     }
-  }
 
-  // Fallback: Find any image from any component
-  for (const comp of project.components) {
-    const anyImage = comp.media.find((media) => media.mediaType === "image");
-    if (anyImage?.url) {
-      return anyImage.url;
+    // Fallback: Find any image from any component
+    for (const comp of project.components) {
+      const anyImage = comp.media.find((media) => media.mediaType === "image");
+      if (anyImage?.url) {
+        return anyImage.url;
+      }
     }
   }
 
