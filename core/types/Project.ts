@@ -9,7 +9,7 @@ import { ProjectStatus } from "./Status";
  * Project represents a complete remodeling project that contains multiple components
  *
  * PROJECT STRUCTURE:
- * A project is the top-level entity (identified by projectNumber like "187").
+ * A project is the top-level entity (identified by number like "187").
  * It contains one or more components representing different aspects (bathroom, kitchen, etc.).
  *
  * FALLBACK PATTERN:
@@ -34,7 +34,7 @@ export interface Project {
   id: string;
 
   /** ACE project tracking number (e.g., "187", "311B") */
-  projectNumber: string;
+  number: string;
 
   /** Project name - descriptive, design-focused */
   name: string;

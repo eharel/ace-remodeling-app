@@ -33,7 +33,7 @@ export interface ComponentDisplayData {
   projectId: string;
 
   /** Parent project number (e.g., '187') */
-  projectNumber: string;
+  number: string;
 
   /** Component ID (e.g., '187-bathroom') */
   componentId: string;
@@ -170,7 +170,7 @@ export function getComponentDisplayData(
   return {
     // Identity
     projectId: project.id,
-    projectNumber: project.projectNumber,
+    number: project.number,
     componentId: component.id,
     category: component.category,
 
