@@ -8,13 +8,20 @@
  * @module scripts/lib/csv/parser
  */
 
-import * as Papa from "papaparse";
 import * as fs from "fs/promises";
+import * as Papa from "papaparse";
+import {
+  ComponentCategory,
+  ComponentSubcategory,
+} from "../../../core/types/ComponentCategory";
 import { Project } from "../../../core/types/Project";
 import { ProjectComponent } from "../../../core/types/ProjectComponent";
-import { ProjectStatus, PROJECT_STATUSES, isValidProjectStatus } from "../../../core/types/Status";
-import { ComponentCategory, ComponentSubcategory } from "../../../core/types/ComponentCategory";
 import { ProjectManager } from "../../../core/types/ProjectManager";
+import {
+  PROJECT_STATUSES,
+  ProjectStatus,
+  isValidProjectStatus,
+} from "../../../core/types/Status";
 
 /**
  * Raw CSV row structure (matches CSV columns exactly)
@@ -141,7 +148,9 @@ function validateRow(row: CSVRow, rowNumber: number): ValidationResult {
     errors.push(`Missing required field "status"`);
   } else if (!isValidProjectStatus(row.status.trim())) {
     errors.push(
-      `Invalid status "${row.status}". Must be one of: ${Object.values(PROJECT_STATUSES).join(", ")}`
+      `Invalid status "${row.status}". Must be one of: ${Object.values(
+        PROJECT_STATUSES
+      ).join(", ")}`
     );
   }
 
@@ -159,7 +168,9 @@ function validateRow(row: CSVRow, rowNumber: number): ValidationResult {
   const categoryLower = row.category?.toLowerCase().trim();
   if (categoryLower === "outdoor-living" || categoryLower === "outdoor") {
     if (!row.subcategory || row.subcategory.trim() === "") {
-      warnings.push(`Outdoor project missing "subcategory" (pool, deck, patio, etc.)`);
+      warnings.push(
+        `Outdoor project missing "subcategory" (pool, deck, patio, etc.)`
+      );
     }
   }
 
@@ -238,7 +249,9 @@ function checkProjectFieldConsistency(
   const statuses = new Set(rows.map((r) => r.status?.trim()).filter(Boolean));
   if (statuses.size > 1) {
     warnings.push(
-      `Inconsistent "status" field across rows: ${Array.from(statuses).join(", ")}`
+      `Inconsistent "status" field across rows: ${Array.from(statuses).join(
+        ", "
+      )}`
     );
   }
 
@@ -502,7 +515,9 @@ export async function parseProjectsCSV(csvPath: string): Promise<ParseResult> {
 
     // Convert to Project objects
     console.log(`🔨 Converting to Project objects...`);
-    for (const [projectNumber, projectRows] of Array.from(projectGroups.entries())) {
+    for (const [projectNumber, projectRows] of Array.from(
+      projectGroups.entries()
+    )) {
       // Check consistency
       const consistencyWarnings = checkProjectFieldConsistency(
         projectRows,
@@ -524,7 +539,11 @@ export async function parseProjectsCSV(csvPath: string): Promise<ParseResult> {
           .map((c) => c.category)
           .join(", ");
         console.log(
-          `   ✓ Project ${projectNumber}: ${project.components.length} component${project.components.length !== 1 ? "s" : ""} (${componentCategories})`
+          `   ✓ Project ${projectNumber}: ${
+            project.components.length
+          } component${
+            project.components.length !== 1 ? "s" : ""
+          } (${componentCategories})`
         );
       } catch (error) {
         const errorMessage =
@@ -593,8 +612,7 @@ export async function parseProjectsCSV(csvPath: string): Promise<ParseResult> {
       },
     };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
 
     // Handle file not found
     if (errorMessage.includes("ENOENT") || errorMessage.includes("not found")) {
@@ -636,10 +654,14 @@ if (require.main === module) {
   parseProjectsCSV(csvPath)
     .then((result) => {
       if (result.success) {
-        console.log(`\n✅ Successfully parsed ${result.projects.length} projects`);
+        console.log(
+          `\n✅ Successfully parsed ${result.projects.length} projects`
+        );
         process.exit(0);
       } else {
-        console.error(`\n❌ Parsing failed with ${result.errors.length} errors`);
+        console.error(
+          `\n❌ Parsing failed with ${result.errors.length} errors`
+        );
         process.exit(1);
       }
     })
@@ -648,4 +670,3 @@ if (require.main === module) {
       process.exit(1);
     });
 }
-
