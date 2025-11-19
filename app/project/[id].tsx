@@ -33,7 +33,7 @@ import {
 } from "@/shared/utils";
 
 export default function ProjectDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, componentId } = useLocalSearchParams<{ id: string; componentId?: string }>();
   const { projects } = useProjects();
   const [project, setProject] = useState<Project | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
@@ -57,15 +57,41 @@ export default function ProjectDetailScreen() {
       const foundProject = projects.find((p) => p.id === id);
       setProject(foundProject || null);
 
-      // Set default selected component to first component when project loads
+      // Set selected component: use componentId param if provided, otherwise default to first
       if (foundProject && foundProject.components.length > 0) {
-        setSelectedComponentId(foundProject.components[0].id);
+        // If componentId param is provided and exists in project, use it
+        if (componentId) {
+          const matchingComponent = foundProject.components.find(
+            (c) => c.id === componentId
+          );
+          if (matchingComponent) {
+            setSelectedComponentId(componentId);
+          } else {
+            // componentId doesn't match, fall back to first component
+            setSelectedComponentId(foundProject.components[0].id);
+          }
+        } else {
+          // No componentId param, use first component
+          setSelectedComponentId(foundProject.components[0].id);
+        }
       }
 
       // Fallback to mock data if needed (commented out for now)
       // const foundProject = mockProjects.find((p) => p.id === id);
     }
-  }, [id, projects]);
+  }, [id, componentId, projects]);
+
+  // Update selectedComponentId when componentId param changes
+  useEffect(() => {
+    if (componentId && project && componentId !== selectedComponentId) {
+      const matchingComponent = project.components.find(
+        (c) => c.id === componentId
+      );
+      if (matchingComponent) {
+        setSelectedComponentId(componentId);
+      }
+    }
+  }, [componentId, project, selectedComponentId]);
 
   // OPTIMIZATION 1: Preload all component images when project loads
   useEffect(() => {
@@ -108,24 +134,19 @@ export default function ProjectDetailScreen() {
   }, [project]);
 
   /**
-   * Get display label for a component
-   * Uses componentName if present, otherwise formats category + subcategory
+   * Get display label for a component pill
+   * For pills, ALWAYS use category/subcategory (consistent labels)
+   * componentName is for display below project name, not for pills
    */
   const getComponentLabel = (component: ProjectComponent): string => {
-    // If has custom name, use it
-    if (component.name) {
-      return component.name;
-    }
-
-    // Otherwise format category + subcategory
-    const categoryLabel = getCategoryLabel(component.category);
-
+    // If has subcategory, use it (e.g., "Pool" instead of "Outdoor")
     if (component.subcategory) {
       const subcategoryLabel = getSubcategoryLabel(component.subcategory);
-      // For "outdoor/pool" just show "Pool" (subcategory is more specific)
       return subcategoryLabel;
     }
 
+    // Otherwise use category label
+    const categoryLabel = getCategoryLabel(component.category);
     return categoryLabel;
   };
 
@@ -958,9 +979,8 @@ export default function ProjectDetailScreen() {
           {/* Project Header */}
           <ThemedView style={styles.header}>
             <ThemedView style={styles.headerContent}>
-              <ThemedText style={styles.projectName}>{project.name}</ThemedText>
-              {/* Component Name - show if exists and multiple components */}
-              {project.components.length > 1 && currentComponent?.name && (
+              {/* Component Name - show if exists (project name is in header) */}
+              {currentComponent?.name && (
                 <ThemedText
                   style={[
                     styles.componentName,

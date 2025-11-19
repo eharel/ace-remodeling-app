@@ -57,8 +57,30 @@ export default function CategoryScreen() {
 
   const categoryDisplayName = getCategoryDisplayName(validCategory);
 
-  const handleProjectPress = (project: any) => {
-    router.push(`/project/${project.id}`);
+  const handleProjectPress = (projectSummary: any) => {
+    // Find the full project object to get component information
+    const fullProject = projects.find((p) => p.id === projectSummary.id);
+    
+    if (fullProject) {
+      // Find the component that matches the current category
+      const matchingComponent = fullProject.components.find(
+        (c) => c.category === validCategory
+      );
+      
+      if (matchingComponent) {
+        // Navigate with componentId param to open directly to that component
+        router.push({
+          pathname: `/project/${fullProject.id}`,
+          params: { componentId: matchingComponent.id },
+        });
+      } else {
+        // Fallback: no matching component found, just navigate to project
+        router.push(`/project/${fullProject.id}`);
+      }
+    } else {
+      // Fallback: project not found in full list, use summary ID
+      router.push(`/project/${projectSummary.id}`);
+    }
   };
 
   const handleCategoryChange = (newCategory: ComponentCategory) => {

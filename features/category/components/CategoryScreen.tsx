@@ -40,12 +40,35 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
     // REMOVED: pmNames - computed field no longer stored
   }));
 
-  const handleProjectPress = (project: ProjectSummary) => {
+  const handleProjectPress = (projectSummary: ProjectSummary) => {
     try {
-      if (!project?.id) {
+      if (!projectSummary?.id) {
         throw new Error("Invalid project data");
       }
-      router.push(`/project/${project.id}`);
+      
+      // Find the full project object to get component information
+      const fullProject = projects.find((p) => p.id === projectSummary.id);
+      
+      if (fullProject) {
+        // Find the component that matches the current category
+        const matchingComponent = fullProject.components.find(
+          (c) => c.category === category
+        );
+        
+        if (matchingComponent) {
+          // Navigate with componentId param to open directly to that component
+          router.push({
+            pathname: `/project/${fullProject.id}`,
+            params: { componentId: matchingComponent.id },
+          });
+        } else {
+          // Fallback: no matching component found, just navigate to project
+          router.push(`/project/${fullProject.id}`);
+        }
+      } else {
+        // Fallback: project not found, use summary ID
+        router.push(`/project/${projectSummary.id}`);
+      }
     } catch (error) {
       console.error("Navigation error:", error);
       // In a real app, you might show a toast or alert here
