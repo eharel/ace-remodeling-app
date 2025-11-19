@@ -1,326 +1,302 @@
-# Database Seeding Scripts
+# Project Upload System
 
-This directory contains scripts for managing the Firestore database during development.
+Complete upload pipeline for ACE Remodeling projects from CSV to Firebase.
 
 ## Overview
 
-The seeding system allows you to quickly populate your Firestore database with sample project data. This is useful for:
+The upload system provides an end-to-end solution for uploading projects to Firebase:
 
-- **Development**: Test features with realistic data
-- **Testing**: Ensure consistent test data across environments
-- **Demos**: Showcase the app with professional-looking projects
-- **Onboarding**: Help new developers get started quickly
+1. **Parse CSV** → Read project metadata from `projects.csv`
+2. **Scan Filesystem** → Discover all photos, videos, and assets
+3. **Upload to Storage** → Upload files to Firebase Storage
+4. **Create Firestore Docs** → Build and write Project documents
 
 ## Quick Start
 
 ### Prerequisites
 
-1. Ensure Firebase is configured in `config/firebase.ts`
-2. Install dependencies: `npm install`
+1. **CSV File**: `projects.csv` in assets folder
+2. **Project Folders**: Organized in `ace-remodeling-assets/`
+3. **Firebase Config**: Configured in `core/config/firebase.ts`
+4. **Dependencies**: `npm install`
 
-### Running the Seed Script
-
-```bash
-npm run seed
-```
-
-This command will:
-
-1. ⚠️ **DELETE all existing projects** in the database
-2. Add fresh seed data from `data/seedData.ts`
-3. Display a detailed summary of the operation
-
-### Expected Output
-
-```
-🌱 Starting Firebase Database Seeding
-=====================================
-
-⏰ Started at: 10/14/2025, 2:30:45 PM
-📊 Projects to seed: 4
-
-🗑️  Clearing existing projects...
-✅ Deleted 4 existing project(s)
-
-📦 Adding 4 seed projects...
-   ✓ Added: "Luxury Master Bathroom Remodel" (bathroom) - ID: abc123
-   ✓ Added: "Modern Guest Bathroom Update" (bathroom) - ID: def456
-   ✓ Added: "Open Concept Kitchen Transformation" (kitchen) - ID: ghi789
-   ✓ Added: "Farmhouse Kitchen Refresh" (kitchen) - ID: jkl012
-
-=====================================
-📊 Seeding Summary
-=====================================
-✅ Projects deleted: 4
-✅ Projects added: 4
-❌ Errors: 0
-⏱️  Duration: 1234ms
-
-🎉 Database seeding completed successfully!
-```
-
-## Adding New Projects
-
-### Step 1: Edit Seed Data
-
-Open `data/seedData.ts` and add a new project to the `seedProjects` array:
-
-```typescript
-{
-  name: "Your Project Name",
-  category: "bathroom", // or "kitchen", "outdoor", etc.
-  briefDescription: "Short one-line description",
-  longDescription: "Detailed multi-paragraph description...",
-  thumbnail: "https://images.unsplash.com/photo-xxxxx?w=800&h=600&fit=crop",
-
-  // PM information
-  pms: [{ name: "Project Manager Name" }],
-
-  // Empty arrays for media (can be populated later)
-  pictures: [],
-  documents: [],
-  logs: [],
-
-  // Location and client details
-  location: "Austin, TX - Neighborhood",
-  clientInfo: {
-    name: "Client Name",
-    address: "123 Street Name, Austin, TX 78701",
-    phone: "(512) 555-0123",
-    email: "client@email.com",
-  },
-
-  // Project timeline (ISO date strings)
-  projectDates: {
-    startDate: "2024-01-15T09:00:00.000Z",
-    completionDate: "2024-03-10T17:00:00.000Z",
-    estimatedCompletion: "2024-03-15T17:00:00.000Z",
-  },
-
-  status: "completed", // or "in-progress", "planning", "on-hold"
-
-  // Metadata (ISO date strings)
-  createdAt: "2024-01-10T14:30:00.000Z",
-  updatedAt: "2024-03-10T17:00:00.000Z",
-
-  // Additional details
-  tags: ["tag1", "tag2", "tag3"],
-  estimatedCost: 50000,
-  actualCost: 48500,
-}
-```
-
-### Step 2: Run the Seed Script
+### Basic Usage
 
 ```bash
-npm run seed
+# Dry run first (always recommended!)
+npm run upload -- --dry-run
+
+# Upload all projects
+npm run upload
+
+# Upload specific projects
+npm run upload -- --projects 187,148,145
+
+# Clear existing Firestore data first
+npm run upload -- --clear
+
+# Skip files already in Storage
+npm run upload -- --skip-existing
 ```
 
-### Tips for Good Seed Data
-
-- **Use real Unsplash URLs** for thumbnails (search unsplash.com for relevant images)
-- **Write realistic descriptions** that showcase actual renovation work
-- **Include variety** in project types, sizes, and costs
-- **Use ISO date strings** for all dates (format: `YYYY-MM-DDTHH:MM:SS.000Z`)
-- **Add relevant tags** to help with filtering and search
-- **Include complete client info** for testing contact features
-- **Vary the PMs** to test multi-PM scenarios
-
-### Finding Good Images
-
-1. Go to [Unsplash](https://unsplash.com)
-2. Search for relevant terms: "modern bathroom", "kitchen remodel", etc.
-3. Right-click on an image → Copy Image Address
-4. Append `?w=800&h=600&fit=crop` to the URL for consistent sizing
-
-Example: `https://images.unsplash.com/photo-1234567890?w=800&h=600&fit=crop`
-
-## File Structure
+## Architecture
 
 ```
 scripts/
-├── README.md           # This file
-└── seedFirebase.ts     # Main seeding script
-
-data/
-└── seedData.ts         # Seed project data
+├── uploadProjects.ts        # Main orchestrator script
+├── lib/                     # Core modules
+│   ├── csv/                # CSV parsing
+│   │   └── parser.ts
+│   ├── filesystem/         # File discovery
+│   │   ├── scanner.ts
+│   │   └── types.ts
+│   ├── firebase/           # Firebase operations
+│   │   ├── storage.ts      # Storage uploader
+│   │   ├── firestore.ts    # Firestore operations
+│   │   ├── dataBuilder.ts  # Data merging
+│   │   └── client.ts       # Firebase client
+│   └── utils/              # Utilities
+│       ├── fileUtils.ts
+│       └── progressTracker.ts
+└── utilities/               # Standalone utilities
+    ├── extractProjectList.ts
+    └── addFeaturedField.ts
 ```
 
-## Script Architecture
+## Workflow
 
-### `seedFirebase.ts`
+### Step 1: Prepare CSV
 
-The main seeding script with the following functions:
+Create `projects.csv` with project metadata:
 
-- **`validateProject()`** - Validates project data structure before insertion
-- **`clearProjects()`** - Deletes all existing projects from Firestore
-- **`addSeedProjects()`** - Adds seed projects to Firestore
-- **`main()`** - Orchestrates the seeding process
+```csv
+number,name,category,subcategory,componentName,isFeatured,projectManagers,summary,description,location.zipCode,location.neighborhood,timeline.duration,status,tags
+187,Bold Beauty,bathroom,,Spa Master Bath,true,"Mike Johnson;Sarah Chen","Luxury home...","Full description...",78701,"Austin, TX","3 months",completed,"luxury;spa;modern"
+187,Bold Beauty,theater-room,,Home Theater,false,"Mike Johnson","Luxury home...","Full description...",78701,"Austin, TX","3 months",completed,"luxury;theater"
+```
 
-### `seedData.ts`
+### Step 2: Organize Files
 
-Contains the `seedProjects` array with sample project data. Each project:
+Structure your assets folder:
 
-- Matches the `Project` interface (minus the auto-generated `id`)
-- Includes all required fields
-- Uses TypeScript for type safety
-- Is well-documented with inline comments
+```
+ace-remodeling-assets/
+├── projects.csv
+├── 187/
+│   ├── bathroom/
+│   │   ├── photos/
+│   │   │   ├── before/
+│   │   │   │   ├── photo1.jpg
+│   │   │   │   └── photo2.jpg
+│   │   │   └── after/
+│   │   │       ├── photo1.jpg
+│   │   │       └── photo2.jpg
+│   │   └── assets/
+│   │       └── plans/
+│   │           └── floor-plan.pdf
+│   └── theater-room/
+│       └── photos/
+│           └── after/
+│               └── theater.jpg
+```
+
+### Step 3: Run Upload
+
+```bash
+# Preview what will happen
+npm run upload -- --dry-run
+
+# Actually upload
+npm run upload
+```
+
+## CLI Options
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Preview without uploading |
+| `--projects 187,148` | Upload specific projects only |
+| `--clear` | Clear existing Firestore data first |
+| `--skip-existing` | Skip files already in Storage |
+| `--verbose` | Detailed error output |
+
+## Examples
+
+### Upload Single Project
+
+```bash
+npm run upload -- --projects 187 --dry-run
+```
+
+### Full Upload with Options
+
+```bash
+npm run upload -- --clear --skip-existing
+```
+
+### Development vs Production
+
+```bash
+# Development (default)
+npm run upload
+
+# Production
+npm run upload:prod
+```
+
+## Module Details
+
+### CSV Parser (`lib/csv/parser.ts`)
+
+- Parses `projects.csv` into Project objects
+- Validates required fields
+- Groups rows by project number
+- Handles multiple components per project
+
+### Filesystem Scanner (`lib/filesystem/scanner.ts`)
+
+- Recursively scans project folders
+- Identifies photos, videos, and assets
+- Extracts stage from folder names
+- Handles nested structures (outdoor/pool)
+
+### Storage Uploader (`lib/firebase/storage.ts`)
+
+- Uploads files to Firebase Storage
+- Preserves folder structure
+- Progress tracking with ETA
+- Retry logic for failures
+- Skip existing files option
+
+### Firestore Creator (`lib/firebase/firestore.ts` + `dataBuilder.ts`)
+
+- Merges CSV, scanner, and upload data
+- Builds complete Project documents
+- Validates before writing
+- Creates Firestore documents
+
+## Utilities
+
+### Extract Project List
+
+Generate project list for CSV:
+
+```bash
+npm run extract-projects
+```
+
+### Add Featured Field
+
+Migration script to add featured field:
+
+```bash
+npm run add-featured:dev
+npm run add-featured:prod
+```
 
 ## Troubleshooting
 
-### Error: "Firebase not initialized"
+### CSV Parsing Errors
 
-**Problem**: Firebase configuration is missing or incorrect.
+**Problem**: Missing required fields
 
-**Solution**:
+**Solution**: Check CSV has all required columns:
+- `number`, `name`, `category`, `status` (required)
+- `summary`, `description` (recommended)
 
-1. Check that `config/firebase.ts` exists and is properly configured
-2. Verify your Firebase credentials are correct
-3. Ensure you're connected to the internet
+### Files Not Found
 
-### Error: "Permission denied"
+**Problem**: Scanner can't find project folders
 
-**Problem**: Firestore security rules are blocking the operation.
+**Solution**: 
+- Verify folder names match project numbers
+- Check folder structure matches expected format
+- Use `--verbose` for detailed errors
 
-**Solution**:
+### Upload Failures
 
-1. Go to Firebase Console → Firestore Database → Rules
-2. For development, temporarily set rules to allow all:
-   ```
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       match /{document=**} {
-         allow read, write: if true;
-       }
-     }
-   }
-   ```
-3. ⚠️ **Never use these rules in production!**
-
-### Error: "Module not found: tsx"
-
-**Problem**: The `tsx` package is not installed.
+**Problem**: Some files fail to upload
 
 **Solution**:
+- Check Firebase Storage rules allow writes
+- Verify network connection
+- Use `--skip-existing` to avoid re-uploading
+- Check file sizes (large files may timeout)
 
-```bash
-npm install
+### Firestore Write Errors
+
+**Problem**: Projects fail to create
+
+**Solution**:
+- Check Firestore security rules
+- Verify Firebase credentials
+- Use `--dry-run` to preview
+- Check validation errors in output
+
+## File Structure Requirements
+
+### Project Folders
+
+```
+{projectNumber}/
+├── {category}/
+│   ├── photos/
+│   │   ├── before/
+│   │   ├── after/
+│   │   ├── in-progress/
+│   │   └── renderings/
+│   ├── videos/ (optional)
+│   │   └── {stage}/
+│   └── assets/
+│       ├── plans/
+│       ├── materials/
+│       └── renderings/
+└── {category}/{subcategory}/ (for nested like outdoor/pool)
 ```
 
-### Script runs but no data appears in app
+### Supported Stages
 
-**Problem**: The app might be caching old data or not refetching.
+- `before` - Before photos
+- `after` - After photos
+- `in-progress` - During construction
+- `renderings` - 3D renderings
+- `other` - Other media
 
-**Solution**:
+## Data Model
 
-1. Refresh the app (shake device → Reload)
-2. Check Firebase Console to verify data was added
-3. Check the `ProjectsContext` is fetching correctly
+The system creates Project documents matching the TypeScript interfaces:
 
-### Validation errors
+- **Project** - Top-level entity with components
+- **ProjectComponent** - Individual aspects (bathroom, kitchen)
+- **MediaAsset** - Photos and videos
+- **Document** - PDFs, plans, materials
 
-**Problem**: Seed data doesn't match the `Project` interface.
+See `core/types/` for complete type definitions.
 
-**Solution**:
+## Legacy System
 
-1. Read the error message carefully - it tells you which field is invalid
-2. Check `types/Project.ts` for the correct interface structure
-3. Ensure all required fields are present
-4. Verify date strings are in ISO format
-5. Confirm arrays are actually arrays (not null/undefined)
+The old upload system has been archived to `legacy/`. See `legacy/README.md` for details.
 
-## ⚠️ Important Warnings
+**Do not use the old system** - use this new CSV-based system instead.
 
-### Development Only
+## Environment Variables
 
-**This script is for DEVELOPMENT ONLY.** It will:
+- `NODE_ENV` - `development` (default) or `production`
+- `EXPO_PUBLIC_FIREBASE_ENV` - Override Firebase environment
 
-- Delete ALL existing projects in your database
-- Cannot be undone
-- Should NEVER be run in production
+## Best Practices
 
-### Data Loss
-
-Running `npm run seed` will permanently delete all projects in your Firestore database. Make sure you:
-
-- Are connected to the correct Firebase project (development, not production)
-- Have backups if needed
-- Understand the data will be replaced
-
-### Security Rules
-
-For the seed script to work, your Firestore security rules must allow write access. In development, this is fine. In production, always use proper authentication and authorization rules.
-
-## Advanced Usage
-
-### Seeding Specific Categories
-
-To seed only certain project types, edit `data/seedData.ts` and comment out unwanted projects:
-
-```typescript
-export const seedProjects: Omit<Project, "id">[] = [
-  // Bathroom projects
-  {
-    /* ... */
-  },
-
-  // Kitchen projects (commented out for now)
-  // { /* ... */ },
-];
-```
-
-### Adding Media to Projects
-
-The seed data currently uses empty arrays for `pictures`, `documents`, and `logs`. To add media:
-
-1. Upload images to a hosting service (Unsplash, Firebase Storage, etc.)
-2. Add picture objects to the `pictures` array:
-   ```typescript
-   pictures: [
-     {
-       id: "pic-1",
-       url: "https://...",
-       thumbnailUrl: "https://...",
-       altText: "Description",
-       type: "before",
-       description: "Original condition",
-       order: 1,
-       createdAt: "2024-01-15T00:00:00.000Z",
-     },
-   ],
-   ```
-
-### Running in CI/CD
-
-To run the seed script in a CI/CD pipeline:
-
-```bash
-# Set Firebase credentials as environment variables
-export FIREBASE_API_KEY="..."
-export FIREBASE_PROJECT_ID="..."
-
-# Run the seed script
-npm run seed
-```
+1. **Always dry-run first**: `npm run upload -- --dry-run`
+2. **Use `--skip-existing`**: Avoid re-uploading files
+3. **Check CSV format**: Validate before uploading
+4. **Organize files**: Follow folder structure conventions
+5. **Test with one project**: Use `--projects` to test
+6. **Review output**: Check logs for warnings/errors
 
 ## Support
 
-If you encounter issues not covered here:
-
-1. Check the console output for detailed error messages
-2. Verify your Firebase configuration
-3. Ensure all dependencies are installed
-4. Check Firestore security rules
-5. Review the `Project` interface in `types/Project.ts`
-
-## Future Enhancements
-
-Potential improvements to the seeding system:
-
-- [ ] Add option to seed without clearing existing data
-- [ ] Support for seeding other collections (users, settings, etc.)
-- [ ] Import data from CSV/JSON files
-- [ ] Seed data generators for testing (faker.js)
-- [ ] Environment-specific seed data (dev vs staging)
-- [ ] Incremental seeding (add new projects without clearing)
+For issues:
+1. Check error messages in console
+2. Use `--verbose` for detailed output
+3. Review module documentation in `lib/`
+4. Check Firebase Console for upload status

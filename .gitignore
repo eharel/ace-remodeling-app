@@ -43,3 +43,8 @@ commit-msg.txt
 
 # Documentation
 project-overview.md
+
+# Script outputs
+scripts/legacy/output/
+scripts/**/*.json
+!scripts/lib/**/*.json
