@@ -59,6 +59,37 @@ export interface CreateSummary {
 }
 
 /**
+ * Remove undefined values from an object recursively
+ *
+ * Firestore doesn't accept undefined values. This function recursively
+ * removes all undefined fields from objects and arrays.
+ *
+ * @param obj - Object to sanitize
+ * @returns Object with undefined values removed
+ */
+function removeUndefinedValues(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return null;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(removeUndefinedValues).filter((item) => item !== undefined);
+  }
+
+  if (typeof obj === "object") {
+    const cleaned: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        cleaned[key] = removeUndefinedValues(value);
+      }
+    }
+    return cleaned;
+  }
+
+  return obj;
+}
+
+/**
  * Create a project document in Firestore
  *
  * @param project - Project document to create
@@ -68,8 +99,11 @@ export async function createProject(
   project: Project
 ): Promise<CreateResult> {
   try {
+    // Remove undefined values before writing to Firestore
+    const sanitizedProject = removeUndefinedValues(project);
+
     const projectsCollection = collection(db, "projects");
-    const docRef = await addDoc(projectsCollection, project);
+    const docRef = await addDoc(projectsCollection, sanitizedProject);
 
     return {
       success: true,
