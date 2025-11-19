@@ -36,6 +36,7 @@ scripts/
 ## Categorization
 
 ### ✅ NEW SYSTEM (Keep in place)
+
 - **`uploadProjects.ts`** - Main orchestrator script
 - **`lib/`** - Complete new upload architecture
   - `lib/csv/parser.ts` - CSV parser
@@ -49,23 +50,28 @@ scripts/
   - `lib/utils/progressTracker.ts` - Progress tracker
 
 ### 🗄️ OLD SYSTEM (Archive → `legacy/`)
+
 - **`uploadPhotos.ts`** - Old category-based uploader
+
   - Uploads by category (bathroom, kitchen)
   - Generates JSON output files
   - No CSV integration
   - Separate from seeding step
 
 - **`seedFirebase.ts`** - Old Firestore seeding script
+
   - Reads JSON files from `output/`
   - Uses old Project type (Picture, not MediaAsset)
   - Separate step from upload
 
 - **`config/uploadConfig.ts`** - Configuration for old uploader
+
   - Category mappings
   - File type definitions
   - Used only by `uploadPhotos.ts`
 
 - **`types/upload.ts`** - Types for old uploader
+
   - LocalFile, UploadedFile interfaces
   - Used only by old system
 
@@ -75,17 +81,21 @@ scripts/
   - Not needed for new system
 
 ### 🔧 UTILITIES (Keep, organize in `utilities/`)
+
 - **`extractProjectList.ts`** - Extract project list for CSV
+
   - Scans assets folder
   - Outputs TSV format
   - Still useful for CSV generation
 
 - **`addFeaturedField.ts`** - Add featured field to Firestore
+
   - Updates existing projects
   - One-time migration script
   - Still potentially useful
 
 - **`sync-version.js`** - Sync version to app.json
+
   - Used by npm version commands
   - Keep at root level (used by npm scripts)
 
@@ -94,14 +104,18 @@ scripts/
   - Keep at root level (rarely used)
 
 ### 📄 DOCUMENTATION (Review and update)
+
 - **`README.md`** - Currently documents old seeding system
+
   - Needs complete rewrite for new system
   - Should document new upload architecture
 
 - **`UPLOAD_README.md`** - Old upload documentation
+
   - Archive with old system
 
 - **`UPLOAD_QUICK_START.md`** - Old quick start guide
+
   - Archive with old system
 
 - **`FIREBASE_INTEGRATION.md`** - Firebase integration docs
@@ -146,6 +160,7 @@ scripts/
 ### Current Scripts (to update):
 
 **OLD SYSTEM (move to legacy: prefix):**
+
 - `upload` → `legacy:upload`
 - `upload:prod` → `legacy:upload:prod`
 - `upload:dry-run` → `legacy:upload:dry-run`
@@ -154,16 +169,19 @@ scripts/
 - `seed:prod` → `legacy:seed:prod`
 
 **NEW SYSTEM (keep/update):**
+
 - `upload:projects` → `upload` (make primary)
 - `upload:projects:dev` → `upload:dev`
 - `upload:projects:prod` → `upload:prod`
 
 **UTILITIES (update paths):**
+
 - `extract-projects` → Update path to `utilities/extractProjectList.ts`
 - `add-featured:dev` → Update path to `utilities/addFeaturedField.ts`
 - `add-featured:prod` → Update path to `utilities/addFeaturedField.ts`
 
 **KEEP AS-IS:**
+
 - `version:*` scripts (use sync-version.js at root)
 - `reset-project` (uses reset-project.js at root)
 
@@ -172,11 +190,13 @@ scripts/
 ## Migration Notes
 
 ### Breaking Changes
+
 - Old `npm run upload` will become `npm run legacy:upload`
 - New primary command: `npm run upload` (points to new system)
 - Old `npm run seed` will become `npm run legacy:seed`
 
 ### Backward Compatibility
+
 - Old scripts still accessible via `legacy:` prefix
 - Old system files preserved in `legacy/` folder
 - Can reference old code if needed
@@ -201,7 +221,7 @@ scripts/
 ## Files Requiring Inspection
 
 **FIREBASE_INTEGRATION.md** - Need to review contents to determine if:
+
 - Still relevant to new system
 - Contains useful information
 - Should be kept or archived
-

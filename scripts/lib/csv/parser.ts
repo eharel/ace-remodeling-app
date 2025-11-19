@@ -17,11 +17,7 @@ import {
 import { Project } from "../../../core/types/Project";
 import { ProjectComponent } from "../../../core/types/ProjectComponent";
 import { ProjectManager } from "../../../core/types/ProjectManager";
-import {
-  PROJECT_STATUSES,
-  ProjectStatus,
-  isValidProjectStatus,
-} from "../../../core/types/Status";
+import { PROJECT_STATUSES, ProjectStatus } from "../../../core/types/Status";
 
 /**
  * Raw CSV row structure (matches CSV columns exactly)
@@ -95,6 +91,25 @@ export interface ParseStats {
 }
 
 /**
+ * Normalize status value for validation
+ *
+ * Handles:
+ * - Leading/trailing whitespace
+ * - Case sensitivity (converts to lowercase)
+ * - Underscore variants (converts "in_progress" to "in-progress")
+ *
+ * @param status - Raw status string from CSV
+ * @returns Normalized status string
+ */
+function normalizeStatus(status: string | undefined): string {
+  if (!status) {
+    return "";
+  }
+
+  return status.trim().toLowerCase().replace(/_/g, "-");
+}
+
+/**
  * Parses semicolon-separated string into array
  *
  * Helper for tags, projectManagers, etc.
@@ -146,12 +161,18 @@ function validateRow(row: CSVRow, rowNumber: number): ValidationResult {
   // Required field: status
   if (!row.status || row.status.trim() === "") {
     errors.push(`Missing required field "status"`);
-  } else if (!isValidProjectStatus(row.status.trim())) {
-    errors.push(
-      `Invalid status "${row.status}". Must be one of: ${Object.values(
-        PROJECT_STATUSES
-      ).join(", ")}`
-    );
+  } else {
+    // Normalize status before validation
+    const normalizedStatus = normalizeStatus(row.status);
+    const validStatuses = Object.values(PROJECT_STATUSES);
+
+    if (!validStatuses.includes(normalizedStatus as ProjectStatus)) {
+      errors.push(
+        `Invalid status "${row.status}". Must be one of: ${validStatuses.join(
+          ", "
+        )}`
+      );
+    }
   }
 
   // Warning: missing summary
@@ -245,8 +266,10 @@ function checkProjectFieldConsistency(
     warnings.push(`Inconsistent "description" field across rows`);
   }
 
-  // Check status consistency
-  const statuses = new Set(rows.map((r) => r.status?.trim()).filter(Boolean));
+  // Check status consistency (normalize before comparing)
+  const statuses = new Set(
+    rows.map((r) => normalizeStatus(r.status)).filter(Boolean)
+  );
   if (statuses.size > 1) {
     warnings.push(
       `Inconsistent "status" field across rows: ${Array.from(statuses).join(
@@ -367,7 +390,7 @@ function convertRowsToProject(projectNumber: string, rows: CSVRow[]): Project {
     components,
 
     // Metadata
-    status: firstRow.status.trim() as ProjectStatus,
+    status: normalizeStatus(firstRow.status) as ProjectStatus,
     ...(tags.length > 0 && { tags }),
     ...(isFeatured && { isFeatured }),
 
