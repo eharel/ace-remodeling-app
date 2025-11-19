@@ -7,7 +7,7 @@
  * @module scripts/lib/firebase/client
  */
 
-import { db, storage, currentEnvironment } from "../../../core/config/firebase";
+import { currentEnvironment, db, storage } from "../../../core/config/firebase";
 
 export { db, storage };
 
@@ -27,4 +27,3 @@ if (!process.env.SUPPRESS_FIREBASE_LOG) {
     `📦 Project: ${isDevelopment ? "ace-remodeling-dev" : "ace-remodeling"}`
   );
 }
-
