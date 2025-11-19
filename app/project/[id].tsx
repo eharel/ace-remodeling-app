@@ -15,7 +15,13 @@ import { useProjects, useTheme, getProjectMedia } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/core/themes";
-import { Project, getProjectThumbnail } from "@/core/types";
+import {
+  Project,
+  ProjectComponent,
+  getProjectThumbnail,
+  getCategoryLabel,
+  getSubcategoryLabel,
+} from "@/core/types";
 import {
   commonStyles,
   getPhotoCounts,
@@ -34,6 +40,10 @@ export default function ProjectDetailScreen() {
     null
   );
   const [activePhotoTab, setActivePhotoTab] = useState<PhotoTabValue>("after");
+  // Component selection state - defaults to first component
+  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
+    null
+  );
   const { theme } = useTheme();
 
   // Show 3 preview photos (Flexbox will handle equal sizing)
@@ -45,19 +55,78 @@ export default function ProjectDetailScreen() {
       const foundProject = projects.find((p) => p.id === id);
       setProject(foundProject || null);
 
+      // Set default selected component to first component when project loads
+      if (foundProject && foundProject.components.length > 0) {
+        setSelectedComponentId(foundProject.components[0].id);
+      }
+
       // Fallback to mock data if needed (commented out for now)
       // const foundProject = mockProjects.find((p) => p.id === id);
     }
   }, [id, projects]);
 
-  // Get all media from all components (new structure - no aggregation needed)
-  const aggregatedPictures = useMemo(() => {
+  /**
+   * Get display label for a component
+   * Uses componentName if present, otherwise formats category + subcategory
+   */
+  const getComponentLabel = (component: ProjectComponent): string => {
+    // If has custom name, use it
+    if (component.name) {
+      return component.name;
+    }
+
+    // Otherwise format category + subcategory
+    const categoryLabel = getCategoryLabel(component.category);
+
+    if (component.subcategory) {
+      const subcategoryLabel = getSubcategoryLabel(component.subcategory);
+      // For "outdoor/pool" just show "Pool" (subcategory is more specific)
+      return subcategoryLabel;
+    }
+
+    return categoryLabel;
+  };
+
+  /**
+   * Current selected component
+   * Filters project components to find the one matching selectedComponentId
+   */
+  const currentComponent = useMemo(() => {
+    if (!project || !selectedComponentId) return null;
+    return (
+      project.components.find((c) => c.id === selectedComponentId) ||
+      project.components[0] ||
+      null
+    );
+  }, [project, selectedComponentId]);
+
+  /**
+   * Media for current component + shared media
+   * Filters to show only the selected component's media plus project-wide shared media
+   */
+  const currentMedia = useMemo(() => {
     if (!project) return [];
-    // Get all media from all components + shared media
-    const allMedia = getProjectMedia(project);
+    const componentMedia = currentComponent?.media || [];
     const sharedMedia = project.sharedMedia || [];
-    return [...allMedia, ...sharedMedia];
-  }, [project]);
+    return [...componentMedia, ...sharedMedia];
+  }, [project, currentComponent]);
+
+  /**
+   * Documents for current component + shared documents
+   * Filters to show only the selected component's documents plus project-wide shared documents
+   */
+  const currentDocuments = useMemo(() => {
+    if (!project) return [];
+    const componentDocuments = currentComponent?.documents || [];
+    const sharedDocuments = project.sharedDocuments || [];
+    return [...componentDocuments, ...sharedDocuments];
+  }, [project, currentComponent]);
+
+  // Legacy: Keep aggregatedPictures for backward compatibility during transition
+  // This will be replaced with currentMedia in next steps
+  const aggregatedPictures = useMemo(() => {
+    return currentMedia;
+  }, [currentMedia]);
 
   // Calculate photo counts for each category
   const photoCounts = useMemo(() => {
@@ -117,6 +186,25 @@ export default function ProjectDetailScreen() {
       (m) => m.mediaType === "image" && m.stage === targetStage
     );
   }, [aggregatedPictures, activePhotoTab]);
+
+  // Debug logging for component selection (Stage 1 testing)
+  useEffect(() => {
+    if (project && currentComponent) {
+      console.log("🔍 Component Selection Debug:");
+      console.log(`  selectedComponentId: ${selectedComponentId}`);
+      console.log(`  currentComponent:`, {
+        id: currentComponent.id,
+        category: currentComponent.category,
+        subcategory: currentComponent.subcategory,
+        name: currentComponent.name,
+      });
+      console.log(`  currentMedia.length: ${currentMedia.length}`);
+      console.log(`  currentDocuments.length: ${currentDocuments.length}`);
+      console.log(
+        `  componentLabel: "${getComponentLabel(currentComponent)}"`
+      );
+    }
+  }, [project, currentComponent, selectedComponentId, currentMedia, currentDocuments]);
 
   const closeGallery = () => {
     setGalleryVisible(false);
@@ -939,7 +1027,7 @@ export default function ProjectDetailScreen() {
           </ThemedView>
 
           {/* Documents Section */}
-          {project.documents && project.documents.length > 0 && (
+          {currentDocuments && currentDocuments.length > 0 && (
             <ThemedView style={styles.section}>
               <View style={styles.sectionHeader}>
                 <ThemedText
@@ -948,7 +1036,7 @@ export default function ProjectDetailScreen() {
                     { color: theme.colors.text.primary },
                   ]}
                 >
-                  Documents ({project.documents.length})
+                  Documents ({currentDocuments.length})
                 </ThemedText>
                 <Pressable
                   style={styles.viewAllButton}
@@ -970,10 +1058,10 @@ export default function ProjectDetailScreen() {
                 </Pressable>
               </View>
               <ThemedView style={styles.documentsPreview}>
-                {project.documents
+                {currentDocuments
                   .slice(0, 2)
                   .map((item, index) => renderDocumentPreview(item, index))}
-                {project.documents.length > 2 && (
+                {currentDocuments.length > 2 && (
                   <Pressable
                     style={styles.moreDocumentsButton}
                     onPress={() =>
@@ -981,12 +1069,12 @@ export default function ProjectDetailScreen() {
                     }
                     accessible={true}
                     accessibilityLabel={`View ${
-                      project.documents.length - 2
+                      currentDocuments.length - 2
                     } more documents`}
                     accessibilityRole="button"
                   >
                     <ThemedText style={styles.moreDocumentsText}>
-                      +{project.documents.length - 2} more
+                      +{currentDocuments.length - 2} more
                     </ThemedText>
                   </Pressable>
                 )}
