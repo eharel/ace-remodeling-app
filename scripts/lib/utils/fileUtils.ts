@@ -235,9 +235,7 @@ export function formatBytes(bytes: number): string {
  * @param dirPath - Directory to scan
  * @returns Array of absolute file paths
  */
-export async function getFilesInDirectory(
-  dirPath: string
-): Promise<string[]> {
+export async function getFilesInDirectory(dirPath: string): Promise<string[]> {
   const files: string[] = [];
 
   try {
@@ -283,4 +281,3 @@ export async function getSubdirectories(dirPath: string): Promise<string[]> {
     return [];
   }
 }
-
