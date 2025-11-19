@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectCategory } from "@/core/types";
+import { ComponentCategory } from "@/core/types/ComponentCategory";
 import {
   EmptyState,
   LoadingState,
@@ -16,7 +16,7 @@ import { useProjects, useTheme } from "@/shared/contexts";
 import { getAllCategories, getCategoryDisplayName, getCategoryIcon } from "@/shared/utils";
 
 interface CategoryItem {
-  id: ProjectCategory;
+  id: ComponentCategory;
   name: string;
   icon: string;
   count: number;
@@ -36,7 +36,9 @@ export default function ProjectsScreen() {
       id: category,
       name: getCategoryDisplayName(category),
       icon: getCategoryIcon(category),
-      count: projects.filter((p) => p.category === category).length,
+      count: projects.filter((p) =>
+        p.components.some((c) => c.category === category)
+      ).length,
     }));
 
     // Only show categories that have projects

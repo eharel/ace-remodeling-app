@@ -90,23 +90,62 @@ function formatMonths(months: number): string {
 }
 
 /**
- * Get formatted duration from project dates object
+ * Get formatted duration from project timeline object
  *
- * @param project - Project with projectDates field
+ * Uses start/end dates if available, otherwise falls back to duration string.
+ *
+ * @param project - Project with timeline field (new structure) or projectDates (legacy)
  * @returns Formatted duration string
  *
  * @example
- * getProjectDuration({ projectDates: { start: "2024-01-01", end: "2024-03-01" } })
+ * getProjectDuration({ timeline: { start: "2024-01-01", end: "2024-03-01" } })
  * // "8 weeks"
+ * getProjectDuration({ timeline: { duration: "3 months" } })
+ * // "3 months"
  */
 export function getProjectDuration(project: {
-  projectDates: { start: string; end: string };
+  timeline?: {
+    start?: string;
+    end?: string;
+    duration?: string;
+  };
+  projectDates?: { start: string; end: string }; // Legacy support
 }): string {
-  const days = calculateDays(
-    project.projectDates.start,
-    project.projectDates.end
-  );
-  return formatDuration(days);
+  // Try new timeline structure first
+  if (project.timeline) {
+    // If we have start and end dates, calculate from them
+    if (project.timeline.start && project.timeline.end) {
+      try {
+        const days = calculateDays(
+          project.timeline.start,
+          project.timeline.end
+        );
+        return formatDuration(days);
+      } catch (error) {
+        // If calculation fails, fall through to duration string
+      }
+    }
+    // Fall back to duration string if available
+    if (project.timeline.duration) {
+      return project.timeline.duration;
+    }
+  }
+
+  // Legacy support: try projectDates
+  if (project.projectDates?.start && project.projectDates?.end) {
+    try {
+      const days = calculateDays(
+        project.projectDates.start,
+        project.projectDates.end
+      );
+      return formatDuration(days);
+    } catch (error) {
+      // If calculation fails, return default
+    }
+  }
+
+  // Default fallback
+  return "Duration not available";
 }
 
 /**

@@ -244,8 +244,10 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
             </View>
 
             <ThemedText style={styles.category}>
-              {project.category.charAt(0).toUpperCase() +
-                project.category.slice(1)}
+              {project.category
+                ? project.category.charAt(0).toUpperCase() +
+                  project.category.slice(1)
+                : "Miscellaneous"}
             </ThemedText>
           </View>
         </View>

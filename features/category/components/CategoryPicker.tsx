@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectCategory } from "@/core/types";
+import { ComponentCategory } from "@/core/types/ComponentCategory";
 import { ThemedText } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import {
@@ -13,12 +13,12 @@ import {
 } from "@/shared/utils";
 
 interface CategoryPickerProps {
-  currentCategory: ProjectCategory;
-  onCategoryChange: (category: ProjectCategory) => void;
+  currentCategory: ComponentCategory;
+  onCategoryChange: (category: ComponentCategory) => void;
 }
 
 interface CategoryOption {
-  category: ProjectCategory;
+  category: ComponentCategory;
   displayName: string;
   icon: string;
   count: number;
@@ -41,11 +41,13 @@ export function CategoryPicker({
       category,
       displayName: getCategoryDisplayName(category),
       icon: getCategoryIcon(category),
-      count: projects.filter((p) => p.category === category).length,
+      count: projects.filter((p) =>
+        p.components.some((c) => c.category === category)
+      ).length,
     }));
   }, [projects]);
 
-  const handleSelect = (category: ProjectCategory) => {
+  const handleSelect = (category: ComponentCategory) => {
     setIsOpen(false);
     onCategoryChange(category);
   };

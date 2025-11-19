@@ -3,9 +3,15 @@ import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { getCategoryConfig } from "@/core/constants/categoryConfig";
+import {
+  getCategoryConfig,
+  isValidCategoryKey,
+} from "@/core/constants/categoryConfig";
 import { DesignTokens } from "@/core/themes";
-import { ProjectCategory } from "@/core/types";
+import {
+  ComponentCategory,
+  CORE_CATEGORIES,
+} from "@/core/types/ComponentCategory";
 import { FeaturedCategorySection, HeroCarousel } from "@/features/showcase";
 import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
@@ -27,11 +33,36 @@ export default function ShowcaseScreen() {
    * Returns a Map for efficient lookups and iteration
    */
   const featuredByCategory = useMemo(() => {
-    const grouped = new Map<ProjectCategory, typeof featuredProjects>();
+    const grouped = new Map<ComponentCategory, typeof featuredProjects>();
+
+    // Normalize category names (e.g., "outdoor" -> "outdoor-living")
+    const normalizeCategory = (category: string): ComponentCategory => {
+      if (category === "outdoor") {
+        return CORE_CATEGORIES.OUTDOOR_LIVING;
+      }
+      return category as ComponentCategory;
+    };
 
     featuredProjects.forEach((project) => {
-      const existing = grouped.get(project.category) || [];
-      grouped.set(project.category, [...existing, project]);
+      // Group by ALL component categories - show project in each category it belongs to
+      // This way a project with [bathroom, kitchen, full-home] appears in all three sections
+      const categories = project.components.map((c) => c.category);
+      if (categories.length === 0) {
+        // Fallback if no components
+        const defaultCategory = normalizeCategory("miscellaneous");
+        const existing = grouped.get(defaultCategory) || [];
+        grouped.set(defaultCategory, [...existing, project]);
+      } else {
+        // Add project to each category it belongs to
+        categories.forEach((rawCategory) => {
+          const normalizedCategory = normalizeCategory(rawCategory);
+          const existing = grouped.get(normalizedCategory) || [];
+          // Only add if not already in this category (avoid duplicates)
+          if (!existing.includes(project)) {
+            grouped.set(normalizedCategory, [...existing, project]);
+          }
+        });
+      }
     });
 
     // Debug logging
@@ -41,7 +72,7 @@ export default function ShowcaseScreen() {
     grouped.forEach((projects, category) => {
       console.log(`    ${category}: ${projects.length} project(s)`);
       projects.forEach((p) => {
-        console.log(`      - ${p.name} (${p.id}) - featured: ${p.featured}`);
+        console.log(`      - ${p.name} (${p.id}) - featured: ${p.isFeatured}`);
       });
     });
 
@@ -153,7 +184,10 @@ export default function ShowcaseScreen() {
             }
 
             // Check if category has config, skip if not
-            const categoryConfig = getCategoryConfig(category);
+            // getCategoryConfig expects CoreCategory, so we need to check if it's a core category
+            const categoryConfig = isValidCategoryKey(category)
+              ? getCategoryConfig(category)
+              : null;
             if (!categoryConfig) {
               console.log(`⚠️  Skipping ${category}: no category config found`);
               return null;

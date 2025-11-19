@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectCategory } from "@/core/types";
+import { ComponentCategory } from "@/core/types/ComponentCategory";
 import { CategoryPicker } from "@/features/category";
 import { ProjectGallery } from "@/features/projects";
 import {
@@ -22,8 +22,8 @@ export default function CategoryScreen() {
   const { category } = useLocalSearchParams<{ category: string }>();
 
   // Validate category parameter
-  const validCategory = category as ProjectCategory;
-  if (!category || !getAllCategories().includes(category as ProjectCategory)) {
+  const validCategory = category as ComponentCategory;
+  if (!category || !getAllCategories().includes(category as ComponentCategory)) {
     return (
       <ThemedView style={styles.container}>
         <Stack.Screen
@@ -47,10 +47,12 @@ export default function CategoryScreen() {
     );
   }
 
-  // Filter projects by category
+  // Filter projects by category (check if any component matches)
   const categoryProjects = useMemo(() => {
     if (!projects) return [];
-    return projects.filter((project) => project.category === validCategory);
+    return projects.filter((project) =>
+      project.components.some((c) => c.category === validCategory)
+    );
   }, [projects, validCategory]);
 
   const categoryDisplayName = getCategoryDisplayName(validCategory);
@@ -59,7 +61,7 @@ export default function CategoryScreen() {
     router.push(`/project/${project.id}`);
   };
 
-  const handleCategoryChange = (newCategory: ProjectCategory) => {
+  const handleCategoryChange = (newCategory: ComponentCategory) => {
     // Use replace to avoid building up navigation stack
     router.replace(`/category/${newCategory}`);
   };

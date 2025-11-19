@@ -176,7 +176,7 @@ export function SearchSuggestions({
                 variant="caption"
                 style={{ fontSize: DesignTokens.typography.fontSize.xs }}
               >
-                {project.category}
+                {project.category || "Miscellaneous"}
               </ThemedText>
             </View>
           </Pressable>

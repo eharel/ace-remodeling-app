@@ -18,7 +18,8 @@ import Animated, {
 
 import { getCategoryConfig } from "@/core/constants/categoryConfig";
 import { DesignTokens } from "@/core/themes";
-import { Project, ProjectCategory } from "@/core/types";
+import { Project, getProjectThumbnail } from "@/core/types";
+import { ComponentCategory } from "@/core/types/ComponentCategory";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { getCategoryIcon } from "@/shared/utils";
@@ -30,7 +31,7 @@ const LIST_PADDING_LEFT = DesignTokens.spacing[6];
 const BLURHASH_PLACEHOLDER = "L6PZfSi_.AyE_3t7t7R**0o#DgR4";
 
 interface FeaturedCategorySectionProps {
-  category: ProjectCategory;
+  category: ComponentCategory;
   projects: Project[];
 }
 
@@ -214,7 +215,7 @@ function FeaturedProjectCard({ project }: { project: Project }) {
       {/* Project Image */}
       <View style={staticCardStyles.imageContainer}>
         <Image
-          source={{ uri: project.thumbnail }}
+          source={{ uri: getProjectThumbnail(project) }}
           style={staticCardStyles.image}
           contentFit="cover"
           placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
@@ -247,7 +248,7 @@ function FeaturedProjectCard({ project }: { project: Project }) {
           {project.name}
         </ThemedText>
         <ThemedText style={dynamicStyles.description} numberOfLines={2}>
-          {project.briefDescription}
+          {project.summary}
         </ThemedText>
       </View>
     </AnimatedPressable>

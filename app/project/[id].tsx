@@ -11,15 +11,11 @@ import {
   type PhotoTabValue,
 } from "@/features/gallery";
 import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
-import {
-  getAggregatedProjectPhotos,
-  useProjects,
-  useTheme,
-} from "@/shared/contexts";
+import { useProjects, useTheme, getProjectMedia } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/core/themes";
-import { Project } from "@/core/types";
+import { Project, getProjectThumbnail } from "@/core/types";
 import {
   commonStyles,
   getPhotoCounts,
@@ -54,11 +50,14 @@ export default function ProjectDetailScreen() {
     }
   }, [id, projects]);
 
-  // Get aggregated photos (includes related project photos for Full Home projects)
+  // Get all media from all components (new structure - no aggregation needed)
   const aggregatedPictures = useMemo(() => {
     if (!project) return [];
-    return getAggregatedProjectPhotos(project, projects);
-  }, [project, projects]);
+    // Get all media from all components + shared media
+    const allMedia = getProjectMedia(project);
+    const sharedMedia = project.sharedMedia || [];
+    return [...allMedia, ...sharedMedia];
+  }, [project]);
 
   // Calculate photo counts for each category
   const photoCounts = useMemo(() => {
@@ -73,9 +72,16 @@ export default function ProjectDetailScreen() {
       // Use intelligent sampling for "All Photos" tab
       return samplePreviewPhotos(aggregatedPictures, previewCount);
     } else {
-      // Filter by specific category and take first N
+      // Filter by specific stage and take first N
+      // Map tab values to MediaAsset stages
+      const stageMap: Record<string, string> = {
+        before: "before",
+        after: "after",
+        progress: "in-progress",
+      };
+      const targetStage = stageMap[activePhotoTab] || activePhotoTab;
       const filtered = aggregatedPictures.filter(
-        (p) => p.type === activePhotoTab
+        (m) => m.mediaType === "image" && m.stage === targetStage
       );
       return getPreviewPhotos(filtered, previewCount);
     }
@@ -100,10 +106,16 @@ export default function ProjectDetailScreen() {
       return aggregatedPictures;
     }
 
-    // Map tab value to photo type (note: 'progress' tab maps to 'process' type)
-    const photoType =
-      activePhotoTab === "progress" ? "process" : activePhotoTab;
-    return aggregatedPictures.filter((p) => p.type === photoType);
+    // Map tab value to MediaAsset stage
+    const stageMap: Record<string, string> = {
+      before: "before",
+      after: "after",
+      progress: "in-progress",
+    };
+    const targetStage = stageMap[activePhotoTab] || activePhotoTab;
+    return aggregatedPictures.filter(
+      (m) => m.mediaType === "image" && m.stage === targetStage
+    );
   }, [aggregatedPictures, activePhotoTab]);
 
   const closeGallery = () => {
@@ -732,7 +744,7 @@ export default function ProjectDetailScreen() {
         >
           {/* Hero Image */}
           <Image
-            source={{ uri: project.thumbnail }}
+            source={{ uri: getProjectThumbnail(project) }}
             style={styles.heroImage}
             contentFit="cover"
           />
@@ -747,7 +759,7 @@ export default function ProjectDetailScreen() {
                   { color: theme.colors.text.secondary },
                 ]}
               >
-                {project.longDescription}
+                {project.description}
               </ThemedText>
             </ThemedView>
 
@@ -796,8 +808,12 @@ export default function ProjectDetailScreen() {
                   Category
                 </ThemedText>
                 <ThemedText style={styles.metaValue}>
-                  {project.category.charAt(0).toUpperCase() +
-                    project.category.slice(1)}
+                  {project.components[0]?.category
+                    ? project.components[0].category
+                        .charAt(0)
+                        .toUpperCase() +
+                      project.components[0].category.slice(1)
+                    : "Miscellaneous"}
                 </ThemedText>
               </ThemedView>
               <ThemedView style={styles.metaItem}>

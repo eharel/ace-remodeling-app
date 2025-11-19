@@ -7,7 +7,11 @@ import { CategoryPage } from "./CategoryPage";
 // Comment out mock data for now (keeping for fallback)
 // import { getProjectSummariesByCategory } from "@/data/mockProjects";
 import { CategoryKey, getCategoryConfig } from "@/core/constants";
-import { ProjectSummary, getProjectCompletionDate } from "@/core/types";
+import {
+  ProjectSummary,
+  getProjectCompletionDate,
+  getProjectThumbnail,
+} from "@/core/types";
 import { MaterialIcons } from "@expo/vector-icons";
 
 interface CategoryScreenProps {
@@ -26,11 +30,11 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
   // Convert Project[] to ProjectSummary[] for the CategoryPage component
   const projectSummaries: ProjectSummary[] = projects.map((project) => ({
     id: project.id,
-    projectNumber: project.projectNumber,
+    projectNumber: project.number, // Use new field name
     name: project.name,
-    category: project.category,
-    briefDescription: project.briefDescription,
-    thumbnail: project.thumbnail,
+    category: project.components[0]?.category || "miscellaneous", // Use first component's category
+    briefDescription: project.summary, // Use new field name
+    thumbnail: getProjectThumbnail(project), // Use thumbnail with fallback
     status: project.status,
     completedAt: getProjectCompletionDate(project),
     // REMOVED: pmNames - computed field no longer stored

@@ -2,12 +2,13 @@ import { StyleSheet } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
 import { commonStyles } from "@/shared/utils";
-import { ProjectCategory, ProjectSummary } from "@/core/types";
+import { ComponentCategory } from "@/core/types/ComponentCategory";
+import { ProjectSummary } from "@/core/types";
 import { ProjectGallery } from "@/features/projects";
 import { ThemedText, ThemedView } from "@/shared/components";
 
 interface CategoryPageProps {
-  category: ProjectCategory;
+  category: ComponentCategory;
   title: string;
   subtitle: string;
   galleryTitle: string;

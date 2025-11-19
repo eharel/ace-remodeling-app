@@ -4,7 +4,7 @@
  */
 
 export {
-  getAggregatedProjectPhotos,
+  getProjectMedia,
   ProjectsProvider,
   useProjects,
 } from "./ProjectsContext";

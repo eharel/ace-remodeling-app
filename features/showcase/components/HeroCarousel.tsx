@@ -25,7 +25,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { DesignTokens } from "@/core/themes";
-import { Project } from "@/core/types";
+import { Project, getProjectThumbnail } from "@/core/types";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 
@@ -223,7 +223,7 @@ const HeroSlide = React.memo(
       >
         {/* Project Image */}
         <Image
-          source={{ uri: project.thumbnail }}
+          source={{ uri: getProjectThumbnail(project) }}
           style={staticStyles.image}
           contentFit="cover"
           placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
@@ -246,13 +246,15 @@ const HeroSlide = React.memo(
           </ThemedText>
 
           {/* Location */}
-          <ThemedText style={staticStyles.location}>
-            {project.location.neighborhood}
-          </ThemedText>
+          {project.location?.neighborhood && (
+            <ThemedText style={staticStyles.location}>
+              {project.location.neighborhood}
+            </ThemedText>
+          )}
 
           {/* Description */}
           <ThemedText style={staticStyles.description} numberOfLines={2}>
-            {project.briefDescription}
+            {project.summary}
           </ThemedText>
         </View>
 

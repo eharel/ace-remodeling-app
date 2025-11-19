@@ -8,9 +8,9 @@ import { DesignTokens } from "@/core/themes";
 import { commonStyles } from "@/shared/utils";
 import {
   Project,
-  ProjectSummary,
   getProjectCompletionDate,
   getProjectPMNames,
+  getProjectThumbnail,
 } from "@/core/types";
 import { ProjectGallery } from "@/features/projects";
 import {
@@ -80,6 +80,17 @@ export default function SearchScreen() {
   const { theme } = useTheme();
   const { projects, loading: projectsLoading } = useProjects();
   const [searchQuery, setSearchQuery] = useState("");
+  // ProjectSummary is a simplified Project for display - using inline type
+  type ProjectSummary = {
+    id: string;
+    projectNumber: string;
+    name: string;
+    category: string;
+    briefDescription: string;
+    thumbnail: string;
+    status: string;
+    completedAt?: string;
+  };
   const [searchResults, setSearchResults] = useState<ProjectSummary[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -155,14 +166,14 @@ export default function SearchScreen() {
           });
         }
 
-        // Step 3: Map to ProjectSummary format
+        // Step 3: Map to ProjectSummary format (using new Project structure)
         return filteredProjects.map((project) => ({
           id: project.id,
-          projectNumber: project.projectNumber,
+          projectNumber: project.number, // Use new field name
           name: project.name,
-          category: project.category,
-          briefDescription: project.briefDescription,
-          thumbnail: project.thumbnail,
+          category: project.components[0]?.category || "miscellaneous", // Use first component's category
+          briefDescription: project.summary, // Use new field name
+          thumbnail: getProjectThumbnail(project), // Use thumbnail with fallback
           status: project.status,
           completedAt: getProjectCompletionDate(project),
           // REMOVED: pmNames - computed field no longer stored

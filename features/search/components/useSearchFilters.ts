@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { ProjectCategory } from "@/core/types/Category";
+import { ComponentCategory } from "@/core/types/ComponentCategory";
 import { Project } from "@/core/types/Project";
 import { ProjectStatus } from "@/core/types/Status";
 import { applyAllFilters } from "../utils/searchFilters";
@@ -151,10 +151,10 @@ export function useSearchFilters(projects: Project[]) {
   // Get filter values for specific filter types
   /**
    * Gets the currently selected category filters
-   * @returns Array of selected ProjectCategory values
+   * @returns Array of selected ComponentCategory values
    */
   const getCategoryFilters = useCallback(
-    () => filters.categories as ProjectCategory[],
+    () => filters.categories as ComponentCategory[],
     [filters.categories]
   );
 

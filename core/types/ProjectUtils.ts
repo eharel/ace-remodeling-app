@@ -143,6 +143,66 @@ export interface ComponentDisplayData {
 }
 
 /**
+ * Get project thumbnail with fallback to first "after" image
+ *
+ * Falls back to the first image in the "after" stage from any component
+ * if no thumbnail is set at project or component level.
+ *
+ * @param project - The project
+ * @param component - Optional component to check for component-specific thumbnail
+ * @returns Thumbnail URL or empty string if no image found
+ */
+export function getProjectThumbnail(
+  project: Project,
+  component?: ProjectComponent
+): string {
+  // Check component thumbnail first
+  if (component?.thumbnail) {
+    return component.thumbnail;
+  }
+
+  // Check project thumbnail
+  if (project.thumbnail) {
+    return project.thumbnail;
+  }
+
+  // Fallback: Find first "after" image from any component
+  for (const comp of project.components) {
+    const afterImage = comp.media.find(
+      (media) => media.stage === "after" && media.mediaType === "image"
+    );
+    if (afterImage?.url) {
+      return afterImage.url;
+    }
+  }
+
+  // Fallback: Find any image from any component
+  for (const comp of project.components) {
+    const anyImage = comp.media.find((media) => media.mediaType === "image");
+    if (anyImage?.url) {
+      return anyImage.url;
+    }
+  }
+
+  // Fallback: Check shared media
+  const sharedAfterImage = project.sharedMedia?.find(
+    (media) => media.stage === "after" && media.mediaType === "image"
+  );
+  if (sharedAfterImage?.url) {
+    return sharedAfterImage.url;
+  }
+
+  const sharedAnyImage = project.sharedMedia?.find(
+    (media) => media.mediaType === "image"
+  );
+  if (sharedAnyImage?.url) {
+    return sharedAnyImage.url;
+  }
+
+  return "";
+}
+
+/**
  * Get fully-resolved display data for a component with fallbacks applied
  *
  * This is the PRIMARY utility for displaying component information in the UI.
@@ -179,7 +239,7 @@ export function getComponentDisplayData(
     summary: component.summary ?? project.summary,
     description: component.description ?? project.description,
     scope: component.scope ?? project.scope,
-    thumbnail: component.thumbnail ?? project.thumbnail,
+    thumbnail: getProjectThumbnail(project, component),
 
     // Category info
     categoryLabel,

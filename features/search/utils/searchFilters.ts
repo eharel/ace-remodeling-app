@@ -1,4 +1,4 @@
-import { ProjectCategory } from "@/core/types/Category";
+import { ComponentCategory } from "@/core/types/ComponentCategory";
 import { Project } from "@/core/types/Project";
 import { ProjectStatus } from "@/core/types/Status";
 
@@ -12,24 +12,30 @@ import { ProjectStatus } from "@/core/types/Status";
 /**
  * Checks if a project matches any of the selected categories
  *
+ * With the new multi-component structure, a project matches if ANY of its
+ * components matches any of the selected categories.
+ *
  * @param project - Project to check
  * @param categories - Array of selected categories (empty = no filter)
- * @returns true if project matches any category or no categories selected
+ * @returns true if any component matches any category or no categories selected
  *
  * @example
  * ```typescript
- * filterByCategory(project, ["kitchen", "bathroom"]) // true if kitchen OR bathroom
+ * filterByCategory(project, ["kitchen", "bathroom"]) // true if any component is kitchen OR bathroom
  * filterByCategory(project, []) // true (no filter)
  * ```
  */
 export function filterByCategory(
   project: Project,
-  categories: ProjectCategory[]
+  categories: ComponentCategory[]
 ): boolean {
   if (categories.length === 0) {
     return true; // No filter applied
   }
-  return categories.includes(project.category);
+  // Check if any component matches any selected category
+  return project.components.some((component) =>
+    categories.includes(component.category)
+  );
 }
 
 /**
@@ -76,7 +82,7 @@ export function filterByProjectManager(
     return true; // No filter applied
   }
 
-  const projectPmNames = project.pms?.map((pm) => pm.name) || [];
+  const projectPmNames = project.projectManagers?.map((pm) => pm.name) || [];
   return projectManagers.some((pmName) => projectPmNames.includes(pmName));
 }
 
@@ -126,7 +132,7 @@ export function filterByTags(project: Project, tags: string[]): boolean {
 export function applyAllFilters(
   project: Project,
   filters: {
-    categories: ProjectCategory[];
+    categories: ComponentCategory[];
     statuses: ProjectStatus[];
     projectManagers: string[];
     tags: string[];

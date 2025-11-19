@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectCategory } from "@/core/types/Category";
+import { ComponentCategory } from "@/core/types/ComponentCategory";
 import { ProjectStatus } from "@/core/types/Status";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
@@ -23,7 +23,7 @@ import { FilterButton } from "./FilterButton";
  */
 interface SearchFiltersBarProps {
   /** Currently selected category values */
-  categoryValues: ProjectCategory[];
+  categoryValues: ComponentCategory[];
   /** Currently selected status values */
   statusValues: ProjectStatus[];
   /** Currently selected project manager names */
@@ -35,7 +35,7 @@ interface SearchFiltersBarProps {
   /** Available tags extracted from all projects */
   availableTags: string[];
   /** Callback when category selection changes */
-  onCategoryChange: (values: ProjectCategory[]) => void;
+  onCategoryChange: (values: ComponentCategory[]) => void;
   /** Callback when status selection changes */
   onStatusChange: (values: ProjectStatus[]) => void;
   /** Callback when project manager selection changes */

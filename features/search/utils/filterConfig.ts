@@ -1,4 +1,8 @@
-import { CATEGORY_LABELS, ProjectCategory } from "@/core/types/Category";
+import {
+  ComponentCategory,
+  CoreCategory,
+  getCategoryLabel,
+} from "@/core/types/ComponentCategory";
 import { getStatusDisplayText, ProjectStatus } from "@/core/types/Status";
 import { getAllCategories } from "@/shared/utils/categoryUtils";
 import { FilterOption } from "../types/types";
@@ -28,10 +32,10 @@ export function createFilterConfig(
   availableTags: string[]
 ) {
   // Category options - dynamically generated from centralized category constants
-  const categoryOptions: FilterOption<ProjectCategory>[] = getAllCategories().map(
+  const categoryOptions: FilterOption<ComponentCategory>[] = getAllCategories().map(
     (category) => ({
       value: category,
-      label: CATEGORY_LABELS[category],
+      label: getCategoryLabel(category),
     })
   );
 
