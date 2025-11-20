@@ -1,10 +1,11 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { Document, DOCUMENT_TYPES } from "@/core/types";
-import { ThemedText, ThemedView } from "@/shared/components";
+import { Document } from "@/core/types";
+import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 
 /**
@@ -33,6 +34,15 @@ export const AssetThumbnail: React.FC<AssetThumbnailProps> = ({
   testID = "asset-thumbnail",
 }) => {
   const { theme } = useTheme();
+
+  // Check if document is an image or PDF
+  const isImage =
+    document.fileType?.includes("image/") ||
+    document.filename.match(/\.(jpg|jpeg|png|heic)$/i);
+
+  const isPdf =
+    document.fileType?.includes("pdf") ||
+    document.filename.toLowerCase().endsWith(".pdf");
 
   // Helper function to normalize category string
   const normalizeCategory = (category: string | undefined): string => {
@@ -140,13 +150,20 @@ export const AssetThumbnail: React.FC<AssetThumbnailProps> = ({
           gap: DesignTokens.spacing[2],
           alignItems: "center",
         },
+        imagePreview: {
+          width: "100%",
+          height: 80,
+          borderRadius: DesignTokens.borderRadius.md,
+          backgroundColor: theme.colors.background.secondary,
+        },
         iconContainer: {
-          width: 64,
-          height: 64,
+          width: 80,
+          height: 80,
           borderRadius: DesignTokens.borderRadius.md,
           backgroundColor: theme.colors.background.secondary,
           alignItems: "center",
           justifyContent: "center",
+          alignSelf: "center",
         },
         filename: {
           fontSize: DesignTokens.typography.fontSize.sm,
@@ -174,21 +191,34 @@ export const AssetThumbnail: React.FC<AssetThumbnailProps> = ({
       style={styles.thumbnail}
       testID={testID}
       accessible={true}
-      accessibilityLabel={`Open ${document.name}, ${document.category || 'other'} document`}
+      accessibilityLabel={`Open ${document.name}, ${document.category || "other"} document`}
       accessibilityRole="button"
       android_ripple={{
         color: `${theme.colors.interactive.primary}20`,
         borderless: false,
       }}
     >
-      <View style={styles.iconContainer}>
-        <MaterialIcons
-          name={getIcon()}
-          size={32}
-          color={getIconColor()}
-          accessibilityLabel={`${document.category || 'other'} icon`}
+      {isImage ? (
+        // Show image preview for image documents
+        <Image
+          source={{ uri: document.url }}
+          style={styles.imagePreview}
+          contentFit="cover"
+          transition={200}
+          cachePolicy="memory-disk"
+          accessibilityLabel={`Preview of ${document.name}`}
         />
-      </View>
+      ) : (
+        // Show icon for PDFs and other documents
+        <View style={styles.iconContainer}>
+          <MaterialIcons
+            name={isPdf ? "picture-as-pdf" : getIcon()}
+            size={32}
+            color={isPdf ? theme.colors.status.error : getIconColor()}
+            accessibilityLabel={`${document.category || "other"} icon`}
+          />
+        </View>
+      )}
       <ThemedText style={styles.filename} numberOfLines={2}>
         {displayName}
       </ThemedText>
