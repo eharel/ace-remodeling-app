@@ -36,6 +36,7 @@ export { usePerformanceMonitoring } from "./hooks/usePerformanceMonitoring";
 export * from "./types/gallery.types";
 
 // Utils
+export * from "./utils/assetViewer";
 export * from "./utils/galleryPerformance";
 export * from "./utils/imagePreloading";
 export * from "./utils/lazyLoading";
