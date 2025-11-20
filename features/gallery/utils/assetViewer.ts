@@ -1,6 +1,6 @@
 import { Router } from "expo-router";
 
-import { Document } from "@/core/types";
+import { Document, MediaAsset, Picture } from "@/core/types";
 
 /**
  * Opens an asset in the appropriate viewer based on file type
@@ -67,7 +67,10 @@ export function openAsset(
       setSelectedAssetIndex(0);
     } else {
       // Ensure index is within bounds (defensive check)
-      const safeIndex = Math.max(0, Math.min(imageIndex, imageDocuments.length - 1));
+      const safeIndex = Math.max(
+        0,
+        Math.min(imageIndex, imageDocuments.length - 1)
+      );
       setSelectedAssetIndex(safeIndex);
     }
 
@@ -85,15 +88,16 @@ export function openAsset(
  * Filters documents to only images and maps them to the format
  * expected by the image gallery modal.
  *
+ * This is a PRESENTATION MODEL conversion - Document is the domain model,
+ * Picture is the UI presentation model. This function bridges the gap.
+ *
  * @param documents - Array of document assets
- * @returns Array of objects with uri property for gallery
+ * @returns Array of Picture objects for gallery display
  */
-export function convertDocumentsToPictures(
-  documents: Document[]
-): Array<{ uri: string; id?: string }> {
-  console.log('\n=== CONVERT DOCUMENTS TO PICTURES ===');
-  console.log('📦 Input documents:', documents.length);
-  
+export function convertDocumentsToPictures(documents: Document[]): Picture[] {
+  console.log("\n=== CONVERT DOCUMENTS TO PICTURES ===");
+  console.log("📦 Input documents:", documents.length);
+
   const result = documents
     .filter(
       (d) =>
@@ -111,15 +115,46 @@ export function convertDocumentsToPictures(
       return {
         uri: d.url,
         id: d.id,
+        type: d.category || d.type || "Other",
+        description: d.name || d.filename,
+        thumbnailUrl: d.thumbnailUrl,
       };
     })
     .filter((pic) => pic.uri && pic.uri.trim().length > 0); // Final safety check
-  
-  console.log('🖼️  Output pictures:', result.length);
+
+  console.log("🖼️  Output pictures:", result.length);
   result.forEach((pic, i) => {
-    console.log(`  [${i}] id: ${pic.id} (type: ${typeof pic.id}, length: ${pic.id?.length})`);
+    console.log(
+      `  [${i}] id: ${pic.id} (type: ${typeof pic.id}, length: ${
+        pic.id?.length
+      })`
+    );
   });
-  console.log('=== END CONVERT ===\n');
-  
+  console.log("=== END CONVERT ===\n");
+
   return result;
+}
+
+/**
+ * Converts MediaAsset to Picture format for ImageGalleryModal
+ *
+ * Filters media to only images and maps them to the format
+ * expected by the image gallery modal.
+ *
+ * This is a PRESENTATION MODEL conversion - MediaAsset is the domain model,
+ * Picture is the UI presentation model. This function bridges the gap.
+ *
+ * @param media - Array of MediaAsset objects
+ * @returns Array of Picture objects for gallery display
+ */
+export function convertMediaToPictures(media: MediaAsset[]): Picture[] {
+  return media
+    .filter((m) => m.mediaType === "image" && m.url) // Only images with URLs
+    .map((m) => ({
+      uri: m.url, // Convert url to uri for expo-image
+      id: m.id,
+      type: m.stage || "other", // Convert stage to type
+      description: m.caption || m.description || "", // Use caption or description
+      thumbnailUrl: m.thumbnailUrl,
+    }));
 }

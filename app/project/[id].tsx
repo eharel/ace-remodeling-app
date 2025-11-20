@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
@@ -10,6 +10,7 @@ import {
   type AssetCategoryValue,
   AssetThumbnail,
   convertDocumentsToPictures,
+  convertMediaToPictures,
   ImageGalleryModal,
   MorePhotosCard,
   PhotoTabs,
@@ -417,22 +418,6 @@ export default function ProjectDetailScreen() {
     return photoCounts[activePhotoTab] - previewPhotos.length;
   }, [photoCounts, activePhotoTab, previewPhotos.length]);
 
-  // Convert MediaAsset to Picture format for gallery
-  const convertMediaToPictures = useCallback(
-    (media: typeof aggregatedPictures) => {
-      return media
-        .filter((m) => m.mediaType === "image" && m.url) // Only images with URLs
-        .map((m) => ({
-          uri: m.url, // Convert url to uri
-          id: m.id,
-          type: m.stage || "other", // Convert stage to type
-          description: m.caption || m.description || "", // Use caption or description
-          thumbnailUrl: m.thumbnailUrl,
-        }));
-    },
-    []
-  );
-
   // Get filtered images for gallery based on active tab
   const galleryImages = useMemo(() => {
     console.log("\n=== PHOTO GALLERY CREATION ===");
@@ -475,7 +460,7 @@ export default function ProjectDetailScreen() {
     console.log("=== END PHOTO GALLERY CREATION ===\n");
 
     return result;
-  }, [aggregatedPictures, activePhotoTab, convertMediaToPictures]);
+  }, [aggregatedPictures, activePhotoTab]);
 
   // Debug logging for asset filtering (current issue)
   useEffect(() => {

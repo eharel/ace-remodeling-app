@@ -5,6 +5,7 @@ export * from "./FileAsset";
 export * from "./Document";
 export * from "./Log";
 export * from "./MediaAsset";
+export type { Picture } from "./Picture";
 
 // Category and component types
 export * from "./ComponentCategory";

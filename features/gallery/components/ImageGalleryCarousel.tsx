@@ -172,6 +172,12 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
                       source={{ uri: image.uri }}
                       style={styles.image}
                       contentFit="contain"
+                      // Performance optimizations
+                      cachePolicy="memory-disk"
+                      priority={isCurrentImage ? "high" : "normal"}
+                      transition={200}
+                      recyclingKey={image.id}
+                      // Accessibility
                       accessibilityLabel={accessibilityStrings.image.getLabel(
                         index,
                         images.length,
@@ -182,6 +188,7 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
                         isCurrentImage
                       )}
                       accessibilityRole="image"
+                      // Event handlers
                       onLoad={() => onImageLoad(image.id)}
                       onError={() =>
                         onImageError(image.id, "Failed to load image")
