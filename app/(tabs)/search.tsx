@@ -187,12 +187,6 @@ export default function SearchScreen() {
   );
 
   useEffect(() => {
-    console.log("🔍 SEARCH TRIGGERED:", {
-      query: debouncedSearchQuery,
-      queryLength: debouncedSearchQuery.length,
-      isEmpty: debouncedSearchQuery.trim() === "",
-    });
-
     setIsSearching(true);
     setSearchError(null);
 

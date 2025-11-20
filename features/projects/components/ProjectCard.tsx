@@ -34,11 +34,12 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
 
   const handleImageError = (error: any) => {
     console.error(
-      `❌ Failed to load image for project "${project.name}":`,
+      `❌ Failed to load image for project "${project.name}"`,
+      {
+        projectId: project.id,
+        thumbnailUrl: project.thumbnail,
+      },
       error
-    );
-    console.log(
-      `Project ID: ${project.id}, Thumbnail URL: ${project.thumbnail}`
     );
 
     // Log to error logging system

@@ -10,6 +10,9 @@ import {
   MorePhotosCard,
   PhotoTabs,
   type PhotoTabValue,
+  AssetCategoryTabs,
+  type AssetCategoryValue,
+  AssetThumbnail,
 } from "@/features/gallery";
 import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme, getProjectMedia } from "@/shared/contexts";
@@ -23,6 +26,8 @@ import {
   getProjectThumbnail,
   getCategoryLabel,
   getSubcategoryLabel,
+  Document,
+  DOCUMENT_TYPES,
 } from "@/core/types";
 import {
   commonStyles,
@@ -46,6 +51,8 @@ export default function ProjectDetailScreen() {
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
     null
   );
+  // Asset category selection state
+  const [selectedAssetCategory, setSelectedAssetCategory] = useState<AssetCategoryValue>("all");
   const { theme } = useTheme();
 
   // Show 3 preview photos (Flexbox will handle equal sizing)
@@ -92,6 +99,11 @@ export default function ProjectDetailScreen() {
       }
     }
   }, [componentId, project, selectedComponentId]);
+
+  // Reset asset category when component changes
+  useEffect(() => {
+    setSelectedAssetCategory("all");
+  }, [selectedComponentId]);
 
   // OPTIMIZATION 1: Preload all component images when project loads
   useEffect(() => {
@@ -163,6 +175,10 @@ export default function ProjectDetailScreen() {
     );
   }, [project, selectedComponentId]);
 
+  const currentComponentLabel = currentComponent
+    ? getComponentLabel(currentComponent)
+    : null;
+
   /**
    * Media for current component + shared media
    * Filters to show only the selected component's media plus project-wide shared media
@@ -184,6 +200,48 @@ export default function ProjectDetailScreen() {
     const sharedDocuments = project.sharedDocuments || [];
     return [...componentDocuments, ...sharedDocuments];
   }, [project, currentComponent]);
+
+  /**
+   * Helper function to map category string to AssetCategoryValue
+   */
+  const mapCategoryToTabValue = (category: string | undefined): AssetCategoryValue => {
+    if (!category) return "other";
+    const normalizedCategory = category.toLowerCase().trim();
+    
+    // Map common category values to tab values
+    if (normalizedCategory === "plans" || normalizedCategory === "floor-plan" || normalizedCategory === "floor plan") {
+      return "floor-plan";
+    }
+    if (normalizedCategory === "materials") {
+      return "materials";
+    }
+    if (normalizedCategory === "rendering" || normalizedCategory === "rendering-3d" || normalizedCategory === "3d rendering" || normalizedCategory === "3d") {
+      return "rendering-3d";
+    }
+    if (normalizedCategory === "contract" || normalizedCategory === "contracts") {
+      return "contract";
+    }
+    if (normalizedCategory === "permit" || normalizedCategory === "permits") {
+      return "permit";
+    }
+    if (normalizedCategory === "invoice" || normalizedCategory === "invoices") {
+      return "invoice";
+    }
+    return "other";
+  };
+
+  /**
+   * Filtered documents based on selected asset category
+   * Uses doc.category instead of doc.type (which is legacy)
+   */
+  const filteredDocuments = useMemo(() => {
+    if (selectedAssetCategory === "all") return currentDocuments;
+
+    return currentDocuments.filter((doc) => {
+      const docTabValue = mapCategoryToTabValue(doc.category);
+      return docTabValue === selectedAssetCategory;
+    });
+  }, [currentDocuments, selectedAssetCategory]);
 
   /**
    * Display description - component description with fallback to project description
@@ -277,38 +335,36 @@ export default function ProjectDetailScreen() {
     );
   }, [aggregatedPictures, activePhotoTab]);
 
-  // Debug logging for component selection - verify state updates
-  useEffect(() => {
-    if (!project) return; // Don't log if project not loaded yet
-    
-    const heroUrl = currentComponent
-      ? getProjectThumbnail(project, currentComponent)
-      : getProjectThumbnail(project);
-    
-    console.log("🔴 STATE CHANGED:", {
-      selectedComponentId,
-      componentCategory: currentComponent?.category,
-      componentName: currentComponent?.name,
-      mediaCount: currentMedia?.length,
-      firstMediaUrl: currentMedia?.[0]?.url?.substring(0, 50),
-      description: displayDescription?.substring(0, 50),
-      heroImageUrl: heroUrl?.substring(0, 50),
-    });
-  }, [selectedComponentId, currentComponent, currentMedia, displayDescription, project]);
-
-  // Debug logging specifically for description changes
+  // Debug logging for asset filtering (current issue)
   useEffect(() => {
     if (!project) return;
-    
-    console.log("📝 DESCRIPTION CHECK:", {
-      componentId: selectedComponentId,
-      componentDesc: currentComponent?.description?.substring(0, 100),
-      projectDesc: project?.description?.substring(0, 100),
-      displayDesc: displayDescription?.substring(0, 100),
-      hasComponentDesc: !!currentComponent?.description,
-      hasProjectDesc: !!project?.description,
+
+    console.log("📁 Assets Filter Debug:", {
+      project: project.name,
+      componentId: currentComponent?.id,
+      componentLabel: currentComponentLabel,
+      selectedAssetCategory,
+      currentDocuments: currentDocuments.map((doc) => ({
+        id: doc.id,
+        name: doc.name,
+        category: doc.category,
+        type: doc.type,
+      })),
+      filteredDocuments: filteredDocuments.map((doc) => ({
+        id: doc.id,
+        name: doc.name,
+        category: doc.category,
+        type: doc.type,
+      })),
     });
-  }, [selectedComponentId, currentComponent, displayDescription, project]);
+  }, [
+    project,
+    currentComponent,
+    currentComponentLabel,
+    selectedAssetCategory,
+    currentDocuments,
+    filteredDocuments,
+  ]);
 
   const closeGallery = () => {
     setGalleryVisible(false);
@@ -745,6 +801,26 @@ export default function ProjectDetailScreen() {
           fontWeight: "600",
           color: theme.colors.interactive.primary,
         },
+        assetThumbnails: {
+          paddingHorizontal: DesignTokens.spacing[4],
+          gap: DesignTokens.spacing[4],
+          paddingBottom: DesignTokens.spacing[2],
+        },
+        moreAssetsButton: {
+          width: 120,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: theme.colors.background.secondary,
+          borderRadius: DesignTokens.borderRadius.lg,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          padding: DesignTokens.spacing[3],
+        },
+        moreAssetsText: {
+          color: theme.colors.text.primary,
+          fontFamily: DesignTokens.typography.fontFamily.semibold,
+          fontSize: DesignTokens.typography.fontSize.sm,
+        },
         logsList: {
           flexDirection: "column",
         },
@@ -1175,7 +1251,7 @@ export default function ProjectDetailScreen() {
             )}
           </ThemedView>
 
-          {/* Documents Section */}
+          {/* Assets Section */}
           {currentDocuments && currentDocuments.length > 0 && (
             <ThemedView style={styles.section}>
               <View style={styles.sectionHeader}>
@@ -1185,7 +1261,7 @@ export default function ProjectDetailScreen() {
                     { color: theme.colors.text.primary },
                   ]}
                 >
-                  Documents ({currentDocuments.length})
+                  Assets ({currentDocuments.length})
                 </ThemedText>
                 <Pressable
                   style={styles.viewAllButton}
@@ -1193,7 +1269,7 @@ export default function ProjectDetailScreen() {
                     router.push(`/project/${project.id}/documents`)
                   }
                   accessible={true}
-                  accessibilityLabel="View all documents"
+                  accessibilityLabel="View all assets"
                   accessibilityRole="button"
                 >
                   <ThemedText style={styles.viewAllButtonText}>
@@ -1206,28 +1282,48 @@ export default function ProjectDetailScreen() {
                   />
                 </Pressable>
               </View>
-              <ThemedView style={styles.documentsPreview}>
-                {currentDocuments
-                  .slice(0, 2)
-                  .map((item, index) => renderDocumentPreview(item, index))}
-                {currentDocuments.length > 2 && (
+
+              {/* Asset Category Tabs */}
+              <AssetCategoryTabs
+                activeTab={selectedAssetCategory}
+                onTabChange={setSelectedAssetCategory}
+                documents={currentDocuments}
+              />
+
+              {/* Asset Thumbnails */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.assetThumbnails}
+              >
+                {filteredDocuments.slice(0, 4).map((doc) => (
+                  <AssetThumbnail
+                    key={doc.id}
+                    document={doc}
+                    onPress={() => {
+                      // Navigate to documents screen (which handles PDF viewing)
+                      router.push(`/project/${project.id}/documents`);
+                    }}
+                  />
+                ))}
+                {filteredDocuments.length > 4 && (
                   <Pressable
-                    style={styles.moreDocumentsButton}
+                    style={styles.moreAssetsButton}
                     onPress={() =>
                       router.push(`/project/${project.id}/documents`)
                     }
                     accessible={true}
                     accessibilityLabel={`View ${
-                      currentDocuments.length - 2
-                    } more documents`}
+                      filteredDocuments.length - 4
+                    } more assets`}
                     accessibilityRole="button"
                   >
-                    <ThemedText style={styles.moreDocumentsText}>
-                      +{currentDocuments.length - 2} more
+                    <ThemedText style={styles.moreAssetsText}>
+                      +{filteredDocuments.length - 4} more
                     </ThemedText>
                   </Pressable>
                 )}
-              </ThemedView>
+              </ScrollView>
             </ThemedView>
           )}
 

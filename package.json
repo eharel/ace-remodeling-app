@@ -16,6 +16,7 @@
     "prebuild:clean": "expo prebuild --clean",
     "lint": "expo lint",
     "extract-projects": "tsx scripts/utilities/extractProjectList.ts",
+    "find-invalid-assets": "tsx scripts/utilities/findInvalidAssets.ts",
     "build:ios": "eas build --platform ios --profile production",
     "build:ios:submit": "eas build --platform ios --profile production --auto-submit",
     "build:preview": "eas build --platform ios --profile preview",

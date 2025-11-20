@@ -13,6 +13,10 @@ export { ImageLoadingSkeleton } from "./components/ImageLoadingSkeleton";
 export { MorePhotosCard } from "./components/MorePhotosCard";
 export { PhotoTabs } from "./components/PhotoTabs";
 export type { PhotoTabValue, PhotoCounts } from "./components/PhotoTabs";
+export { AssetCategoryTabs } from "./components/AssetCategoryTabs";
+export type { AssetCategoryValue, AssetCounts } from "./components/AssetCategoryTabs";
+export { AssetThumbnail } from "./components/AssetThumbnail";
+export type { AssetThumbnailProps } from "./components/AssetThumbnail";
 
 // Constants
 export * from "./constants/accessibilityStrings";

@@ -18,6 +18,8 @@ export const FILE_EXTENSIONS = {
   videos: [".mp4", ".mov", ".avi", ".m4v"],
   documents: [".pdf", ".doc", ".docx"],
   cad: [".dwg", ".dxf", ".skp"],
+  // Images that can be documents (high-res plans, specs, etc.)
+  imageDocuments: [".jpg", ".jpeg", ".png", ".heic"],
 } as const;
 
 /**
@@ -54,7 +56,10 @@ export function isVideoFile(filename: string): boolean {
 }
 
 /**
- * Check if file is an asset (PDF, CAD, etc.)
+ * Check if file is an asset (PDF, CAD, images, etc.)
+ *
+ * Assets include PDFs, CAD files, and high-resolution images (specs, plans, etc.).
+ * Images in /assets/ are treated as documents, not gallery photos.
  *
  * @param filename - Filename to check
  * @returns True if file is an asset type
@@ -64,6 +69,7 @@ export function isAssetFile(filename: string): boolean {
   const allAssetExtensions = [
     ...FILE_EXTENSIONS.documents,
     ...FILE_EXTENSIONS.cad,
+    ...FILE_EXTENSIONS.imageDocuments,
   ];
   return allAssetExtensions.includes(ext as any);
 }

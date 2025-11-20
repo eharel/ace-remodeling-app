@@ -378,15 +378,32 @@ function mapAssetTypeToDocumentType(
  * @param ext - File extension (e.g., ".pdf")
  * @returns MIME type string
  */
+/**
+ * Get MIME type from file extension
+ *
+ * Maps file extensions to proper MIME types for document assets.
+ * Supports PDFs, CAD files, and high-resolution images.
+ *
+ * @param ext - File extension (with or without dot)
+ * @returns MIME type string
+ */
 function getFileTypeFromExtension(ext: string): string {
   const extLower = ext.toLowerCase();
 
+  // Documents
   if ([".pdf"].includes(extLower)) return "application/pdf";
-  if ([".dwg", ".dxf"].includes(extLower)) return "application/acad";
-  if ([".doc", ".docx"].includes(extLower))
+  if ([".doc"].includes(extLower)) return "application/msword";
+  if ([".docx"].includes(extLower))
     return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+  // CAD files
+  if ([".dwg", ".dxf"].includes(extLower)) return "application/acad";
+  if ([".skp"].includes(extLower)) return "application/vnd.sketchup.skp";
+
+  // Images (high-res documents - specs, plans, etc.)
   if ([".jpg", ".jpeg"].includes(extLower)) return "image/jpeg";
   if ([".png"].includes(extLower)) return "image/png";
+  if ([".heic"].includes(extLower)) return "image/heic";
   if ([".gif"].includes(extLower)) return "image/gif";
   if ([".webp"].includes(extLower)) return "image/webp";
 

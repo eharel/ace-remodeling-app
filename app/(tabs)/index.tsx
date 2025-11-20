@@ -65,17 +65,6 @@ export default function ShowcaseScreen() {
       }
     });
 
-    // Debug logging
-    console.log("🔍 Featured Projects Debug:");
-    console.log(`  Total featured projects: ${featuredProjects.length}`);
-    console.log("  Featured projects by category:");
-    grouped.forEach((projects, category) => {
-      console.log(`    ${category}: ${projects.length} project(s)`);
-      projects.forEach((p) => {
-        console.log(`      - ${p.name} (${p.id}) - featured: ${p.isFeatured}`);
-      });
-    });
-
     return grouped;
   }, [featuredProjects]);
 
@@ -84,9 +73,7 @@ export default function ShowcaseScreen() {
    * Sorted by category name for consistent ordering
    */
   const categoriesWithFeatured = useMemo(() => {
-    const categories = Array.from(featuredByCategory.keys()).sort();
-    console.log("📋 Categories with featured projects:", categories);
-    return categories;
+    return Array.from(featuredByCategory.keys()).sort();
   }, [featuredByCategory]);
 
   const styles = StyleSheet.create({
@@ -179,7 +166,6 @@ export default function ShowcaseScreen() {
           categoriesWithFeatured.map((category) => {
             const projects = featuredByCategory.get(category);
             if (!projects || projects.length === 0) {
-              console.log(`⚠️  Skipping ${category}: no projects`);
               return null;
             }
 
@@ -189,7 +175,6 @@ export default function ShowcaseScreen() {
               ? getCategoryConfig(category)
               : null;
             if (!categoryConfig) {
-              console.log(`⚠️  Skipping ${category}: no category config found`);
               return null;
             }
 
@@ -198,13 +183,8 @@ export default function ShowcaseScreen() {
               "internal" in categoryConfig &&
               categoryConfig.internal === true
             ) {
-              console.log(`⚠️  Skipping ${category}: internal category`);
               return null;
             }
-
-            console.log(
-              `✅ Rendering section for ${category} with ${projects.length} project(s)`
-            );
             return (
               <FeaturedCategorySection
                 key={category}
