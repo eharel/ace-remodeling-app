@@ -13,6 +13,7 @@ export * from "./ProjectComponent";
 
 // Project types and utilities
 export * from "./Project";
+export type { ProjectSummary } from "./Project";
 export * from "./ProjectUtils";
 
 // Standalone content types

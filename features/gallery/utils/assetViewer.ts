@@ -116,7 +116,7 @@ export function convertDocumentsToPictures(documents: Document[]): Picture[] {
         uri: d.url,
         id: d.id,
         type: d.category || d.type || "Other",
-        description: d.name || d.filename,
+        description: d.name || d.filename || undefined,
         thumbnailUrl: d.thumbnailUrl,
       };
     })
@@ -154,7 +154,7 @@ export function convertMediaToPictures(media: MediaAsset[]): Picture[] {
       uri: m.url, // Convert url to uri for expo-image
       id: m.id,
       type: m.stage || "other", // Convert stage to type
-      description: m.caption || m.description || "", // Use caption or description
+      description: m.caption || m.description || undefined, // Use caption or description
       thumbnailUrl: m.thumbnailUrl,
     }));
 }

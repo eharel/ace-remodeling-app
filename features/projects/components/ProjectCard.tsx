@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectSummary } from "@/core/types";
+import { ProjectSummary, ProjectStatus } from "@/core/types";
 import { getStatusDisplayText, getStatusStyleKey } from "@/core/types/Status";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
@@ -221,11 +221,11 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
             <View
               style={[
                 styles.statusBadge,
-                styles[getStatusStyleKey(project.status)] as ViewStyle,
+                styles[getStatusStyleKey(project.status as ProjectStatus)] as ViewStyle,
               ]}
             >
               <ThemedText style={styles.statusText}>
-                {getStatusDisplayText(project.status)}
+                {getStatusDisplayText(project.status as ProjectStatus)}
               </ThemedText>
             </View>
 

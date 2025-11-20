@@ -35,7 +35,8 @@
     "version:patch": "npm version patch && node scripts/sync-version.js",
     "version:minor": "npm version minor && node scripts/sync-version.js",
     "version:major": "npm version major && node scripts/sync-version.js",
-    "version:info": "echo 'Current version:' && grep '\"version\":' package.json"
+    "version:info": "echo 'Current version:' && grep '\"version\":' package.json",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@expo/metro-config": "^54.0.3",
@@ -82,6 +83,7 @@
     "@babel/core": "^7.25.2",
     "@config-plugins/react-native-blob-util": "^12.0.0",
     "@config-plugins/react-native-pdf": "^12.0.0",
+    "@types/jest": "^30.0.0",
     "@types/papaparse": "^5.5.0",
     "@types/react": "~19.1.10",
     "eslint": "^9.25.0",

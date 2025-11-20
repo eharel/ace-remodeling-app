@@ -33,7 +33,21 @@ export default function DocumentsPage({}: DocumentsPageProps) {
 
   // Find the project by ID using Firebase data
   const project = projects.find((p) => p.id === id);
-  const documents = project?.documents || [];
+  
+  // Collect all documents from all components plus shared documents
+  const documents: Document[] = [];
+  if (project) {
+    // Add shared documents
+    if (project.sharedDocuments) {
+      documents.push(...project.sharedDocuments);
+    }
+    // Add documents from all components
+    project.components.forEach((component) => {
+      if (component.documents) {
+        documents.push(...component.documents);
+      }
+    });
+  }
 
   // Calculate grid layout
   const numColumns = 2;
@@ -119,7 +133,7 @@ export default function DocumentsPage({}: DocumentsPageProps) {
       padding: DesignTokens.spacing[4],
       marginBottom: DesignTokens.spacing[4],
       borderWidth: 1,
-      borderColor: theme.colors.border.subtle,
+      borderColor: theme.colors.border.secondary,
       ...DesignTokens.shadows.sm,
     },
     documentCardPressed: {

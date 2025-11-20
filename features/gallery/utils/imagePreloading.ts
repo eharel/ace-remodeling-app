@@ -157,8 +157,8 @@ export function createPreloadTimeout(
   imageId: string,
   timeoutMs: number,
   onTimeout: () => void
-): NodeJS.Timeout {
+): number {
   return setTimeout(() => {
     onTimeout();
-  }, timeoutMs);
+  }, timeoutMs) as unknown as number;
 }

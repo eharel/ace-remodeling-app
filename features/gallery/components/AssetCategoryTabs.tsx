@@ -204,7 +204,7 @@ export const AssetCategoryTabs: React.FC<AssetCategoryTabsProps> = ({
         },
         tabLabel: {
           fontSize: DesignTokens.typography.fontSize.base,
-          fontWeight: DesignTokens.typography.fontWeight.regular,
+          fontWeight: DesignTokens.typography.fontWeight.normal,
           color: theme.colors.text.secondary,
         },
         tabLabelActive: {
@@ -213,7 +213,7 @@ export const AssetCategoryTabs: React.FC<AssetCategoryTabsProps> = ({
         },
         tabCount: {
           fontSize: DesignTokens.typography.fontSize.sm,
-          fontWeight: DesignTokens.typography.fontWeight.regular,
+          fontWeight: DesignTokens.typography.fontWeight.normal,
           color: theme.colors.text.secondary,
         },
         tabCountActive: {

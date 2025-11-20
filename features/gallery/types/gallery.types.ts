@@ -5,6 +5,31 @@ import { SharedValue } from "react-native-reanimated";
 import { Picture } from "@/core/types";
 
 /**
+ * Performance metrics for a single measurement
+ */
+export interface PerformanceMetrics {
+  renderTime: number;
+  imageLoadTime: number;
+  memoryUsage: number;
+  frameRate: number;
+  gestureResponseTime: number;
+}
+
+/**
+ * Aggregated performance statistics
+ */
+export interface PerformanceStats {
+  averageRenderTime: number;
+  averageImageLoadTime: number;
+  averageMemoryUsage: number;
+  averageFrameRate: number;
+  averageGestureResponseTime: number;
+  totalRenders: number;
+  totalImageLoads: number;
+  performanceScore: number; // 0-100
+}
+
+/**
  * Theme interface for gallery components
  *
  * Defines the minimal theme structure required by gallery components.

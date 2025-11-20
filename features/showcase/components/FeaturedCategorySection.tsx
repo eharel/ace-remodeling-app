@@ -19,7 +19,7 @@ import Animated, {
 import { getCategoryConfig } from "@/core/constants/categoryConfig";
 import { DesignTokens } from "@/core/themes";
 import { Project, getProjectThumbnail } from "@/core/types";
-import { ComponentCategory } from "@/core/types/ComponentCategory";
+import { ComponentCategory, CoreCategory } from "@/core/types/ComponentCategory";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { getCategoryIcon } from "@/shared/utils";
@@ -272,7 +272,7 @@ export function FeaturedCategorySection({
   const { theme } = useTheme();
 
   // Get category config and icon - use fallbacks if not found
-  const categoryConfig = getCategoryConfig(category);
+  const categoryConfig = getCategoryConfig(category as CoreCategory);
   const categoryIcon = getCategoryIcon(category);
 
   // Dynamic styles - only theme-dependent colors

@@ -76,7 +76,7 @@ export const useLazyLoading = ({
     visibleIndices: new Set(),
   });
 
-  const loadTimeouts = useRef<Map<number, NodeJS.Timeout>>(new Map());
+  const loadTimeouts = useRef<Map<number, number>>(new Map());
 
   // Get indices that should be visible (rendered) using utility function
   const getVisibleIndicesCallback = useCallback(() => {
@@ -126,7 +126,7 @@ export const useLazyLoading = ({
         }, LAZY_LOADING_CONSTANTS.SIMULATED_LOAD_TIME);
 
         loadTimeouts.current.delete(index);
-      }, delay);
+      }, delay) as unknown as number;
 
       loadTimeouts.current.set(index, timeout);
     },

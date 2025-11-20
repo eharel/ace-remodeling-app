@@ -55,7 +55,9 @@ export const PERFORMANCE_PENALTIES = {
  * // Returns: ~95 (good performance)
  * ```
  */
-export function calculatePerformanceScore(stats: PerformanceStats): number {
+export function calculatePerformanceScore(
+  stats: Omit<PerformanceStats, "performanceScore">
+): number {
   let score = 100;
 
   // Penalize slow renders (target: <16ms for 60fps)

@@ -1,3 +1,4 @@
+import { ComponentCategory } from "./ComponentCategory";
 import { Document } from "./Document";
 import { Log } from "./Log";
 import { MediaAsset } from "./MediaAsset";
@@ -165,4 +166,25 @@ export interface Project {
 
   /** ISO format timestamp of last project update */
   updatedAt: string;
+}
+
+/**
+ * Lightweight project summary for lists and cards
+ *
+ * Used for displaying projects in galleries, search results, and category pages.
+ * Contains only the essential fields needed for preview display.
+ */
+export interface ProjectSummary {
+  id: string;
+  projectNumber: string;
+  name: string;
+  briefDescription?: string;
+  thumbnail: string;
+  status: ProjectStatus | string; // Allow string for flexibility
+  category: ComponentCategory | string; // Allow string for flexibility
+  completedAt?: string;
+  location?: {
+    neighborhood?: string;
+    zipCode?: string;
+  };
 }

@@ -500,9 +500,11 @@ export function FilterDropdown<T extends string>({
                   } filter${tempSelectedValues.length === 1 ? "" : "s"}`}
                   style={{ flex: 1 }}
                 >
-                  Apply
-                  {tempSelectedValues.length > 0 &&
-                    ` (${tempSelectedValues.length})`}
+                  {`Apply${
+                    tempSelectedValues.length > 0
+                      ? ` (${tempSelectedValues.length})`
+                      : ""
+                  }`}
                 </ThemedButton>
               </ThemedView>
             </ThemedView>

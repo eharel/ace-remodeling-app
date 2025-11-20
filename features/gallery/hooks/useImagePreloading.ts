@@ -70,7 +70,7 @@ export const useImagePreloading = ({
     failed: new Set(),
   });
 
-  const preloadTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const preloadTimeouts = useRef<Map<string, number>>(new Map());
 
   // Get images that should be preloaded using utility function
   const getPreloadIndicesCallback = useCallback(() => {

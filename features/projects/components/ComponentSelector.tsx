@@ -81,7 +81,6 @@ export function ComponentSelector({
                   borderColor: theme.colors.interactive.primary,
                 },
               ]}
-              activeOpacity={DesignTokens.interactions.activeOpacity}
               accessibilityRole="button"
               accessibilityLabel={`Select ${label} component`}
               accessibilityState={{ selected: isSelected }}

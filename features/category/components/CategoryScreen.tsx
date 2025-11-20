@@ -58,6 +58,7 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
         if (matchingComponent) {
           // Navigate with componentId param to open directly to that component
           router.push({
+            // @ts-expect-error - Expo Router generated types are overly strict
             pathname: `/project/${fullProject.id}`,
             params: { componentId: matchingComponent.id },
           });
@@ -67,7 +68,7 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
         }
       } else {
         // Fallback: project not found, use summary ID
-        router.push(`/project/${projectSummary.id}`);
+        router.push(`/project/${projectSummary.id}` as any);
       }
     } catch (error) {
       // Navigation error - silently fail

@@ -5,25 +5,7 @@ import {
   createDefaultPerformanceStats,
   getPerformanceRecommendations,
 } from "../utils/galleryPerformance";
-
-interface PerformanceMetrics {
-  renderTime: number;
-  imageLoadTime: number;
-  memoryUsage: number;
-  frameRate: number;
-  gestureResponseTime: number;
-}
-
-interface PerformanceStats {
-  averageRenderTime: number;
-  averageImageLoadTime: number;
-  averageMemoryUsage: number;
-  averageFrameRate: number;
-  averageGestureResponseTime: number;
-  totalRenders: number;
-  totalImageLoads: number;
-  performanceScore: number; // 0-100
-}
+import { PerformanceMetrics, PerformanceStats } from "../types/gallery.types";
 
 /**
  * usePerformanceMonitoring - Custom hook for monitoring gallery performance metrics

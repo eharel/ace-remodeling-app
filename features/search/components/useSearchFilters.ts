@@ -53,7 +53,7 @@ export function useSearchFilters(projects: Project[]) {
   const availableProjectManagers = useMemo(() => {
     const pmSet = new Set<string>();
     projects.forEach((project) => {
-      project.pms?.forEach((pm) => {
+      project.projectManagers?.forEach((pm) => {
         if (pm.name) {
           pmSet.add(pm.name);
         }

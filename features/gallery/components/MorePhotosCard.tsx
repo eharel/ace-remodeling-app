@@ -99,7 +99,7 @@ export const MorePhotosCard: React.FC<MorePhotosCardProps> = ({
     >
       {backgroundPhoto && (
         <Image
-          source={{ uri: backgroundPhoto.url }}
+          source={{ uri: backgroundPhoto.uri }}
           style={styles.backgroundImage}
           contentFit="cover"
         />
