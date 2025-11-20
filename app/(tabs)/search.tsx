@@ -5,15 +5,18 @@ import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
 import { DesignTokens } from "@/core/themes";
-import { commonStyles } from "@/shared/utils";
 import {
+  ComponentCategory,
   Project,
+  ProjectComponent,
+  ProjectStatus,
   getProjectCompletionDate,
   getProjectPMNames,
   getProjectThumbnail,
 } from "@/core/types";
 import { ProjectGallery } from "@/features/projects";
 import {
+  SearchFilters,
   SearchFiltersBar,
   SearchInputWithHistory,
   useSearchFilters,
@@ -25,7 +28,7 @@ import {
   ThemedView,
 } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
-import { logError, logWarning, useSearchHistory } from "@/shared/utils";
+import { commonStyles, logError, useSearchHistory } from "@/shared/utils";
 
 // Constants
 const SEARCH_DEBOUNCE_MS = 500;
@@ -80,18 +83,31 @@ export default function SearchScreen() {
   const { theme } = useTheme();
   const { projects, loading: projectsLoading } = useProjects();
   const [searchQuery, setSearchQuery] = useState("");
-  // ProjectSummary is a simplified Project for display - using inline type
-  type ProjectSummary = {
-    id: string;
+
+  // SearchResult represents a matched component from a project
+  type SearchResult = {
+    // Project info
+    projectId: string;
     projectNumber: string;
-    name: string;
-    category: string;
-    briefDescription: string;
+    projectName: string;
+
+    // Component info (the matched component)
+    componentId: string;
+    componentCategory: string;
+    componentName?: string;
+    componentSummary?: string;
+
+    // Display info
     thumbnail: string;
     status: string;
     completedAt?: string;
+
+    // Search metadata
+    matchType: "project" | "component";
+    matchedField?: string;
   };
-  const [searchResults, setSearchResults] = useState<ProjectSummary[]>([]);
+
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [debouncedSearchQuery] = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
@@ -106,7 +122,7 @@ export default function SearchScreen() {
     resetFilters,
     hasActiveFilters,
     activeFilterCount,
-    applyFilters,
+    filters,
     availableProjectManagers,
     availableTags,
     getCategoryFilters,
@@ -115,23 +131,89 @@ export default function SearchScreen() {
     getTagFilters,
   } = useSearchFilters(projects);
 
-  // Memoized function to create searchable text from a project
-  const createSearchableText = useCallback((project: Project) => {
+  // Create searchable text for PROJECT-LEVEL fields only
+  const createProjectSearchableText = useCallback((project: Project) => {
     const pmNames = getProjectPMNames(project);
     return [
+      project.number, // ✅ Correct field name
       project.name,
-      project.briefDescription,
-      project.longDescription || "",
       project.location?.zipCode || "",
       project.location?.neighborhood || "",
+      project.status,
       ...(project.tags || []),
-      project.scope || "",
-      project.projectNumber || "",
       ...pmNames,
     ]
+      .filter(Boolean)
       .join(" ")
       .toLowerCase();
   }, []);
+
+  // Create searchable text for COMPONENT-LEVEL fields
+  const createComponentSearchableText = useCallback(
+    (component: ProjectComponent) => {
+      return [
+        component.category,
+        component.subcategory || "",
+        component.name || "",
+        component.summary || "",
+        component.description || "",
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+    },
+    []
+  );
+
+  // Helper to check if a component passes filter criteria
+  const applyComponentFilters = useCallback(
+    (
+      project: Project,
+      component: ProjectComponent,
+      filters: SearchFilters
+    ): boolean => {
+      // Category filter (component-level)
+      if (filters.categories.length > 0) {
+        if (
+          !filters.categories.includes(component.category as ComponentCategory)
+        ) {
+          return false;
+        }
+      }
+
+      // Status filter (project-level)
+      if (filters.statuses.length > 0) {
+        if (!filters.statuses.includes(project.status as ProjectStatus)) {
+          return false;
+        }
+      }
+
+      // Project Manager filter (project-level)
+      if (filters.projectManagers.length > 0) {
+        const projectPMs = project.projectManagers?.map((pm) => pm.name) || [];
+        const hasMatchingPM = filters.projectManagers.some((filterPM) =>
+          projectPMs.includes(filterPM)
+        );
+        if (!hasMatchingPM) {
+          return false;
+        }
+      }
+
+      // Tags filter (project-level)
+      if (filters.tags.length > 0) {
+        const projectTags = project.tags || [];
+        const hasMatchingTag = filters.tags.some((filterTag) =>
+          projectTags.includes(filterTag)
+        );
+        if (!hasMatchingTag) {
+          return false;
+        }
+      }
+
+      return true;
+    },
+    []
+  );
 
   // Memoized search function with error handling
   const searchProjects = useCallback(
@@ -141,49 +223,102 @@ export default function SearchScreen() {
           throw new Error("Project data is not available");
         }
 
-        // Step 1: Apply filters first
-        let filteredProjects = applyFilters(projects);
+        const searchTerms = query
+          .toLowerCase()
+          .trim()
+          .split(/\s+/)
+          .filter((term) => term.length > 0);
 
-        // Step 2: If there's a text query, apply text search to filtered results
-        if (query.trim() !== "") {
-          const searchTerms = query
-            .toLowerCase()
-            .trim()
-            .split(/\s+/)
-            .filter((term) => term.length > 0);
+        const hasTextQuery = searchTerms.length > 0;
 
-          filteredProjects = filteredProjects.filter((project) => {
-            try {
-              const searchableText = createSearchableText(project);
-              return searchTerms.every((term) => searchableText.includes(term));
-            } catch (error) {
-              logWarning(`Error processing project ${project.id}`, {
+        // Results array: one result per matched component
+        const results: SearchResult[] = [];
+
+        projects.forEach((project) => {
+          // Check project-level match
+          let projectMatches = false;
+          if (hasTextQuery) {
+            const projectText = createProjectSearchableText(project);
+            projectMatches = searchTerms.every((term) =>
+              projectText.includes(term)
+            );
+          }
+
+          // Check each component
+          project.components.forEach((component) => {
+            let shouldInclude = false;
+            let matchType: "project" | "component" = "project";
+
+            // If text query exists, check for matches
+            if (hasTextQuery) {
+              if (projectMatches) {
+                // Project-level match means all components match
+                shouldInclude = true;
+                matchType = "project";
+              } else {
+                // Check component-level match
+                const componentText = createComponentSearchableText(component);
+                const componentMatches = searchTerms.every((term) =>
+                  componentText.includes(term)
+                );
+                if (componentMatches) {
+                  shouldInclude = true;
+                  matchType = "component";
+                }
+              }
+            } else {
+              // No text query - include all (will be filtered by filters)
+              shouldInclude = true;
+            }
+
+            // Apply filters (always, even with no text query)
+            if (shouldInclude && hasActiveFilters) {
+              // Check filters against this specific component
+              shouldInclude = applyComponentFilters(
+                project,
+                component,
+                filters
+              );
+            }
+
+            if (shouldInclude) {
+              // Get component thumbnail or fallback to project thumbnail
+              const componentThumbnail =
+                component.thumbnail ||
+                component.media?.[0]?.url ||
+                getProjectThumbnail(project);
+
+              results.push({
                 projectId: project.id,
-                error: error,
+                projectNumber: project.number,
+                projectName: project.name,
+                componentId: component.id,
+                componentCategory: component.category,
+                componentName: component.name,
+                componentSummary: component.summary,
+                thumbnail: componentThumbnail,
+                status: project.status,
+                completedAt: getProjectCompletionDate(project),
+                matchType,
               });
-              return false;
             }
           });
-        }
+        });
 
-        // Step 3: Map to ProjectSummary format (using new Project structure)
-        return filteredProjects.map((project) => ({
-          id: project.id,
-          projectNumber: project.number, // Use new field name
-          name: project.name,
-          category: project.components[0]?.category || "miscellaneous", // Use first component's category
-          briefDescription: project.summary, // Use new field name
-          thumbnail: getProjectThumbnail(project), // Use thumbnail with fallback
-          status: project.status,
-          completedAt: getProjectCompletionDate(project),
-          // REMOVED: pmNames - computed field no longer stored
-        }));
+        return results;
       } catch (error) {
-        logError("Search operation failed", { query, error: error });
+        logError("Search operation failed", { query, error });
         throw error;
       }
     },
-    [createSearchableText, projects, applyFilters]
+    [
+      projects,
+      createProjectSearchableText,
+      createComponentSearchableText,
+      filters,
+      hasActiveFilters,
+      applyComponentFilters,
+    ]
   );
 
   useEffect(() => {
@@ -219,16 +354,19 @@ export default function SearchScreen() {
     }
   }, [searchResults, debouncedSearchQuery, isSearching, projectsLoading]);
 
-  const handleProjectPress = (project: ProjectSummary) => {
+  const handleProjectPress = (result: SearchResult) => {
     try {
-      if (!project?.id) {
-        throw new Error("Invalid project data");
+      if (!result?.projectId || !result?.componentId) {
+        throw new Error("Invalid search result data");
       }
-      router.push(`/project/${project.id}`);
+
+      // Navigate to project with component context
+      router.push({
+        pathname: `/project/${result.projectId}` as any,
+        params: { componentId: result.componentId },
+      });
     } catch (error) {
       console.error("Navigation error:", error);
-      // In a real app, you might show a toast or alert here
-      // For now, we'll just log the error
     }
   };
 
@@ -254,8 +392,30 @@ export default function SearchScreen() {
           onRemoveHistory={removeFromHistory}
           onClearHistory={clearHistory}
           onAddToHistory={addToHistory}
-          projects={searchResults}
-          onSelectProject={(id) => router.push(`/project/${id}`)}
+          projects={searchResults.map((result) => ({
+            id: result.projectId,
+            projectNumber: result.projectNumber,
+            name: `${result.projectName}${
+              result.componentName ? ` - ${result.componentName}` : ""
+            }`,
+            category: result.componentCategory,
+            briefDescription: result.componentSummary || "",
+            thumbnail: result.thumbnail,
+            status: result.status,
+            completedAt: result.completedAt,
+          }))}
+          onSelectProject={(id) => {
+            // Find the result and navigate with componentId
+            const result = searchResults.find((r) => r.projectId === id);
+            if (result) {
+              router.push({
+                pathname: `/project/${result.projectId}` as any,
+                params: { componentId: result.componentId },
+              });
+            } else {
+              router.push(`/project/${id}` as any);
+            }
+          }}
         />
       </PageHeader>
 
@@ -341,8 +501,27 @@ export default function SearchScreen() {
             </ThemedText>
           </ThemedView>
           <ProjectGallery
-            projects={searchResults}
-            onProjectPress={handleProjectPress}
+            projects={searchResults.map((result) => ({
+              id: result.projectId,
+              projectNumber: result.projectNumber,
+              name: `${result.projectName}${
+                result.componentName ? ` - ${result.componentName}` : ""
+              }`,
+              category: result.componentCategory,
+              briefDescription: result.componentSummary || "",
+              thumbnail: result.thumbnail,
+              status: result.status,
+              completedAt: result.completedAt,
+            }))}
+            onProjectPress={(summary) => {
+              // Find the original result to get componentId
+              const result = searchResults.find(
+                (r) => r.projectId === summary.id
+              );
+              if (result) {
+                handleProjectPress(result);
+              }
+            }}
           />
         </ThemedView>
       ) : (
