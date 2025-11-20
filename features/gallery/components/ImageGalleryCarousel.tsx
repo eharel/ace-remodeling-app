@@ -1,9 +1,17 @@
-import React, { useMemo } from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  Dimensions,
+  ImageStyle,
+  InteractionManager,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { DesignTokens } from "@/core/themes";
+import { Picture } from "@/core/types";
 import { Image } from "expo-image";
 import { accessibilityStrings } from "../constants/accessibilityStrings";
 import { useImageLoading } from "../hooks/useImageLoading";
@@ -13,6 +21,108 @@ import { ImageGalleryCarouselProps } from "../types/gallery.types";
 import { ImageErrorState } from "./ImageErrorState";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+
+/**
+ * Memoized image item component to prevent unnecessary re-renders
+ * Only re-renders when its own props change, not when currentIndex changes
+ */
+const CarouselImageItem = React.memo<{
+  image: Picture & { actualIndex: number };
+  index: number;
+  isCurrentImage: boolean;
+  shouldRender: boolean;
+  hasError: boolean;
+  errorMessage: string | undefined;
+  onImageLoad: (id: string) => void;
+  onImageError: (id: string, error: string) => void;
+  imageContainerStyle: ViewStyle;
+  imageStyle: ImageStyle;
+  totalImages: number;
+}>(
+  ({
+    image,
+    index,
+    isCurrentImage,
+    shouldRender,
+    hasError,
+    errorMessage,
+    onImageLoad,
+    onImageError,
+    imageContainerStyle,
+    imageStyle,
+    totalImages,
+  }) => {
+    return (
+      <View
+        key={image.id}
+        style={imageContainerStyle}
+        accessible={isCurrentImage}
+        accessibilityLabel={accessibilityStrings.image.getLabel(
+          index,
+          totalImages,
+          image.type,
+          image.description
+        )}
+        accessibilityRole="image"
+        accessibilityHint={accessibilityStrings.image.getHint(isCurrentImage)}
+      >
+        {shouldRender && hasError && (
+          <ImageErrorState
+            error={errorMessage}
+            onRetry={() => {
+              // Reset the image state and retry loading
+              onImageError(image.id, "");
+            }}
+          />
+        )}
+
+        {shouldRender && !hasError && (
+          <Image
+            source={{ uri: image.uri }}
+            style={imageStyle}
+            contentFit="contain"
+            // Performance optimizations
+            cachePolicy="memory-disk"
+            priority={isCurrentImage ? "high" : "normal"}
+            transition={200}
+            recyclingKey={image.id}
+            // Accessibility
+            accessibilityLabel={accessibilityStrings.image.getLabel(
+              index,
+              totalImages,
+              image.type,
+              image.description
+            )}
+            accessibilityHint={accessibilityStrings.image.getHint(
+              isCurrentImage
+            )}
+            accessibilityRole="image"
+            // Event handlers
+            onLoad={() => onImageLoad(image.id)}
+            onError={() => onImageError(image.id, "Failed to load image")}
+          />
+        )}
+      </View>
+    );
+  },
+  (prevProps, nextProps) => {
+    // Only re-render if:
+    // - Image data changes
+    // - Should render status changes
+    // - Error state changes
+    // - Current image status changes (for priority/accessibility)
+    return (
+      prevProps.image.id === nextProps.image.id &&
+      prevProps.image.uri === nextProps.image.uri &&
+      prevProps.shouldRender === nextProps.shouldRender &&
+      prevProps.hasError === nextProps.hasError &&
+      prevProps.errorMessage === nextProps.errorMessage &&
+      prevProps.isCurrentImage === nextProps.isCurrentImage
+    );
+  }
+);
+
+CarouselImageItem.displayName = "CarouselImageItem";
 
 /**
  * ImageGalleryCarousel - Main carousel component for displaying and navigating images
@@ -54,6 +164,48 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
     const { hasError, getImageError, onImageLoad, onImageError } =
       useImageLoading({ images });
 
+    // Track pending image load callbacks to batch them and avoid blocking gestures
+    const pendingLoadCallbacksRef = useRef<Set<string>>(new Set());
+    const pendingLoadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+      null
+    );
+
+    // Deferred image load callback that batches updates to avoid blocking gestures
+    const deferredOnImageLoad = useCallback(
+      (imageId: string) => {
+        // Always defer using InteractionManager to avoid blocking UI thread
+        // This ensures callbacks don't fire during active animations/gestures
+        pendingLoadCallbacksRef.current.add(imageId);
+
+        // Clear existing timeout
+        if (pendingLoadTimeoutRef.current) {
+          clearTimeout(pendingLoadTimeoutRef.current);
+        }
+
+        // Batch callbacks and execute after interactions complete
+        pendingLoadTimeoutRef.current = setTimeout(() => {
+          InteractionManager.runAfterInteractions(() => {
+            // Execute all pending callbacks
+            pendingLoadCallbacksRef.current.forEach((id) => {
+              onImageLoad(id);
+            });
+            pendingLoadCallbacksRef.current.clear();
+            pendingLoadTimeoutRef.current = null;
+          });
+        }, 150); // Small delay to batch multiple loads that happen during swipe
+      },
+      [onImageLoad]
+    );
+
+    // Cleanup on unmount
+    useEffect(() => {
+      return () => {
+        if (pendingLoadTimeoutRef.current) {
+          clearTimeout(pendingLoadTimeoutRef.current);
+        }
+      };
+    }, []);
+
     // Performance optimizations - preloading happens in background
     useImagePreloading({
       images,
@@ -61,13 +213,28 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
       preloadRadius: 2,
     });
 
-    // Only use lazy loading for galleries with more than 10 images
-    const { shouldRenderImage } = useLazyLoading({
+    // For performance: Always render images for small/medium galleries
+    // This eliminates re-renders from lazy loading state changes
+    // Only use conditional rendering for very large galleries (20+ images)
+    const shouldUseLazyLoading = images.length > 20;
+
+    // Use lazy loading hook only for very large galleries
+    // For smaller galleries, always render to avoid re-render stutters
+    const { shouldRenderImage: lazyShouldRenderImage } = useLazyLoading({
       images,
       currentIndex,
-      visibleRange: images.length > 10 ? 5 : images.length, // Render all images for small galleries
-      loadThreshold: 2,
+      visibleRange: shouldUseLazyLoading ? 8 : images.length, // Wider range for large galleries
+      loadThreshold: shouldUseLazyLoading ? 4 : images.length,
     });
+
+    // Wrapper that always returns true for small galleries
+    const shouldRenderImage = useCallback(
+      (index: number) => {
+        if (!shouldUseLazyLoading) return true;
+        return lazyShouldRenderImage(index);
+      },
+      [shouldUseLazyLoading, lazyShouldRenderImage]
+    );
 
     // const {
     //   startRenderTiming,
@@ -135,67 +302,23 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
               const isCurrentImage = index === currentIndex;
               const imageError = hasError(image.id);
               const errorMessage = getImageError(image.id);
-
-              // Performance optimizations - testing preloading + lazy loading
               const shouldRender = shouldRenderImage(index);
 
-              // Always render a container to maintain carousel positioning
-              // but only load the actual image if in visible range
               return (
-                <View
+                <CarouselImageItem
                   key={image.id}
-                  style={styles.imageContainer}
-                  accessible={isCurrentImage}
-                  accessibilityLabel={accessibilityStrings.image.getLabel(
-                    index,
-                    images.length,
-                    image.type,
-                    image.description
-                  )}
-                  accessibilityRole="image"
-                  accessibilityHint={accessibilityStrings.image.getHint(
-                    isCurrentImage
-                  )}
-                >
-                  {shouldRender && imageError && (
-                    <ImageErrorState
-                      error={errorMessage}
-                      onRetry={() => {
-                        // Reset the image state and retry loading
-                        onImageError(image.id, "");
-                      }}
-                    />
-                  )}
-
-                  {shouldRender && !imageError && (
-                    <Image
-                      source={{ uri: image.uri }}
-                      style={styles.image}
-                      contentFit="contain"
-                      // Performance optimizations
-                      cachePolicy="memory-disk"
-                      priority={isCurrentImage ? "high" : "normal"}
-                      transition={200}
-                      recyclingKey={image.id}
-                      // Accessibility
-                      accessibilityLabel={accessibilityStrings.image.getLabel(
-                        index,
-                        images.length,
-                        image.type,
-                        image.description
-                      )}
-                      accessibilityHint={accessibilityStrings.image.getHint(
-                        isCurrentImage
-                      )}
-                      accessibilityRole="image"
-                      // Event handlers
-                      onLoad={() => onImageLoad(image.id)}
-                      onError={() =>
-                        onImageError(image.id, "Failed to load image")
-                      }
-                    />
-                  )}
-                </View>
+                  image={image}
+                  index={index}
+                  isCurrentImage={isCurrentImage}
+                  shouldRender={shouldRender}
+                  hasError={imageError}
+                  errorMessage={errorMessage}
+                  onImageLoad={deferredOnImageLoad}
+                  onImageError={onImageError}
+                  imageContainerStyle={styles.imageContainer}
+                  imageStyle={styles.image}
+                  totalImages={images.length}
+                />
               );
             })}
           </Animated.View>
@@ -204,14 +327,14 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
     );
   },
   (prevProps, nextProps) => {
-    // Re-render only when images array reference changes
-    // currentIndex changes are handled by animated transforms, not re-renders
-    // Note: We still need to re-render on currentIndex changes for accessibility
-    // but the images themselves don't need to re-render
+    // Optimized memo: Don't re-render on currentIndex changes
+    // Individual image components handle their own currentIndex updates
+    // Only re-render when images array or theme changes
     return (
       prevProps.images === nextProps.images &&
-      prevProps.currentIndex === nextProps.currentIndex &&
-      prevProps.theme === nextProps.theme
+      prevProps.theme === nextProps.theme &&
+      prevProps.translateX === nextProps.translateX &&
+      prevProps.panGesture === nextProps.panGesture
     );
   }
 );
