@@ -113,7 +113,7 @@ export const useImagePreloading = ({
 
       try {
         // Use expo-image's prefetch method for React Native
-        await Image.prefetch(image.url);
+        await Image.prefetch(image.uri);
 
         // Clear timeout on success
         clearTimeout(timeout);

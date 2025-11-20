@@ -98,11 +98,10 @@ export const useMemoryManagement = ({
 
       // Trigger memory warning if pressure is high
       if (newStats.memoryPressure === "high" && onMemoryWarning) {
-        console.warn("🚨 High memory pressure detected");
         onMemoryWarning();
       }
     } catch (error) {
-      console.warn("Memory check failed:", error);
+      // Memory check failed - silently ignore
     }
   }, [onMemoryWarning]);
 

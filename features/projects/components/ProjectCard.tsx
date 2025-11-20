@@ -33,22 +33,7 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
   };
 
   const handleImageError = (error: any) => {
-    console.error(
-      `❌ Failed to load image for project "${project.name}"`,
-      {
-        projectId: project.id,
-        thumbnailUrl: project.thumbnail,
-      },
-      error
-    );
-
-    // Log to error logging system
-    logError(`Failed to load image for project "${project.name}"`, {
-      projectId: project.id,
-      projectName: project.name,
-      thumbnailUrl: project.thumbnail,
-      error: error,
-    });
+    // Image load error - silently fail
 
     setImageLoading(false);
     setImageError(true);

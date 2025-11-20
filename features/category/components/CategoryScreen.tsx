@@ -70,8 +70,7 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
         router.push(`/project/${projectSummary.id}`);
       }
     } catch (error) {
-      console.error("Navigation error:", error);
-      // In a real app, you might show a toast or alert here
+      // Navigation error - silently fail
     }
   };
 

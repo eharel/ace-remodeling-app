@@ -119,19 +119,6 @@ export const AssetCategoryTabs: React.FC<AssetCategoryTabsProps> = ({
   }, [documents]);
 
   // Debug logging to investigate categorization issues
-  useEffect(() => {
-    console.log('📁 ASSET CATEGORIES DEBUG:', {
-      totalDocuments: documents.length,
-      documentCategories: documents.map(d => ({
-        name: d.name,
-        category: d.category,
-        type: d.type,
-        categoryType: typeof d.category,
-        typeType: typeof d.type,
-      })),
-      categoryCounts: assetCounts,
-    });
-  }, [documents, assetCounts]);
 
   // Helper function to get label for tab value
   const getTabLabel = (tabValue: AssetCategoryValue): string => {

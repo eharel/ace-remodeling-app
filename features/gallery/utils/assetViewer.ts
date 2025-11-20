@@ -45,25 +45,38 @@ export function openAsset(
     document.fileType?.includes("image/") ||
     document.filename.match(/\.(jpg|jpeg|png|heic)$/i)
   ) {
-    // Filter to only images from all documents
+    // Filter to only images from the provided documents
+    // This should match the same filtering used to create assetGalleryImages
     const imageDocuments = allDocuments.filter(
       (d) =>
         d.fileType?.includes("image/") ||
         d.filename.match(/\.(jpg|jpeg|png|heic)$/i)
     );
 
-    // Find the index of the clicked image
+    // Only proceed if we have images
+    if (imageDocuments.length === 0) {
+      return;
+    }
+
+    // Find the index of the clicked image in the filtered list
     const imageIndex = imageDocuments.findIndex((d) => d.id === document.id);
 
+    // Ensure index is valid
+    if (imageIndex < 0) {
+      // Fallback: open with first image (index 0)
+      setSelectedAssetIndex(0);
+    } else {
+      // Ensure index is within bounds (defensive check)
+      const safeIndex = Math.max(0, Math.min(imageIndex, imageDocuments.length - 1));
+      setSelectedAssetIndex(safeIndex);
+    }
+
     // Open gallery
-    setSelectedAssetIndex(imageIndex >= 0 ? imageIndex : 0);
     setAssetGalleryVisible(true);
     return;
   }
 
-  // Fallback for unknown file types
-  console.warn("Unknown asset file type:", document.fileType);
-  // Could show an error or try to open in PDF viewer as fallback
+  // Fallback for unknown file types - silently ignore
 }
 
 /**
@@ -78,14 +91,35 @@ export function openAsset(
 export function convertDocumentsToPictures(
   documents: Document[]
 ): Array<{ uri: string; id?: string }> {
-  return documents
+  console.log('\n=== CONVERT DOCUMENTS TO PICTURES ===');
+  console.log('📦 Input documents:', documents.length);
+  
+  const result = documents
     .filter(
       (d) =>
         d.fileType?.includes("image/") ||
         d.filename.match(/\.(jpg|jpeg|png|heic)$/i)
     )
-    .map((d) => ({
-      uri: d.url,
-      id: d.id,
-    }));
+    .filter((d) => d.url && d.url.trim().length > 0) // Ensure URL exists and is not empty
+    .map((d) => {
+      console.log(`  📄 Mapping doc:`, {
+        docId: d.id,
+        filename: d.filename,
+        idType: typeof d.id,
+        idLength: d.id?.length,
+      });
+      return {
+        uri: d.url,
+        id: d.id,
+      };
+    })
+    .filter((pic) => pic.uri && pic.uri.trim().length > 0); // Final safety check
+  
+  console.log('🖼️  Output pictures:', result.length);
+  result.forEach((pic, i) => {
+    console.log(`  [${i}] id: ${pic.id} (type: ${typeof pic.id}, length: ${pic.id?.length})`);
+  });
+  console.log('=== END CONVERT ===\n');
+  
+  return result;
 }

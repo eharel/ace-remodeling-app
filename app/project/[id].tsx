@@ -1,35 +1,32 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import {
+  AssetCategoryTabs,
+  type AssetCategoryValue,
+  AssetThumbnail,
+  convertDocumentsToPictures,
   ImageGalleryModal,
   MorePhotosCard,
   PhotoTabs,
   type PhotoTabValue,
-  AssetCategoryTabs,
-  type AssetCategoryValue,
-  AssetThumbnail,
-  openAsset,
-  convertDocumentsToPictures,
 } from "@/features/gallery";
-import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
-import { useProjects, useTheme, getProjectMedia } from "@/shared/contexts";
 import { ComponentSelector } from "@/features/projects";
+import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
+import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/core/themes";
 import {
+  getCategoryLabel,
+  getProjectThumbnail,
+  getSubcategoryLabel,
   Project,
   ProjectComponent,
-  getProjectThumbnail,
-  getCategoryLabel,
-  getSubcategoryLabel,
-  Document,
-  DOCUMENT_TYPES,
 } from "@/core/types";
 import {
   commonStyles,
@@ -40,7 +37,10 @@ import {
 } from "@/shared/utils";
 
 export default function ProjectDetailScreen() {
-  const { id, componentId } = useLocalSearchParams<{ id: string; componentId?: string }>();
+  const { id, componentId } = useLocalSearchParams<{
+    id: string;
+    componentId?: string;
+  }>();
   const { projects } = useProjects();
   const [project, setProject] = useState<Project | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
@@ -54,7 +54,8 @@ export default function ProjectDetailScreen() {
     null
   );
   // Asset category selection state
-  const [selectedAssetCategory, setSelectedAssetCategory] = useState<AssetCategoryValue>("all");
+  const [selectedAssetCategory, setSelectedAssetCategory] =
+    useState<AssetCategoryValue>("all");
   // Asset gallery state (for viewing images in Assets section)
   const [assetGalleryVisible, setAssetGalleryVisible] = useState(false);
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
@@ -125,9 +126,7 @@ export default function ProjectDetailScreen() {
           .filter(Boolean) as string[];
 
         // Preload hero images
-        await Promise.all(
-          allHeroImages.map((url) => Image.prefetch(url))
-        );
+        await Promise.all(allHeroImages.map((url) => Image.prefetch(url)));
 
         // Preload first 6 thumbnails from each component
         const allThumbnails = project.components.flatMap((c) =>
@@ -138,12 +137,9 @@ export default function ProjectDetailScreen() {
         ) as string[];
 
         // Preload thumbnails
-        await Promise.all(
-          allThumbnails.map((url) => Image.prefetch(url))
-        );
-      } catch (error) {
+        await Promise.all(allThumbnails.map((url) => Image.prefetch(url)));
+      } catch {
         // Silently fail - preloading is best effort
-        console.warn("Image preloading failed:", error);
       }
     };
 
@@ -209,21 +205,35 @@ export default function ProjectDetailScreen() {
   /**
    * Helper function to map category string to AssetCategoryValue
    */
-  const mapCategoryToTabValue = (category: string | undefined): AssetCategoryValue => {
+  const mapCategoryToTabValue = (
+    category: string | undefined
+  ): AssetCategoryValue => {
     if (!category) return "other";
     const normalizedCategory = category.toLowerCase().trim();
-    
+
     // Map common category values to tab values
-    if (normalizedCategory === "plans" || normalizedCategory === "floor-plan" || normalizedCategory === "floor plan") {
+    if (
+      normalizedCategory === "plans" ||
+      normalizedCategory === "floor-plan" ||
+      normalizedCategory === "floor plan"
+    ) {
       return "floor-plan";
     }
     if (normalizedCategory === "materials") {
       return "materials";
     }
-    if (normalizedCategory === "rendering" || normalizedCategory === "rendering-3d" || normalizedCategory === "3d rendering" || normalizedCategory === "3d") {
+    if (
+      normalizedCategory === "rendering" ||
+      normalizedCategory === "rendering-3d" ||
+      normalizedCategory === "3d rendering" ||
+      normalizedCategory === "3d"
+    ) {
       return "rendering-3d";
     }
-    if (normalizedCategory === "contract" || normalizedCategory === "contracts") {
+    if (
+      normalizedCategory === "contract" ||
+      normalizedCategory === "contracts"
+    ) {
       return "contract";
     }
     if (normalizedCategory === "permit" || normalizedCategory === "permits") {
@@ -253,8 +263,76 @@ export default function ProjectDetailScreen() {
    * Used for displaying asset images in the gallery modal
    */
   const assetGalleryImages = useMemo(() => {
-    return convertDocumentsToPictures(filteredDocuments);
+    console.log("\n=== ASSET GALLERY CREATION ===");
+    console.log("📦 Total filtered documents:", filteredDocuments.length);
+
+    // Log each document
+    filteredDocuments.forEach((doc, i) => {
+      const isImage =
+        doc.fileType?.includes("image/") ||
+        /\.(jpg|jpeg|png|heic)$/i.test(doc.filename);
+      console.log(`  [${i}] ${doc.filename}`, {
+        id: doc.id.substring(0, 8),
+        fileType: doc.fileType || "MISSING",
+        isImage,
+      });
+    });
+
+    const images = convertDocumentsToPictures(filteredDocuments);
+
+    console.log("🖼️  Created gallery images:", images.length);
+    images.forEach((img, i) => {
+      console.log(`  [${i}] FULL URI:`, img.uri);
+      console.log(`      Length: ${img.uri.length} chars`);
+    });
+    console.log("=== END ASSET GALLERY CREATION ===\n");
+
+    return images;
   }, [filteredDocuments]);
+
+  // Create a map: document URL -> gallery image index
+  // Use URL as key since it's guaranteed to be unique and consistent
+  const documentToImageIndex = useMemo(() => {
+    console.log("\n=== BUILDING INDEX MAP ===");
+    const map = new Map<string, number>();
+
+    // For each image in the gallery, use its URI (URL) as the key
+    // URLs are unique and consistent between documents and gallery images
+    assetGalleryImages.forEach((galleryImage, galleryIndex) => {
+      map.set(galleryImage.uri, galleryIndex);
+      console.log(
+        `  Map: URL[${galleryImage.uri.substring(
+          0,
+          50
+        )}...] -> gallery[${galleryIndex}]`
+      );
+    });
+
+    console.log(`✅ Index map created: ${map.size} entries`);
+    console.log("=== END INDEX MAP ===\n");
+
+    return map;
+  }, [assetGalleryImages]);
+
+  /**
+   * Ensure selectedAssetIndex is within bounds when assetGalleryImages changes
+   */
+  useEffect(() => {
+    if (assetGalleryImages.length > 0) {
+      if (
+        selectedAssetIndex >= assetGalleryImages.length ||
+        selectedAssetIndex < 0
+      ) {
+        setSelectedAssetIndex(0);
+      }
+    } else {
+      // If images array becomes empty, close the gallery
+      if (assetGalleryVisible) {
+        setAssetGalleryVisible(false);
+        setSelectedAssetIndex(0);
+      }
+    }
+  }, [assetGalleryImages.length, selectedAssetIndex, assetGalleryVisible]);
 
   /**
    * Display description - component description with fallback to project description
@@ -286,6 +364,17 @@ export default function ProjectDetailScreen() {
   // Legacy: Keep aggregatedPictures for backward compatibility during transition
   // This will be replaced with currentMedia in next steps
   const aggregatedPictures = useMemo(() => {
+    console.log("\n=== AGGREGATED PICTURES CREATION ===");
+    console.log("📦 Current media count:", currentMedia.length);
+    currentMedia.forEach((media, i) => {
+      console.log(`  [${i}] Media:`, {
+        id: media.id?.substring(0, 8) || "NO ID",
+        url: media.url?.substring(0, 50) || "NO URL",
+        mediaType: media.mediaType,
+        stage: media.stage,
+      });
+    });
+    console.log("=== END AGGREGATED PICTURES ===\n");
     return currentMedia;
   }, [currentMedia]);
 
@@ -328,48 +417,69 @@ export default function ProjectDetailScreen() {
     return photoCounts[activePhotoTab] - previewPhotos.length;
   }, [photoCounts, activePhotoTab, previewPhotos.length]);
 
+  // Convert MediaAsset to Picture format for gallery
+  const convertMediaToPictures = useCallback(
+    (media: typeof aggregatedPictures) => {
+      return media
+        .filter((m) => m.mediaType === "image" && m.url) // Only images with URLs
+        .map((m) => ({
+          uri: m.url, // Convert url to uri
+          id: m.id,
+          type: m.stage || "other", // Convert stage to type
+          description: m.caption || m.description || "", // Use caption or description
+          thumbnailUrl: m.thumbnailUrl,
+        }));
+    },
+    []
+  );
+
   // Get filtered images for gallery based on active tab
   const galleryImages = useMemo(() => {
-    if (aggregatedPictures.length === 0) return [];
+    console.log("\n=== PHOTO GALLERY CREATION ===");
+    console.log("📦 Total aggregated pictures:", aggregatedPictures.length);
+    console.log("📑 Active photo tab:", activePhotoTab);
 
-    if (activePhotoTab === "all") {
-      return aggregatedPictures;
+    if (aggregatedPictures.length === 0) {
+      console.log("⚠️  No aggregated pictures, returning empty array");
+      console.log("=== END PHOTO GALLERY CREATION ===\n");
+      return [];
     }
 
-    // Map tab value to MediaAsset stage
-    const stageMap: Record<string, string> = {
-      before: "before",
-      after: "after",
-      progress: "in-progress",
-    };
-    const targetStage = stageMap[activePhotoTab] || activePhotoTab;
-    return aggregatedPictures.filter(
-      (m) => m.mediaType === "image" && m.stage === targetStage
-    );
-  }, [aggregatedPictures, activePhotoTab]);
+    let filteredMedia: typeof aggregatedPictures;
+    if (activePhotoTab === "all") {
+      filteredMedia = aggregatedPictures;
+    } else {
+      // Map tab value to MediaAsset stage
+      const stageMap: Record<string, string> = {
+        before: "before",
+        after: "after",
+        progress: "in-progress",
+      };
+      const targetStage = stageMap[activePhotoTab] || activePhotoTab;
+      filteredMedia = aggregatedPictures.filter(
+        (m) => m.mediaType === "image" && m.stage === targetStage
+      );
+    }
+
+    // Convert MediaAsset to Picture format
+    const result = convertMediaToPictures(filteredMedia);
+
+    console.log("🖼️  Created gallery images:", result.length);
+    result.forEach((img: { id?: string; uri?: string }, i: number) => {
+      console.log(
+        `  [${i}] id: ${img.id?.substring(0, 8) || "NO ID"}, uri: ${
+          img.uri?.substring(0, 50) || "NO URI"
+        }...`
+      );
+    });
+    console.log("=== END PHOTO GALLERY CREATION ===\n");
+
+    return result;
+  }, [aggregatedPictures, activePhotoTab, convertMediaToPictures]);
 
   // Debug logging for asset filtering (current issue)
   useEffect(() => {
     if (!project) return;
-
-    console.log("📁 Assets Filter Debug:", {
-      project: project.name,
-      componentId: currentComponent?.id,
-      componentLabel: currentComponentLabel,
-      selectedAssetCategory,
-      currentDocuments: currentDocuments.map((doc) => ({
-        id: doc.id,
-        name: doc.name,
-        category: doc.category,
-        type: doc.type,
-      })),
-      filteredDocuments: filteredDocuments.map((doc) => ({
-        id: doc.id,
-        name: doc.name,
-        category: doc.category,
-        type: doc.type,
-      })),
-    });
   }, [
     project,
     currentComponent,
@@ -384,7 +494,54 @@ export default function ProjectDetailScreen() {
   };
 
   const handleImagePress = (index: number) => {
-    setSelectedImageIndex(index);
+    console.log("\n=== PHOTO PRESS ===");
+    console.log("📸 Pressed photo index:", index);
+    console.log("📊 Gallery images length:", galleryImages.length);
+    console.log(
+      "📋 Gallery images:",
+      galleryImages.map((img: { id?: string; uri?: string }, i: number) => ({
+        index: i,
+        id: img.id?.substring(0, 8) || "NO ID",
+        uri: img.uri?.substring(0, 50) || "NO URI",
+      }))
+    );
+
+    // Ensure index is within bounds before opening gallery
+    if (galleryImages.length === 0) {
+      console.error("❌ CRITICAL: Gallery images array is empty!");
+      console.log("=== END PHOTO PRESS ===\n");
+      return;
+    }
+
+    const safeIndex = Math.max(0, Math.min(index, galleryImages.length - 1));
+    console.log("✅ Safe index calculated:", safeIndex);
+
+    if (index !== safeIndex) {
+      console.warn("⚠️  Index was out of bounds, clamped to:", safeIndex);
+    }
+
+    if (safeIndex < 0 || safeIndex >= galleryImages.length) {
+      console.error("❌ CRITICAL: Safe index still out of bounds!");
+      console.error("   Safe index:", safeIndex);
+      console.error("   Gallery length:", galleryImages.length);
+      console.log("=== END PHOTO PRESS ===\n");
+      return;
+    }
+
+    console.log(
+      `✅ Opening gallery at index ${safeIndex} of ${galleryImages.length}`
+    );
+    console.log(
+      "   Image ID:",
+      galleryImages[safeIndex]?.id?.substring(0, 8) || "NO ID"
+    );
+    console.log(
+      "   Image URI:",
+      galleryImages[safeIndex]?.uri?.substring(0, 50) || "NO URI"
+    );
+    console.log("=== END PHOTO PRESS ===\n");
+
+    setSelectedImageIndex(safeIndex);
     setGalleryVisible(true);
   };
 
@@ -1038,12 +1195,12 @@ export default function ProjectDetailScreen() {
           {/* Hero Image - OPTIMIZED with caching and transitions */}
           {heroImageUrl ? (
             <Animated.View
-              key={`hero-container-${selectedComponentId || 'default'}`}
+              key={`hero-container-${selectedComponentId || "default"}`}
               entering={FadeIn.duration(200)}
               exiting={FadeOut.duration(200)}
             >
               <Image
-                key={`hero-${selectedComponentId || 'default'}`}
+                key={`hero-${selectedComponentId || "default"}`}
                 source={{ uri: heroImageUrl }}
                 style={styles.heroImage}
                 contentFit="cover"
@@ -1080,7 +1237,7 @@ export default function ProjectDetailScreen() {
                 </ThemedText>
               )}
               <ThemedText
-                key={`description-${selectedComponentId || 'default'}`}
+                key={`description-${selectedComponentId || "default"}`}
                 style={[
                   styles.projectDescription,
                   { color: theme.colors.text.secondary },
@@ -1203,12 +1360,29 @@ export default function ProjectDetailScreen() {
                 {/* Photo Grid */}
                 {previewPhotos.length > 0 ? (
                   <ThemedView variant="ghost" style={styles.picturesGrid}>
-                    {previewPhotos.map((item) => {
+                    {previewPhotos.map((item, previewIndex) => {
                       // Find the index in the filtered gallery images for correct navigation
                       const galleryIndex = galleryImages.findIndex(
-                        (p) => p.id === item.id
+                        (p: { id?: string }) => p.id === item.id
                       );
-                      return renderGridImage(item, galleryIndex);
+                      // If not found, use previewIndex as fallback (but ensure it's in bounds)
+                      const safeIndex =
+                        galleryIndex >= 0
+                          ? galleryIndex
+                          : Math.min(previewIndex, galleryImages.length - 1);
+
+                      if (galleryIndex < 0) {
+                        console.warn(
+                          `⚠️  Preview photo [${previewIndex}] not found in galleryImages:`,
+                          {
+                            itemId: item.id?.substring(0, 8) || "NO ID",
+                            itemUrl: item.url?.substring(0, 50) || "NO URL",
+                            usingFallbackIndex: safeIndex,
+                          }
+                        );
+                      }
+
+                      return renderGridImage(item, safeIndex);
                     })}
                     {/* "+X more" card */}
                     {hasMorePhotos && (
@@ -1314,10 +1488,98 @@ export default function ProjectDetailScreen() {
                     key={doc.id}
                     document={doc}
                     onPress={() => {
-                      openAsset(doc, filteredDocuments, router, {
-                        setAssetGalleryVisible,
-                        setSelectedAssetIndex,
+                      console.log("\n=== ASSET PRESS ===");
+                      console.log("📄 Pressed document:", {
+                        id: doc.id.substring(0, 8),
+                        filename: doc.filename,
+                        fileType: doc.fileType,
                       });
+
+                      // Check if this is an image
+                      const isImage =
+                        doc.fileType?.includes("image/") ||
+                        doc.filename.match(/\.(jpg|jpeg|png|heic)$/i);
+
+                      console.log("🖼️  Is image?", isImage);
+
+                      if (isImage) {
+                        // Look up this document's index in the gallery using URL
+                        // URLs are consistent between documents and gallery images
+                        const galleryIndex = documentToImageIndex.get(doc.url);
+
+                        console.log("🔍 Looking up gallery index...");
+                        console.log(
+                          "  - Document URL:",
+                          doc.url.substring(0, 50)
+                        );
+                        console.log("  - Document ID:", doc.id.substring(0, 8));
+                        console.log("  - Found index:", galleryIndex);
+                        console.log(
+                          "  - Gallery length:",
+                          assetGalleryImages.length
+                        );
+                        console.log(
+                          "  - Map has entry?",
+                          documentToImageIndex.has(doc.url)
+                        );
+
+                        if (galleryIndex === undefined) {
+                          console.error(
+                            "❌ CRITICAL: Document URL not found in index map!"
+                          );
+                          console.error(
+                            "   This document was filtered out by convertDocumentsToPictures"
+                          );
+                          console.error("   Document:", {
+                            id: doc.id,
+                            filename: doc.filename,
+                            fileType: doc.fileType,
+                            url: doc.url,
+                          });
+                          console.error(
+                            "   Available URLs in map:",
+                            Array.from(documentToImageIndex.keys()).map((k) =>
+                              k.substring(0, 60)
+                            )
+                          );
+                          return; // Don't try to open - it will crash
+                        }
+
+                        // Validate index is in bounds
+                        if (
+                          galleryIndex < 0 ||
+                          galleryIndex >= assetGalleryImages.length
+                        ) {
+                          console.error("❌ CRITICAL: Index out of bounds!");
+                          console.error("   Index:", galleryIndex);
+                          console.error(
+                            "   Gallery length:",
+                            assetGalleryImages.length
+                          );
+                          return; // Don't try to open - it will crash
+                        }
+
+                        console.log(
+                          `✅ Opening gallery at index ${galleryIndex} of ${assetGalleryImages.length}`
+                        );
+                        console.log("=== END ASSET PRESS ===\n");
+
+                        setSelectedAssetIndex(galleryIndex);
+                        setAssetGalleryVisible(true);
+                      } else {
+                        // This is a PDF - open PDF viewer
+                        console.log("📄 Opening PDF viewer");
+                        console.log("=== END ASSET PRESS ===\n");
+
+                        router.push({
+                          pathname: "/pdf-viewer",
+                          params: {
+                            url: encodeURIComponent(doc.url),
+                            name: doc.name || doc.filename,
+                            id: doc.id,
+                          },
+                        });
+                      }
                     }}
                   />
                 ))}
@@ -1343,7 +1605,7 @@ export default function ProjectDetailScreen() {
           )}
 
           {/* Logs Section */}
-          {project.logs && project.logs.length > 0 && (
+          {project.sharedLogs && project.sharedLogs.length > 0 && (
             <ThemedView style={styles.section}>
               <ThemedText
                 style={[
@@ -1351,11 +1613,15 @@ export default function ProjectDetailScreen() {
                   { color: theme.colors.text.primary },
                 ]}
               >
-                Project Logs ({project.logs.length})
+                Project Logs ({project.sharedLogs.length})
               </ThemedText>
               <ThemedView style={styles.logsList}>
-                {project.logs.map((item, index) =>
-                  renderLog(item, index, index === project.logs.length - 1)
+                {project.sharedLogs.map((item, index) =>
+                  renderLog(
+                    item,
+                    index,
+                    index === (project.sharedLogs?.length ?? 0) - 1
+                  )
                 )}
               </ThemedView>
             </ThemedView>
@@ -1408,18 +1674,43 @@ export default function ProjectDetailScreen() {
         <ImageGalleryModal
           visible={galleryVisible}
           images={galleryImages}
-          initialIndex={selectedImageIndex}
+          initialIndex={(() => {
+            const clampedIndex = Math.max(
+              0,
+              Math.min(selectedImageIndex, galleryImages.length - 1)
+            );
+            console.log("\n=== OPENING PHOTO GALLERY MODAL ===");
+            console.log("📊 Gallery images count:", galleryImages.length);
+            console.log("📌 Requested index:", selectedImageIndex);
+            console.log("✅ Clamped index:", clampedIndex);
+            if (selectedImageIndex !== clampedIndex) {
+              console.warn(
+                "⚠️  Index was clamped from",
+                selectedImageIndex,
+                "to",
+                clampedIndex
+              );
+            }
+            console.log("=== END OPENING MODAL ===\n");
+            return clampedIndex;
+          })()}
           onClose={closeGallery}
         />
       )}
 
-      {/* Asset Image Gallery (for images in Assets section) */}
-      {assetGalleryImages.length > 0 && (
+      {/* Asset Image Gallery - with safety check */}
+      {assetGalleryVisible && assetGalleryImages.length > 0 && (
         <ImageGalleryModal
           visible={assetGalleryVisible}
           images={assetGalleryImages}
-          initialIndex={selectedAssetIndex}
-          onClose={() => setAssetGalleryVisible(false)}
+          initialIndex={Math.max(
+            0,
+            Math.min(selectedAssetIndex, assetGalleryImages.length - 1)
+          )}
+          onClose={() => {
+            console.log("🚪 Closing asset gallery");
+            setAssetGalleryVisible(false);
+          }}
         />
       )}
     </>

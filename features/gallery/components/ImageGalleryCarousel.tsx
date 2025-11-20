@@ -169,7 +169,7 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
 
                   {shouldRender && !imageError && (
                     <Image
-                      source={{ uri: image.url }}
+                      source={{ uri: image.uri }}
                       style={styles.image}
                       contentFit="contain"
                       accessibilityLabel={accessibilityStrings.image.getLabel(
@@ -194,6 +194,17 @@ export const ImageGalleryCarousel = React.memo<ImageGalleryCarouselProps>(
           </Animated.View>
         </GestureDetector>
       </View>
+    );
+  },
+  (prevProps, nextProps) => {
+    // Re-render only when images array reference changes
+    // currentIndex changes are handled by animated transforms, not re-renders
+    // Note: We still need to re-render on currentIndex changes for accessibility
+    // but the images themselves don't need to re-render
+    return (
+      prevProps.images === nextProps.images &&
+      prevProps.currentIndex === nextProps.currentIndex &&
+      prevProps.theme === nextProps.theme
     );
   }
 );

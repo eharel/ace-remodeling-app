@@ -365,8 +365,8 @@ export default function SearchScreen() {
         pathname: `/project/${result.projectId}` as any,
         params: { componentId: result.componentId },
       });
-    } catch (error) {
-      console.error("Navigation error:", error);
+    } catch {
+      // Navigation error - silently fail
     }
   };
 
@@ -474,7 +474,6 @@ export default function SearchScreen() {
               const results = searchProjects(debouncedSearchQuery);
               setSearchResults(results);
             } catch (error) {
-              console.error("Retry search failed:", error);
               setSearchError(
                 error instanceof Error ? error.message : "Search failed"
               );
@@ -502,7 +501,7 @@ export default function SearchScreen() {
           </ThemedView>
           <ProjectGallery
             projects={searchResults.map((result) => ({
-              id: result.projectId,
+              id: `${result.projectId}::${result.componentId}`, // Unique key: project + component (using :: separator to avoid UUID dash conflicts)
               projectNumber: result.projectNumber,
               name: `${result.projectName}${
                 result.componentName ? ` - ${result.componentName}` : ""
@@ -514,12 +513,21 @@ export default function SearchScreen() {
               completedAt: result.completedAt,
             }))}
             onProjectPress={(summary) => {
-              // Find the original result to get componentId
+              // Find the original result by extracting projectId and componentId from the composite key
+              // Format: "projectId::componentId" (using :: to avoid conflicts with UUID dashes)
+              const [projectId, componentId] = summary.id.split("::", 2);
               const result = searchResults.find(
-                (r) => r.projectId === summary.id
+                (r) =>
+                  r.projectId === projectId && r.componentId === componentId
               );
               if (result) {
                 handleProjectPress(result);
+              } else {
+                console.error("Could not find search result for:", {
+                  compositeId: summary.id,
+                  projectId,
+                  componentId,
+                });
               }
             }}
           />

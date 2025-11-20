@@ -113,7 +113,6 @@ export function getEstimatedMemoryUsage(): {
       memoryLimit: estimatedMemoryLimit,
     };
   } catch (error) {
-    console.warn("Memory check failed:", error);
     return {
       usedMemory: 0,
       memoryLimit: MEMORY_CONSTANTS.DEFAULT_MEMORY_LIMIT,
@@ -172,7 +171,6 @@ export function forceGarbageCollection(): boolean {
     }
     return false;
   } catch (error) {
-    console.warn("Garbage collection failed:", error);
     return false;
   }
 }

@@ -49,7 +49,14 @@ export const useImageGallery = ({
   "visible" | "images" | "initialIndex"
 >): UseImageGalleryReturn => {
   const insets = useSafeAreaInsets();
-  const [currentIndex, setCurrentIndex] = useState<number>(initialIndex);
+  
+  // Ensure initial index is safe before using it in useState
+  const safeInitialIndex =
+    images.length > 0
+      ? Math.max(0, Math.min(initialIndex || 0, images.length - 1))
+      : 0;
+  
+  const [currentIndex, setCurrentIndex] = useState<number>(safeInitialIndex);
   const modalRef = useRef<View>(null);
   const closeButtonRef = useRef<View>(null);
 
@@ -58,13 +65,15 @@ export const useImageGallery = ({
 
   // Update currentIndex when initialIndex changes
   useEffect(() => {
-    if (initialIndex >= 0 && initialIndex < images.length) {
-      setCurrentIndex(initialIndex);
-      translateX.value = -initialIndex * screenWidth;
-    } else {
+    if (images.length === 0) {
       setCurrentIndex(0);
       translateX.value = 0;
+      return;
     }
+    
+    const safeIndex = Math.max(0, Math.min(initialIndex || 0, images.length - 1));
+    setCurrentIndex(safeIndex);
+    translateX.value = -safeIndex * screenWidth;
   }, [initialIndex, images.length, translateX]);
 
   const goToImage = useCallback(

@@ -25,9 +25,7 @@ export function useChecklist(
   useMemo(() => {
     const validation = validateUniqueIds([...items]);
     if (!validation.isValid) {
-      console.error(
-        `Checklist contains duplicate IDs: ${validation.duplicates.join(", ")}`
-      );
+      // Checklist contains duplicate IDs - silently ignore
     }
   }, [items]);
 
@@ -107,7 +105,6 @@ export function useChecklist(
     (id: string, checked: boolean) => {
       const item = findItemById([...items], id);
       if (!item) {
-        console.warn(`setItemChecked: Item with id "${id}" not found`);
         return;
       }
 
@@ -131,7 +128,6 @@ export function useChecklist(
     (id: string) => {
       const item = findItemById([...items], id);
       if (!item) {
-        console.warn(`toggleItem: Item with id "${id}" not found`);
         return;
       }
 
@@ -168,14 +164,10 @@ export function useChecklist(
     (id: string) => {
       const item = findItemById([...items], id);
       if (!item) {
-        console.warn(`toggleExpanded: Item with id "${id}" not found`);
         return;
       }
 
       if (!hasChildren(item)) {
-        console.warn(
-          `toggleExpanded: Item "${id}" has no children and cannot be expanded`
-        );
         return;
       }
 
@@ -212,7 +204,6 @@ export function useChecklist(
     (id: string): boolean => {
       const item = findItemById([...items], id);
       if (!item) {
-        console.warn(`isItemChecked: Item with id "${id}" not found`);
         return false;
       }
       return checkedStates[id] || false;
@@ -227,7 +218,6 @@ export function useChecklist(
     (id: string): boolean => {
       const item = findItemById([...items], id);
       if (!item) {
-        console.warn(`isItemExpanded: Item with id "${id}" not found`);
         return false;
       }
       if (!hasChildren(item)) {
@@ -245,14 +235,10 @@ export function useChecklist(
     (id: string): ChecklistProgress => {
       const item = findItemById([...items], id);
       if (!item) {
-        console.warn(`getItemProgress: Item with id "${id}" not found`);
         return { completed: 0, total: 0 };
       }
 
       if (!hasChildren(item)) {
-        console.warn(
-          `getItemProgress: Item "${id}" has no children to track progress`
-        );
         return { completed: 0, total: 0 };
       }
 

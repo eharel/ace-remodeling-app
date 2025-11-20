@@ -7,17 +7,19 @@
  * @module scripts/lib/firebase/dataBuilder
  */
 
+import { randomUUID } from "crypto";
+
+import { Document, DOCUMENT_TYPES } from "../../../core/types/Document";
+import { MEDIA_STAGES, MediaAsset } from "../../../core/types/MediaAsset";
 import { Project } from "../../../core/types/Project";
 import { ProjectComponent } from "../../../core/types/ProjectComponent";
-import { MediaAsset, MEDIA_STAGES } from "../../../core/types/MediaAsset";
-import { Document, DOCUMENT_TYPES } from "../../../core/types/Document";
-import { ComponentUploadResult, UploadResult } from "./storage";
 import {
+  AssetType,
   ComponentFiles,
   DiscoveredAsset,
   DiscoveredMedia,
-  AssetType,
 } from "../filesystem/types";
+import { ComponentUploadResult, UploadResult } from "./storage";
 
 /**
  * All data sources needed to build a Project document
@@ -56,9 +58,7 @@ export interface BuildResult {
  * @param sources - All data sources
  * @returns BuildResult with Project or errors
  */
-export function buildProjectDocument(
-  sources: ProjectDataSources
-): BuildResult {
+export function buildProjectDocument(sources: ProjectDataSources): BuildResult {
   const { csvData, componentFiles, uploadResults } = sources;
 
   const errors: string[] = [];
@@ -117,8 +117,7 @@ export function buildProjectDocument(
       warnings,
     };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     errors.push(`Failed to build project: ${errorMessage}`);
     return { success: false, errors, warnings };
   }
@@ -161,14 +160,18 @@ function buildComponents(
 
     if (!files) {
       warnings.push(
-        `Component ${csvComponent.category}${csvComponent.subcategory ? "/" + csvComponent.subcategory : ""} has no scanned files`
+        `Component ${csvComponent.category}${
+          csvComponent.subcategory ? "/" + csvComponent.subcategory : ""
+        } has no scanned files`
       );
       return csvComponent;
     }
 
     if (!uploads) {
       warnings.push(
-        `Component ${csvComponent.category}${csvComponent.subcategory ? "/" + csvComponent.subcategory : ""} has no upload results`
+        `Component ${csvComponent.category}${
+          csvComponent.subcategory ? "/" + csvComponent.subcategory : ""
+        } has no upload results`
       );
       // Return component with empty arrays
       return {
@@ -236,8 +239,7 @@ function buildMediaAssets(
       rendering: MEDIA_STAGES.RENDERINGS, // Map singular to plural
       other: MEDIA_STAGES.OTHER,
     };
-    const stage =
-      stageMap[discoveredMedia.stage] || MEDIA_STAGES.OTHER;
+    const stage = stageMap[discoveredMedia.stage] || MEDIA_STAGES.OTHER;
 
     // Create MediaAsset
     const mediaAsset: MediaAsset = {
@@ -332,12 +334,7 @@ function buildDocuments(
  * @returns Unique ID string
  */
 function generateMediaId(media: DiscoveredMedia): string {
-  // Use filename without extension + stage + timestamp
-  const nameWithoutExt = media.filename.replace(/\.[^.]+$/, "");
-  const sanitized = nameWithoutExt
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-");
-  return `${media.stage}-${sanitized}-${Date.now()}`;
+  return randomUUID();
 }
 
 /**
@@ -347,9 +344,7 @@ function generateMediaId(media: DiscoveredMedia): string {
  * @returns Unique ID string
  */
 function generateDocumentId(asset: DiscoveredAsset): string {
-  const nameWithoutExt = asset.filename.replace(/\.[^.]+$/, "");
-  const sanitized = nameWithoutExt.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-  return `${asset.category}-${sanitized}-${Date.now()}`;
+  return randomUUID();
 }
 
 /**
@@ -358,9 +353,7 @@ function generateDocumentId(asset: DiscoveredAsset): string {
  * @param assetType - Asset type from scanner
  * @returns DocumentType
  */
-function mapAssetTypeToDocumentType(
-  assetType: AssetType
-): Document["type"] {
+function mapAssetTypeToDocumentType(assetType: AssetType): Document["type"] {
   const mapping: Record<AssetType, Document["type"]> = {
     plan: DOCUMENT_TYPES.FLOOR_PLAN,
     rendering: DOCUMENT_TYPES.RENDERING_3D,
@@ -455,4 +448,3 @@ function validateProject(project: Project): {
     errors,
   };
 }
-

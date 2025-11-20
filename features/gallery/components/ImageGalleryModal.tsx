@@ -46,21 +46,32 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
   ({ visible, images, initialIndex, onClose }) => {
     const { theme } = useTheme();
 
-    const { currentIndex, translateX, updateCurrentIndex, modalRef } =
-      useImageGallery({ visible, images, initialIndex });
+    // Ensure initialIndex is within bounds before passing to hook
+    const safeInitialIndex =
+      images.length > 0
+        ? Math.max(0, Math.min(initialIndex || 0, images.length - 1))
+        : 0;
 
-    const currentImage = images[currentIndex];
+    const { currentIndex, translateX, updateCurrentIndex, modalRef } =
+      useImageGallery({ visible, images, initialIndex: safeInitialIndex });
+
+    // Safety check: ensure currentIndex is valid before accessing array
+    const safeCurrentIndex =
+      images.length > 0
+        ? Math.max(0, Math.min(currentIndex, images.length - 1))
+        : 0;
+    const currentImage = images.length > 0 ? images[safeCurrentIndex] : undefined;
 
     useAccessibilityAnnouncements({
       visible,
-      currentIndex,
+      currentIndex: safeCurrentIndex,
       images,
       currentImage,
       modalRef,
     });
 
     const { goToImage: navigateToImage, panGesture } = useImageNavigation({
-      currentIndex,
+      currentIndex: safeCurrentIndex,
       imagesLength: images.length,
       translateX,
       onIndexChange: updateCurrentIndex,
@@ -82,7 +93,8 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
       [theme]
     );
 
-    if (!visible || !currentImage) {
+    // Safety checks: don't render if not visible, no images, or invalid index
+    if (!visible || images.length === 0 || !currentImage) {
       return null;
     }
 
@@ -106,7 +118,7 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
           accessibilityLabel={accessibilityStrings.modal.label}
         >
           <ImageGalleryHeader
-            currentIndex={currentIndex}
+            currentIndex={safeCurrentIndex}
             totalImages={images.length}
             onClose={onClose}
             theme={theme}
@@ -115,7 +127,7 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
           <View style={styles.container}>
             <ImageGalleryCarousel
               images={images}
-              currentIndex={currentIndex}
+              currentIndex={safeCurrentIndex}
               translateX={translateX}
               panGesture={panGesture}
               theme={theme}
@@ -125,7 +137,7 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
           <ImageGalleryFooter
             currentImage={currentImage}
             images={images}
-            currentIndex={currentIndex}
+            currentIndex={safeCurrentIndex}
             onImageSelect={navigateToImage}
             theme={theme}
           />
