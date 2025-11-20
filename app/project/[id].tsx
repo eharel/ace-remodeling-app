@@ -13,6 +13,8 @@ import {
   AssetCategoryTabs,
   type AssetCategoryValue,
   AssetThumbnail,
+  openAsset,
+  convertDocumentsToPictures,
 } from "@/features/gallery";
 import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme, getProjectMedia } from "@/shared/contexts";
@@ -53,6 +55,9 @@ export default function ProjectDetailScreen() {
   );
   // Asset category selection state
   const [selectedAssetCategory, setSelectedAssetCategory] = useState<AssetCategoryValue>("all");
+  // Asset gallery state (for viewing images in Assets section)
+  const [assetGalleryVisible, setAssetGalleryVisible] = useState(false);
+  const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
   const { theme } = useTheme();
 
   // Show 3 preview photos (Flexbox will handle equal sizing)
@@ -242,6 +247,14 @@ export default function ProjectDetailScreen() {
       return docTabValue === selectedAssetCategory;
     });
   }, [currentDocuments, selectedAssetCategory]);
+
+  /**
+   * Convert filtered documents to gallery format for images
+   * Used for displaying asset images in the gallery modal
+   */
+  const assetGalleryImages = useMemo(() => {
+    return convertDocumentsToPictures(filteredDocuments);
+  }, [filteredDocuments]);
 
   /**
    * Display description - component description with fallback to project description
@@ -1301,8 +1314,10 @@ export default function ProjectDetailScreen() {
                     key={doc.id}
                     document={doc}
                     onPress={() => {
-                      // Navigate to documents screen (which handles PDF viewing)
-                      router.push(`/project/${project.id}/documents`);
+                      openAsset(doc, filteredDocuments, router, {
+                        setAssetGalleryVisible,
+                        setSelectedAssetIndex,
+                      });
                     }}
                   />
                 ))}
@@ -1395,6 +1410,16 @@ export default function ProjectDetailScreen() {
           images={galleryImages}
           initialIndex={selectedImageIndex}
           onClose={closeGallery}
+        />
+      )}
+
+      {/* Asset Image Gallery (for images in Assets section) */}
+      {assetGalleryImages.length > 0 && (
+        <ImageGalleryModal
+          visible={assetGalleryVisible}
+          images={assetGalleryImages}
+          initialIndex={selectedAssetIndex}
+          onClose={() => setAssetGalleryVisible(false)}
         />
       )}
     </>
