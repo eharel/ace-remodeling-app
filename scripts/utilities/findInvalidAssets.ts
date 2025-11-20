@@ -4,25 +4,40 @@ import * as path from "path";
 const ASSETS_BASE_PATH = "/Users/eliharel/Code/Projects/ace-remodeling-assets";
 
 // File extensions that should NOT be in /assets/
+// These are unsupported formats that should be converted or moved
 const INVALID_EXTENSIONS = [
-  ".jpg",
-  ".jpeg",
-  ".JPG",
-  ".JPEG",
-  ".png",
-  ".PNG",
-  ".heic",
-  ".HEIC",
   ".gif",
-  ".GIF",
+  ".GIF", // Animated images (not supported)
   ".bmp",
-  ".BMP",
+  ".BMP", // Bitmap (use PNG instead)
   ".tiff",
-  ".TIFF",
+  ".TIFF", // TIFF (use PNG instead)
+  ".svg",
+  ".SVG", // Vector graphics (not supported as document)
+  ".mp4",
+  ".MP4", // Videos (should be in /videos/)
+  ".mov",
+  ".MOV", // Videos (should be in /videos/)
+  ".avi",
+  ".AVI", // Videos (should be in /videos/)
 ];
 
 // Valid document extensions
-const VALID_EXTENSIONS = [".pdf", ".PDF"];
+// PDFs and supported image formats are now valid in /assets/
+// This is for reference/documentation - the script checks for invalid extensions
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const VALID_EXTENSIONS = [
+  ".pdf",
+  ".PDF", // PDFs
+  ".jpg",
+  ".jpeg",
+  ".JPG",
+  ".JPEG", // Images ✅ NOW VALID
+  ".png",
+  ".PNG", // Images ✅ NOW VALID
+  ".heic",
+  ".HEIC", // Images ✅ NOW VALID
+];
 
 interface InvalidAsset {
   projectNumber: string;
@@ -111,13 +126,13 @@ function printResults(invalidAssets: InvalidAsset[]) {
 
   if (invalidAssets.length === 0) {
     console.log(
-      "✅ No invalid assets found! All files in /assets/ are PDFs.\n"
+      "✅ No invalid assets found! All files in /assets/ are PDFs or supported images.\n"
     );
     return;
   }
 
   console.log(
-    `❌ Found ${invalidAssets.length} non-PDF files in /assets/ folders:\n`
+    `❌ Found ${invalidAssets.length} unsupported files in /assets/ folders:\n`
   );
 
   // Group by project
@@ -152,8 +167,10 @@ function printResults(invalidAssets: InvalidAsset[]) {
   }
 
   console.log("\n\n💡 Recommendations:");
-  console.log("   1. Convert images to PDF if they are spec sheets/documents");
-  console.log("   2. Move images to /photos/ if they are project photos");
+  console.log(
+    "   1. Convert unsupported formats to PDF or supported image formats"
+  );
+  console.log("   2. Move videos to /videos/ folder");
   console.log("   3. Re-run this script after making changes");
   console.log("   4. Re-upload: npm run upload -- --clear\n");
 }
