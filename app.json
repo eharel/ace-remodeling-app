@@ -14,7 +14,8 @@
       "buildNumber": "11",
       "infoPlist": {
         "CFBundleDisplayName": "ACE Remodeling TX",
-        "CFBundleName": "ACE Remodeling TX"
+        "CFBundleName": "ACE Remodeling TX",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

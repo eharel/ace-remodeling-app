@@ -1,7 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
+  RefreshControl,
   StyleSheet,
   useWindowDimensions,
   ViewStyle,
@@ -10,14 +11,22 @@ import {
 import { DesignTokens } from "@/core/themes";
 import { ProjectSummary } from "@/core/types";
 import { ThemedText, ThemedView } from "@/shared/components";
-import { useTheme } from "@/shared/contexts";
+import { useProjects, useTheme } from "@/shared/contexts";
 import { ProjectCard } from "./ProjectCard";
+
+// Minimum duration for refresh animation to feel smooth (in milliseconds)
+const MIN_REFRESH_DURATION = 500;
 
 interface ProjectGalleryProps {
   projects: ProjectSummary[];
   onProjectPress?: (project: ProjectSummary) => void;
   style?: ViewStyle; // Allow custom styling
   testID?: string; // For testing purposes
+  /**
+   * Enable pull-to-refresh functionality.
+   * When true, adds RefreshControl to the FlatList.
+   */
+  enableRefresh?: boolean;
 }
 
 // Calculate number of columns based on screen width - moved outside component for performance
@@ -32,9 +41,46 @@ export function ProjectGallery({
   onProjectPress,
   style,
   testID,
+  enableRefresh = false,
 }: ProjectGalleryProps) {
   const { width } = useWindowDimensions();
   const { theme } = useTheme();
+  const { refetchProjects, loading } = useProjects();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const refreshStartTime = useRef<number | null>(null);
+
+  // Handle smooth refresh animation when refresh is enabled
+  useEffect(() => {
+    if (!enableRefresh) return;
+
+    if (loading) {
+      // Refresh started - record start time
+      if (!refreshStartTime.current) {
+        refreshStartTime.current = Date.now();
+        setIsRefreshing(true);
+      }
+    } else {
+      // Refresh completed - wait for minimum duration before hiding spinner
+      if (refreshStartTime.current) {
+        const elapsed = Date.now() - refreshStartTime.current;
+        const remaining = Math.max(0, MIN_REFRESH_DURATION - elapsed);
+
+        const timeoutId = setTimeout(() => {
+          setIsRefreshing(false);
+          refreshStartTime.current = null;
+        }, remaining);
+
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [loading, enableRefresh]);
+
+  const handleRefresh = useCallback(async () => {
+    if (!enableRefresh) return;
+    refreshStartTime.current = Date.now();
+    setIsRefreshing(true);
+    await refetchProjects();
+  }, [enableRefresh, refetchProjects]);
 
   // Error handling: Ensure projects is an array
   const safeProjects = Array.isArray(projects) ? projects : [];
@@ -163,6 +209,16 @@ export function ProjectGallery({
         maxToRenderPerBatch={10} // Render 10 items per batch
         windowSize={10} // Keep 10 screens worth of items in memory
         initialNumToRender={6} // Render 6 items initially
+        refreshControl={
+          enableRefresh ? (
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              tintColor={theme.colors.text.secondary}
+              colors={[theme.colors.text.secondary]} // Android
+            />
+          ) : undefined
+        }
         accessibilityLabel="Project list"
         accessibilityRole="list"
         testID={testID ? `${testID}-list` : "project-gallery-list"}

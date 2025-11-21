@@ -2,7 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import {
@@ -17,7 +17,13 @@ import {
   type PhotoTabValue,
 } from "@/features/gallery";
 import { ComponentSelector } from "@/features/projects";
-import { LoadingState, PageHeader, ThemedText, ThemedView } from "@/shared/components";
+import {
+  LoadingState,
+  PageHeader,
+  RefreshableScrollView,
+  ThemedText,
+  ThemedView,
+} from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
@@ -1032,8 +1038,9 @@ export default function ProjectDetailScreen() {
     [theme]
   );
 
-  // Show loading state while projects are being fetched
-  if (loading) {
+  // Show loading state only on initial load (when no project found yet)
+  // During refresh, keep content visible and just show refresh spinner
+  if (loading && !project) {
     return (
       <>
         <Stack.Screen
@@ -1183,7 +1190,7 @@ export default function ProjectDetailScreen() {
           backLabel="Back"
           variant="compact"
         />
-        <ScrollView
+        <RefreshableScrollView
           style={styles.scrollView}
           contentContainerStyle={{ paddingBottom: DesignTokens.spacing[20] }}
         >
@@ -1588,7 +1595,7 @@ export default function ProjectDetailScreen() {
               </ThemedView>
             </ThemedView>
           )}
-        </ScrollView>
+        </RefreshableScrollView>
       </ThemedView>
 
       {/* Image Gallery Modal */}

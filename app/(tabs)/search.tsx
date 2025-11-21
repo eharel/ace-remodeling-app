@@ -524,6 +524,7 @@ export default function SearchScreen() {
                 handleProjectPress(result);
               }
             }}
+            enableRefresh={true}
           />
         </ThemedView>
       ) : (
