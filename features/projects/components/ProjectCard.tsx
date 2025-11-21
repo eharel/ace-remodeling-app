@@ -10,10 +10,11 @@ import {
 
 import { DesignTokens } from "@/core/themes";
 import { ProjectSummary, ProjectStatus } from "@/core/types";
+import { getSubcategoryLabel } from "@/core/types/ComponentCategory";
 import { getStatusDisplayText, getStatusStyleKey } from "@/core/types/Status";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
-import { logError } from "@/shared/utils";
+import { getCategoryDisplayName, logError } from "@/shared/utils";
 
 interface ProjectCardProps {
   project: ProjectSummary;
@@ -230,9 +231,10 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
             </View>
 
             <ThemedText style={styles.category}>
-              {project.category
-                ? project.category.charAt(0).toUpperCase() +
-                  project.category.slice(1)
+              {project.subcategory
+                ? getSubcategoryLabel(project.subcategory)
+                : project.category
+                ? getCategoryDisplayName(project.category)
                 : "Miscellaneous"}
             </ThemedText>
           </View>

@@ -38,9 +38,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="categories"
+        name="browse"
         options={{
-          title: "Categories",
+          title: "Browse",
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="grid-view" size={size} color={color} />
           ),

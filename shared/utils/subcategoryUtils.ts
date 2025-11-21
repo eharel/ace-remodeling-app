@@ -54,6 +54,11 @@ export function getSubcategories(
       )
     )
   ).sort((a, b) => {
+    // Special handling for outdoor-living: prioritize "pool" first
+    if (category === CORE_CATEGORIES.OUTDOOR_LIVING) {
+      if (a === "pool") return -1;
+      if (b === "pool") return 1;
+    }
     // Sort by display label for better UX
     const labelA = getSubcategoryLabel(a);
     const labelB = getSubcategoryLabel(b);

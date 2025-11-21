@@ -93,16 +93,16 @@ export default function CategoryScreen() {
         <PageHeader
           title="Category Not Found"
           showBack={true}
-          backLabel="Portfolio"
+          backLabel="Browse"
           layoutMode="inline"
         />
         <EmptyState
           title="Category Not Found"
           message="The requested category does not exist."
-          actionText="Go to Portfolio"
+          actionText="Go to Browse"
           onAction={() => {
             // @ts-expect-error - Expo Router generated types are overly strict
-            router.push("/(tabs)/portfolio");
+            router.push("/(tabs)/browse");
           }}
         />
       </ThemedView>
@@ -128,16 +128,25 @@ export default function CategoryScreen() {
           return normalizedComponentCategory === validCategory;
         })
       )
-      .map((project) => ({
-        id: project.id,
-        projectNumber: project.number,
-        name: project.name,
-        category: validCategory,
-        briefDescription: project.summary,
-        thumbnail: getProjectThumbnail(project),
-        status: project.status,
-        completedAt: getProjectCompletionDate(project),
-      }));
+      .map((project) => {
+        // Find the matching component to get its subcategory
+        const matchingComponent = project.components.find((c) => {
+          const normalizedComponentCategory = normalizeCategory(c.category);
+          return normalizedComponentCategory === validCategory;
+        });
+        
+        return {
+          id: project.id,
+          projectNumber: project.number,
+          name: project.name,
+          category: validCategory,
+          subcategory: matchingComponent?.subcategory,
+          briefDescription: project.summary,
+          thumbnail: getProjectThumbnail(project),
+          status: project.status,
+          completedAt: getProjectCompletionDate(project),
+        };
+      });
   }, [projects, validCategory]);
 
   // Extract available subcategories for this category
@@ -230,7 +239,7 @@ export default function CategoryScreen() {
             />
           }
           showBack={true}
-          backLabel="Portfolio"
+          backLabel="Browse"
           layoutMode="inline"
         />
         <LoadingState />
@@ -254,7 +263,7 @@ export default function CategoryScreen() {
             />
           }
           showBack={true}
-          backLabel="Portfolio"
+          backLabel="Browse"
           layoutMode="inline"
         />
         <EmptyState
@@ -285,16 +294,16 @@ export default function CategoryScreen() {
             />
           }
           showBack={true}
-          backLabel="Portfolio"
+          backLabel="Browse"
           layoutMode="inline"
         />
         <EmptyState
           title={`No ${categoryDisplayName} Projects`}
           message={`We don't have any ${categoryDisplayName.toLowerCase()} projects to show at the moment.`}
-          actionText="Browse Other Categories"
+          actionText="Browse Other Projects"
           onAction={() => {
             // @ts-expect-error - Expo Router generated types are overly strict
-            router.push("/(tabs)/portfolio");
+            router.push("/(tabs)/browse");
           }}
         />
       </ThemedView>
@@ -316,7 +325,7 @@ export default function CategoryScreen() {
           />
         }
         showBack={true}
-        backLabel="Portfolio"
+          backLabel="Browse"
         layoutMode="inline"
         subtitle={`Explore our ${categoryDisplayName.toLowerCase()} portfolio`}
       >
