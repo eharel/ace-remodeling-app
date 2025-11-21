@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 
 import { useTheme } from "@/shared/contexts";
@@ -6,9 +6,11 @@ import { useTheme } from "@/shared/contexts";
 import { accessibilityStrings } from "../constants/accessibilityStrings";
 import { useAccessibilityAnnouncements } from "../hooks/useAccessibilityAnnouncements";
 import { useImageGallery } from "../hooks/useImageGallery";
-import { useImageNavigation } from "../hooks/useImageNavigation";
 import { GalleryStyles, ImageGalleryModalProps } from "../types/gallery.types";
-import { ImageGalleryCarousel } from "./ImageGalleryCarousel";
+import {
+  ImageGalleryCarousel,
+  ImageGalleryCarouselRef,
+} from "./ImageGalleryCarousel";
 import { ImageGalleryFooter } from "./ImageGalleryFooter";
 import { ImageGalleryHeader } from "./ImageGalleryHeader";
 
@@ -52,15 +54,22 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
         ? Math.max(0, Math.min(initialIndex || 0, images.length - 1))
         : 0;
 
-    const { currentIndex, translateX, updateCurrentIndex, modalRef } =
-      useImageGallery({ visible, images, initialIndex: safeInitialIndex });
+    const { currentIndex, updateCurrentIndex, modalRef } = useImageGallery({
+      visible,
+      images,
+      initialIndex: safeInitialIndex,
+    });
 
     // Safety check: ensure currentIndex is valid before accessing array
     const safeCurrentIndex =
       images.length > 0
         ? Math.max(0, Math.min(currentIndex, images.length - 1))
         : 0;
-    const currentImage = images.length > 0 ? images[safeCurrentIndex] : undefined;
+    const currentImage =
+      images.length > 0 ? images[safeCurrentIndex] : undefined;
+
+    // Ref for programmatic carousel navigation (e.g., thumbnail taps)
+    const carouselRef = useRef<ImageGalleryCarouselRef>(null);
 
     useAccessibilityAnnouncements({
       visible,
@@ -70,12 +79,14 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
       modalRef,
     });
 
-    const { goToImage: navigateToImage, panGesture } = useImageNavigation({
-      currentIndex: safeCurrentIndex,
-      imagesLength: images.length,
-      translateX,
-      onIndexChange: updateCurrentIndex,
-    });
+    // Handle thumbnail navigation
+    const handleThumbnailPress = React.useCallback(
+      (index: number) => {
+        carouselRef.current?.scrollToIndex(index);
+        updateCurrentIndex(index);
+      },
+      [updateCurrentIndex]
+    );
 
     const styles = useMemo(
       (): GalleryStyles =>
@@ -126,10 +137,10 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
 
           <View style={styles.container}>
             <ImageGalleryCarousel
+              ref={carouselRef}
               images={images}
               currentIndex={safeCurrentIndex}
-              translateX={translateX}
-              panGesture={panGesture}
+              onIndexChange={updateCurrentIndex}
               theme={theme}
             />
           </View>
@@ -138,7 +149,7 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
             currentImage={currentImage}
             images={images}
             currentIndex={safeCurrentIndex}
-            onImageSelect={navigateToImage}
+            onImageSelect={handleThumbnailPress}
             theme={theme}
           />
         </View>

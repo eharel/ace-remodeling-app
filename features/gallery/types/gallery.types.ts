@@ -1,6 +1,4 @@
 import { TextStyle, ViewStyle } from "react-native";
-import { PanGesture } from "react-native-gesture-handler";
-import { SharedValue } from "react-native-reanimated";
 
 import { Picture } from "@/core/types";
 
@@ -121,10 +119,8 @@ export interface ImageGalleryCarouselProps extends BaseGalleryProps {
   images: Picture[];
   /** Current image index being displayed */
   currentIndex: number;
-  /** Shared value for horizontal translation animation */
-  translateX: SharedValue<number>;
-  /** Pan gesture handler for swipe navigation */
-  panGesture: PanGesture;
+  /** Callback function called when the current index changes */
+  onIndexChange: (index: number) => void;
 }
 
 /**
@@ -157,11 +153,7 @@ export interface UseImageGalleryReturn {
   currentIndex: number;
   /** Function to set the current image index */
   setCurrentIndex: (index: number) => void;
-  /** Shared value for horizontal translation animation */
-  translateX: SharedValue<number>;
-  /** Function to navigate to a specific image */
-  goToImage: (index: number) => void;
-  /** Function to update the current index with animation */
+  /** Function to update the current index */
   updateCurrentIndex: (newIndex: number) => void;
   /** Ref for the modal component */
   modalRef: React.RefObject<any>;
@@ -187,7 +179,7 @@ export interface UseImageNavigationReturn {
   /** Function to navigate to a specific image */
   goToImage: (index: number) => void;
   /** Pan gesture handler for swipe navigation */
-  panGesture: PanGesture;
+  panGesture: any; // PanGesture - kept as any since hook is deprecated but still exists
 }
 
 // Style types
