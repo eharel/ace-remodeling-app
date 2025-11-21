@@ -14,7 +14,7 @@ import {
   CoreCategory,
 } from "@/core/types/ComponentCategory";
 import { FeaturedCategorySection, HeroCarousel } from "@/features/showcase";
-import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
+import { LoadingState, PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import { CATEGORY_DISPLAY_ORDER } from "@/shared/utils";
 
@@ -27,7 +27,7 @@ import { CATEGORY_DISPLAY_ORDER } from "@/shared/utils";
 export default function ShowcaseScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const { featuredProjects } = useProjects();
+  const { featuredProjects, loading } = useProjects();
 
   /**
    * Group featured projects by category dynamically
@@ -173,60 +173,67 @@ export default function ShowcaseScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        {/* Hero Carousel - Auto-advancing featured projects */}
-        <View style={styles.carouselContainer}>
-          <HeroCarousel projects={featuredProjects} />
-        </View>
-
-        {/* Dynamic Category Sections - Only render if we have featured projects */}
-        {featuredProjects.length > 0 ? (
-          categoriesWithFeatured.map((category) => {
-            const projects = featuredByCategory.get(category);
-            if (!projects || projects.length === 0) {
-              return null;
-            }
-
-            // Check if category has config, skip if not
-            // getCategoryConfig expects CoreCategory, so we need to check if it's a core category
-            const categoryConfig = isValidCategoryKey(category)
-              ? getCategoryConfig(category)
-              : null;
-            if (!categoryConfig) {
-              return null;
-            }
-
-            // Skip internal categories (management tools, etc.)
-            if (
-              "internal" in categoryConfig &&
-              categoryConfig.internal === true
-            ) {
-              return null;
-            }
-            return (
-              <FeaturedCategorySection
-                key={category}
-                category={category}
-                projects={projects}
-              />
-            );
-          })
+        {/* Loading State - Show while fetching projects */}
+        {loading ? (
+          <LoadingState message="Loading showcase..." />
         ) : (
-          /* Empty State - No featured projects at all */
-          <View style={styles.emptyStateContainer}>
-            <MaterialIcons
-              name="star-border"
-              size={72}
-              color={theme.colors.showcase.accent}
-              style={styles.emptyStateIcon}
-            />
-            <ThemedText style={styles.emptyStateTitle}>
-              Building our showcase
-            </ThemedText>
-            <ThemedText style={styles.emptyStateMessage}>
-              Featured projects will appear here as we curate our finest work.
-              Check back soon to see our portfolio highlights.
-            </ThemedText>
-          </View>
+          <>
+            {/* Hero Carousel - Auto-advancing featured projects */}
+            <View style={styles.carouselContainer}>
+              <HeroCarousel projects={featuredProjects} />
+            </View>
+
+            {/* Dynamic Category Sections - Only render if we have featured projects */}
+            {featuredProjects.length > 0 ? (
+              categoriesWithFeatured.map((category) => {
+                const projects = featuredByCategory.get(category);
+                if (!projects || projects.length === 0) {
+                  return null;
+                }
+
+                // Check if category has config, skip if not
+                // getCategoryConfig expects CoreCategory, so we need to check if it's a core category
+                const categoryConfig = isValidCategoryKey(category)
+                  ? getCategoryConfig(category)
+                  : null;
+                if (!categoryConfig) {
+                  return null;
+                }
+
+                // Skip internal categories (management tools, etc.)
+                if (
+                  "internal" in categoryConfig &&
+                  categoryConfig.internal === true
+                ) {
+                  return null;
+                }
+                return (
+                  <FeaturedCategorySection
+                    key={category}
+                    category={category}
+                    projects={projects}
+                  />
+                );
+              })
+            ) : (
+              /* Empty State - No featured projects at all */
+              <View style={styles.emptyStateContainer}>
+                <MaterialIcons
+                  name="star-border"
+                  size={72}
+                  color={theme.colors.showcase.accent}
+                  style={styles.emptyStateIcon}
+                />
+                <ThemedText style={styles.emptyStateTitle}>
+                  Building our showcase
+                </ThemedText>
+                <ThemedText style={styles.emptyStateMessage}>
+                  Featured projects will appear here as we curate our finest work.
+                  Check back soon to see our portfolio highlights.
+                </ThemedText>
+              </View>
+            )}
+          </>
         )}
       </ScrollView>
     </ThemedView>
