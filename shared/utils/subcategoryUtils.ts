@@ -1,6 +1,20 @@
 import { Project, ProjectSummary } from "@/core/types";
-import { ComponentCategory } from "@/core/types/ComponentCategory";
-import { getSubcategoryLabel } from "@/core/types/ComponentCategory";
+import {
+  ComponentCategory,
+  CORE_CATEGORIES,
+  getSubcategoryLabel,
+} from "@/core/types/ComponentCategory";
+
+/**
+ * Normalize category names (e.g., "outdoor" -> "outdoor-living")
+ * This handles legacy data where projects may use "outdoor" instead of "outdoor-living"
+ */
+function normalizeCategory(category: string): ComponentCategory {
+  if (category === "outdoor") {
+    return CORE_CATEGORIES.OUTDOOR_LIVING;
+  }
+  return category as ComponentCategory;
+}
 
 /**
  * Extract unique subcategories from projects that match a specific category
@@ -27,13 +41,17 @@ export function getSubcategories(
   // Extract unique subcategories from components matching the category
   const uniqueSubcategories = Array.from(
     new Set(
-      projects
-        .flatMap((project) =>
-          project.components
-            .filter((component) => component.category === category)
-            .map((component) => component.subcategory)
-            .filter((sub): sub is string => Boolean(sub))
-        )
+      projects.flatMap((project) =>
+        project.components
+          .filter((component) => {
+            const normalizedComponentCategory = normalizeCategory(
+              component.category
+            );
+            return normalizedComponentCategory === category;
+          })
+          .map((component) => component.subcategory)
+          .filter((sub): sub is string => Boolean(sub))
+      )
     )
   ).sort((a, b) => {
     // Sort by display label for better UX
@@ -90,17 +108,24 @@ export function filterBySubcategory(
   if (selectedSubcategory === "all") {
     // Return all projects that have at least one component matching the category
     return projects.filter((project) =>
-      project.components.some((component) => component.category === category)
+      project.components.some((component) => {
+        const normalizedComponentCategory = normalizeCategory(
+          component.category
+        );
+        return normalizedComponentCategory === category;
+      })
     );
   }
 
   // Return projects that have at least one component matching both category and subcategory
   return projects.filter((project) =>
-    project.components.some(
-      (component) =>
-        component.category === category &&
+    project.components.some((component) => {
+      const normalizedComponentCategory = normalizeCategory(component.category);
+      return (
+        normalizedComponentCategory === category &&
         component.subcategory === selectedSubcategory
-    )
+      );
+    })
   );
 }
 
@@ -119,16 +144,23 @@ export function getSubcategoryCount(
 ): number {
   if (subcategory === "all") {
     return projects.filter((project) =>
-      project.components.some((component) => component.category === category)
+      project.components.some((component) => {
+        const normalizedComponentCategory = normalizeCategory(
+          component.category
+        );
+        return normalizedComponentCategory === category;
+      })
     ).length;
   }
 
   return projects.filter((project) =>
-    project.components.some(
-      (component) =>
-        component.category === category &&
+    project.components.some((component) => {
+      const normalizedComponentCategory = normalizeCategory(component.category);
+      return (
+        normalizedComponentCategory === category &&
         component.subcategory === subcategory
-    )
+      );
+    })
   ).length;
 }
 
@@ -160,16 +192,20 @@ export function filterSummariesBySubcategory(
     if (!fullProject) return false;
 
     if (selectedSubcategory === "all") {
-      return fullProject.components.some(
-        (component) => component.category === category
-      );
+      return fullProject.components.some((component) => {
+        const normalizedComponentCategory = normalizeCategory(
+          component.category
+        );
+        return normalizedComponentCategory === category;
+      });
     }
 
-    return fullProject.components.some(
-      (component) =>
-        component.category === category &&
+    return fullProject.components.some((component) => {
+      const normalizedComponentCategory = normalizeCategory(component.category);
+      return (
+        normalizedComponentCategory === category &&
         component.subcategory === selectedSubcategory
-    );
+      );
+    });
   });
 }
-

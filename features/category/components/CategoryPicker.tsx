@@ -3,7 +3,10 @@ import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ComponentCategory } from "@/core/types/ComponentCategory";
+import {
+  ComponentCategory,
+  CORE_CATEGORIES,
+} from "@/core/types/ComponentCategory";
 import { ThemedText } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import {
@@ -32,19 +35,34 @@ export function CategoryPicker({
   const { projects } = useProjects();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Get all categories with project counts
+  // Normalize category names (e.g., "outdoor" -> "outdoor-living")
+  // This handles legacy data where projects may use "outdoor" instead of "outdoor-living"
+  const normalizeCategory = (category: string): ComponentCategory => {
+    if (category === "outdoor") {
+      return CORE_CATEGORIES.OUTDOOR_LIVING;
+    }
+    return category as ComponentCategory;
+  };
+
+  // Get all categories with project counts, filtered to only show categories with projects
   const categories = useMemo(() => {
     if (!projects) return [];
 
     const allCategories = getAllCategories();
-    return allCategories.map((category) => ({
+    const categoriesWithCounts = allCategories.map((category) => ({
       category,
       displayName: getCategoryDisplayName(category),
       icon: getCategoryIcon(category),
       count: projects.filter((p) =>
-        p.components.some((c) => c.category === category)
+        p.components.some((c) => {
+          const normalizedComponentCategory = normalizeCategory(c.category);
+          return normalizedComponentCategory === category;
+        })
       ).length,
     }));
+
+    // Filter out categories with 0 projects
+    return categoriesWithCounts.filter((item) => item.count > 0);
   }, [projects]);
 
   const handleSelect = (category: ComponentCategory) => {

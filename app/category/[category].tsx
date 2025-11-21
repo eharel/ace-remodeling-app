@@ -6,6 +6,7 @@ import { DesignTokens } from "@/core/themes";
 import { ProjectSummary } from "@/core/types";
 import {
   ComponentCategory,
+  CORE_CATEGORIES,
   CoreCategory,
   getSubcategoryLabel,
 } from "@/core/types/ComponentCategory";
@@ -108,12 +109,24 @@ export default function CategoryScreen() {
     );
   }
 
+  // Normalize category names (e.g., "outdoor" -> "outdoor-living")
+  // This handles legacy data where projects may use "outdoor" instead of "outdoor-living"
+  const normalizeCategory = (category: string): ComponentCategory => {
+    if (category === "outdoor") {
+      return CORE_CATEGORIES.OUTDOOR_LIVING;
+    }
+    return category as ComponentCategory;
+  };
+
   // Filter projects by category (check if any component matches) and convert to ProjectSummary
   const allCategoryProjects = useMemo((): ProjectSummary[] => {
     if (!projects) return [];
     return projects
       .filter((project) =>
-        project.components.some((c) => c.category === validCategory)
+        project.components.some((c) => {
+          const normalizedComponentCategory = normalizeCategory(c.category);
+          return normalizedComponentCategory === validCategory;
+        })
       )
       .map((project) => ({
         id: project.id,
@@ -172,9 +185,11 @@ export default function CategoryScreen() {
 
     if (fullProject) {
       // Find the component that matches the current category
-      const matchingComponent = fullProject.components.find(
-        (c) => c.category === validCategory
-      );
+      // Use normalization to handle legacy "outdoor" category
+      const matchingComponent = fullProject.components.find((c) => {
+        const normalizedComponentCategory = normalizeCategory(c.category);
+        return normalizedComponentCategory === validCategory;
+      });
 
       if (matchingComponent) {
         // Navigate with componentId param to open directly to that component
