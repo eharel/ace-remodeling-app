@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ComponentCategory } from "@/core/types/ComponentCategory";
+import { ComponentCategory, CORE_CATEGORIES } from "@/core/types/ComponentCategory";
 import {
   EmptyState,
   LoadingState,
@@ -35,6 +35,15 @@ export default function ProjectsScreen() {
   const categories = useMemo(() => {
     if (!projects) return [];
 
+    // Normalize category names (e.g., "outdoor" -> "outdoor-living")
+    // This handles legacy data where projects may use "outdoor" instead of "outdoor-living"
+    const normalizeCategory = (category: string): ComponentCategory => {
+      if (category === "outdoor") {
+        return CORE_CATEGORIES.OUTDOOR_LIVING;
+      }
+      return category as ComponentCategory;
+    };
+
     // Dynamically build category list from all available categories
     const allCategories = getAllCategories();
     const categoryData: CategoryItem[] = allCategories.map((category) => ({
@@ -42,7 +51,10 @@ export default function ProjectsScreen() {
       name: getCategoryDisplayName(category),
       icon: getCategoryIcon(category),
       count: projects.filter((p) =>
-        p.components.some((c) => c.category === category)
+        p.components.some((c) => {
+          const normalizedComponentCategory = normalizeCategory(c.category);
+          return normalizedComponentCategory === category;
+        })
       ).length,
     }));
 
