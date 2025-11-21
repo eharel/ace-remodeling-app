@@ -36,6 +36,7 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
     briefDescription: project.summary, // Use new field name
     thumbnail: getProjectThumbnail(project), // Use thumbnail with fallback
     status: project.status,
+    isFeatured: project.isFeatured,
     completedAt: getProjectCompletionDate(project),
     // REMOVED: pmNames - computed field no longer stored
   }));

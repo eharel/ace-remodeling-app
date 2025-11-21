@@ -182,6 +182,8 @@ export interface ProjectSummary {
   thumbnail: string;
   status: ProjectStatus | string; // Allow string for flexibility
   category: ComponentCategory | string; // Allow string for flexibility
+  subcategory?: string; // Optional subcategory (e.g., "pool", "deck" for outdoor-living)
+  isFeatured?: boolean; // Whether this project is featured
   completedAt?: string;
   location?: {
     neighborhood?: string;

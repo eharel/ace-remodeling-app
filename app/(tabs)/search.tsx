@@ -90,6 +90,7 @@ export default function SearchScreen() {
     projectId: string;
     projectNumber: string;
     projectName: string;
+    isFeatured?: boolean;
 
     // Component info (the matched component)
     componentId: string;
@@ -292,6 +293,7 @@ export default function SearchScreen() {
                 projectId: project.id,
                 projectNumber: project.number,
                 projectName: project.name,
+                isFeatured: project.isFeatured,
                 componentId: component.id,
                 componentCategory: component.category,
                 componentName: component.name,
@@ -402,6 +404,7 @@ export default function SearchScreen() {
             briefDescription: result.componentSummary || "",
             thumbnail: result.thumbnail,
             status: result.status,
+            isFeatured: result.isFeatured,
             completedAt: result.completedAt,
           }))}
           onSelectProject={(id) => {
@@ -510,6 +513,7 @@ export default function SearchScreen() {
               briefDescription: result.componentSummary || "",
               thumbnail: result.thumbnail,
               status: result.status,
+              isFeatured: result.isFeatured,
               completedAt: result.completedAt,
             }))}
             onProjectPress={(summary) => {

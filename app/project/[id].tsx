@@ -2,21 +2,18 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import {
-  AssetCategoryTabs,
   type AssetCategoryValue,
   AssetThumbnail,
   convertDocumentsToPictures,
   convertMediaToPictures,
   ImageGalleryModal,
   MorePhotosCard,
-  PhotoTabs,
   type PhotoTabValue,
 } from "@/features/gallery";
-import { ComponentSelector } from "@/features/projects";
 import {
   LoadingState,
   PageHeader,
@@ -24,6 +21,7 @@ import {
   ThemedText,
   ThemedView,
 } from "@/shared/components";
+import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
@@ -322,6 +320,63 @@ export default function ProjectDetailScreen() {
       return "invoice";
     }
     return "other";
+  };
+
+  /**
+   * Calculate asset counts for each category
+   * Used for SegmentedControl to show counts
+   */
+  const assetCounts = useMemo(() => {
+    const counts: Record<AssetCategoryValue, number> = {
+      "floor-plan": 0,
+      materials: 0,
+      "rendering-3d": 0,
+      contract: 0,
+      permit: 0,
+      invoice: 0,
+      other: 0,
+    };
+
+    currentDocuments.forEach((doc) => {
+      const tabValue = mapCategoryToTabValue(doc.category);
+      counts[tabValue]++;
+    });
+
+    return counts;
+  }, [currentDocuments]);
+
+  /**
+   * Available asset categories (only those with documents)
+   * Ordered by priority
+   */
+  const availableAssetCategories = useMemo(() => {
+    const categoryOrder: AssetCategoryValue[] = [
+      "floor-plan",
+      "materials",
+      "rendering-3d",
+      "contract",
+      "permit",
+      "invoice",
+      "other",
+    ];
+
+    return categoryOrder.filter((cat) => assetCounts[cat] > 0);
+  }, [assetCounts]);
+
+  /**
+   * Get label for asset category
+   */
+  const getAssetCategoryLabel = (category: AssetCategoryValue): string => {
+    const labels: Record<AssetCategoryValue, string> = {
+      "floor-plan": "Plans",
+      materials: "Materials",
+      "rendering-3d": "Renderings",
+      contract: "Contracts",
+      permit: "Permits",
+      invoice: "Invoices",
+      other: "Other",
+    };
+    return labels[category] || category;
   };
 
   /**
@@ -1215,12 +1270,19 @@ export default function ProjectDetailScreen() {
           ) : null}
 
           {/* Component Selector - only show if multiple components */}
-          {project.components.length > 1 && (
-            <ComponentSelector
-              components={sortedComponents}
-              selectedComponentId={selectedComponentId}
-              onSelectComponent={setSelectedComponentId}
-              getComponentLabel={getComponentLabel}
+          {project.components.length > 1 && sortedComponents.length > 0 && (
+            <SegmentedControl
+              variant="pills"
+              options={sortedComponents.map((c) => c.id) as readonly string[]}
+              selected={selectedComponentId || sortedComponents[0].id}
+              onSelect={setSelectedComponentId}
+              getLabel={(componentId) => {
+                const component = sortedComponents.find(
+                  (c) => c.id === componentId
+                );
+                return component ? getComponentLabel(component) : componentId;
+              }}
+              ariaLabel="Select project component"
             />
           )}
 
@@ -1350,10 +1412,23 @@ export default function ProjectDetailScreen() {
             {aggregatedPictures.length > 0 ? (
               <>
                 {/* Photo Category Tabs */}
-                <PhotoTabs
-                  activeTab={activePhotoTab}
-                  onTabChange={setActivePhotoTab}
-                  photoCounts={photoCounts}
+                <SegmentedControl
+                  variant="tabs"
+                  options={["after", "before", "progress", "all"] as const}
+                  selected={activePhotoTab}
+                  onSelect={setActivePhotoTab}
+                  showCounts={true}
+                  getCounts={(tab) => photoCounts[tab as PhotoTabValue]}
+                  getLabel={(tab) => {
+                    const labels: Record<PhotoTabValue, string> = {
+                      after: "After",
+                      before: "Before",
+                      progress: "In Progress",
+                      all: "All Photos",
+                    };
+                    return labels[tab as PhotoTabValue] || tab;
+                  }}
+                  ariaLabel="Filter photos by stage"
                 />
 
                 {/* Photo Grid */}
@@ -1459,13 +1534,27 @@ export default function ProjectDetailScreen() {
               </View>
 
               {/* Asset Category Tabs */}
-              {currentDocuments.length > 0 && (
-                <AssetCategoryTabs
-                  activeTab={selectedAssetCategory || "other"}
-                  onTabChange={setSelectedAssetCategory}
-                  documents={currentDocuments}
-                />
-              )}
+              {currentDocuments.length > 0 &&
+                availableAssetCategories.length > 0 && (
+                  <SegmentedControl
+                    variant="tabs"
+                    options={
+                      availableAssetCategories as readonly AssetCategoryValue[]
+                    }
+                    selected={
+                      selectedAssetCategory || availableAssetCategories[0]
+                    }
+                    onSelect={setSelectedAssetCategory}
+                    showCounts={true}
+                    getCounts={(category) =>
+                      assetCounts[category as AssetCategoryValue]
+                    }
+                    getLabel={(category) =>
+                      getAssetCategoryLabel(category as AssetCategoryValue)
+                    }
+                    ariaLabel="Filter assets by category"
+                  />
+                )}
 
               {/* Asset Thumbnails */}
               <ScrollView
