@@ -11,7 +11,7 @@ import {
 
 import { DesignTokens } from "@/core/themes";
 import { Document } from "@/core/types";
-import { PageHeader, ThemedText } from "@/shared/components";
+import { LoadingState, PageHeader, ThemedText } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import { commonStyles } from "@/shared/utils";
 
@@ -29,7 +29,7 @@ interface DocumentsPageProps {}
 export default function DocumentsPage({}: DocumentsPageProps) {
   const { theme } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { projects } = useProjects();
+  const { projects, loading } = useProjects();
 
   // Find the project by ID using Firebase data
   const project = projects.find((p) => p.id === id);
@@ -208,11 +208,60 @@ export default function DocumentsPage({}: DocumentsPageProps) {
     },
   });
 
+  // Show loading state while projects are being fetched
+  if (loading) {
+    return (
+      <>
+        <Stack.Screen
+          options={{
+            headerShown: false,
+            presentation: "card",
+          }}
+        />
+        <View style={styles.container}>
+          <PageHeader
+            title="Documents"
+            showBack
+            variant="compact"
+          />
+          <LoadingState message="Loading documents..." />
+        </View>
+      </>
+    );
+  }
+
+  // Show error state only after loading is complete and project is still not found
   if (!project) {
     return (
-      <View style={styles.container}>
-        <ThemedText>Project not found</ThemedText>
-      </View>
+      <>
+        <Stack.Screen
+          options={{
+            headerShown: false,
+            presentation: "card",
+          }}
+        />
+        <View style={styles.container}>
+          <PageHeader
+            title="Documents"
+            showBack
+            variant="compact"
+          />
+          <View style={styles.emptyState}>
+            <MaterialIcons
+              name="error-outline"
+              size={64}
+              color={theme.colors.text.tertiary}
+              style={styles.emptyStateIcon}
+            />
+            <ThemedText style={styles.emptyStateText}>
+              Project not found
+            </ThemedText>
+            <ThemedText style={styles.emptyStateSubtext}>
+              The project you're looking for doesn't exist or has been removed.
+            </ThemedText>
+          </View>
+        </View>
+      </>
     );
   }
 

@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import React from "react";
 
-import { EmptyState } from "@/shared/components";
+import { EmptyState, LoadingState } from "@/shared/components";
 import { useProjects } from "@/shared/contexts";
 import { CategoryPage } from "./CategoryPage";
 // Comment out mock data for now (keeping for fallback)
@@ -78,19 +78,9 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
   // Get configuration for this category
   const config = getCategoryConfig(category);
 
-  // Simple loading indicator
+  // Show loading state while projects are being fetched
   if (loading) {
-    return (
-      <CategoryPage
-        category={category}
-        title={config.title}
-        subtitle="Loading projects..."
-        galleryTitle={config.galleryTitle}
-        gallerySubtitle="Loading projects from Firebase..."
-        projects={[]}
-        onProjectPress={handleProjectPress}
-      />
-    );
+    return <LoadingState message="Loading projects..." />;
   }
 
   // Empty state - no projects found for this category

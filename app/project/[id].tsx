@@ -17,7 +17,7 @@ import {
   type PhotoTabValue,
 } from "@/features/gallery";
 import { ComponentSelector } from "@/features/projects";
-import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
+import { LoadingState, PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
@@ -44,7 +44,7 @@ export default function ProjectDetailScreen() {
     id: string;
     componentId?: string;
   }>();
-  const { projects } = useProjects();
+  const { projects, loading } = useProjects();
   const [project, setProject] = useState<Project | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -1032,6 +1032,28 @@ export default function ProjectDetailScreen() {
     [theme]
   );
 
+  // Show loading state while projects are being fetched
+  if (loading) {
+    return (
+      <>
+        <Stack.Screen
+          options={{
+            headerShown: false, // Hide React Navigation's header
+          }}
+        />
+        <ThemedView style={styles.container}>
+          <PageHeader
+            title="Project Details"
+            showBack={true}
+            backLabel="Back"
+          />
+          <LoadingState message="Loading project..." />
+        </ThemedView>
+      </>
+    );
+  }
+
+  // Show error state only after loading is complete and project is still not found
   if (!project) {
     return (
       <>
