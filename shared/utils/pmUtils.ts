@@ -18,7 +18,7 @@ export interface PMInfo {
  * Get all PM names from a project
  */
 export function getPMNames(project: Project): string[] {
-  return project.pms?.map((pm) => pm.name) || [];
+  return project.projectManagers?.map((pm) => pm.name) || [];
 }
 
 /**
@@ -33,15 +33,15 @@ export function getPMNamesString(project: Project): string {
  * Get the first PM (primary PM)
  */
 export function getPrimaryPM(project: Project): PMInfo | undefined {
-  if (!project.pms || project.pms.length === 0) return undefined;
-  return project.pms[0];
+  if (!project.projectManagers || project.projectManagers.length === 0) return undefined;
+  return project.projectManagers[0];
 }
 
 /**
  * Check if a specific PM is assigned to a project
  */
 export function isPMAssigned(project: Project, pmName: string): boolean {
-  return project.pms?.some((pm) => pm.name === pmName) || false;
+  return project.projectManagers?.some((pm) => pm.name === pmName) || false;
 }
 
 /**
@@ -51,14 +51,14 @@ export function getPMByName(
   project: Project,
   pmName: string
 ): PMInfo | undefined {
-  return project.pms?.find((pm) => pm.name === pmName);
+  return project.projectManagers?.find((pm) => pm.name === pmName);
 }
 
 /**
  * Add a PM to a project
  */
 export function addPMToProject(project: Project, pmInfo: PMInfo): Project {
-  const currentPMs = project.pms || [];
+  const currentPMs = project.projectManagers || [];
 
   // Check if PM is already assigned
   if (isPMAssigned(project, pmInfo.name)) {
@@ -67,7 +67,7 @@ export function addPMToProject(project: Project, pmInfo: PMInfo): Project {
 
   return {
     ...project,
-    pms: [...currentPMs, pmInfo],
+    projectManagers: [...currentPMs, pmInfo],
   };
 }
 
@@ -75,12 +75,12 @@ export function addPMToProject(project: Project, pmInfo: PMInfo): Project {
  * Remove a PM from a project
  */
 export function removePMFromProject(project: Project, pmName: string): Project {
-  const currentPMs = project.pms || [];
+  const currentPMs = project.projectManagers || [];
   const updatedPMs = currentPMs.filter((pm) => pm.name !== pmName);
 
   return {
     ...project,
-    pms: updatedPMs,
+    projectManagers: updatedPMs,
   };
 }
 

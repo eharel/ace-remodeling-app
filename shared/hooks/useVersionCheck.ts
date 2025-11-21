@@ -47,11 +47,9 @@ export function useVersionCheck(): UseVersionCheckResult {
       try {
         // Get current build number
         const currentBuild = getCurrentBuildNumber();
-        console.log("[VersionCheck] Current build number:", currentBuild);
 
         // Fetch minimum required build from Firestore
         const versionConfig = await fetchVersionConfig();
-        console.log("[VersionCheck] Version config from Firestore:", versionConfig);
 
         // Only update state if component is still mounted
         if (!isMounted) return;
@@ -62,20 +60,11 @@ export function useVersionCheck(): UseVersionCheckResult {
             currentBuild,
             versionConfig.minimumBuildNumber
           );
-          console.log(
-            "[VersionCheck] Update required:",
-            needsUpdate,
-            `(current: ${currentBuild}, minimum: ${versionConfig.minimumBuildNumber})`
-          );
           setUpdateRequired(needsUpdate);
-        } else {
-          console.log("[VersionCheck] No version config found, assuming no update needed");
         }
         // If config fetch failed, fail gracefully (updateRequired remains false)
       } catch (error) {
-        // Log error for debugging but don't crash the app
-        console.error("[VersionCheck] Error in version check:", error);
-        // updateRequired remains false (graceful failure)
+        // Fail gracefully (updateRequired remains false)
       } finally {
         // Always set loading to false, even if fetch failed
         if (isMounted) {

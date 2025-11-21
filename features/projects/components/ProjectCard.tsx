@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectSummary } from "@/core/types";
+import { ProjectSummary, ProjectStatus } from "@/core/types";
 import { getStatusDisplayText, getStatusStyleKey } from "@/core/types/Status";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
@@ -33,21 +33,7 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
   };
 
   const handleImageError = (error: any) => {
-    console.error(
-      `❌ Failed to load image for project "${project.name}":`,
-      error
-    );
-    console.log(
-      `Project ID: ${project.id}, Thumbnail URL: ${project.thumbnail}`
-    );
-
-    // Log to error logging system
-    logError(`Failed to load image for project "${project.name}"`, {
-      projectId: project.id,
-      projectName: project.name,
-      thumbnailUrl: project.thumbnail,
-      error: error,
-    });
+    // Image load error - silently fail
 
     setImageLoading(false);
     setImageError(true);
@@ -235,17 +221,19 @@ export function ProjectCard({ project, onPress, style }: ProjectCardProps) {
             <View
               style={[
                 styles.statusBadge,
-                styles[getStatusStyleKey(project.status)] as ViewStyle,
+                styles[getStatusStyleKey(project.status as ProjectStatus)] as ViewStyle,
               ]}
             >
               <ThemedText style={styles.statusText}>
-                {getStatusDisplayText(project.status)}
+                {getStatusDisplayText(project.status as ProjectStatus)}
               </ThemedText>
             </View>
 
             <ThemedText style={styles.category}>
-              {project.category.charAt(0).toUpperCase() +
-                project.category.slice(1)}
+              {project.category
+                ? project.category.charAt(0).toUpperCase() +
+                  project.category.slice(1)
+                : "Miscellaneous"}
             </ThemedText>
           </View>
         </View>

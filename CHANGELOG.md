@@ -9,9 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.2.0] - TBD
+## [1.3.0] - TDB
 
 ### Added
+
+### Changed
+
+---
+
+## [1.3.0] - 2025-11-17
+
+### Added
+
+- Aggregate all photos in full-home project page details
 
 ### Changed
 

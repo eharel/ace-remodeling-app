@@ -1,7 +1,11 @@
-import { PROJECT_CATEGORIES, ProjectCategory } from "../types/Category";
+import {
+  CORE_CATEGORIES,
+  CoreCategory,
+  ComponentCategory,
+} from "../types/ComponentCategory";
 
 // Use centralized category types instead of duplicating
-export type CategoryKey = ProjectCategory;
+export type CategoryKey = CoreCategory;
 
 /**
  * Configuration interface for category settings
@@ -47,7 +51,7 @@ export interface CategoryConfig {
  * 9. management-tools - Internal only
  *
  * To add a new category:
- * 1. Add to PROJECT_CATEGORIES in types/Category.ts
+ * 1. Add to CORE_CATEGORIES in types/ComponentCategory.ts
  * 2. Add configuration here
  * 3. TypeScript will enforce proper usage throughout the app
  *
@@ -55,7 +59,7 @@ export interface CategoryConfig {
  * areas like the Showcase tab, even if projects are marked as featured.
  */
 export const CATEGORY_CONFIG = {
-  [PROJECT_CATEGORIES.BATHROOM]: {
+  [CORE_CATEGORIES.BATHROOM]: {
     title: "Bathroom Projects",
     subtitle: "Transform your bathroom with our expert remodeling services",
     galleryTitle: "Featured Bathroom Renovations",
@@ -66,7 +70,7 @@ export const CATEGORY_CONFIG = {
       "We haven't completed any bathroom renovation projects yet. Check back soon for our latest work!",
     order: 1,
   },
-  [PROJECT_CATEGORIES.KITCHEN]: {
+  [CORE_CATEGORIES.KITCHEN]: {
     title: "Kitchen Projects",
     subtitle: "Transform your kitchen with our expert remodeling services",
     galleryTitle: "Featured Kitchen Renovations",
@@ -77,7 +81,7 @@ export const CATEGORY_CONFIG = {
       "We haven't completed any kitchen renovation projects yet. Check back soon for our latest work!",
     order: 2,
   },
-  [PROJECT_CATEGORIES.FULL_HOME]: {
+  [CORE_CATEGORIES.FULL_HOME]: {
     title: "Full Home Renovations",
     subtitle: "Complete home transformations from top to bottom",
     galleryTitle: "Featured Full Home Renovations",
@@ -88,7 +92,7 @@ export const CATEGORY_CONFIG = {
       "We haven't completed any full home renovation projects yet. Check back soon for our latest work!",
     order: 3,
   },
-  [PROJECT_CATEGORIES.ADU_ADDITION]: {
+  [CORE_CATEGORIES.ADU_ADDITION]: {
     title: "ADUs & Additions",
     subtitle:
       "Expand your living space with accessory dwelling units and additions",
@@ -100,7 +104,7 @@ export const CATEGORY_CONFIG = {
       "We haven't completed any ADU or addition projects yet. Check back soon for our latest work!",
     order: 4,
   },
-  [PROJECT_CATEGORIES.OUTDOOR_LIVING]: {
+  [CORE_CATEGORIES.OUTDOOR_LIVING]: {
     title: "Outdoor Living Projects",
     subtitle: "Transform your outdoor space into a living oasis",
     galleryTitle: "Featured Outdoor Living Projects",
@@ -111,7 +115,7 @@ export const CATEGORY_CONFIG = {
       "We haven't completed any outdoor living projects yet. Check back soon for our latest work!",
     order: 5,
   },
-  [PROJECT_CATEGORIES.NEW_CONSTRUCTION]: {
+  [CORE_CATEGORIES.NEW_CONSTRUCTION]: {
     title: "New Construction Projects",
     subtitle: "Ground-up construction projects built to your vision",
     galleryTitle: "Featured New Construction Projects",
@@ -122,7 +126,7 @@ export const CATEGORY_CONFIG = {
       "We haven't completed any new construction projects yet. Check back soon for our latest work!",
     order: 6,
   },
-  [PROJECT_CATEGORIES.COMMERCIAL]: {
+  [CORE_CATEGORIES.COMMERCIAL]: {
     title: "Commercial Projects",
     subtitle: "Professional remodeling services for business spaces",
     galleryTitle: "Featured Commercial Projects",
@@ -133,7 +137,7 @@ export const CATEGORY_CONFIG = {
       "We haven't completed any commercial projects yet. Check back soon for our latest work!",
     order: 7,
   },
-  [PROJECT_CATEGORIES.MISCELLANEOUS]: {
+  [CORE_CATEGORIES.MISCELLANEOUS]: {
     title: "Other Projects",
     subtitle: "Unique projects and specialized services",
     galleryTitle: "Featured Projects",
@@ -143,17 +147,6 @@ export const CATEGORY_CONFIG = {
     emptyMessage:
       "We haven't completed any projects in this category yet. Check back soon for our latest work!",
     order: 8,
-  },
-  [PROJECT_CATEGORIES.MANAGEMENT_TOOLS]: {
-    title: "Management Tools",
-    subtitle: "Internal project management and documentation",
-    galleryTitle: "Management Projects",
-    gallerySubtitle: "Internal use only",
-    emptyIcon: "build",
-    emptyTitle: "No Management Projects",
-    emptyMessage: "Internal category for management tools and templates.",
-    internal: true,
-    order: 9,
   },
 } satisfies Record<CategoryKey, CategoryConfig>;
 
@@ -169,5 +162,5 @@ export const getCategoryConfig = (category: CategoryKey) =>
  * Uses centralized validation from types
  */
 export function isValidCategoryKey(category: string): category is CategoryKey {
-  return category in PROJECT_CATEGORIES;
+  return Object.values(CORE_CATEGORIES).includes(category as CoreCategory);
 }

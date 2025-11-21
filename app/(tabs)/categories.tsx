@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectCategory } from "@/core/types";
+import { ComponentCategory } from "@/core/types/ComponentCategory";
 import {
   EmptyState,
   LoadingState,
@@ -13,10 +13,15 @@ import {
   ThemedView,
 } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
-import { getAllCategories, getCategoryDisplayName, getCategoryIcon } from "@/shared/utils";
+import { 
+  CATEGORY_DISPLAY_ORDER,
+  getAllCategories, 
+  getCategoryDisplayName, 
+  getCategoryIcon 
+} from "@/shared/utils";
 
 interface CategoryItem {
-  id: ProjectCategory;
+  id: ComponentCategory;
   name: string;
   icon: string;
   count: number;
@@ -26,7 +31,7 @@ export default function ProjectsScreen() {
   const { theme } = useTheme();
   const { projects, loading, error } = useProjects();
 
-  // Get categories with projects
+  // Get categories with projects, sorted by display order
   const categories = useMemo(() => {
     if (!projects) return [];
 
@@ -36,11 +41,24 @@ export default function ProjectsScreen() {
       id: category,
       name: getCategoryDisplayName(category),
       icon: getCategoryIcon(category),
-      count: projects.filter((p) => p.category === category).length,
+      count: projects.filter((p) =>
+        p.components.some((c) => c.category === category)
+      ).length,
     }));
 
-    // Only show categories that have projects
-    return categoryData.filter((category) => category.count > 0);
+    // Filter to only show categories that have projects
+    const filtered = categoryData.filter((category) => category.count > 0);
+    
+    // Sort by display order
+    return filtered.sort((a, b) => {
+      const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a.id);
+      const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b.id);
+      // If not in order array, put at end
+      if (orderA === -1 && orderB === -1) return 0;
+      if (orderA === -1) return 1;
+      if (orderB === -1) return -1;
+      return orderA - orderB;
+    });
   }, [projects]);
 
   const handleCategoryPress = (category: CategoryItem) => {

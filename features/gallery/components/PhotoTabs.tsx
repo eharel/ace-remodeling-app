@@ -136,7 +136,7 @@ export const PhotoTabs: React.FC<PhotoTabsProps> = ({
         },
         tabLabel: {
           fontSize: DesignTokens.typography.fontSize.base,
-          fontWeight: DesignTokens.typography.fontWeight.regular,
+          fontWeight: DesignTokens.typography.fontWeight.normal,
           color: theme.colors.text.secondary,
         },
         tabLabelActive: {
@@ -145,7 +145,7 @@ export const PhotoTabs: React.FC<PhotoTabsProps> = ({
         },
         tabCount: {
           fontSize: DesignTokens.typography.fontSize.sm,
-          fontWeight: DesignTokens.typography.fontWeight.regular,
+          fontWeight: DesignTokens.typography.fontWeight.normal,
           color: theme.colors.text.secondary, // Match label color for visibility
         },
         tabCountActive: {

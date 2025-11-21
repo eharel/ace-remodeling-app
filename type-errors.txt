@@ -1,0 +1,110 @@
+
+> ace-remodeling-app@1.3.0 type-check
+> tsc --noEmit
+
+app/category/[category].tsx(26,49): error TS2345: Argument of type 'string' is not assignable to parameter of type 'CoreCategory'.
+app/category/[category].tsx(28,26): error TS2448: Block-scoped variable 'styles' used before its declaration.
+app/category/[category].tsx(28,26): error TS2454: Variable 'styles' is used before being assigned.
+app/category/[category].tsx(44,39): error TS2345: Argument of type '"/(tabs)/portfolio"' is not assignable to parameter of type 'RelativePathString | ExternalPathString | "/about-company" | `/about-company?${string}` | `/about-company#${string}` | "/pdf-viewer" | `/pdf-viewer?${string}` | `/pdf-viewer#${string}` | "/_sitemap" | ... 50 more ... | { ...; }'.
+app/category/[category].tsx(73,11): error TS2322: Type '`/project/${string}`' is not assignable to type 'RelativePathString | ExternalPathString | "/about-company" | "/pdf-viewer" | "/_sitemap" | "/(tabs)" | "/(tabs)/categories" | "/categories" | ... 8 more ... | "/project/[id]/documents"'.
+app/category/[category].tsx(193,39): error TS2345: Argument of type '"/(tabs)/portfolio"' is not assignable to parameter of type 'RelativePathString | ExternalPathString | "/about-company" | `/about-company?${string}` | `/about-company#${string}` | "/pdf-viewer" | `/pdf-viewer?${string}` | `/pdf-viewer#${string}` | "/_sitemap" | ... 50 more ... | { ...; }'.
+app/project/[id]/documents.tsx(36,30): error TS2339: Property 'documents' does not exist on type 'Project'.
+app/project/[id]/documents.tsx(122,40): error TS2339: Property 'subtle' does not exist on type 'BorderColors'.
+app/project/[id]/documents.tsx(223,31): error TS7006: Parameter 'document' implicitly has an 'any' type.
+features/category/components/CategoryPage.tsx(6,10): error TS2305: Module '"@/core/types"' has no exported member 'ProjectSummary'.
+features/category/components/CategoryScreen.tsx(11,3): error TS2305: Module '"@/core/types"' has no exported member 'ProjectSummary'.
+features/category/components/CategoryScreen.tsx(61,13): error TS2322: Type '`/project/${string}`' is not assignable to type 'RelativePathString | ExternalPathString | "/about-company" | "/pdf-viewer" | "/_sitemap" | "/(tabs)" | "/(tabs)/categories" | "/categories" | ... 8 more ... | "/project/[id]/documents"'.
+features/gallery/components/AssetCategoryTabs.tsx(207,58): error TS2339: Property 'regular' does not exist on type '{ readonly normal: "400"; readonly medium: "500"; readonly semibold: "600"; readonly bold: "700"; readonly extrabold: "800"; }'.
+features/gallery/components/AssetCategoryTabs.tsx(216,58): error TS2339: Property 'regular' does not exist on type '{ readonly normal: "400"; readonly medium: "500"; readonly semibold: "600"; readonly bold: "700"; readonly extrabold: "800"; }'.
+features/gallery/components/PhotoTabs.tsx(139,58): error TS2339: Property 'regular' does not exist on type '{ readonly normal: "400"; readonly medium: "500"; readonly semibold: "600"; readonly bold: "700"; readonly extrabold: "800"; }'.
+features/gallery/components/PhotoTabs.tsx(148,58): error TS2339: Property 'regular' does not exist on type '{ readonly normal: "400"; readonly medium: "500"; readonly semibold: "600"; readonly bold: "700"; readonly extrabold: "800"; }'.
+features/gallery/hooks/useLazyLoading.ts(131,39): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Timeout'.
+features/gallery/hooks/useMemoryManagement.ts(124,11): error TS2322: Type 'number' is not assignable to type 'Timeout'.
+features/gallery/hooks/useMemoryManagement.ts(137,5): error TS2322: Type 'number' is not assignable to type 'Timeout'.
+features/gallery/hooks/usePerformanceMonitoring.ts(212,11): error TS2740: Type '{ performanceScore: number; }' is missing the following properties from type 'PerformanceStats': averageRenderTime, averageImageLoadTime, averageMemoryUsage, averageFrameRate, and 3 more.
+features/gallery/utils/galleryPerformance.ts(1,10): error TS2305: Module '"../types/gallery.types"' has no exported member 'PerformanceMetrics'.
+features/gallery/utils/galleryPerformance.ts(1,30): error TS2305: Module '"../types/gallery.types"' has no exported member 'PerformanceStats'.
+features/gallery/utils/imagePreloading.ts(161,3): error TS2322: Type 'number' is not assignable to type 'Timeout'.
+features/gallery/utils/memoryManagement.ts(106,46): error TS2339: Property 'memory' does not exist on type 'Performance'.
+features/gallery/utils/memoryManagement.ts(108,19): error TS2339: Property 'memory' does not exist on type 'Performance'.
+features/projects/components/ComponentSelector.tsx(84,15): error TS2322: Type '{ children: Element; key: string; onPress: () => void; style: ({ paddingVertical: 12; paddingHorizontal: 24; borderRadius: 9999; borderWidth: 1; minHeight: number; } | { backgroundColor: string; borderColor: string; })[]; activeOpacity: 0.7; accessibilityRole: "button"; accessibilityLabel: string; accessibilityState...' is not assignable to type 'IntrinsicAttributes & PressableProps & RefAttributes<View>'.
+  Property 'activeOpacity' does not exist on type 'IntrinsicAttributes & PressableProps & RefAttributes<View>'.
+features/projects/components/ProjectCard.tsx(12,10): error TS2305: Module '"@/core/types"' has no exported member 'ProjectSummary'.
+features/projects/components/ProjectGallery.tsx(11,10): error TS2305: Module '"@/core/types"' has no exported member 'ProjectSummary'.
+features/search/components/FilterDropdown.tsx(504,19): error TS2322: Type 'string | false' is not assignable to type 'string'.
+  Type 'boolean' is not assignable to type 'string'.
+features/search/components/SearchInputWithHistory.tsx(12,10): error TS2305: Module '"@/core/types/Project"' has no exported member 'ProjectSummary'.
+features/search/components/SearchSuggestions.tsx(6,10): error TS2305: Module '"@/core/types/Project"' has no exported member 'ProjectSummary'.
+features/search/components/useSearchFilters.ts(56,15): error TS2339: Property 'pms' does not exist on type 'Project'.
+features/search/components/useSearchFilters.ts(56,29): error TS7006: Parameter 'pm' implicitly has an 'any' type.
+features/search/utils/searchScoring.ts(1,10): error TS2305: Module '"@/core/types/Project"' has no exported member 'ProjectSummary'.
+features/showcase/components/FeaturedCategorySection.tsx(275,44): error TS2345: Argument of type 'string' is not assignable to parameter of type 'CoreCategory'.
+scripts/legacy/seedFirebase.ts(26,20): error TS2307: Cannot find module '../core/config' or its corresponding type declarations.
+scripts/legacy/seedFirebase.ts(27,61): error TS2307: Cannot find module '../core/types' or its corresponding type declarations.
+scripts/legacy/uploadPhotos.ts(26,25): error TS2307: Cannot find module '../core/config' or its corresponding type declarations.
+shared/utils/__tests__/duration.test.ts(9,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(10,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(11,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(12,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(13,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(16,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(17,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(20,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(21,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(25,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(26,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(27,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(28,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(29,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(30,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(33,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(34,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(35,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(36,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(39,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(40,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(41,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(42,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(45,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(46,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(47,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(48,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(49,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(50,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(54,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(55,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(62,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(65,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(72,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(80,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(84,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(85,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(86,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(91,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(97,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(100,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(106,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(110,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(111,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(112,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(115,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(118,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(123,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(124,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(129,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+shared/utils/__tests__/duration.test.ts(130,7): error TS2304: Cannot find name 'expect'.
+shared/utils/__tests__/duration.test.ts(133,7): error TS2304: Cannot find name 'expect'.
+shared/utils/pmUtils.ts(21,18): error TS2339: Property 'pms' does not exist on type 'Project'.
+shared/utils/pmUtils.ts(21,28): error TS7006: Parameter 'pm' implicitly has an 'any' type.
+shared/utils/pmUtils.ts(36,16): error TS2339: Property 'pms' does not exist on type 'Project'.
+shared/utils/pmUtils.ts(36,31): error TS2339: Property 'pms' does not exist on type 'Project'.
+shared/utils/pmUtils.ts(37,18): error TS2339: Property 'pms' does not exist on type 'Project'.
+shared/utils/pmUtils.ts(44,18): error TS2339: Property 'pms' does not exist on type 'Project'.
+shared/utils/pmUtils.ts(44,29): error TS7006: Parameter 'pm' implicitly has an 'any' type.
+shared/utils/pmUtils.ts(54,18): error TS2339: Property 'pms' does not exist on type 'Project'.
+shared/utils/pmUtils.ts(54,29): error TS7006: Parameter 'pm' implicitly has an 'any' type.
+shared/utils/pmUtils.ts(61,30): error TS2339: Property 'pms' does not exist on type 'Project'.
+shared/utils/pmUtils.ts(70,5): error TS2353: Object literal may only specify known properties, and 'pms' does not exist in type 'Project'.
+shared/utils/pmUtils.ts(78,30): error TS2339: Property 'pms' does not exist on type 'Project'.
+shared/utils/pmUtils.ts(79,41): error TS7006: Parameter 'pm' implicitly has an 'any' type.
+shared/utils/pmUtils.ts(83,5): error TS2353: Object literal may only specify known properties, and 'pms' does not exist in type 'Project'.

@@ -25,7 +25,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { DesignTokens } from "@/core/themes";
-import { Project } from "@/core/types";
+import { Project, getProjectThumbnail } from "@/core/types";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 
@@ -219,11 +219,11 @@ const HeroSlide = React.memo(
         onPressOut={handlePressOut}
         accessibilityRole="button"
         accessibilityLabel={`View ${project.name} project details`}
-        accessibilityHint="Double tap to view full project details"
+        accessibilityHint="Tap to view full project details"
       >
         {/* Project Image */}
         <Image
-          source={{ uri: project.thumbnail }}
+          source={{ uri: getProjectThumbnail(project) }}
           style={staticStyles.image}
           contentFit="cover"
           placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
@@ -246,31 +246,35 @@ const HeroSlide = React.memo(
           </ThemedText>
 
           {/* Location */}
-          <ThemedText style={staticStyles.location}>
-            {project.location.neighborhood}
-          </ThemedText>
+          {project.location?.neighborhood && (
+            <ThemedText style={staticStyles.location}>
+              {project.location.neighborhood}
+            </ThemedText>
+          )}
 
           {/* Description */}
           <ThemedText style={staticStyles.description} numberOfLines={2}>
-            {project.briefDescription}
+            {project.summary}
           </ThemedText>
         </View>
 
-        {/* Pagination Dots */}
+        {/* Pagination Dots - Memoized to prevent unnecessary re-renders */}
         <View style={staticStyles.paginationContainer}>
-          {projects.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                staticStyles.paginationDot,
-                {
-                  backgroundColor:
-                    index === currentIndex ? showcaseAccent : textTertiary,
-                  opacity: index === currentIndex ? 1 : 0.4,
-                },
-              ]}
-            />
-          ))}
+          {projects.map((_, index) => {
+            const isActive = index === currentIndex;
+            return (
+              <View
+                key={index}
+                style={[
+                  staticStyles.paginationDot,
+                  {
+                    backgroundColor: isActive ? showcaseAccent : textTertiary,
+                    opacity: isActive ? 1 : 0.4,
+                  },
+                ]}
+              />
+            );
+          })}
         </View>
       </AnimatedPressable>
     );
@@ -333,19 +337,23 @@ export function HeroCarousel({ projects }: HeroCarouselProps) {
   /**
    * Advance to next project in carousel
    * Loops back to first project after reaching the end
+   * Only advances if user is not currently interacting
    */
   const advanceToNext = useCallback(() => {
-    if (projects.length === 0) return;
+    if (projects.length === 0 || isUserInteracting) return;
 
     setCurrentIndex((prevIndex) => {
       const nextIndex = (prevIndex + 1) % projects.length;
-      flatListRef.current?.scrollToIndex({
-        index: nextIndex,
-        animated: true,
+      // Use requestAnimationFrame to ensure smooth animation
+      requestAnimationFrame(() => {
+        flatListRef.current?.scrollToIndex({
+          index: nextIndex,
+          animated: true,
+        });
       });
       return nextIndex;
     });
-  }, [projects.length]);
+  }, [projects.length, isUserInteracting]);
 
   /**
    * Start auto-advance timer
@@ -364,6 +372,7 @@ export function HeroCarousel({ projects }: HeroCarouselProps) {
   /**
    * Handle user interaction (scroll begin)
    * Pauses auto-advance and schedules resume after delay
+   * Also clears any pending auto-advance to prevent conflicts
    */
   const handleScrollBegin = useCallback(() => {
     setIsUserInteracting(true);
@@ -376,22 +385,67 @@ export function HeroCarousel({ projects }: HeroCarouselProps) {
   }, [clearTimers]);
 
   /**
+   * Handle scroll end - reset resume timer if user continues scrolling
+   */
+  const handleScrollEndDrag = useCallback(() => {
+    // Reset resume timer when user finishes dragging
+    if (resumeTimer.current) {
+      clearTimeout(resumeTimer.current);
+    }
+    resumeTimer.current = setTimeout(() => {
+      setIsUserInteracting(false);
+    }, RESUME_DELAY);
+  }, []);
+
+  /**
    * Handle viewable items change (when scrolling stops)
    * Updates current index based on visible item
-   * Triggers haptic feedback on slide change
+   * Optimized to only update when index actually changes
    */
+  const viewabilityConfigRef = useRef({
+    itemVisiblePercentThreshold: 50,
+    minimumViewTime: 100, // Require item to be visible for 100ms before considering it viewed
+  });
+
   const handleViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
       if (viewableItems.length > 0 && viewableItems[0].index !== null) {
         const newIndex = viewableItems[0].index;
-        if (newIndex !== currentIndex) {
-          // Haptic feedback on slide change
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        // Only update if index actually changed to avoid unnecessary re-renders
+        if (
+          newIndex !== currentIndex &&
+          newIndex >= 0 &&
+          newIndex < projects.length
+        ) {
+          setCurrentIndex(newIndex);
+          // Haptic feedback on slide change (defer to avoid blocking scroll)
+          setTimeout(() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }, 0);
         }
+      }
+    },
+    [currentIndex, projects.length]
+  );
+
+  /**
+   * Handle momentum scroll end for more reliable index updates
+   * This fires after scroll animation completes, ensuring accurate index
+   */
+  const handleMomentumScrollEnd = useCallback(
+    (event: any) => {
+      const offsetX = event.nativeEvent.contentOffset.x;
+      const newIndex = Math.round(offsetX / screenWidth);
+
+      if (
+        newIndex !== currentIndex &&
+        newIndex >= 0 &&
+        newIndex < projects.length
+      ) {
         setCurrentIndex(newIndex);
       }
     },
-    [currentIndex]
+    [currentIndex, projects.length]
   );
 
   // Start auto-advance when component mounts or when isUserInteracting changes
@@ -432,6 +486,7 @@ export function HeroCarousel({ projects }: HeroCarouselProps) {
 
   /**
    * Render a single carousel slide
+   * Optimized: Memoized with stable dependencies
    */
   const renderSlide = useCallback(
     ({ item: project }: ListRenderItemInfo<Project>) => (
@@ -445,6 +500,23 @@ export function HeroCarousel({ projects }: HeroCarouselProps) {
       />
     ),
     [handleProjectPress, showcaseAccent, textTertiary, projects, currentIndex]
+  );
+
+  /**
+   * Key extractor - stable function reference
+   */
+  const keyExtractor = useCallback((item: Project) => item.id, []);
+
+  /**
+   * Get item layout - stable function reference for performance
+   */
+  const getItemLayout = useCallback(
+    (_data: ArrayLike<Project> | null | undefined, index: number) => ({
+      length: screenWidth,
+      offset: screenWidth * index,
+      index,
+    }),
+    []
   );
 
   // Empty state
@@ -473,25 +545,37 @@ export function HeroCarousel({ projects }: HeroCarouselProps) {
         ref={flatListRef}
         data={projects}
         renderItem={renderSlide}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
+        snapToInterval={screenWidth}
+        snapToAlignment="center"
+        decelerationRate="fast"
         onScrollBeginDrag={handleScrollBegin}
+        onScrollEndDrag={handleScrollEndDrag}
+        onMomentumScrollEnd={handleMomentumScrollEnd}
         onViewableItemsChanged={handleViewableItemsChanged}
-        viewabilityConfig={{
-          itemVisiblePercentThreshold: 50,
-        }}
-        getItemLayout={(_, index) => ({
-          length: screenWidth,
-          offset: screenWidth * index,
-          index,
-        })}
+        viewabilityConfig={viewabilityConfigRef.current}
+        getItemLayout={getItemLayout}
         initialScrollIndex={0}
-        removeClippedSubviews={false} // Prevent white flash by keeping off-screen items rendered
-        onScrollToIndexFailed={() => {
-          // Handle scroll failure gracefully
-          flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+        // Performance optimizations
+        removeClippedSubviews={true} // Enable for better memory management
+        maxToRenderPerBatch={2} // Render 2 items per batch for smooth scrolling
+        windowSize={3} // Keep 3 screens worth of items in memory (current + 1 on each side)
+        initialNumToRender={2} // Render 2 items initially
+        updateCellsBatchingPeriod={50} // Batch updates every 50ms
+        onScrollToIndexFailed={(info) => {
+          // Handle scroll failure gracefully - wait for layout then retry
+          const wait = new Promise((resolve) => setTimeout(resolve, 500));
+          wait.then(() => {
+            if (flatListRef.current && info.index < projects.length) {
+              flatListRef.current.scrollToIndex({
+                index: info.index,
+                animated: false,
+              });
+            }
+          });
         }}
       />
     </View>

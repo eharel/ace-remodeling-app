@@ -70,7 +70,7 @@ export const useMemoryManagement = ({
   onAppBackground,
   onAppForeground,
 }: UseMemoryManagementProps = {}) => {
-  const memoryCheckInterval = useRef<NodeJS.Timeout | null>(null);
+  const memoryCheckInterval = useRef<number | null>(null);
   const lastMemoryCheck = useRef<number>(0);
   const memoryStats = useRef<MemoryStats>({
     usedMemory: 0,
@@ -98,11 +98,10 @@ export const useMemoryManagement = ({
 
       // Trigger memory warning if pressure is high
       if (newStats.memoryPressure === "high" && onMemoryWarning) {
-        console.warn("🚨 High memory pressure detected");
         onMemoryWarning();
       }
     } catch (error) {
-      console.warn("Memory check failed:", error);
+      // Memory check failed - silently ignore
     }
   }, [onMemoryWarning]);
 
@@ -125,7 +124,7 @@ export const useMemoryManagement = ({
           memoryCheckInterval.current = setInterval(
             checkMemoryUsage,
             MEMORY_CONSTANTS.MEMORY_CHECK_INTERVAL
-          );
+          ) as unknown as number;
         }
       }
     },

@@ -17,7 +17,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import { BASE_ASSETS_PATH, VALID_CATEGORIES } from "./config/uploadConfig";
+import { BASE_ASSETS_PATH, VALID_CATEGORIES } from "../legacy/config/uploadConfig";
 
 /**
  * Parsed project information

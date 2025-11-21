@@ -82,7 +82,7 @@ const Thumbnail = React.memo<ThumbnailProps>(
         ]}
       >
         <Image
-          source={{ uri: image.thumbnailUrl || image.url }}
+          source={{ uri: image.thumbnailUrl || image.uri }}
           style={[styles.thumbnail, isActive && styles.thumbnailActive]}
           contentFit="cover"
           accessibilityIgnoresInvertColors

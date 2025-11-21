@@ -102,10 +102,12 @@ export function getEstimatedMemoryUsage(): {
   memoryLimit: number;
 } {
   try {
-    // Use performance.memory if available (Chrome/Edge)
-    const estimatedMemoryUsage = performance.memory?.usedJSHeapSize || 0;
+    // Use performance.memory if available (Chrome/Edge only - not available in React Native)
+    // Type assertion needed because TypeScript doesn't include this browser-specific API
+    const perfMemory = (performance as any).memory;
+    const estimatedMemoryUsage = perfMemory?.usedJSHeapSize || 0;
     const estimatedMemoryLimit =
-      performance.memory?.totalJSHeapSize ||
+      perfMemory?.totalJSHeapSize ||
       MEMORY_CONSTANTS.DEFAULT_MEMORY_LIMIT;
 
     return {
@@ -113,7 +115,6 @@ export function getEstimatedMemoryUsage(): {
       memoryLimit: estimatedMemoryLimit,
     };
   } catch (error) {
-    console.warn("Memory check failed:", error);
     return {
       usedMemory: 0,
       memoryLimit: MEMORY_CONSTANTS.DEFAULT_MEMORY_LIMIT,
@@ -172,7 +173,6 @@ export function forceGarbageCollection(): boolean {
     }
     return false;
   } catch (error) {
-    console.warn("Garbage collection failed:", error);
     return false;
   }
 }

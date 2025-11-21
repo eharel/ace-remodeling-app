@@ -148,10 +148,10 @@ export function UpdateBanner({ updateRequired }: UpdateBannerProps) {
       if (canOpen) {
         await Linking.openURL(TESTFLIGHT_URL);
       } else {
-        console.error("Cannot open TestFlight URL");
+        // Cannot open TestFlight URL
       }
     } catch (error) {
-      console.error("Error opening TestFlight:", error);
+      // Error opening TestFlight
     }
   };
 

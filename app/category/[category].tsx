@@ -3,7 +3,9 @@ import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectCategory } from "@/core/types";
+import { ComponentCategory, CoreCategory } from "@/core/types/ComponentCategory";
+import { ProjectSummary } from "@/core/types";
+import { getProjectThumbnail, getProjectCompletionDate } from "@/core/types/ProjectUtils";
 import { CategoryPicker } from "@/features/category";
 import { ProjectGallery } from "@/features/projects";
 import {
@@ -21,49 +23,7 @@ export default function CategoryScreen() {
   const { projects, loading, error } = useProjects();
   const { category } = useLocalSearchParams<{ category: string }>();
 
-  // Validate category parameter
-  const validCategory = category as ProjectCategory;
-  if (!category || !getAllCategories().includes(category as ProjectCategory)) {
-    return (
-      <ThemedView style={styles.container}>
-        <Stack.Screen
-          options={{
-            headerShown: false, // Hide React Navigation header
-          }}
-        />
-        <PageHeader
-          title="Category Not Found"
-          showBack={true}
-          backLabel="Portfolio"
-          layoutMode="inline"
-        />
-        <EmptyState
-          title="Category Not Found"
-          message="The requested category does not exist."
-          actionText="Go to Portfolio"
-          onAction={() => router.push("/(tabs)/portfolio")}
-        />
-      </ThemedView>
-    );
-  }
-
-  // Filter projects by category
-  const categoryProjects = useMemo(() => {
-    if (!projects) return [];
-    return projects.filter((project) => project.category === validCategory);
-  }, [projects, validCategory]);
-
-  const categoryDisplayName = getCategoryDisplayName(validCategory);
-
-  const handleProjectPress = (project: any) => {
-    router.push(`/project/${project.id}`);
-  };
-
-  const handleCategoryChange = (newCategory: ProjectCategory) => {
-    // Use replace to avoid building up navigation stack
-    router.replace(`/category/${newCategory}`);
-  };
-
+  // Define styles early to avoid hoisting issues
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -87,6 +47,89 @@ export default function CategoryScreen() {
       }),
     [theme]
   );
+
+  // Validate category parameter
+  const validCategory = category as ComponentCategory;
+  const allCategories = getAllCategories();
+  
+  if (!category || !allCategories.includes(category as CoreCategory)) {
+    return (
+      <ThemedView style={styles.container}>
+        <Stack.Screen
+          options={{
+            headerShown: false, // Hide React Navigation header
+          }}
+        />
+        <PageHeader
+          title="Category Not Found"
+          showBack={true}
+          backLabel="Portfolio"
+          layoutMode="inline"
+        />
+        <EmptyState
+          title="Category Not Found"
+          message="The requested category does not exist."
+          actionText="Go to Portfolio"
+          onAction={() => {
+            // @ts-expect-error - Expo Router generated types are overly strict
+            router.push("/(tabs)/portfolio");
+          }}
+        />
+      </ThemedView>
+    );
+  }
+
+  // Filter projects by category (check if any component matches) and convert to ProjectSummary
+  const categoryProjects = useMemo((): ProjectSummary[] => {
+    if (!projects) return [];
+    return projects
+      .filter((project) =>
+        project.components.some((c) => c.category === validCategory)
+      )
+      .map((project) => ({
+        id: project.id,
+        projectNumber: project.number,
+        name: project.name,
+        category: validCategory,
+        briefDescription: project.summary,
+        thumbnail: getProjectThumbnail(project),
+        status: project.status,
+        completedAt: getProjectCompletionDate(project),
+      }));
+  }, [projects, validCategory]);
+
+  const categoryDisplayName = getCategoryDisplayName(validCategory);
+
+  const handleProjectPress = (projectSummary: any) => {
+    // Find the full project object to get component information
+    const fullProject = projects.find((p) => p.id === projectSummary.id);
+    
+    if (fullProject) {
+      // Find the component that matches the current category
+      const matchingComponent = fullProject.components.find(
+        (c) => c.category === validCategory
+      );
+      
+      if (matchingComponent) {
+        // Navigate with componentId param to open directly to that component
+        router.push({
+          pathname: `/project/${fullProject.id}` as any,
+          params: { componentId: matchingComponent.id },
+        });
+      } else {
+        // Fallback: no matching component found, just navigate to project
+        router.push(`/project/${fullProject.id}` as any);
+      }
+    } else {
+      // Fallback: project not found in full list, use summary ID
+      router.push(`/project/${projectSummary.id}` as any);
+    }
+  };
+
+  const handleCategoryChange = (newCategory: ComponentCategory) => {
+    // Use replace to avoid building up navigation stack
+    router.replace(`/category/${newCategory}`);
+  };
 
   if (loading) {
     return (
@@ -136,10 +179,7 @@ export default function CategoryScreen() {
           message="There was an error loading the projects. Please try again."
           actionText="Retry"
           onAction={() => {
-            // In React Native, we can't reload the page like in web
-            // Instead, we could trigger a refresh of the projects data
-            // For now, we'll just log the retry attempt
-            console.log("Retry loading projects requested");
+            // TODO: trigger projects refresh when available
           }}
         />
       </ThemedView>
@@ -169,7 +209,10 @@ export default function CategoryScreen() {
           title={`No ${categoryDisplayName} Projects`}
           message={`We don't have any ${categoryDisplayName.toLowerCase()} projects to show at the moment.`}
           actionText="Browse Other Categories"
-          onAction={() => router.push("/(tabs)/portfolio")}
+          onAction={() => {
+            // @ts-expect-error - Expo Router generated types are overly strict
+            router.push("/(tabs)/portfolio");
+          }}
         />
       </ThemedView>
     );

@@ -140,7 +140,7 @@ export function calculateProjectScore(
     query,
     project.briefDescription
   );
-  const locationScore = calculateLocationScore(query, project.location);
+  const locationScore = calculateLocationScore(query, project.location || undefined);
 
   // Return the highest score (don't sum multiple matches)
   return Math.max(nameScore, descriptionScore, locationScore);

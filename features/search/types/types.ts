@@ -1,4 +1,4 @@
-import { ProjectCategory } from "@/core/types/Category";
+import { ComponentCategory } from "@/core/types/ComponentCategory";
 import { ProjectStatus } from "@/core/types/Status";
 
 /**
@@ -20,7 +20,7 @@ import { ProjectStatus } from "@/core/types/Status";
  */
 export interface SearchFilters {
   /** Selected project categories (multi-select) */
-  categories: ProjectCategory[];
+  categories: ComponentCategory[];
   /** Selected project statuses (multi-select) */
   statuses: ProjectStatus[];
   /** Selected project manager names (multi-select) */
@@ -36,7 +36,7 @@ export interface SearchFilters {
  *
  * @example
  * ```typescript
- * const categoryOption: FilterOption<ProjectCategory> = {
+ * const categoryOption: FilterOption<ComponentCategory> = {
  *   value: "kitchen",
  *   label: "Kitchen"
  * };
@@ -59,7 +59,7 @@ export interface FilterOption<T = string> {
  *
  * @example
  * ```typescript
- * <FilterDropdown<ProjectCategory>
+ * <FilterDropdown<ComponentCategory>
  *   label="Category"
  *   selectedValues={["kitchen", "bathroom"]}
  *   options={categoryOptions}

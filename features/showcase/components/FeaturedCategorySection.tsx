@@ -18,7 +18,8 @@ import Animated, {
 
 import { getCategoryConfig } from "@/core/constants/categoryConfig";
 import { DesignTokens } from "@/core/themes";
-import { Project, ProjectCategory } from "@/core/types";
+import { Project, getProjectThumbnail } from "@/core/types";
+import { ComponentCategory, CoreCategory } from "@/core/types/ComponentCategory";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { getCategoryIcon } from "@/shared/utils";
@@ -30,7 +31,7 @@ const LIST_PADDING_LEFT = DesignTokens.spacing[6];
 const BLURHASH_PLACEHOLDER = "L6PZfSi_.AyE_3t7t7R**0o#DgR4";
 
 interface FeaturedCategorySectionProps {
-  category: ProjectCategory;
+  category: ComponentCategory;
   projects: Project[];
 }
 
@@ -112,15 +113,36 @@ const staticSectionStyles = StyleSheet.create({
  * Displays project thumbnail, name, brief description, and featured badge.
  * Optimized for horizontal FlatList with consistent sizing.
  */
-function FeaturedProjectCard({ project }: { project: Project }) {
+function FeaturedProjectCard({ 
+  project, 
+  category 
+}: { 
+  project: Project;
+  category: ComponentCategory;
+}) {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
   const shadowElevation = useSharedValue(4);
 
   const handlePress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(`/project/${project.id}`);
-  }, [project.id]);
+    
+    // Find the component that matches the category for this section
+    const matchingComponent = project.components.find(
+      (c) => c.category === category
+    );
+    
+    if (matchingComponent) {
+      // Navigate with componentId param to open directly to that component
+      router.push({
+        pathname: `/project/${project.id}`,
+        params: { componentId: matchingComponent.id },
+      });
+    } else {
+      // Fallback: no matching component found, just navigate to project
+      router.push(`/project/${project.id}`);
+    }
+  }, [project.id, project.components, category]);
 
   const handlePressIn = useCallback(() => {
     scale.value = withSpring(0.97, {
@@ -209,12 +231,12 @@ function FeaturedProjectCard({ project }: { project: Project }) {
       style={[dynamicStyles.card, animatedCardStyle]}
       accessibilityRole="button"
       accessibilityLabel={`View ${project.name} project details`}
-      accessibilityHint="Double tap to view full project details"
+      accessibilityHint="Tap to view full project details"
     >
       {/* Project Image */}
       <View style={staticCardStyles.imageContainer}>
         <Image
-          source={{ uri: project.thumbnail }}
+          source={{ uri: getProjectThumbnail(project) }}
           style={staticCardStyles.image}
           contentFit="cover"
           placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
@@ -247,7 +269,7 @@ function FeaturedProjectCard({ project }: { project: Project }) {
           {project.name}
         </ThemedText>
         <ThemedText style={dynamicStyles.description} numberOfLines={2}>
-          {project.briefDescription}
+          {project.summary}
         </ThemedText>
       </View>
     </AnimatedPressable>
@@ -271,7 +293,7 @@ export function FeaturedCategorySection({
   const { theme } = useTheme();
 
   // Get category config and icon - use fallbacks if not found
-  const categoryConfig = getCategoryConfig(category);
+  const categoryConfig = getCategoryConfig(category as CoreCategory);
   const categoryIcon = getCategoryIcon(category);
 
   // Dynamic styles - only theme-dependent colors
@@ -293,10 +315,10 @@ export function FeaturedCategorySection({
   const renderCard = useCallback(
     ({ item }: ListRenderItemInfo<Project>) => (
       <View style={staticSectionStyles.cardWrapper}>
-        <FeaturedProjectCard project={item} />
+        <FeaturedProjectCard project={item} category={category} />
       </View>
     ),
-    []
+    [category]
   );
 
   // Fixed getItemLayout - accounts for listContainer paddingLeft

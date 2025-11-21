@@ -1,8 +1,23 @@
-export * from "./Category";
+// Core entity types
+export * from "./Status";
+export * from "./ProjectManager";
+export * from "./FileAsset";
 export * from "./Document";
 export * from "./Log";
-export * from "./Picture";
+export * from "./MediaAsset";
+export type { Picture } from "./Picture";
+
+// Category and component types
+export * from "./ComponentCategory";
+export * from "./ProjectComponent";
+
+// Project types and utilities
 export * from "./Project";
-export * from "./ProjectManager";
-export * from "./Status";
+export type { ProjectSummary } from "./Project";
+export * from "./ProjectUtils";
+
+// Standalone content types
+export * from "./StandaloneCollection";
+
+// Version configuration
 export * from "./VersionConfig";

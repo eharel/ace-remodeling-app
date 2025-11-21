@@ -3,24 +3,35 @@ import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import {
+  AssetCategoryTabs,
+  type AssetCategoryValue,
+  AssetThumbnail,
+  convertDocumentsToPictures,
+  convertMediaToPictures,
   ImageGalleryModal,
   MorePhotosCard,
   PhotoTabs,
   type PhotoTabValue,
 } from "@/features/gallery";
-import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
-import {
-  getAggregatedProjectPhotos,
-  useProjects,
-  useTheme,
-} from "@/shared/contexts";
+import { ComponentSelector } from "@/features/projects";
+import { LoadingState, PageHeader, ThemedText, ThemedView } from "@/shared/components";
+import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/core/themes";
-import { Project } from "@/core/types";
 import {
+  getCategoryLabel,
+  getProjectThumbnail,
+  getSubcategoryLabel,
+  Project,
+  ProjectComponent,
+} from "@/core/types";
+import { CoreCategory } from "@/core/types/ComponentCategory";
+import {
+  CATEGORY_DISPLAY_ORDER,
   commonStyles,
   getPhotoCounts,
   getPreviewPhotos,
@@ -29,8 +40,11 @@ import {
 } from "@/shared/utils";
 
 export default function ProjectDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { projects } = useProjects();
+  const { id, componentId } = useLocalSearchParams<{
+    id: string;
+    componentId?: string;
+  }>();
+  const { projects, loading } = useProjects();
   const [project, setProject] = useState<Project | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -38,27 +52,361 @@ export default function ProjectDetailScreen() {
     null
   );
   const [activePhotoTab, setActivePhotoTab] = useState<PhotoTabValue>("after");
+  // Component selection state - defaults to first component
+  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
+    null
+  );
+  // Asset category selection state - default to first available category
+  const [selectedAssetCategory, setSelectedAssetCategory] =
+    useState<AssetCategoryValue | null>(null);
+  // Asset gallery state (for viewing images in Assets section)
+  const [assetGalleryVisible, setAssetGalleryVisible] = useState(false);
+  const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
   const { theme } = useTheme();
 
   // Show 3 preview photos (Flexbox will handle equal sizing)
   const previewCount = 3;
 
+  // Initialize project and set initial component selection
+  // Only runs when id, componentId param, or projects change - NOT when selectedComponentId changes
   useEffect(() => {
     if (id) {
       // Use Firebase data instead of mock data
       const foundProject = projects.find((p) => p.id === id);
       setProject(foundProject || null);
 
-      // Fallback to mock data if needed (commented out for now)
-      // const foundProject = mockProjects.find((p) => p.id === id);
-    }
-  }, [id, projects]);
+      // Set selected component: use componentId param if provided, otherwise default to first
+      // Only set on initial load or when project/componentId param changes
+      if (foundProject && foundProject.components.length > 0) {
+        // Sort components by category display order to get consistent first component
+        const sorted = [...foundProject.components].sort((a, b) => {
+          const orderA = CATEGORY_DISPLAY_ORDER.indexOf(
+            a.category as CoreCategory
+          );
+          const orderB = CATEGORY_DISPLAY_ORDER.indexOf(
+            b.category as CoreCategory
+          );
+          if (orderA === -1 && orderB === -1) return 0;
+          if (orderA === -1) return 1;
+          if (orderB === -1) return -1;
+          return orderA - orderB;
+        });
 
-  // Get aggregated photos (includes related project photos for Full Home projects)
-  const aggregatedPictures = useMemo(() => {
+        // If componentId param is provided and exists in project, use it
+        if (componentId) {
+          const matchingComponent = foundProject.components.find(
+            (c) => c.id === componentId
+          );
+          if (matchingComponent) {
+            setSelectedComponentId(componentId);
+          } else {
+            // componentId doesn't match, fall back to first component from sorted order
+            setSelectedComponentId(sorted[0].id);
+          }
+        } else {
+          // No componentId param - set to first component from sorted order
+          // This only happens on initial load or when project changes
+          setSelectedComponentId(sorted[0].id);
+        }
+      }
+    }
+  }, [id, componentId, projects]);
+
+  // Update selectedComponentId when componentId param changes (from URL navigation)
+  // Only runs when componentId param actually changes, not when selectedComponentId changes from user interaction
+  useEffect(() => {
+    if (componentId && project) {
+      const matchingComponent = project.components.find(
+        (c) => c.id === componentId
+      );
+      if (matchingComponent) {
+        setSelectedComponentId(componentId);
+      }
+    }
+  }, [componentId, project]);
+
+  // OPTIMIZATION 1: Preload all component images when project loads
+  useEffect(() => {
+    if (!project) return;
+
+    const preloadImages = async () => {
+      try {
+        // Preload hero images from all components
+        const allHeroImages = project.components
+          .map((c) => {
+            const thumbnail = getProjectThumbnail(project, c);
+            return thumbnail || c.media?.[0]?.url;
+          })
+          .filter(Boolean) as string[];
+
+        // Preload hero images
+        await Promise.all(allHeroImages.map((url) => Image.prefetch(url)));
+
+        // Preload first 6 thumbnails from each component
+        const allThumbnails = project.components.flatMap((c) =>
+          (c.media || [])
+            .slice(0, 6)
+            .map((m) => m.url)
+            .filter(Boolean)
+        ) as string[];
+
+        // Preload thumbnails
+        await Promise.all(allThumbnails.map((url) => Image.prefetch(url)));
+      } catch {
+        // Silently fail - preloading is best effort
+      }
+    };
+
+    preloadImages();
+  }, [project]);
+
+  /**
+   * Get display label for a component pill
+   * For pills, ALWAYS use category/subcategory (consistent labels)
+   * componentName is for display below project name, not for pills
+   */
+  const getComponentLabel = (component: ProjectComponent): string => {
+    // If has subcategory, use it (e.g., "Pool" instead of "Outdoor")
+    if (component.subcategory) {
+      const subcategoryLabel = getSubcategoryLabel(component.subcategory);
+      return subcategoryLabel;
+    }
+
+    // Otherwise use category label
+    const categoryLabel = getCategoryLabel(component.category);
+    return categoryLabel;
+  };
+
+  /**
+   * Current selected component
+   * Filters project components to find the one matching selectedComponentId
+   */
+  const currentComponent = useMemo(() => {
+    if (!project || !selectedComponentId) return null;
+
+    return (
+      project.components.find((c) => c.id === selectedComponentId) ||
+      project.components[0] ||
+      null
+    );
+  }, [project, selectedComponentId]);
+
+  const currentComponentLabel = currentComponent
+    ? getComponentLabel(currentComponent)
+    : null;
+
+  /**
+   * Media for current component + shared media
+   * Filters to show only the selected component's media plus project-wide shared media
+   */
+  const currentMedia = useMemo(() => {
     if (!project) return [];
-    return getAggregatedProjectPhotos(project, projects);
-  }, [project, projects]);
+    const componentMedia = currentComponent?.media || [];
+    const sharedMedia = project.sharedMedia || [];
+    return [...componentMedia, ...sharedMedia];
+  }, [project, currentComponent]);
+
+  /**
+   * Documents for current component + shared documents
+   * Filters to show only the selected component's documents plus project-wide shared documents
+   */
+  const currentDocuments = useMemo(() => {
+    if (!project) return [];
+    const componentDocuments = currentComponent?.documents || [];
+    const sharedDocuments = project.sharedDocuments || [];
+    return [...componentDocuments, ...sharedDocuments];
+  }, [project, currentComponent]);
+
+  // Reset asset category when component changes - set to first available category
+  useEffect(() => {
+    if (currentDocuments.length === 0) {
+      setSelectedAssetCategory(null);
+      return;
+    }
+
+    // Find first available category from documents in priority order
+    const categoryOrder: AssetCategoryValue[] = [
+      "floor-plan",
+      "materials",
+      "rendering-3d",
+      "contract",
+      "permit",
+      "invoice",
+      "other",
+    ];
+
+    const documentCategories = new Set<string>();
+    currentDocuments.forEach((doc) => {
+      const category = mapCategoryToTabValue(doc.category);
+      documentCategories.add(category);
+    });
+
+    // Find first category in priority order that exists in documents
+    const firstCategory = categoryOrder.find((cat) =>
+      documentCategories.has(cat)
+    );
+
+    if (firstCategory) {
+      setSelectedAssetCategory(firstCategory);
+    } else if (documentCategories.size > 0) {
+      // Fallback: use first category from set if not in priority order
+      setSelectedAssetCategory(
+        Array.from(documentCategories)[0] as AssetCategoryValue
+      );
+    } else {
+      setSelectedAssetCategory(null);
+    }
+  }, [selectedComponentId, currentDocuments]);
+
+  /**
+   * Sorted components by category display order
+   * Used for ComponentSelector to ensure consistent ordering
+   */
+  const sortedComponents = useMemo(() => {
+    if (!project) return [];
+    return [...project.components].sort((a, b) => {
+      const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a.category as CoreCategory);
+      const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b.category as CoreCategory);
+      // If not in order array, put at end
+      if (orderA === -1 && orderB === -1) return 0;
+      if (orderA === -1) return 1;
+      if (orderB === -1) return -1;
+      return orderA - orderB;
+    });
+  }, [project]);
+
+  /**
+   * Helper function to map category string to AssetCategoryValue
+   */
+  const mapCategoryToTabValue = (
+    category: string | undefined
+  ): AssetCategoryValue => {
+    if (!category) return "other";
+    const normalizedCategory = category.toLowerCase().trim();
+
+    // Map common category values to tab values
+    if (
+      normalizedCategory === "plans" ||
+      normalizedCategory === "floor-plan" ||
+      normalizedCategory === "floor plan"
+    ) {
+      return "floor-plan";
+    }
+    if (normalizedCategory === "materials") {
+      return "materials";
+    }
+    if (
+      normalizedCategory === "rendering" ||
+      normalizedCategory === "rendering-3d" ||
+      normalizedCategory === "3d rendering" ||
+      normalizedCategory === "3d"
+    ) {
+      return "rendering-3d";
+    }
+    if (
+      normalizedCategory === "contract" ||
+      normalizedCategory === "contracts"
+    ) {
+      return "contract";
+    }
+    if (normalizedCategory === "permit" || normalizedCategory === "permits") {
+      return "permit";
+    }
+    if (normalizedCategory === "invoice" || normalizedCategory === "invoices") {
+      return "invoice";
+    }
+    return "other";
+  };
+
+  /**
+   * Filtered documents based on selected asset category
+   * Uses doc.category instead of doc.type (which is legacy)
+   */
+  const filteredDocuments = useMemo(() => {
+    if (!selectedAssetCategory) {
+      return [];
+    }
+
+    return currentDocuments.filter((doc) => {
+      const docTabValue = mapCategoryToTabValue(doc.category);
+      return docTabValue === selectedAssetCategory;
+    });
+  }, [currentDocuments, selectedAssetCategory]);
+
+  /**
+   * Convert filtered documents to gallery format for images
+   * Used for displaying asset images in the gallery modal
+   */
+  const assetGalleryImages = useMemo(() => {
+    return convertDocumentsToPictures(filteredDocuments);
+  }, [filteredDocuments]);
+
+  // Create a map: document URL -> gallery image index
+  // Use URL as key since it's guaranteed to be unique and consistent
+  const documentToImageIndex = useMemo(() => {
+    const map = new Map<string, number>();
+
+    // For each image in the gallery, use its URI (URL) as the key
+    // URLs are unique and consistent between documents and gallery images
+    assetGalleryImages.forEach((galleryImage, galleryIndex) => {
+      map.set(galleryImage.uri, galleryIndex);
+    });
+
+    return map;
+  }, [assetGalleryImages]);
+
+  /**
+   * Ensure selectedAssetIndex is within bounds when assetGalleryImages changes
+   */
+  useEffect(() => {
+    if (assetGalleryImages.length > 0) {
+      if (
+        selectedAssetIndex >= assetGalleryImages.length ||
+        selectedAssetIndex < 0
+      ) {
+        setSelectedAssetIndex(0);
+      }
+    } else {
+      // If images array becomes empty, close the gallery
+      if (assetGalleryVisible) {
+        setAssetGalleryVisible(false);
+        setSelectedAssetIndex(0);
+      }
+    }
+  }, [assetGalleryImages.length, selectedAssetIndex, assetGalleryVisible]);
+
+  /**
+   * Display description - component description with fallback to project description
+   * Uses nullish coalescing (??) to properly handle empty strings
+   */
+  const displayDescription = useMemo(() => {
+    if (!project) return "";
+    // Use component description if it exists, otherwise fall back to project description
+    return currentComponent?.description ?? project.description ?? "";
+  }, [currentComponent, project]);
+
+  /**
+   * Display timeline/duration - component timeline with fallback to project timeline
+   */
+  const displayTimeline = useMemo(() => {
+    if (!project) return null;
+    // Use component timeline if available, otherwise use project timeline
+    return currentComponent?.timeline || project.timeline || null;
+  }, [project, currentComponent]);
+
+  /**
+   * Hero image URL - component-specific thumbnail with fallback
+   */
+  const heroImageUrl = useMemo(() => {
+    if (!project) return "";
+    return getProjectThumbnail(project, currentComponent || undefined);
+  }, [project, currentComponent]);
+
+  // Legacy: Keep aggregatedPictures for backward compatibility during transition
+  // This will be replaced with currentMedia in next steps
+  const aggregatedPictures = useMemo(() => {
+    return currentMedia;
+  }, [currentMedia]);
 
   // Calculate photo counts for each category
   const photoCounts = useMemo(() => {
@@ -73,9 +421,16 @@ export default function ProjectDetailScreen() {
       // Use intelligent sampling for "All Photos" tab
       return samplePreviewPhotos(aggregatedPictures, previewCount);
     } else {
-      // Filter by specific category and take first N
+      // Filter by specific stage and take first N
+      // Map tab values to MediaAsset stages
+      const stageMap: Record<string, string> = {
+        before: "before",
+        after: "after",
+        progress: "in-progress",
+      };
+      const targetStage = stageMap[activePhotoTab] || activePhotoTab;
       const filtered = aggregatedPictures.filter(
-        (p) => p.type === activePhotoTab
+        (m) => m.mediaType === "image" && m.stage === targetStage
       );
       return getPreviewPhotos(filtered, previewCount);
     }
@@ -94,24 +449,59 @@ export default function ProjectDetailScreen() {
 
   // Get filtered images for gallery based on active tab
   const galleryImages = useMemo(() => {
-    if (aggregatedPictures.length === 0) return [];
-
-    if (activePhotoTab === "all") {
-      return aggregatedPictures;
+    if (aggregatedPictures.length === 0) {
+      return [];
     }
 
-    // Map tab value to photo type (note: 'progress' tab maps to 'process' type)
-    const photoType =
-      activePhotoTab === "progress" ? "process" : activePhotoTab;
-    return aggregatedPictures.filter((p) => p.type === photoType);
+    let filteredMedia: typeof aggregatedPictures;
+    if (activePhotoTab === "all") {
+      filteredMedia = aggregatedPictures;
+    } else {
+      // Map tab value to MediaAsset stage
+      const stageMap: Record<string, string> = {
+        before: "before",
+        after: "after",
+        progress: "in-progress",
+      };
+      const targetStage = stageMap[activePhotoTab] || activePhotoTab;
+      filteredMedia = aggregatedPictures.filter(
+        (m) => m.mediaType === "image" && m.stage === targetStage
+      );
+    }
+
+    // Convert MediaAsset to Picture format
+    return convertMediaToPictures(filteredMedia);
   }, [aggregatedPictures, activePhotoTab]);
+
+  // Debug logging for asset filtering (current issue)
+  useEffect(() => {
+    if (!project) return;
+  }, [
+    project,
+    currentComponent,
+    currentComponentLabel,
+    selectedAssetCategory,
+    currentDocuments,
+    filteredDocuments,
+  ]);
 
   const closeGallery = () => {
     setGalleryVisible(false);
   };
 
   const handleImagePress = (index: number) => {
-    setSelectedImageIndex(index);
+    // Ensure index is within bounds before opening gallery
+    if (galleryImages.length === 0) {
+      return;
+    }
+
+    const safeIndex = Math.max(0, Math.min(index, galleryImages.length - 1));
+
+    if (safeIndex < 0 || safeIndex >= galleryImages.length) {
+      return;
+    }
+
+    setSelectedImageIndex(safeIndex);
     setGalleryVisible(true);
   };
 
@@ -229,11 +619,11 @@ export default function ProjectDetailScreen() {
         },
         headerContent: {
           flex: 1,
+          marginTop: DesignTokens.spacing[2], // Add space for status badge
         },
         statusBadge: {
-          position: "absolute",
-          top: DesignTokens.spacing[6],
-          right: DesignTokens.spacing[6],
+          alignSelf: "flex-end",
+          marginBottom: DesignTokens.spacing[2],
           paddingHorizontal: DesignTokens.spacing[3],
           paddingVertical: DesignTokens.spacing[1],
           borderRadius: DesignTokens.borderRadius.full,
@@ -246,6 +636,13 @@ export default function ProjectDetailScreen() {
         projectName: {
           ...commonStyles.text.pageTitle,
           marginBottom: DesignTokens.spacing[2],
+        },
+        componentName: {
+          fontSize: DesignTokens.typography.fontSize.lg,
+          fontWeight: DesignTokens.typography.fontWeight.semibold,
+          fontFamily: DesignTokens.typography.fontFamily.semibold,
+          marginBottom: DesignTokens.spacing[2],
+          opacity: 0.9,
         },
         projectDescription: {
           ...commonStyles.text.description,
@@ -274,6 +671,19 @@ export default function ProjectDetailScreen() {
           ...commonStyles.text.value,
           flex: 1,
           textAlign: "right",
+        },
+        metaValuePill: {
+          alignItems: "flex-end",
+        },
+        statusPill: {
+          paddingHorizontal: DesignTokens.spacing[3],
+          paddingVertical: DesignTokens.spacing[1],
+          borderRadius: DesignTokens.borderRadius.full,
+          minWidth: 80,
+          alignItems: "center",
+        },
+        statusPillText: {
+          ...commonStyles.text.badge,
         },
         section: {
           backgroundColor: theme.colors.background.card,
@@ -534,6 +944,26 @@ export default function ProjectDetailScreen() {
           fontWeight: "600",
           color: theme.colors.interactive.primary,
         },
+        assetThumbnails: {
+          paddingHorizontal: DesignTokens.spacing[4],
+          gap: DesignTokens.spacing[4],
+          paddingBottom: DesignTokens.spacing[2],
+        },
+        moreAssetsButton: {
+          width: 120,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: theme.colors.background.secondary,
+          borderRadius: DesignTokens.borderRadius.lg,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
+          padding: DesignTokens.spacing[3],
+        },
+        moreAssetsText: {
+          color: theme.colors.text.primary,
+          fontFamily: DesignTokens.typography.fontFamily.semibold,
+          fontSize: DesignTokens.typography.fontSize.sm,
+        },
         logsList: {
           flexDirection: "column",
         },
@@ -602,6 +1032,28 @@ export default function ProjectDetailScreen() {
     [theme]
   );
 
+  // Show loading state while projects are being fetched
+  if (loading) {
+    return (
+      <>
+        <Stack.Screen
+          options={{
+            headerShown: false, // Hide React Navigation's header
+          }}
+        />
+        <ThemedView style={styles.container}>
+          <PageHeader
+            title="Project Details"
+            showBack={true}
+            backLabel="Back"
+          />
+          <LoadingState message="Loading project..." />
+        </ThemedView>
+      </>
+    );
+  }
+
+  // Show error state only after loading is complete and project is still not found
   if (!project) {
     return (
       <>
@@ -624,6 +1076,7 @@ export default function ProjectDetailScreen() {
     );
   }
 
+  // OPTIMIZATION 3: Gallery image renderer with optimized image props
   const renderGridImage = (
     item: any,
     index: number,
@@ -645,6 +1098,10 @@ export default function ProjectDetailScreen() {
             source={{ uri: item.url }}
             style={styles.gridImage}
             contentFit="cover"
+            transition={150}
+            cachePolicy="memory-disk"
+            priority="normal"
+            recyclingKey={item.url}
           />
           {isMoreCell && (
             <ThemedView style={styles.moreImagesOverlay}>
@@ -730,44 +1187,58 @@ export default function ProjectDetailScreen() {
           style={styles.scrollView}
           contentContainerStyle={{ paddingBottom: DesignTokens.spacing[20] }}
         >
-          {/* Hero Image */}
-          <Image
-            source={{ uri: project.thumbnail }}
-            style={styles.heroImage}
-            contentFit="cover"
-          />
+          {/* Hero Image - OPTIMIZED with caching and transitions */}
+          {heroImageUrl ? (
+            <Animated.View
+              key={`hero-container-${selectedComponentId || "default"}`}
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(200)}
+            >
+              <Image
+                key={`hero-${selectedComponentId || "default"}`}
+                source={{ uri: heroImageUrl }}
+                style={styles.heroImage}
+                contentFit="cover"
+                transition={200}
+                cachePolicy="memory-disk"
+                priority="high"
+                recyclingKey={heroImageUrl}
+              />
+            </Animated.View>
+          ) : null}
+
+          {/* Component Selector - only show if multiple components */}
+          {project.components.length > 1 && (
+            <ComponentSelector
+              components={sortedComponents}
+              selectedComponentId={selectedComponentId}
+              onSelectComponent={setSelectedComponentId}
+              getComponentLabel={getComponentLabel}
+            />
+          )}
 
           {/* Project Header */}
           <ThemedView style={styles.header}>
             <ThemedView style={styles.headerContent}>
-              <ThemedText style={styles.projectName}>{project.name}</ThemedText>
+              {/* Component Name - show if exists (project name is in header) */}
+              {currentComponent?.name && (
+                <ThemedText
+                  style={[
+                    styles.componentName,
+                    { color: theme.colors.text.primary },
+                  ]}
+                >
+                  {currentComponent.name}
+                </ThemedText>
+              )}
               <ThemedText
+                key={`description-${selectedComponentId || "default"}`}
                 style={[
                   styles.projectDescription,
                   { color: theme.colors.text.secondary },
                 ]}
               >
-                {project.longDescription}
-              </ThemedText>
-            </ThemedView>
-
-            {/* Status Badge */}
-            <ThemedView
-              style={[
-                styles.statusBadge,
-                {
-                  backgroundColor: getStatusBadgeStyle(project.status)
-                    .backgroundColor,
-                },
-              ]}
-            >
-              <ThemedText
-                style={[
-                  styles.statusBadgeText,
-                  { color: getStatusBadgeStyle(project.status).color },
-                ]}
-              >
-                {project.status.replace("-", " ").toUpperCase()}
+                {displayDescription}
               </ThemedText>
             </ThemedView>
 
@@ -782,9 +1253,26 @@ export default function ProjectDetailScreen() {
                 >
                   Status
                 </ThemedText>
-                <ThemedText style={styles.metaValue}>
-                  {project.status.replace("-", " ").toUpperCase()}
-                </ThemedText>
+                <ThemedView style={styles.metaValuePill}>
+                  <ThemedView
+                    style={[
+                      styles.statusPill,
+                      {
+                        backgroundColor: getStatusBadgeStyle(project.status)
+                          .backgroundColor,
+                      },
+                    ]}
+                  >
+                    <ThemedText
+                      style={[
+                        styles.statusPillText,
+                        { color: getStatusBadgeStyle(project.status).color },
+                      ]}
+                    >
+                      {project.status.replace("-", " ").toUpperCase()}
+                    </ThemedText>
+                  </ThemedView>
+                </ThemedView>
               </ThemedView>
               <ThemedView style={styles.metaItem}>
                 <ThemedText
@@ -796,8 +1284,9 @@ export default function ProjectDetailScreen() {
                   Category
                 </ThemedText>
                 <ThemedText style={styles.metaValue}>
-                  {project.category.charAt(0).toUpperCase() +
-                    project.category.slice(1)}
+                  {currentComponent
+                    ? getCategoryLabel(currentComponent.category)
+                    : "Miscellaneous"}
                 </ThemedText>
               </ThemedView>
               <ThemedView style={styles.metaItem}>
@@ -824,7 +1313,9 @@ export default function ProjectDetailScreen() {
                   Duration
                 </ThemedText>
                 <ThemedText style={styles.metaValue}>
-                  {getProjectDuration(project)}
+                  {displayTimeline
+                    ? getProjectDuration({ timeline: displayTimeline })
+                    : getProjectDuration(project)}
                 </ThemedText>
               </ThemedView>
             </ThemedView>
@@ -838,7 +1329,7 @@ export default function ProjectDetailScreen() {
                 { color: theme.colors.text.primary },
               ]}
             >
-              Project Photos ({aggregatedPictures.length})
+              Project Photos ({currentMedia.length})
             </ThemedText>
             <ThemedText
               style={[
@@ -861,12 +1352,18 @@ export default function ProjectDetailScreen() {
                 {/* Photo Grid */}
                 {previewPhotos.length > 0 ? (
                   <ThemedView variant="ghost" style={styles.picturesGrid}>
-                    {previewPhotos.map((item) => {
+                    {previewPhotos.map((item, previewIndex) => {
                       // Find the index in the filtered gallery images for correct navigation
                       const galleryIndex = galleryImages.findIndex(
-                        (p) => p.id === item.id
+                        (p: { id?: string }) => p.id === item.id
                       );
-                      return renderGridImage(item, galleryIndex);
+                      // If not found, use previewIndex as fallback (but ensure it's in bounds)
+                      const safeIndex =
+                        galleryIndex >= 0
+                          ? galleryIndex
+                          : Math.min(previewIndex, galleryImages.length - 1);
+
+                      return renderGridImage(item, safeIndex);
                     })}
                     {/* "+X more" card */}
                     {hasMorePhotos && (
@@ -922,8 +1419,8 @@ export default function ProjectDetailScreen() {
             )}
           </ThemedView>
 
-          {/* Documents Section */}
-          {project.documents && project.documents.length > 0 && (
+          {/* Assets Section */}
+          {currentDocuments && currentDocuments.length > 0 && (
             <ThemedView style={styles.section}>
               <View style={styles.sectionHeader}>
                 <ThemedText
@@ -932,7 +1429,7 @@ export default function ProjectDetailScreen() {
                     { color: theme.colors.text.primary },
                   ]}
                 >
-                  Documents ({project.documents.length})
+                  Assets ({currentDocuments.length})
                 </ThemedText>
                 <Pressable
                   style={styles.viewAllButton}
@@ -940,7 +1437,7 @@ export default function ProjectDetailScreen() {
                     router.push(`/project/${project.id}/documents`)
                   }
                   accessible={true}
-                  accessibilityLabel="View all documents"
+                  accessibilityLabel="View all assets"
                   accessibilityRole="button"
                 >
                   <ThemedText style={styles.viewAllButtonText}>
@@ -953,33 +1450,84 @@ export default function ProjectDetailScreen() {
                   />
                 </Pressable>
               </View>
-              <ThemedView style={styles.documentsPreview}>
-                {project.documents
-                  .slice(0, 2)
-                  .map((item, index) => renderDocumentPreview(item, index))}
-                {project.documents.length > 2 && (
+
+              {/* Asset Category Tabs */}
+              {currentDocuments.length > 0 && (
+                <AssetCategoryTabs
+                  activeTab={selectedAssetCategory || "other"}
+                  onTabChange={setSelectedAssetCategory}
+                  documents={currentDocuments}
+                />
+              )}
+
+              {/* Asset Thumbnails */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.assetThumbnails}
+              >
+                {filteredDocuments.slice(0, 4).map((doc) => (
+                  <AssetThumbnail
+                    key={doc.id}
+                    document={doc}
+                    onPress={() => {
+                      // Check if this is an image
+                      const isImage =
+                        doc.fileType?.includes("image/") ||
+                        doc.filename.match(/\.(jpg|jpeg|png|heic)$/i);
+
+                      if (isImage) {
+                        // Look up this document's index in the gallery using URL
+                        // URLs are consistent between documents and gallery images
+                        const galleryIndex = documentToImageIndex.get(doc.url);
+
+                        if (
+                          galleryIndex === undefined ||
+                          galleryIndex < 0 ||
+                          galleryIndex >= assetGalleryImages.length
+                        ) {
+                          return;
+                        }
+
+                        setSelectedAssetIndex(galleryIndex);
+                        setAssetGalleryVisible(true);
+                      } else {
+                        // This is a PDF - open PDF viewer
+                        router.push({
+                          pathname: "/pdf-viewer",
+                          params: {
+                            url: encodeURIComponent(doc.url),
+                            name: doc.name || doc.filename,
+                            id: doc.id,
+                          },
+                        });
+                      }
+                    }}
+                  />
+                ))}
+                {filteredDocuments.length > 4 && (
                   <Pressable
-                    style={styles.moreDocumentsButton}
+                    style={styles.moreAssetsButton}
                     onPress={() =>
                       router.push(`/project/${project.id}/documents`)
                     }
                     accessible={true}
                     accessibilityLabel={`View ${
-                      project.documents.length - 2
-                    } more documents`}
+                      filteredDocuments.length - 4
+                    } more assets`}
                     accessibilityRole="button"
                   >
-                    <ThemedText style={styles.moreDocumentsText}>
-                      +{project.documents.length - 2} more
+                    <ThemedText style={styles.moreAssetsText}>
+                      +{filteredDocuments.length - 4} more
                     </ThemedText>
                   </Pressable>
                 )}
-              </ThemedView>
+              </ScrollView>
             </ThemedView>
           )}
 
           {/* Logs Section */}
-          {project.logs && project.logs.length > 0 && (
+          {project.sharedLogs && project.sharedLogs.length > 0 && (
             <ThemedView style={styles.section}>
               <ThemedText
                 style={[
@@ -987,11 +1535,15 @@ export default function ProjectDetailScreen() {
                   { color: theme.colors.text.primary },
                 ]}
               >
-                Project Logs ({project.logs.length})
+                Project Logs ({project.sharedLogs.length})
               </ThemedText>
               <ThemedView style={styles.logsList}>
-                {project.logs.map((item, index) =>
-                  renderLog(item, index, index === project.logs.length - 1)
+                {project.sharedLogs.map((item, index) =>
+                  renderLog(
+                    item,
+                    index,
+                    index === (project.sharedLogs?.length ?? 0) - 1
+                  )
                 )}
               </ThemedView>
             </ThemedView>
@@ -1044,8 +1596,26 @@ export default function ProjectDetailScreen() {
         <ImageGalleryModal
           visible={galleryVisible}
           images={galleryImages}
-          initialIndex={selectedImageIndex}
+          initialIndex={Math.max(
+            0,
+            Math.min(selectedImageIndex, galleryImages.length - 1)
+          )}
           onClose={closeGallery}
+        />
+      )}
+
+      {/* Asset Image Gallery - with safety check */}
+      {assetGalleryVisible && assetGalleryImages.length > 0 && (
+        <ImageGalleryModal
+          visible={assetGalleryVisible}
+          images={assetGalleryImages}
+          initialIndex={Math.max(
+            0,
+            Math.min(selectedAssetIndex, assetGalleryImages.length - 1)
+          )}
+          onClose={() => {
+            setAssetGalleryVisible(false);
+          }}
         />
       )}
     </>

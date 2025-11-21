@@ -1,5 +1,6 @@
 import { db } from "@/core/config";
-import { Picture, Project, PROJECT_CATEGORIES } from "@/core/types";
+import { Project, MediaAsset } from "@/core/types";
+import { CORE_CATEGORIES } from "@/core/types/ComponentCategory";
 import { collection, getDocs } from "firebase/firestore";
 import React, {
   createContext,
@@ -14,86 +15,21 @@ import React, {
 const PROJECTS_COLLECTION = "projects";
 
 /**
- * Aggregates photos for a project, with special handling for Full Home projects.
+ * Gets all media assets from a project's components
  * 
- * For Full Home projects, this function finds all related projects sharing the same
- * projectNumber and combines their pictures with the Full Home project's own pictures.
- * For all other projects, it returns the project's pictures as-is.
+ * Collects all media from all components in a project.
  * 
- * @param project - The project to get aggregated photos for
- * @param allProjects - Array of all projects to search for related projects
- * @returns Array of Picture objects with duplicates removed based on URL
- * 
- * @example
- * ```ts
- * const aggregatedPhotos = getAggregatedProjectPhotos(fullHomeProject, allProjects);
- * ```
- * 
- * Edge cases handled:
- * - Missing or empty pictures array: returns empty array
- * - Missing or empty projectNumber: returns project's own pictures (graceful degradation)
- * - No matching projects: returns only the Full Home project's pictures
- * - Duplicate URLs: first occurrence is kept, preserving type categorization
- * - Pictures without URLs: safely skipped during deduplication
- * - Large photo sets (30+ photos): uses efficient Set-based deduplication (O(n))
+ * @param project - The project to get media from
+ * @returns Array of MediaAsset objects from all components
  */
-export function getAggregatedProjectPhotos(
-  project: Project,
-  allProjects: Project[]
-): Picture[] {
-  // Handle missing or empty pictures array
-  if (!project.pictures || project.pictures.length === 0) {
-    return [];
-  }
-
-  // For non-Full Home projects, return pictures as-is
-  if (project.category !== PROJECT_CATEGORIES.FULL_HOME) {
-    return project.pictures;
-  }
-
-  // Handle missing or empty projectNumber - graceful degradation
-  if (!project.projectNumber || project.projectNumber.trim() === "") {
-    console.warn(
-      `Full Home project "${project.name}" (${project.id}) is missing projectNumber. Returning only its own pictures.`
-    );
-    return project.pictures;
-  }
-
-  // For Full Home projects, aggregate photos from related projects
-  // Find all projects with matching projectNumber (excluding the current project)
-  const relatedProjects = allProjects.filter(
-    (p) =>
-      p.projectNumber &&
-      p.projectNumber === project.projectNumber &&
-      p.id !== project.id &&
-      p.pictures &&
-      p.pictures.length > 0
-  );
-
-  // Collect all pictures from related projects
-  const relatedPictures: Picture[] = [];
-  relatedProjects.forEach((relatedProject) => {
-    if (relatedProject.pictures) {
-      relatedPictures.push(...relatedProject.pictures);
+export function getProjectMedia(project: Project): MediaAsset[] {
+  const allMedia: MediaAsset[] = [];
+  project.components.forEach((component) => {
+    if (component.media && component.media.length > 0) {
+      allMedia.push(...component.media);
     }
   });
-
-  // Combine Full Home project's pictures with related project pictures
-  const allPictures = [...project.pictures, ...relatedPictures];
-
-  // Remove duplicates based on URL, preserving the first occurrence
-  // This maintains the type categorization from the original order
-  const seenUrls = new Set<string>();
-  const uniquePictures: Picture[] = [];
-
-  for (const picture of allPictures) {
-    if (picture.url && !seenUrls.has(picture.url)) {
-      seenUrls.add(picture.url);
-      uniquePictures.push(picture);
-    }
-  }
-
-  return uniquePictures;
+  return allMedia;
 }
 
 // Context state interface
@@ -155,8 +91,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
           projectsData.push({
             id: doc.id,
             ...data,
-            // Default featured to false if not present in Firestore
-            featured: data.featured ?? false,
+            // Default isFeatured to false if not present in Firestore
+            isFeatured: data.isFeatured ?? false,
           } as Project);
         });
 
@@ -176,26 +112,34 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   // Memoized filtered projects to prevent unnecessary recalculations
   const bathroomProjects = useMemo(
     () =>
-      projects.filter(
-        (project) => project.category === PROJECT_CATEGORIES.BATHROOM
+      projects.filter((project) =>
+        project.components.some(
+          (c) => c.category === CORE_CATEGORIES.BATHROOM
+        )
       ),
     [projects]
   );
 
   const kitchenProjects = useMemo(
     () =>
-      projects.filter(
-        (project) => project.category === PROJECT_CATEGORIES.KITCHEN
+      projects.filter((project) =>
+        project.components.some((c) => c.category === CORE_CATEGORIES.KITCHEN)
       ),
     [projects]
   );
 
   /**
    * All featured projects across all categories.
+   * A project is featured if project.isFeatured is true OR any component.isFeatured is true.
    * Memoized to prevent unnecessary recalculations.
    */
   const featuredProjects = useMemo(
-    () => projects.filter((project) => project.featured === true),
+    () =>
+      projects.filter(
+        (project) =>
+          project.isFeatured === true ||
+          project.components.some((c) => c.isFeatured === true)
+      ),
     [projects]
   );
 
@@ -205,8 +149,10 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
    */
   const featuredBathroomProjects = useMemo(
     () =>
-      featuredProjects.filter(
-        (project) => project.category === PROJECT_CATEGORIES.BATHROOM
+      featuredProjects.filter((project) =>
+        project.components.some(
+          (c) => c.category === CORE_CATEGORIES.BATHROOM
+        )
       ),
     [featuredProjects]
   );
@@ -217,8 +163,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
    */
   const featuredKitchenProjects = useMemo(
     () =>
-      featuredProjects.filter(
-        (project) => project.category === PROJECT_CATEGORIES.KITCHEN
+      featuredProjects.filter((project) =>
+        project.components.some((c) => c.category === CORE_CATEGORIES.KITCHEN)
       ),
     [featuredProjects]
   );
@@ -231,8 +177,12 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
     () =>
       featuredProjects.filter(
         (project) =>
-          project.category !== PROJECT_CATEGORIES.BATHROOM &&
-          project.category !== PROJECT_CATEGORIES.KITCHEN
+          !project.components.some(
+            (c) => c.category === CORE_CATEGORIES.BATHROOM
+          ) &&
+          !project.components.some(
+            (c) => c.category === CORE_CATEGORIES.KITCHEN
+          )
       ),
     [featuredProjects]
   );

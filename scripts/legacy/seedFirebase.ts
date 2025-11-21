@@ -23,7 +23,9 @@ import {
 } from "firebase/firestore";
 import * as fs from "fs";
 import * as path from "path";
+// @ts-ignore - Legacy script, paths may not exist
 import { db } from "../core/config";
+// @ts-ignore - Legacy script, paths may not exist
 import { Document, Picture, Project, ProjectCategory } from "../core/types";
 
 /**

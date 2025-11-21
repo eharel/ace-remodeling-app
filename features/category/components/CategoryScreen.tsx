@@ -1,13 +1,17 @@
 import { router } from "expo-router";
 import React from "react";
 
-import { EmptyState } from "@/shared/components";
+import { EmptyState, LoadingState } from "@/shared/components";
 import { useProjects } from "@/shared/contexts";
 import { CategoryPage } from "./CategoryPage";
 // Comment out mock data for now (keeping for fallback)
 // import { getProjectSummariesByCategory } from "@/data/mockProjects";
 import { CategoryKey, getCategoryConfig } from "@/core/constants";
-import { ProjectSummary, getProjectCompletionDate } from "@/core/types";
+import {
+  ProjectSummary,
+  getProjectCompletionDate,
+  getProjectThumbnail,
+} from "@/core/types";
 import { MaterialIcons } from "@expo/vector-icons";
 
 interface CategoryScreenProps {
@@ -26,44 +30,57 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
   // Convert Project[] to ProjectSummary[] for the CategoryPage component
   const projectSummaries: ProjectSummary[] = projects.map((project) => ({
     id: project.id,
-    projectNumber: project.projectNumber,
+    projectNumber: project.number, // Use new field name
     name: project.name,
-    category: project.category,
-    briefDescription: project.briefDescription,
-    thumbnail: project.thumbnail,
+    category: project.components[0]?.category || "miscellaneous", // Use first component's category
+    briefDescription: project.summary, // Use new field name
+    thumbnail: getProjectThumbnail(project), // Use thumbnail with fallback
     status: project.status,
     completedAt: getProjectCompletionDate(project),
     // REMOVED: pmNames - computed field no longer stored
   }));
 
-  const handleProjectPress = (project: ProjectSummary) => {
+  const handleProjectPress = (projectSummary: ProjectSummary) => {
     try {
-      if (!project?.id) {
+      if (!projectSummary?.id) {
         throw new Error("Invalid project data");
       }
-      router.push(`/project/${project.id}`);
+      
+      // Find the full project object to get component information
+      const fullProject = projects.find((p) => p.id === projectSummary.id);
+      
+      if (fullProject) {
+        // Find the component that matches the current category
+        const matchingComponent = fullProject.components.find(
+          (c) => c.category === category
+        );
+        
+        if (matchingComponent) {
+          // Navigate with componentId param to open directly to that component
+          router.push({
+            // @ts-expect-error - Expo Router generated types are overly strict
+            pathname: `/project/${fullProject.id}`,
+            params: { componentId: matchingComponent.id },
+          });
+        } else {
+          // Fallback: no matching component found, just navigate to project
+          router.push(`/project/${fullProject.id}`);
+        }
+      } else {
+        // Fallback: project not found, use summary ID
+        router.push(`/project/${projectSummary.id}` as any);
+      }
     } catch (error) {
-      console.error("Navigation error:", error);
-      // In a real app, you might show a toast or alert here
+      // Navigation error - silently fail
     }
   };
 
   // Get configuration for this category
   const config = getCategoryConfig(category);
 
-  // Simple loading indicator
+  // Show loading state while projects are being fetched
   if (loading) {
-    return (
-      <CategoryPage
-        category={category}
-        title={config.title}
-        subtitle="Loading projects..."
-        galleryTitle={config.galleryTitle}
-        gallerySubtitle="Loading projects from Firebase..."
-        projects={[]}
-        onProjectPress={handleProjectPress}
-      />
-    );
+    return <LoadingState message="Loading projects..." />;
   }
 
   // Empty state - no projects found for this category

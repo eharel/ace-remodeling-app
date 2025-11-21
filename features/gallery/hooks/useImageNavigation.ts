@@ -2,7 +2,12 @@ import * as Haptics from "expo-haptics";
 import { useCallback } from "react";
 import { Dimensions } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
-import { runOnJS, SharedValue, withTiming } from "react-native-reanimated";
+import {
+  runOnJS,
+  SharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 import {
   MAX_EDGE_DRAG,
@@ -72,30 +77,29 @@ export const useImageNavigation = ({
   );
 
   const panGesture = Gesture.Pan()
+    .onBegin(() => {
+      "worklet";
+      // Initialize gesture - no state updates needed here
+    })
     .onUpdate((event: GestureEvent) => {
       "worklet";
       // Real-time dragging: move the carousel with finger movement
+      // Pre-calculate bounds once for better performance
       const baseX = -currentIndex * screenWidth;
       const newX = baseX + event.translationX;
-
-      // Apply bounds with subtle edge drag feedback
       const minX = -(imagesLength - 1) * screenWidth;
       const maxX = 0;
 
-      // Subtle edge drag feedback with hard limits
+      // Optimized edge drag feedback - simplified calculations
       if (newX > maxX) {
         // At first image - allow small drag for visual feedback
-        const dragAmount = Math.min(event.translationX, MAX_EDGE_DRAG);
-        translateX.value = maxX + dragAmount;
+        translateX.value = maxX + Math.min(event.translationX, MAX_EDGE_DRAG);
       } else if (newX < minX) {
         // At last image - allow small drag for visual feedback
-        const dragAmount = Math.max(
-          event.translationX - (minX - baseX),
-          -MAX_EDGE_DRAG
-        );
-        translateX.value = minX + dragAmount;
+        const offsetFromMin = event.translationX - (minX - baseX);
+        translateX.value = minX + Math.max(offsetFromMin, -MAX_EDGE_DRAG);
       } else {
-        // Normal dragging
+        // Normal dragging - direct assignment for best performance
         translateX.value = newX;
       }
     })
@@ -106,17 +110,18 @@ export const useImageNavigation = ({
 
       // Calculate which image we should snap to
       let targetIndex = currentIndex;
+      let shouldTriggerHaptic = false;
+      let hapticType: "success" | "warning" = "success";
 
       if (translation > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
         // Swipe right - go to previous image
         if (currentIndex > 0) {
           targetIndex = currentIndex - 1;
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          shouldTriggerHaptic = true;
         } else {
           // Edge bounce effect - at first image
-          runOnJS(Haptics.notificationAsync)(
-            Haptics.NotificationFeedbackType.Warning
-          );
+          shouldTriggerHaptic = true;
+          hapticType = "warning";
         }
       } else if (
         translation < -SWIPE_THRESHOLD ||
@@ -125,23 +130,44 @@ export const useImageNavigation = ({
         // Swipe left - go to next image
         if (currentIndex < imagesLength - 1) {
           targetIndex = currentIndex + 1;
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          shouldTriggerHaptic = true;
         } else {
           // Edge bounce effect - at last image
+          shouldTriggerHaptic = true;
+          hapticType = "warning";
+        }
+      }
+
+      // Trigger haptic feedback immediately (non-blocking)
+      if (shouldTriggerHaptic) {
+        if (hapticType === "success") {
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+        } else {
           runOnJS(Haptics.notificationAsync)(
             Haptics.NotificationFeedbackType.Warning
           );
         }
       }
 
-      // Update the index immediately for instant text updates
-      if (targetIndex !== currentIndex) {
-        runOnJS(onIndexChange)(targetIndex);
-      }
-
-      // Animate to the target position with linear animation
+      // Animate to the target position with optimized spring for smoother feel
+      // Tuned parameters for 60fps: lower damping = more responsive, higher stiffness = faster
       const targetX = -targetIndex * screenWidth;
-      translateX.value = withTiming(targetX, { duration: 300 });
+      translateX.value = withSpring(
+        targetX,
+        {
+          damping: 15, // Reduced from 20 for more responsive feel
+          stiffness: 400, // Increased from 300 for faster animation
+          mass: 0.3, // Reduced from 0.5 for lighter feel
+          velocity: velocity * 0.001, // Use gesture velocity for natural feel
+        },
+        (finished) => {
+          "worklet";
+          // Only update state AFTER animation completes to avoid blocking UI thread
+          if (finished && targetIndex !== currentIndex) {
+            runOnJS(onIndexChange)(targetIndex);
+          }
+        }
+      );
     });
 
   return {

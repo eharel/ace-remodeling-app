@@ -78,16 +78,6 @@ export function SearchInputWithHistory({
     isFocused && value.trim() === "" && history.length > 0;
   const shouldShowSuggestions = isFocused && value.trim().length >= 2;
 
-  // Debug: Log dropdown visibility
-  console.log("🔎 Dropdown visibility:", {
-    isFocused,
-    valueEmpty: value.trim() === "",
-    historyLength: history.length,
-    shouldShowHistory,
-    historyItems: history.map((item) => item.query),
-    currentInputValue: value,
-  });
-
   const handleFocus = () => {
     setIsFocused(true);
   };

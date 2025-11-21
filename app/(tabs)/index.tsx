@@ -3,12 +3,20 @@ import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { getCategoryConfig } from "@/core/constants/categoryConfig";
+import {
+  getCategoryConfig,
+  isValidCategoryKey,
+} from "@/core/constants/categoryConfig";
 import { DesignTokens } from "@/core/themes";
-import { ProjectCategory } from "@/core/types";
+import {
+  ComponentCategory,
+  CORE_CATEGORIES,
+  CoreCategory,
+} from "@/core/types/ComponentCategory";
 import { FeaturedCategorySection, HeroCarousel } from "@/features/showcase";
-import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
+import { LoadingState, PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
+import { CATEGORY_DISPLAY_ORDER } from "@/shared/utils";
 
 /**
  * Showcase Tab - Portfolio Showcase Screen
@@ -19,7 +27,7 @@ import { useProjects, useTheme } from "@/shared/contexts";
 export default function ShowcaseScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const { featuredProjects } = useProjects();
+  const { featuredProjects, loading } = useProjects();
 
   /**
    * Group featured projects by category dynamically
@@ -27,22 +35,36 @@ export default function ShowcaseScreen() {
    * Returns a Map for efficient lookups and iteration
    */
   const featuredByCategory = useMemo(() => {
-    const grouped = new Map<ProjectCategory, typeof featuredProjects>();
+    const grouped = new Map<ComponentCategory, typeof featuredProjects>();
+
+    // Normalize category names (e.g., "outdoor" -> "outdoor-living")
+    const normalizeCategory = (category: string): ComponentCategory => {
+      if (category === "outdoor") {
+        return CORE_CATEGORIES.OUTDOOR_LIVING;
+      }
+      return category as ComponentCategory;
+    };
 
     featuredProjects.forEach((project) => {
-      const existing = grouped.get(project.category) || [];
-      grouped.set(project.category, [...existing, project]);
-    });
-
-    // Debug logging
-    console.log("🔍 Featured Projects Debug:");
-    console.log(`  Total featured projects: ${featuredProjects.length}`);
-    console.log("  Featured projects by category:");
-    grouped.forEach((projects, category) => {
-      console.log(`    ${category}: ${projects.length} project(s)`);
-      projects.forEach((p) => {
-        console.log(`      - ${p.name} (${p.id}) - featured: ${p.featured}`);
-      });
+      // Group by ALL component categories - show project in each category it belongs to
+      // This way a project with [bathroom, kitchen, full-home] appears in all three sections
+      const categories = project.components.map((c) => c.category);
+      if (categories.length === 0) {
+        // Fallback if no components
+        const defaultCategory = normalizeCategory("miscellaneous");
+        const existing = grouped.get(defaultCategory) || [];
+        grouped.set(defaultCategory, [...existing, project]);
+      } else {
+        // Add project to each category it belongs to
+        categories.forEach((rawCategory) => {
+          const normalizedCategory = normalizeCategory(rawCategory);
+          const existing = grouped.get(normalizedCategory) || [];
+          // Only add if not already in this category (avoid duplicates)
+          if (!existing.includes(project)) {
+            grouped.set(normalizedCategory, [...existing, project]);
+          }
+        });
+      }
     });
 
     return grouped;
@@ -50,12 +72,25 @@ export default function ShowcaseScreen() {
 
   /**
    * Get sorted array of categories with featured projects
-   * Sorted by category name for consistent ordering
+   * Sorted by CATEGORY_DISPLAY_ORDER for consistent ordering
    */
   const categoriesWithFeatured = useMemo(() => {
-    const categories = Array.from(featuredByCategory.keys()).sort();
-    console.log("📋 Categories with featured projects:", categories);
-    return categories;
+    const orderedCategories = Array.from(featuredByCategory.keys()).filter(
+      (cat): cat is CoreCategory => {
+        return Object.values(CORE_CATEGORIES).includes(cat as CoreCategory);
+      }
+    );
+
+    // Sort by display order
+    return orderedCategories.sort((a, b) => {
+      const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a);
+      const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b);
+      // If not in order array, put at end
+      if (orderA === -1 && orderB === -1) return 0;
+      if (orderA === -1) return 1;
+      if (orderB === -1) return -1;
+      return orderA - orderB;
+    });
   }, [featuredByCategory]);
 
   const styles = StyleSheet.create({
@@ -138,64 +173,67 @@ export default function ShowcaseScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        {/* Hero Carousel - Auto-advancing featured projects */}
-        <View style={styles.carouselContainer}>
-          <HeroCarousel projects={featuredProjects} />
-        </View>
-
-        {/* Dynamic Category Sections - Only render if we have featured projects */}
-        {featuredProjects.length > 0 ? (
-          categoriesWithFeatured.map((category) => {
-            const projects = featuredByCategory.get(category);
-            if (!projects || projects.length === 0) {
-              console.log(`⚠️  Skipping ${category}: no projects`);
-              return null;
-            }
-
-            // Check if category has config, skip if not
-            const categoryConfig = getCategoryConfig(category);
-            if (!categoryConfig) {
-              console.log(`⚠️  Skipping ${category}: no category config found`);
-              return null;
-            }
-
-            // Skip internal categories (management tools, etc.)
-            if (
-              "internal" in categoryConfig &&
-              categoryConfig.internal === true
-            ) {
-              console.log(`⚠️  Skipping ${category}: internal category`);
-              return null;
-            }
-
-            console.log(
-              `✅ Rendering section for ${category} with ${projects.length} project(s)`
-            );
-            return (
-              <FeaturedCategorySection
-                key={category}
-                category={category}
-                projects={projects}
-              />
-            );
-          })
+        {/* Loading State - Show while fetching projects */}
+        {loading ? (
+          <LoadingState message="Loading showcase..." />
         ) : (
-          /* Empty State - No featured projects at all */
-          <View style={styles.emptyStateContainer}>
-            <MaterialIcons
-              name="star-border"
-              size={72}
-              color={theme.colors.showcase.accent}
-              style={styles.emptyStateIcon}
-            />
-            <ThemedText style={styles.emptyStateTitle}>
-              Building our showcase
-            </ThemedText>
-            <ThemedText style={styles.emptyStateMessage}>
-              Featured projects will appear here as we curate our finest work.
-              Check back soon to see our portfolio highlights.
-            </ThemedText>
-          </View>
+          <>
+            {/* Hero Carousel - Auto-advancing featured projects */}
+            <View style={styles.carouselContainer}>
+              <HeroCarousel projects={featuredProjects} />
+            </View>
+
+            {/* Dynamic Category Sections - Only render if we have featured projects */}
+            {featuredProjects.length > 0 ? (
+              categoriesWithFeatured.map((category) => {
+                const projects = featuredByCategory.get(category);
+                if (!projects || projects.length === 0) {
+                  return null;
+                }
+
+                // Check if category has config, skip if not
+                // getCategoryConfig expects CoreCategory, so we need to check if it's a core category
+                const categoryConfig = isValidCategoryKey(category)
+                  ? getCategoryConfig(category)
+                  : null;
+                if (!categoryConfig) {
+                  return null;
+                }
+
+                // Skip internal categories (management tools, etc.)
+                if (
+                  "internal" in categoryConfig &&
+                  categoryConfig.internal === true
+                ) {
+                  return null;
+                }
+                return (
+                  <FeaturedCategorySection
+                    key={category}
+                    category={category}
+                    projects={projects}
+                  />
+                );
+              })
+            ) : (
+              /* Empty State - No featured projects at all */
+              <View style={styles.emptyStateContainer}>
+                <MaterialIcons
+                  name="star-border"
+                  size={72}
+                  color={theme.colors.showcase.accent}
+                  style={styles.emptyStateIcon}
+                />
+                <ThemedText style={styles.emptyStateTitle}>
+                  Building our showcase
+                </ThemedText>
+                <ThemedText style={styles.emptyStateMessage}>
+                  Featured projects will appear here as we curate our finest work.
+                  Check back soon to see our portfolio highlights.
+                </ThemedText>
+              </View>
+            )}
+          </>
         )}
       </ScrollView>
     </ThemedView>

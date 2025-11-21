@@ -2,7 +2,7 @@
   "expo": {
     "name": "ACE Remodeling TX",
     "slug": "ace-remodeling-app",
-    "version": "1.2.1",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
     "scheme": "aceremodelingapp",
@@ -11,9 +11,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.aceremodelingtx.app",
-      "buildNumber": "9",
+      "buildNumber": "11",
       "infoPlist": {
-        "CFBundleDisplayName": "ACE Remodeling TX"
+        "CFBundleDisplayName": "ACE Remodeling TX",
+        "CFBundleName": "ACE Remodeling TX"
       }
     },
     "android": {
@@ -56,7 +57,7 @@
     "updates": {
       "url": "https://u.expo.dev/ccb81db1-d023-4ef7-bcb9-b8c536378d91"
     },
-    "runtimeVersion": "1.0.0",
+    "runtimeVersion": "2.0.0",
     "extra": {
       "router": {},
       "eas": {

@@ -70,7 +70,7 @@ export const useImagePreloading = ({
     failed: new Set(),
   });
 
-  const preloadTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const preloadTimeouts = useRef<Map<string, number>>(new Map());
 
   // Get images that should be preloaded using utility function
   const getPreloadIndicesCallback = useCallback(() => {
@@ -113,7 +113,7 @@ export const useImagePreloading = ({
 
       try {
         // Use expo-image's prefetch method for React Native
-        await Image.prefetch(image.url);
+        await Image.prefetch(image.uri);
 
         // Clear timeout on success
         clearTimeout(timeout);

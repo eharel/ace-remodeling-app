@@ -1,4 +1,4 @@
-import { Picture } from "@/core/types";
+import { MediaAsset, MEDIA_STAGES } from "@/core/types";
 
 /**
  * Photo counts for each category
@@ -13,19 +13,24 @@ export interface PhotoCounts {
 /**
  * Calculate photo counts for each category
  *
- * @param pictures - Array of project pictures
+ * @param media - Array of project media assets
  * @returns Object containing counts for each category
  */
-export function getPhotoCounts(pictures: Picture[]): PhotoCounts {
-  if (!pictures || pictures.length === 0) {
+export function getPhotoCounts(media: MediaAsset[]): PhotoCounts {
+  if (!media || media.length === 0) {
     return { all: 0, before: 0, progress: 0, after: 0 };
   }
 
+  // Filter to images only (exclude videos)
+  const images = media.filter((m) => m.mediaType === "image");
+
   return {
-    all: pictures.length,
-    before: pictures.filter((p) => p.type === "before").length,
-    progress: pictures.filter((p) => p.type === "progress").length,
-    after: pictures.filter((p) => p.type === "after").length,
+    all: images.length,
+    before: images.filter((m) => m.stage === MEDIA_STAGES.BEFORE).length,
+    progress: images.filter(
+      (m) => m.stage === MEDIA_STAGES.IN_PROGRESS
+    ).length,
+    after: images.filter((m) => m.stage === MEDIA_STAGES.AFTER).length,
   };
 }
 
@@ -44,11 +49,14 @@ export function getPreviewCount(screenWidth: number): number {
 /**
  * Get preview photos for a specific category (simple slice)
  *
- * @param photos - Array of photos to preview
+ * @param photos - Array of media assets to preview
  * @param count - Number of photos to show in preview
- * @returns Array of photos limited to preview count
+ * @returns Array of media assets limited to preview count
  */
-export function getPreviewPhotos(photos: Picture[], count: number): Picture[] {
+export function getPreviewPhotos(
+  photos: MediaAsset[],
+  count: number
+): MediaAsset[] {
   return photos.slice(0, count);
 }
 
@@ -64,9 +72,9 @@ export function getPreviewPhotos(photos: Picture[], count: number): Picture[] {
  * - Always prioritizes showing finished work (after) first for client presentations
  * - Never shows only "ugly construction phase" photos if better options exist
  *
- * @param allPhotos - Complete array of project photos
+ * @param allMedia - Complete array of project media assets (images only)
  * @param previewCount - Number of photos to show in preview (2 or 3)
- * @returns Array of sampled photos for preview
+ * @returns Array of sampled media assets for preview
  *
  * @example
  * ```ts
@@ -81,9 +89,12 @@ export function getPreviewPhotos(photos: Picture[], count: number): Picture[] {
  * ```
  */
 export function samplePreviewPhotos(
-  allPhotos: Picture[],
+  allMedia: MediaAsset[],
   previewCount: number
-): Picture[] {
+): MediaAsset[] {
+  // Filter to images only
+  const allPhotos = allMedia.filter((m) => m.mediaType === "image");
+
   if (!allPhotos || allPhotos.length === 0) {
     return [];
   }
@@ -93,14 +104,16 @@ export function samplePreviewPhotos(
     return [...allPhotos];
   }
 
-  // Separate photos by category
+  // Separate photos by stage
   const categorized = {
-    after: allPhotos.filter((p) => p.type === "after"),
-    before: allPhotos.filter((p) => p.type === "before"),
-    progress: allPhotos.filter((p) => p.type === "progress"),
+    after: allPhotos.filter((p) => p.stage === MEDIA_STAGES.AFTER),
+    before: allPhotos.filter((p) => p.stage === MEDIA_STAGES.BEFORE),
+    progress: allPhotos.filter(
+      (p) => p.stage === MEDIA_STAGES.IN_PROGRESS
+    ),
   };
 
-  const preview: Picture[] = [];
+  const preview: MediaAsset[] = [];
   const priorityOrder: Array<"after" | "before" | "progress"> = [
     "after",
     "before",
