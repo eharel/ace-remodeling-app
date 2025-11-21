@@ -1,11 +1,18 @@
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ComponentCategory, CoreCategory } from "@/core/types/ComponentCategory";
 import { ProjectSummary } from "@/core/types";
-import { getProjectThumbnail, getProjectCompletionDate } from "@/core/types/ProjectUtils";
+import {
+  ComponentCategory,
+  CoreCategory,
+  getSubcategoryLabel,
+} from "@/core/types/ComponentCategory";
+import {
+  getProjectCompletionDate,
+  getProjectThumbnail,
+} from "@/core/types/ProjectUtils";
 import { CategoryPicker } from "@/features/category";
 import { ProjectGallery } from "@/features/projects";
 import {
@@ -15,13 +22,24 @@ import {
   ThemedText,
   ThemedView,
 } from "@/shared/components";
+import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
-import { getAllCategories, getCategoryDisplayName } from "@/shared/utils";
+import {
+  filterSummariesBySubcategory,
+  getAllCategories,
+  getCategoryDisplayName,
+  getSubcategories,
+  getSubcategoryCount,
+  shouldShowSubcategoryFilter,
+} from "@/shared/utils";
 
 export default function CategoryScreen() {
   const { theme } = useTheme();
   const { projects, loading, error } = useProjects();
   const { category } = useLocalSearchParams<{ category: string }>();
+
+  // State for selected subcategory
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
 
   // Define styles early to avoid hoisting issues
   const styles = useMemo(
@@ -36,6 +54,11 @@ export default function CategoryScreen() {
           paddingHorizontal: DesignTokens.spacing[4],
           paddingBottom: DesignTokens.spacing[8],
         },
+        filterContainer: {
+          paddingHorizontal: DesignTokens.spacing[4],
+          paddingTop: DesignTokens.spacing[4],
+          paddingBottom: DesignTokens.spacing[2],
+        },
         projectCount: {
           fontSize: DesignTokens.typography.fontSize.sm,
           lineHeight:
@@ -44,6 +67,12 @@ export default function CategoryScreen() {
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.secondary,
         },
+        emptyState: {
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: DesignTokens.spacing[6],
+        },
       }),
     [theme]
   );
@@ -51,7 +80,7 @@ export default function CategoryScreen() {
   // Validate category parameter
   const validCategory = category as ComponentCategory;
   const allCategories = getAllCategories();
-  
+
   if (!category || !allCategories.includes(category as CoreCategory)) {
     return (
       <ThemedView style={styles.container}>
@@ -80,7 +109,7 @@ export default function CategoryScreen() {
   }
 
   // Filter projects by category (check if any component matches) and convert to ProjectSummary
-  const categoryProjects = useMemo((): ProjectSummary[] => {
+  const allCategoryProjects = useMemo((): ProjectSummary[] => {
     if (!projects) return [];
     return projects
       .filter((project) =>
@@ -98,18 +127,55 @@ export default function CategoryScreen() {
       }));
   }, [projects, validCategory]);
 
+  // Extract available subcategories for this category
+  const subcategories = useMemo(() => {
+    if (!projects) return [];
+    return getSubcategories(projects, validCategory);
+  }, [projects, validCategory]);
+
+  // Determine if we should show the subcategory filter
+  const showSubcategoryFilter = useMemo(() => {
+    return shouldShowSubcategoryFilter(subcategories);
+  }, [subcategories]);
+
+  // Reset selected subcategory if it's no longer available
+  useEffect(() => {
+    if (!subcategories.includes(selectedSubcategory)) {
+      setSelectedSubcategory("all");
+    }
+  }, [subcategories, selectedSubcategory]);
+
+  // Apply subcategory filter to projects
+  const categoryProjects = useMemo((): ProjectSummary[] => {
+    if (!projects || !showSubcategoryFilter) {
+      return allCategoryProjects;
+    }
+    return filterSummariesBySubcategory(
+      allCategoryProjects,
+      projects,
+      validCategory,
+      selectedSubcategory
+    );
+  }, [
+    allCategoryProjects,
+    projects,
+    validCategory,
+    selectedSubcategory,
+    showSubcategoryFilter,
+  ]);
+
   const categoryDisplayName = getCategoryDisplayName(validCategory);
 
   const handleProjectPress = (projectSummary: any) => {
     // Find the full project object to get component information
     const fullProject = projects.find((p) => p.id === projectSummary.id);
-    
+
     if (fullProject) {
       // Find the component that matches the current category
       const matchingComponent = fullProject.components.find(
         (c) => c.category === validCategory
       );
-      
+
       if (matchingComponent) {
         // Navigate with componentId param to open directly to that component
         router.push({
@@ -246,11 +312,54 @@ export default function CategoryScreen() {
       </PageHeader>
 
       <View style={styles.content}>
-        <ProjectGallery
-          projects={categoryProjects}
-          onProjectPress={handleProjectPress}
-          enableRefresh={true}
-        />
+        {/* Subcategory filter - only shown if multiple subcategories exist */}
+        {showSubcategoryFilter && (
+          <View style={styles.filterContainer}>
+            <SegmentedControl
+              variant="tabs"
+              options={subcategories as readonly string[]}
+              selected={selectedSubcategory}
+              onSelect={setSelectedSubcategory}
+              showCounts={true}
+              getCounts={(subcategory) =>
+                getSubcategoryCount(projects, validCategory, subcategory)
+              }
+              getLabel={(subcategory) => {
+                if (subcategory === "all") {
+                  return "All";
+                }
+                return getSubcategoryLabel(subcategory);
+              }}
+              ariaLabel="Filter by project type"
+              testID={`${validCategory}-subcategory-filter`}
+            />
+          </View>
+        )}
+
+        {/* Project gallery or empty state */}
+        {categoryProjects.length === 0 ? (
+          <ThemedView style={styles.emptyState}>
+            <ThemedText
+              style={{
+                fontSize: DesignTokens.typography.fontSize.lg,
+                color: theme.colors.text.secondary,
+                textAlign: "center",
+              }}
+            >
+              {selectedSubcategory === "all"
+                ? `No ${categoryDisplayName.toLowerCase()} projects available yet.`
+                : `No ${getSubcategoryLabel(
+                    selectedSubcategory
+                  ).toLowerCase()} projects available yet.`}
+            </ThemedText>
+          </ThemedView>
+        ) : (
+          <ProjectGallery
+            projects={categoryProjects}
+            onProjectPress={handleProjectPress}
+            enableRefresh={true}
+          />
+        )}
       </View>
     </ThemedView>
   );
