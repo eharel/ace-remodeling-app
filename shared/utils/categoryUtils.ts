@@ -6,6 +6,21 @@ import {
 } from "@/core/types/ComponentCategory";
 
 /**
+ * Default category order for consistent display throughout the app
+ * Used in Showcase, Categories page, and component tabs
+ */
+export const CATEGORY_DISPLAY_ORDER: CoreCategory[] = [
+  CORE_CATEGORIES.FULL_HOME,
+  CORE_CATEGORIES.KITCHEN,
+  CORE_CATEGORIES.BATHROOM,
+  CORE_CATEGORIES.ADU_ADDITION,
+  CORE_CATEGORIES.OUTDOOR_LIVING,
+  CORE_CATEGORIES.NEW_CONSTRUCTION,
+  CORE_CATEGORIES.COMMERCIAL,
+  CORE_CATEGORIES.MISCELLANEOUS,
+];
+
+/**
  * Get the display name for a category
  * Uses the centralized category labels from types
  */
@@ -39,9 +54,9 @@ export function getCategoryIcon(category: ComponentCategory): string {
 }
 
 /**
- * Get all available core categories
+ * Get all available core categories in display order
  * Uses the centralized category constants from types
  */
 export function getAllCategories(): CoreCategory[] {
-  return Object.values(CORE_CATEGORIES);
+  return CATEGORY_DISPLAY_ORDER;
 }

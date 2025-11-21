@@ -96,14 +96,6 @@ export function useSearchHistory() {
         ...filtered,
       ].slice(0, MAX_HISTORY_ITEMS);
 
-      // Debug logging in development
-      if (__DEV__) {
-        console.log("🧠 Search history updated:", {
-          query: trimmedQuery,
-          totalItems: newHistory.length,
-        });
-      }
-
       // Save to AsyncStorage
       AsyncStorage.setItem(
         SEARCH_HISTORY_KEY,

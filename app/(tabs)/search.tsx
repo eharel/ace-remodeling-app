@@ -522,12 +522,6 @@ export default function SearchScreen() {
               );
               if (result) {
                 handleProjectPress(result);
-              } else {
-                console.error("Could not find search result for:", {
-                  compositeId: summary.id,
-                  projectId,
-                  componentId,
-                });
               }
             }}
           />

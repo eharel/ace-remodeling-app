@@ -11,9 +11,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.aceremodelingtx.app",
-      "buildNumber": "9",
+      "buildNumber": "11",
       "infoPlist": {
-        "CFBundleDisplayName": "ACE Remodeling TX"
+        "CFBundleDisplayName": "ACE Remodeling TX",
+        "CFBundleName": "ACE Remodeling TX"
       }
     },
     "android": {

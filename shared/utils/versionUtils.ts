@@ -39,10 +39,7 @@ export function getCurrentBuildNumber(): number | null {
     buildNumberString = appConfig.expo.ios.buildNumber;
   }
   
-  console.log("[VersionUtils] Build number string:", buildNumberString);
-  
   if (!buildNumberString) {
-    console.warn("[VersionUtils] Build number not found in Constants or app.json");
     return null;
   }
 
@@ -50,11 +47,9 @@ export function getCurrentBuildNumber(): number | null {
   
   // Validate that parsing succeeded and returned a valid number
   if (isNaN(buildNumber)) {
-    console.warn("[VersionUtils] Failed to parse build number:", buildNumberString);
     return null;
   }
 
-  console.log("[VersionUtils] Parsed build number:", buildNumber);
   return buildNumber;
 }
 
@@ -102,37 +97,21 @@ export function isUpdateRequired(
 export async function fetchVersionConfig(): Promise<VersionConfig | null> {
   try {
     const versionDocRef = doc(db, FIRESTORE_COLLECTION, FIRESTORE_DOCUMENT);
-    console.log(
-      "[VersionUtils] Fetching from Firestore:",
-      `${FIRESTORE_COLLECTION}/${FIRESTORE_DOCUMENT}`
-    );
     const versionDoc = await getDoc(versionDocRef);
 
     if (!versionDoc.exists()) {
-      console.error(
-        "[VersionUtils] Version config document does not exist in Firestore at",
-        `${FIRESTORE_COLLECTION}/${FIRESTORE_DOCUMENT}`
-      );
       return null;
     }
 
     const data = versionDoc.data() as VersionConfig;
-    console.log("[VersionUtils] Raw Firestore data:", data);
 
     // Validate that we got the expected data structure
     if (typeof data.minimumBuildNumber !== "number") {
-      console.error(
-        "[VersionUtils] Invalid version config: minimumBuildNumber is not a number, got:",
-        typeof data.minimumBuildNumber,
-        data.minimumBuildNumber
-      );
       return null;
     }
 
-    console.log("[VersionUtils] Successfully fetched version config:", data);
     return data;
   } catch (error) {
-    console.error("[VersionUtils] Error fetching version config from Firestore:", error);
     return null;
   }
 }

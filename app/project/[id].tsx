@@ -29,7 +29,9 @@ import {
   Project,
   ProjectComponent,
 } from "@/core/types";
+import { CoreCategory } from "@/core/types/ComponentCategory";
 import {
+  CATEGORY_DISPLAY_ORDER,
   commonStyles,
   getPhotoCounts,
   getPreviewPhotos,
@@ -54,9 +56,9 @@ export default function ProjectDetailScreen() {
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
     null
   );
-  // Asset category selection state
+  // Asset category selection state - default to first available category
   const [selectedAssetCategory, setSelectedAssetCategory] =
-    useState<AssetCategoryValue>("all");
+    useState<AssetCategoryValue | null>(null);
   // Asset gallery state (for viewing images in Assets section)
   const [assetGalleryVisible, setAssetGalleryVisible] = useState(false);
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
@@ -65,6 +67,8 @@ export default function ProjectDetailScreen() {
   // Show 3 preview photos (Flexbox will handle equal sizing)
   const previewCount = 3;
 
+  // Initialize project and set initial component selection
+  // Only runs when id, componentId param, or projects change - NOT when selectedComponentId changes
   useEffect(() => {
     if (id) {
       // Use Firebase data instead of mock data
@@ -72,7 +76,22 @@ export default function ProjectDetailScreen() {
       setProject(foundProject || null);
 
       // Set selected component: use componentId param if provided, otherwise default to first
+      // Only set on initial load or when project/componentId param changes
       if (foundProject && foundProject.components.length > 0) {
+        // Sort components by category display order to get consistent first component
+        const sorted = [...foundProject.components].sort((a, b) => {
+          const orderA = CATEGORY_DISPLAY_ORDER.indexOf(
+            a.category as CoreCategory
+          );
+          const orderB = CATEGORY_DISPLAY_ORDER.indexOf(
+            b.category as CoreCategory
+          );
+          if (orderA === -1 && orderB === -1) return 0;
+          if (orderA === -1) return 1;
+          if (orderB === -1) return -1;
+          return orderA - orderB;
+        });
+
         // If componentId param is provided and exists in project, use it
         if (componentId) {
           const matchingComponent = foundProject.components.find(
@@ -81,23 +100,22 @@ export default function ProjectDetailScreen() {
           if (matchingComponent) {
             setSelectedComponentId(componentId);
           } else {
-            // componentId doesn't match, fall back to first component
-            setSelectedComponentId(foundProject.components[0].id);
+            // componentId doesn't match, fall back to first component from sorted order
+            setSelectedComponentId(sorted[0].id);
           }
         } else {
-          // No componentId param, use first component
-          setSelectedComponentId(foundProject.components[0].id);
+          // No componentId param - set to first component from sorted order
+          // This only happens on initial load or when project changes
+          setSelectedComponentId(sorted[0].id);
         }
       }
-
-      // Fallback to mock data if needed (commented out for now)
-      // const foundProject = mockProjects.find((p) => p.id === id);
     }
   }, [id, componentId, projects]);
 
-  // Update selectedComponentId when componentId param changes
+  // Update selectedComponentId when componentId param changes (from URL navigation)
+  // Only runs when componentId param actually changes, not when selectedComponentId changes from user interaction
   useEffect(() => {
-    if (componentId && project && componentId !== selectedComponentId) {
+    if (componentId && project) {
       const matchingComponent = project.components.find(
         (c) => c.id === componentId
       );
@@ -105,12 +123,7 @@ export default function ProjectDetailScreen() {
         setSelectedComponentId(componentId);
       }
     }
-  }, [componentId, project, selectedComponentId]);
-
-  // Reset asset category when component changes
-  useEffect(() => {
-    setSelectedAssetCategory("all");
-  }, [selectedComponentId]);
+  }, [componentId, project]);
 
   // OPTIMIZATION 1: Preload all component images when project loads
   useEffect(() => {
@@ -170,6 +183,7 @@ export default function ProjectDetailScreen() {
    */
   const currentComponent = useMemo(() => {
     if (!project || !selectedComponentId) return null;
+
     return (
       project.components.find((c) => c.id === selectedComponentId) ||
       project.components[0] ||
@@ -202,6 +216,64 @@ export default function ProjectDetailScreen() {
     const sharedDocuments = project.sharedDocuments || [];
     return [...componentDocuments, ...sharedDocuments];
   }, [project, currentComponent]);
+
+  // Reset asset category when component changes - set to first available category
+  useEffect(() => {
+    if (currentDocuments.length === 0) {
+      setSelectedAssetCategory(null);
+      return;
+    }
+
+    // Find first available category from documents in priority order
+    const categoryOrder: AssetCategoryValue[] = [
+      "floor-plan",
+      "materials",
+      "rendering-3d",
+      "contract",
+      "permit",
+      "invoice",
+      "other",
+    ];
+
+    const documentCategories = new Set<string>();
+    currentDocuments.forEach((doc) => {
+      const category = mapCategoryToTabValue(doc.category);
+      documentCategories.add(category);
+    });
+
+    // Find first category in priority order that exists in documents
+    const firstCategory = categoryOrder.find((cat) =>
+      documentCategories.has(cat)
+    );
+
+    if (firstCategory) {
+      setSelectedAssetCategory(firstCategory);
+    } else if (documentCategories.size > 0) {
+      // Fallback: use first category from set if not in priority order
+      setSelectedAssetCategory(
+        Array.from(documentCategories)[0] as AssetCategoryValue
+      );
+    } else {
+      setSelectedAssetCategory(null);
+    }
+  }, [selectedComponentId, currentDocuments]);
+
+  /**
+   * Sorted components by category display order
+   * Used for ComponentSelector to ensure consistent ordering
+   */
+  const sortedComponents = useMemo(() => {
+    if (!project) return [];
+    return [...project.components].sort((a, b) => {
+      const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a.category as CoreCategory);
+      const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b.category as CoreCategory);
+      // If not in order array, put at end
+      if (orderA === -1 && orderB === -1) return 0;
+      if (orderA === -1) return 1;
+      if (orderB === -1) return -1;
+      return orderA - orderB;
+    });
+  }, [project]);
 
   /**
    * Helper function to map category string to AssetCategoryValue
@@ -251,7 +323,9 @@ export default function ProjectDetailScreen() {
    * Uses doc.category instead of doc.type (which is legacy)
    */
   const filteredDocuments = useMemo(() => {
-    if (selectedAssetCategory === "all") return currentDocuments;
+    if (!selectedAssetCategory) {
+      return [];
+    }
 
     return currentDocuments.filter((doc) => {
       const docTabValue = mapCategoryToTabValue(doc.category);
@@ -264,53 +338,19 @@ export default function ProjectDetailScreen() {
    * Used for displaying asset images in the gallery modal
    */
   const assetGalleryImages = useMemo(() => {
-    console.log("\n=== ASSET GALLERY CREATION ===");
-    console.log("📦 Total filtered documents:", filteredDocuments.length);
-
-    // Log each document
-    filteredDocuments.forEach((doc, i) => {
-      const isImage =
-        doc.fileType?.includes("image/") ||
-        /\.(jpg|jpeg|png|heic)$/i.test(doc.filename);
-      console.log(`  [${i}] ${doc.filename}`, {
-        id: doc.id.substring(0, 8),
-        fileType: doc.fileType || "MISSING",
-        isImage,
-      });
-    });
-
-    const images = convertDocumentsToPictures(filteredDocuments);
-
-    console.log("🖼️  Created gallery images:", images.length);
-    images.forEach((img, i) => {
-      console.log(`  [${i}] FULL URI:`, img.uri);
-      console.log(`      Length: ${img.uri.length} chars`);
-    });
-    console.log("=== END ASSET GALLERY CREATION ===\n");
-
-    return images;
+    return convertDocumentsToPictures(filteredDocuments);
   }, [filteredDocuments]);
 
   // Create a map: document URL -> gallery image index
   // Use URL as key since it's guaranteed to be unique and consistent
   const documentToImageIndex = useMemo(() => {
-    console.log("\n=== BUILDING INDEX MAP ===");
     const map = new Map<string, number>();
 
     // For each image in the gallery, use its URI (URL) as the key
     // URLs are unique and consistent between documents and gallery images
     assetGalleryImages.forEach((galleryImage, galleryIndex) => {
       map.set(galleryImage.uri, galleryIndex);
-      console.log(
-        `  Map: URL[${galleryImage.uri.substring(
-          0,
-          50
-        )}...] -> gallery[${galleryIndex}]`
-      );
     });
-
-    console.log(`✅ Index map created: ${map.size} entries`);
-    console.log("=== END INDEX MAP ===\n");
 
     return map;
   }, [assetGalleryImages]);
@@ -365,17 +405,6 @@ export default function ProjectDetailScreen() {
   // Legacy: Keep aggregatedPictures for backward compatibility during transition
   // This will be replaced with currentMedia in next steps
   const aggregatedPictures = useMemo(() => {
-    console.log("\n=== AGGREGATED PICTURES CREATION ===");
-    console.log("📦 Current media count:", currentMedia.length);
-    currentMedia.forEach((media, i) => {
-      console.log(`  [${i}] Media:`, {
-        id: media.id?.substring(0, 8) || "NO ID",
-        url: media.url?.substring(0, 50) || "NO URL",
-        mediaType: media.mediaType,
-        stage: media.stage,
-      });
-    });
-    console.log("=== END AGGREGATED PICTURES ===\n");
     return currentMedia;
   }, [currentMedia]);
 
@@ -420,13 +449,7 @@ export default function ProjectDetailScreen() {
 
   // Get filtered images for gallery based on active tab
   const galleryImages = useMemo(() => {
-    console.log("\n=== PHOTO GALLERY CREATION ===");
-    console.log("📦 Total aggregated pictures:", aggregatedPictures.length);
-    console.log("📑 Active photo tab:", activePhotoTab);
-
     if (aggregatedPictures.length === 0) {
-      console.log("⚠️  No aggregated pictures, returning empty array");
-      console.log("=== END PHOTO GALLERY CREATION ===\n");
       return [];
     }
 
@@ -447,19 +470,7 @@ export default function ProjectDetailScreen() {
     }
 
     // Convert MediaAsset to Picture format
-    const result = convertMediaToPictures(filteredMedia);
-
-    console.log("🖼️  Created gallery images:", result.length);
-    result.forEach((img: { id?: string; uri?: string }, i: number) => {
-      console.log(
-        `  [${i}] id: ${img.id?.substring(0, 8) || "NO ID"}, uri: ${
-          img.uri?.substring(0, 50) || "NO URI"
-        }...`
-      );
-    });
-    console.log("=== END PHOTO GALLERY CREATION ===\n");
-
-    return result;
+    return convertMediaToPictures(filteredMedia);
   }, [aggregatedPictures, activePhotoTab]);
 
   // Debug logging for asset filtering (current issue)
@@ -479,52 +490,16 @@ export default function ProjectDetailScreen() {
   };
 
   const handleImagePress = (index: number) => {
-    console.log("\n=== PHOTO PRESS ===");
-    console.log("📸 Pressed photo index:", index);
-    console.log("📊 Gallery images length:", galleryImages.length);
-    console.log(
-      "📋 Gallery images:",
-      galleryImages.map((img: { id?: string; uri?: string }, i: number) => ({
-        index: i,
-        id: img.id?.substring(0, 8) || "NO ID",
-        uri: img.uri?.substring(0, 50) || "NO URI",
-      }))
-    );
-
     // Ensure index is within bounds before opening gallery
     if (galleryImages.length === 0) {
-      console.error("❌ CRITICAL: Gallery images array is empty!");
-      console.log("=== END PHOTO PRESS ===\n");
       return;
     }
 
     const safeIndex = Math.max(0, Math.min(index, galleryImages.length - 1));
-    console.log("✅ Safe index calculated:", safeIndex);
-
-    if (index !== safeIndex) {
-      console.warn("⚠️  Index was out of bounds, clamped to:", safeIndex);
-    }
 
     if (safeIndex < 0 || safeIndex >= galleryImages.length) {
-      console.error("❌ CRITICAL: Safe index still out of bounds!");
-      console.error("   Safe index:", safeIndex);
-      console.error("   Gallery length:", galleryImages.length);
-      console.log("=== END PHOTO PRESS ===\n");
       return;
     }
-
-    console.log(
-      `✅ Opening gallery at index ${safeIndex} of ${galleryImages.length}`
-    );
-    console.log(
-      "   Image ID:",
-      galleryImages[safeIndex]?.id?.substring(0, 8) || "NO ID"
-    );
-    console.log(
-      "   Image URI:",
-      galleryImages[safeIndex]?.uri?.substring(0, 50) || "NO URI"
-    );
-    console.log("=== END PHOTO PRESS ===\n");
 
     setSelectedImageIndex(safeIndex);
     setGalleryVisible(true);
@@ -644,11 +619,11 @@ export default function ProjectDetailScreen() {
         },
         headerContent: {
           flex: 1,
+          marginTop: DesignTokens.spacing[2], // Add space for status badge
         },
         statusBadge: {
-          position: "absolute",
-          top: DesignTokens.spacing[6],
-          right: DesignTokens.spacing[6],
+          alignSelf: "flex-end",
+          marginBottom: DesignTokens.spacing[2],
           paddingHorizontal: DesignTokens.spacing[3],
           paddingVertical: DesignTokens.spacing[1],
           borderRadius: DesignTokens.borderRadius.full,
@@ -696,6 +671,19 @@ export default function ProjectDetailScreen() {
           ...commonStyles.text.value,
           flex: 1,
           textAlign: "right",
+        },
+        metaValuePill: {
+          alignItems: "flex-end",
+        },
+        statusPill: {
+          paddingHorizontal: DesignTokens.spacing[3],
+          paddingVertical: DesignTokens.spacing[1],
+          borderRadius: DesignTokens.borderRadius.full,
+          minWidth: 80,
+          alignItems: "center",
+        },
+        statusPillText: {
+          ...commonStyles.text.badge,
         },
         section: {
           backgroundColor: theme.colors.background.card,
@@ -1200,7 +1188,7 @@ export default function ProjectDetailScreen() {
           {/* Component Selector - only show if multiple components */}
           {project.components.length > 1 && (
             <ComponentSelector
-              components={project.components}
+              components={sortedComponents}
               selectedComponentId={selectedComponentId}
               onSelectComponent={setSelectedComponentId}
               getComponentLabel={getComponentLabel}
@@ -1232,26 +1220,6 @@ export default function ProjectDetailScreen() {
               </ThemedText>
             </ThemedView>
 
-            {/* Status Badge */}
-            <ThemedView
-              style={[
-                styles.statusBadge,
-                {
-                  backgroundColor: getStatusBadgeStyle(project.status)
-                    .backgroundColor,
-                },
-              ]}
-            >
-              <ThemedText
-                style={[
-                  styles.statusBadgeText,
-                  { color: getStatusBadgeStyle(project.status).color },
-                ]}
-              >
-                {project.status.replace("-", " ").toUpperCase()}
-              </ThemedText>
-            </ThemedView>
-
             {/* Project Meta */}
             <ThemedView style={styles.metaGrid}>
               <ThemedView style={styles.metaItem}>
@@ -1263,9 +1231,26 @@ export default function ProjectDetailScreen() {
                 >
                   Status
                 </ThemedText>
-                <ThemedText style={styles.metaValue}>
-                  {project.status.replace("-", " ").toUpperCase()}
-                </ThemedText>
+                <ThemedView style={styles.metaValuePill}>
+                  <ThemedView
+                    style={[
+                      styles.statusPill,
+                      {
+                        backgroundColor: getStatusBadgeStyle(project.status)
+                          .backgroundColor,
+                      },
+                    ]}
+                  >
+                    <ThemedText
+                      style={[
+                        styles.statusPillText,
+                        { color: getStatusBadgeStyle(project.status).color },
+                      ]}
+                    >
+                      {project.status.replace("-", " ").toUpperCase()}
+                    </ThemedText>
+                  </ThemedView>
+                </ThemedView>
               </ThemedView>
               <ThemedView style={styles.metaItem}>
                 <ThemedText
@@ -1356,17 +1341,6 @@ export default function ProjectDetailScreen() {
                           ? galleryIndex
                           : Math.min(previewIndex, galleryImages.length - 1);
 
-                      if (galleryIndex < 0) {
-                        console.warn(
-                          `⚠️  Preview photo [${previewIndex}] not found in galleryImages:`,
-                          {
-                            itemId: item.id?.substring(0, 8) || "NO ID",
-                            itemUrl: item.url?.substring(0, 50) || "NO URL",
-                            usingFallbackIndex: safeIndex,
-                          }
-                        );
-                      }
-
                       return renderGridImage(item, safeIndex);
                     })}
                     {/* "+X more" card */}
@@ -1456,11 +1430,13 @@ export default function ProjectDetailScreen() {
               </View>
 
               {/* Asset Category Tabs */}
-              <AssetCategoryTabs
-                activeTab={selectedAssetCategory}
-                onTabChange={setSelectedAssetCategory}
-                documents={currentDocuments}
-              />
+              {currentDocuments.length > 0 && (
+                <AssetCategoryTabs
+                  activeTab={selectedAssetCategory || "other"}
+                  onTabChange={setSelectedAssetCategory}
+                  documents={currentDocuments}
+                />
+              )}
 
               {/* Asset Thumbnails */}
               <ScrollView
@@ -1473,89 +1449,28 @@ export default function ProjectDetailScreen() {
                     key={doc.id}
                     document={doc}
                     onPress={() => {
-                      console.log("\n=== ASSET PRESS ===");
-                      console.log("📄 Pressed document:", {
-                        id: doc.id.substring(0, 8),
-                        filename: doc.filename,
-                        fileType: doc.fileType,
-                      });
-
                       // Check if this is an image
                       const isImage =
                         doc.fileType?.includes("image/") ||
                         doc.filename.match(/\.(jpg|jpeg|png|heic)$/i);
-
-                      console.log("🖼️  Is image?", isImage);
 
                       if (isImage) {
                         // Look up this document's index in the gallery using URL
                         // URLs are consistent between documents and gallery images
                         const galleryIndex = documentToImageIndex.get(doc.url);
 
-                        console.log("🔍 Looking up gallery index...");
-                        console.log(
-                          "  - Document URL:",
-                          doc.url.substring(0, 50)
-                        );
-                        console.log("  - Document ID:", doc.id.substring(0, 8));
-                        console.log("  - Found index:", galleryIndex);
-                        console.log(
-                          "  - Gallery length:",
-                          assetGalleryImages.length
-                        );
-                        console.log(
-                          "  - Map has entry?",
-                          documentToImageIndex.has(doc.url)
-                        );
-
-                        if (galleryIndex === undefined) {
-                          console.error(
-                            "❌ CRITICAL: Document URL not found in index map!"
-                          );
-                          console.error(
-                            "   This document was filtered out by convertDocumentsToPictures"
-                          );
-                          console.error("   Document:", {
-                            id: doc.id,
-                            filename: doc.filename,
-                            fileType: doc.fileType,
-                            url: doc.url,
-                          });
-                          console.error(
-                            "   Available URLs in map:",
-                            Array.from(documentToImageIndex.keys()).map((k) =>
-                              k.substring(0, 60)
-                            )
-                          );
-                          return; // Don't try to open - it will crash
-                        }
-
-                        // Validate index is in bounds
                         if (
+                          galleryIndex === undefined ||
                           galleryIndex < 0 ||
                           galleryIndex >= assetGalleryImages.length
                         ) {
-                          console.error("❌ CRITICAL: Index out of bounds!");
-                          console.error("   Index:", galleryIndex);
-                          console.error(
-                            "   Gallery length:",
-                            assetGalleryImages.length
-                          );
-                          return; // Don't try to open - it will crash
+                          return;
                         }
-
-                        console.log(
-                          `✅ Opening gallery at index ${galleryIndex} of ${assetGalleryImages.length}`
-                        );
-                        console.log("=== END ASSET PRESS ===\n");
 
                         setSelectedAssetIndex(galleryIndex);
                         setAssetGalleryVisible(true);
                       } else {
                         // This is a PDF - open PDF viewer
-                        console.log("📄 Opening PDF viewer");
-                        console.log("=== END ASSET PRESS ===\n");
-
                         router.push({
                           pathname: "/pdf-viewer",
                           params: {
@@ -1659,26 +1574,10 @@ export default function ProjectDetailScreen() {
         <ImageGalleryModal
           visible={galleryVisible}
           images={galleryImages}
-          initialIndex={(() => {
-            const clampedIndex = Math.max(
-              0,
-              Math.min(selectedImageIndex, galleryImages.length - 1)
-            );
-            console.log("\n=== OPENING PHOTO GALLERY MODAL ===");
-            console.log("📊 Gallery images count:", galleryImages.length);
-            console.log("📌 Requested index:", selectedImageIndex);
-            console.log("✅ Clamped index:", clampedIndex);
-            if (selectedImageIndex !== clampedIndex) {
-              console.warn(
-                "⚠️  Index was clamped from",
-                selectedImageIndex,
-                "to",
-                clampedIndex
-              );
-            }
-            console.log("=== END OPENING MODAL ===\n");
-            return clampedIndex;
-          })()}
+          initialIndex={Math.max(
+            0,
+            Math.min(selectedImageIndex, galleryImages.length - 1)
+          )}
           onClose={closeGallery}
         />
       )}
@@ -1693,7 +1592,6 @@ export default function ProjectDetailScreen() {
             Math.min(selectedAssetIndex, assetGalleryImages.length - 1)
           )}
           onClose={() => {
-            console.log("🚪 Closing asset gallery");
             setAssetGalleryVisible(false);
           }}
         />

@@ -113,15 +113,36 @@ const staticSectionStyles = StyleSheet.create({
  * Displays project thumbnail, name, brief description, and featured badge.
  * Optimized for horizontal FlatList with consistent sizing.
  */
-function FeaturedProjectCard({ project }: { project: Project }) {
+function FeaturedProjectCard({ 
+  project, 
+  category 
+}: { 
+  project: Project;
+  category: ComponentCategory;
+}) {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
   const shadowElevation = useSharedValue(4);
 
   const handlePress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(`/project/${project.id}`);
-  }, [project.id]);
+    
+    // Find the component that matches the category for this section
+    const matchingComponent = project.components.find(
+      (c) => c.category === category
+    );
+    
+    if (matchingComponent) {
+      // Navigate with componentId param to open directly to that component
+      router.push({
+        pathname: `/project/${project.id}`,
+        params: { componentId: matchingComponent.id },
+      });
+    } else {
+      // Fallback: no matching component found, just navigate to project
+      router.push(`/project/${project.id}`);
+    }
+  }, [project.id, project.components, category]);
 
   const handlePressIn = useCallback(() => {
     scale.value = withSpring(0.97, {
@@ -210,7 +231,7 @@ function FeaturedProjectCard({ project }: { project: Project }) {
       style={[dynamicStyles.card, animatedCardStyle]}
       accessibilityRole="button"
       accessibilityLabel={`View ${project.name} project details`}
-      accessibilityHint="Double tap to view full project details"
+      accessibilityHint="Tap to view full project details"
     >
       {/* Project Image */}
       <View style={staticCardStyles.imageContainer}>
@@ -294,10 +315,10 @@ export function FeaturedCategorySection({
   const renderCard = useCallback(
     ({ item }: ListRenderItemInfo<Project>) => (
       <View style={staticSectionStyles.cardWrapper}>
-        <FeaturedProjectCard project={item} />
+        <FeaturedProjectCard project={item} category={category} />
       </View>
     ),
-    []
+    [category]
   );
 
   // Fixed getItemLayout - accounts for listContainer paddingLeft

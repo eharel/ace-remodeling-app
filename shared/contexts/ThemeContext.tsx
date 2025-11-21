@@ -93,7 +93,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         setThemeSettingState(savedSetting as ThemeSetting);
       }
     } catch (error) {
-      console.warn("Failed to load theme mode:", error);
+      // Fail silently - will use default theme
     } finally {
       setIsLoaded(true);
     }
@@ -104,7 +104,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     try {
       await AsyncStorage.setItem(THEME_SETTING_KEY, setting);
     } catch (error) {
-      console.warn("Failed to save theme setting:", error);
+      // Fail silently
     }
   };
 

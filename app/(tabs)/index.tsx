@@ -11,10 +11,12 @@ import { DesignTokens } from "@/core/themes";
 import {
   ComponentCategory,
   CORE_CATEGORIES,
+  CoreCategory,
 } from "@/core/types/ComponentCategory";
 import { FeaturedCategorySection, HeroCarousel } from "@/features/showcase";
 import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
+import { CATEGORY_DISPLAY_ORDER } from "@/shared/utils";
 
 /**
  * Showcase Tab - Portfolio Showcase Screen
@@ -70,10 +72,25 @@ export default function ShowcaseScreen() {
 
   /**
    * Get sorted array of categories with featured projects
-   * Sorted by category name for consistent ordering
+   * Sorted by CATEGORY_DISPLAY_ORDER for consistent ordering
    */
   const categoriesWithFeatured = useMemo(() => {
-    return Array.from(featuredByCategory.keys()).sort();
+    const orderedCategories = Array.from(featuredByCategory.keys()).filter(
+      (cat): cat is CoreCategory => {
+        return Object.values(CORE_CATEGORIES).includes(cat as CoreCategory);
+      }
+    );
+
+    // Sort by display order
+    return orderedCategories.sort((a, b) => {
+      const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a);
+      const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b);
+      // If not in order array, put at end
+      if (orderA === -1 && orderB === -1) return 0;
+      if (orderA === -1) return 1;
+      if (orderB === -1) return -1;
+      return orderA - orderB;
+    });
   }, [featuredByCategory]);
 
   const styles = StyleSheet.create({

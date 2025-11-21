@@ -67,16 +67,17 @@ export type ComponentSubcategory = string;
  * Human-readable display labels for core categories
  *
  * Maps core category keys to user-friendly text for UI display.
+ * Used for component tabs and other UI elements where singular form is preferred.
  */
 export const CORE_CATEGORY_LABELS: Record<CoreCategory, string> = {
-  [CORE_CATEGORIES.BATHROOM]: "Bathrooms",
-  [CORE_CATEGORIES.KITCHEN]: "Kitchens",
-  [CORE_CATEGORIES.FULL_HOME]: "Full Home Renovations",
-  [CORE_CATEGORIES.ADU_ADDITION]: "ADUs & Additions",
-  [CORE_CATEGORIES.OUTDOOR_LIVING]: "Outdoor Living",
+  [CORE_CATEGORIES.BATHROOM]: "Bathroom",
+  [CORE_CATEGORIES.KITCHEN]: "Kitchen",
+  [CORE_CATEGORIES.FULL_HOME]: "Full Home",
+  [CORE_CATEGORIES.ADU_ADDITION]: "ADU-Addition",
+  [CORE_CATEGORIES.OUTDOOR_LIVING]: "Outdoor",
   [CORE_CATEGORIES.NEW_CONSTRUCTION]: "New Construction",
-  [CORE_CATEGORIES.COMMERCIAL]: "Commercial Projects",
-  [CORE_CATEGORIES.MISCELLANEOUS]: "Other Projects",
+  [CORE_CATEGORIES.COMMERCIAL]: "Commercial",
+  [CORE_CATEGORIES.MISCELLANEOUS]: "Other",
 };
 
 /**

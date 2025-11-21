@@ -9,13 +9,12 @@ import { useTheme } from "@/shared/contexts";
 /**
  * Asset category tab type definition
  */
-export type AssetCategoryValue = "all" | "floor-plan" | "materials" | "rendering-3d" | "contract" | "permit" | "invoice" | "other";
+export type AssetCategoryValue = "floor-plan" | "materials" | "rendering-3d" | "contract" | "permit" | "invoice" | "other";
 
 /**
  * Asset category counts for each category
  */
 export interface AssetCounts {
-  all: number;
   "floor-plan": number;
   materials: number;
   "rendering-3d": number;
@@ -100,7 +99,6 @@ export const AssetCategoryTabs: React.FC<AssetCategoryTabsProps> = ({
   // Calculate counts for each category using doc.category
   const assetCounts = useMemo<AssetCounts>(() => {
     const counts: AssetCounts = {
-      all: documents.length,
       "floor-plan": 0,
       materials: 0,
       "rendering-3d": 0,
@@ -123,7 +121,6 @@ export const AssetCategoryTabs: React.FC<AssetCategoryTabsProps> = ({
   // Helper function to get label for tab value
   const getTabLabel = (tabValue: AssetCategoryValue): string => {
     const labels: Record<AssetCategoryValue, string> = {
-      "all": "All",
       "floor-plan": "Plans",
       "materials": "Materials",
       "rendering-3d": "Renderings",
@@ -137,13 +134,7 @@ export const AssetCategoryTabs: React.FC<AssetCategoryTabsProps> = ({
 
   // Build tab configurations - only show tabs for categories that have documents
   const tabs: TabConfig[] = useMemo(() => {
-    const tabConfigs: TabConfig[] = [
-      {
-        value: "all",
-        label: "All",
-        accessibilityLabel: `All assets, ${assetCounts.all} total`,
-      },
-    ];
+    const tabConfigs: TabConfig[] = [];
 
     // Add tabs for each category that has documents (ordered by priority)
     const categoryOrder: AssetCategoryValue[] = [

@@ -95,44 +95,21 @@ export function openAsset(
  * @returns Array of Picture objects for gallery display
  */
 export function convertDocumentsToPictures(documents: Document[]): Picture[] {
-  console.log("\n=== CONVERT DOCUMENTS TO PICTURES ===");
-  console.log("📦 Input documents:", documents.length);
-
-  const result = documents
+  return documents
     .filter(
       (d) =>
         d.fileType?.includes("image/") ||
         d.filename.match(/\.(jpg|jpeg|png|heic)$/i)
     )
     .filter((d) => d.url && d.url.trim().length > 0) // Ensure URL exists and is not empty
-    .map((d) => {
-      console.log(`  📄 Mapping doc:`, {
-        docId: d.id,
-        filename: d.filename,
-        idType: typeof d.id,
-        idLength: d.id?.length,
-      });
-      return {
-        uri: d.url,
-        id: d.id,
-        type: d.category || d.type || "Other",
-        description: d.name || d.filename || undefined,
-        thumbnailUrl: d.thumbnailUrl,
-      };
-    })
+    .map((d) => ({
+      uri: d.url,
+      id: d.id,
+      type: d.category || d.type || "Other",
+      description: d.name || d.filename || undefined,
+      thumbnailUrl: d.thumbnailUrl,
+    }))
     .filter((pic) => pic.uri && pic.uri.trim().length > 0); // Final safety check
-
-  console.log("🖼️  Output pictures:", result.length);
-  result.forEach((pic, i) => {
-    console.log(
-      `  [${i}] id: ${pic.id} (type: ${typeof pic.id}, length: ${
-        pic.id?.length
-      })`
-    );
-  });
-  console.log("=== END CONVERT ===\n");
-
-  return result;
 }
 
 /**

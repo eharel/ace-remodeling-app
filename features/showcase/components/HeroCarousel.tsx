@@ -219,7 +219,7 @@ const HeroSlide = React.memo(
         onPressOut={handlePressOut}
         accessibilityRole="button"
         accessibilityLabel={`View ${project.name} project details`}
-        accessibilityHint="Double tap to view full project details"
+        accessibilityHint="Tap to view full project details"
       >
         {/* Project Image */}
         <Image
