@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
+import { useTheme } from "@/shared/contexts";
 import { SegmentedControlProps } from "./types";
 import { formatLabel } from "./utils";
 import PillOption from "./PillOption";
+import TabOption from "./TabOption";
 
 /**
  * SegmentedControl - Unified selection component with multiple visual variants
@@ -46,6 +48,8 @@ export function SegmentedControl<T extends string>({
   ariaLabel,
   testID,
 }: SegmentedControlProps<T>) {
+  const { theme } = useTheme();
+
   /**
    * Pure function: format display text for an option
    * 
@@ -65,12 +69,39 @@ export function SegmentedControl<T extends string>({
     return `${label} (${count})`;
   };
 
+  // Dynamic styles based on variant (tabs need border-bottom and different spacing)
+  const containerStyle = useMemo(
+    () => [
+      variant === "tabs"
+        ? {
+            borderBottomWidth: 1,
+            borderBottomColor: theme.colors.border.secondary,
+            marginBottom: DesignTokens.spacing[4],
+            paddingVertical: 0, // Tabs don't need vertical padding
+          }
+        : {
+            paddingVertical: DesignTokens.spacing[3],
+          },
+      { backgroundColor: "transparent" },
+    ],
+    [variant, theme]
+  );
+
+  const scrollContentStyle = useMemo(
+    () => ({
+      paddingHorizontal: DesignTokens.spacing[4],
+      gap: variant === "tabs" ? DesignTokens.spacing[6] : DesignTokens.spacing[3],
+      flexDirection: "row" as const,
+    }),
+    [variant]
+  );
+
   return (
-    <View style={staticStyles.container} testID={testID}>
+    <View style={containerStyle} testID={testID}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={staticStyles.scrollContent}
+        contentContainerStyle={scrollContentStyle}
         accessibilityLabel={ariaLabel}
         accessibilityRole="tablist"
       >
@@ -93,10 +124,9 @@ export function SegmentedControl<T extends string>({
             );
           }
 
-          // Tab variant will be added in Stage 2
-          // For now, fallback to pill for development/testing
+          // Tab variant
           return (
-            <PillOption
+            <TabOption
               key={option}
               label={displayText}
               isSelected={isSelected}
@@ -110,17 +140,4 @@ export function SegmentedControl<T extends string>({
     </View>
   );
 }
-
-// Static styles (performance optimization - created once, not on every render)
-const staticStyles = StyleSheet.create({
-  container: {
-    paddingVertical: DesignTokens.spacing[3],
-    backgroundColor: "transparent",
-  },
-  scrollContent: {
-    paddingHorizontal: DesignTokens.spacing[4],
-    gap: DesignTokens.spacing[3],
-    flexDirection: "row",
-  },
-});
 

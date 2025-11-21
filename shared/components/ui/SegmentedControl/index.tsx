@@ -7,6 +7,7 @@
  * - SegmentedControl: Main component
  * - Types: TypeScript interfaces and types
  * - Utils: Helper functions
+ * - Variants: PillOption and TabOption (for testing or advanced usage)
  */
 
 export { SegmentedControl } from "./SegmentedControl";
@@ -16,4 +17,6 @@ export type {
   OptionComponentProps,
 } from "./types";
 export { formatLabel, isValidOption } from "./utils";
+export { default as PillOption } from "./PillOption";
+export { default as TabOption } from "./TabOption";
 
