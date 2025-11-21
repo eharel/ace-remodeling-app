@@ -1,31 +1,26 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
 import {
   FlatList,
   ListRenderItemInfo,
-  Pressable,
   StyleSheet,
   View,
 } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
 
 import { getCategoryConfig } from "@/core/constants/categoryConfig";
 import { DesignTokens } from "@/core/themes";
-import { Project, getProjectThumbnail } from "@/core/types";
+import { Project, ProjectSummary, getProjectThumbnail } from "@/core/types";
+import {
+  getProjectCompletionDate,
+} from "@/core/types/ProjectUtils";
 import { ComponentCategory, CoreCategory } from "@/core/types/ComponentCategory";
+import { ProjectCard } from "@/features/projects";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { getCategoryIcon } from "@/shared/utils";
 
 const CARD_WIDTH = 300; // ~280-320px for iPad
-const CARD_HEIGHT = 240; // ~200-240px tall
 const CARD_SPACING = DesignTokens.spacing[4];
 const LIST_PADDING_LEFT = DesignTokens.spacing[6];
 const BLURHASH_PLACEHOLDER = "L6PZfSi_.AyE_3t7t7R**0o#DgR4";
@@ -34,43 +29,6 @@ interface FeaturedCategorySectionProps {
   category: ComponentCategory;
   projects: Project[];
 }
-
-// Static styles - created once, never change
-const staticCardStyles = StyleSheet.create({
-  imageContainer: {
-    width: "100%",
-    height: 160,
-    position: "relative",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: "#000", // Prevent white flash while loading
-  },
-  featuredIcon: {
-    marginRight: DesignTokens.spacing[1],
-  },
-  content: {
-    padding: DesignTokens.spacing[3],
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  title: {
-    fontSize: DesignTokens.typography.fontSize.base,
-    lineHeight:
-      DesignTokens.typography.fontSize.base *
-      DesignTokens.typography.lineHeight.tight,
-    fontWeight: DesignTokens.typography.fontWeight.semibold,
-    fontFamily: DesignTokens.typography.fontFamily.semibold,
-    marginBottom: DesignTokens.spacing[1],
-  },
-  description: {
-    fontSize: DesignTokens.typography.fontSize.sm,
-    lineHeight:
-      DesignTokens.typography.fontSize.sm *
-      DesignTokens.typography.lineHeight.normal,
-  },
-});
 
 const staticSectionStyles = StyleSheet.create({
   section: {
@@ -108,172 +66,29 @@ const staticSectionStyles = StyleSheet.create({
 });
 
 /**
- * FeaturedProjectCard - Card component for horizontal scrolling featured projects
- *
- * Displays project thumbnail, name, brief description, and featured badge.
- * Optimized for horizontal FlatList with consistent sizing.
+ * Convert Project to ProjectSummary for use with ProjectCard
  */
-function FeaturedProjectCard({ 
-  project, 
-  category 
-}: { 
-  project: Project;
-  category: ComponentCategory;
-}) {
-  const { theme } = useTheme();
-  const scale = useSharedValue(1);
-  const shadowElevation = useSharedValue(4);
-
-  const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    
-    // Find the component that matches the category for this section
-    const matchingComponent = project.components.find(
-      (c) => c.category === category
-    );
-    
-    if (matchingComponent) {
-      // Navigate with componentId param to open directly to that component
-      router.push({
-        pathname: `/project/${project.id}`,
-        params: { componentId: matchingComponent.id },
-      });
-    } else {
-      // Fallback: no matching component found, just navigate to project
-      router.push(`/project/${project.id}`);
-    }
-  }, [project.id, project.components, category]);
-
-  const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.97, {
-      damping: 18,
-      stiffness: 200,
-      mass: 1,
-    });
-    shadowElevation.value = withSpring(8, {
-      damping: 18,
-      stiffness: 200,
-    });
-  }, [scale, shadowElevation]);
-
-  const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, {
-      damping: 18,
-      stiffness: 200,
-      mass: 1,
-    });
-    shadowElevation.value = withSpring(4, {
-      damping: 18,
-      stiffness: 200,
-    });
-  }, [scale, shadowElevation]);
-
-  const animatedCardStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    shadowOpacity: shadowElevation.value / 10,
-    shadowRadius: shadowElevation.value * 1.5,
-    elevation: shadowElevation.value,
-  }));
-
-  // Dynamic styles - only theme-dependent colors
-  const dynamicStyles = useMemo(
-    () =>
-      StyleSheet.create({
-        card: {
-          width: CARD_WIDTH,
-          height: CARD_HEIGHT,
-          backgroundColor: theme.colors.background.card,
-          borderRadius: DesignTokens.borderRadius.lg,
-          overflow: "hidden",
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          shadowColor: theme.colors.components.card.shadow,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.15,
-          shadowRadius: 6,
-          elevation: 4,
-        },
-        featuredBadge: {
-          position: "absolute",
-          top: DesignTokens.spacing[2],
-          right: DesignTokens.spacing[2],
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
-          paddingHorizontal: DesignTokens.spacing[2],
-          paddingVertical: DesignTokens.spacing[1],
-          borderRadius: DesignTokens.borderRadius.md,
-          shadowColor: theme.colors.showcase.accent,
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.4,
-          shadowRadius: 3,
-          elevation: 2,
-        },
-        title: {
-          ...staticCardStyles.title,
-          color: theme.colors.text.primary,
-        },
-        description: {
-          ...staticCardStyles.description,
-          color: theme.colors.text.secondary,
-        },
-      }),
-    [theme]
+function convertProjectToSummary(
+  project: Project,
+  category: ComponentCategory
+): ProjectSummary {
+  // Find the matching component for this category
+  const matchingComponent = project.components.find(
+    (c) => c.category === category
   );
 
-  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-  return (
-    <AnimatedPressable
-      onPress={handlePress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={[dynamicStyles.card, animatedCardStyle]}
-      accessibilityRole="button"
-      accessibilityLabel={`View ${project.name} project details`}
-      accessibilityHint="Tap to view full project details"
-    >
-      {/* Project Image */}
-      <View style={staticCardStyles.imageContainer}>
-        <Image
-          source={{ uri: getProjectThumbnail(project) }}
-          style={staticCardStyles.image}
-          contentFit="cover"
-          placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
-          transition={200}
-          cachePolicy="memory-disk"
-        />
-        {/* Featured Badge */}
-        <View style={dynamicStyles.featuredBadge}>
-          <MaterialIcons
-            name="star"
-            size={14}
-            color={theme.colors.showcase.accent}
-            style={staticCardStyles.featuredIcon}
-          />
-          <ThemedText
-            style={{
-              fontSize: DesignTokens.typography.fontSize.xs,
-              color: "#ffffff",
-              fontWeight: DesignTokens.typography.fontWeight.semibold,
-            }}
-          >
-            Featured
-          </ThemedText>
-        </View>
-      </View>
-
-      {/* Project Info */}
-      <View style={staticCardStyles.content}>
-        <ThemedText style={dynamicStyles.title} numberOfLines={1}>
-          {project.name}
-        </ThemedText>
-        <ThemedText style={dynamicStyles.description} numberOfLines={2}>
-          {project.summary}
-        </ThemedText>
-      </View>
-    </AnimatedPressable>
-  );
+  return {
+    id: project.id,
+    projectNumber: project.number,
+    name: project.name,
+    category: category,
+    subcategory: matchingComponent?.subcategory,
+    briefDescription: project.summary,
+    thumbnail: getProjectThumbnail(project),
+    status: project.status,
+    isFeatured: project.isFeatured,
+    completedAt: getProjectCompletionDate(project),
+  };
 }
 
 /**
@@ -312,13 +127,46 @@ export function FeaturedCategorySection({
     [theme]
   );
 
+  const handleProjectPress = useCallback(
+    (projectSummary: ProjectSummary) => {
+      // Find the original project to get component information
+      const project = projects.find((p) => p.id === projectSummary.id);
+      if (!project) return;
+
+      // Find the component that matches the category for this section
+      const matchingComponent = project.components.find(
+        (c) => c.category === category
+      );
+
+      if (matchingComponent) {
+        // Navigate with componentId param to open directly to that component
+        router.push({
+          pathname: `/project/${project.id}`,
+          params: { componentId: matchingComponent.id },
+        });
+      } else {
+        // Fallback: no matching component found, just navigate to project
+        router.push(`/project/${project.id}`);
+      }
+    },
+    [projects, category]
+  );
+
   const renderCard = useCallback(
-    ({ item }: ListRenderItemInfo<Project>) => (
-      <View style={staticSectionStyles.cardWrapper}>
-        <FeaturedProjectCard project={item} category={category} />
-      </View>
-    ),
-    [category]
+    ({ item }: ListRenderItemInfo<Project>) => {
+      const projectSummary = convertProjectToSummary(item, category);
+      return (
+        <View style={staticSectionStyles.cardWrapper}>
+          <ProjectCard
+            project={projectSummary}
+            onPress={handleProjectPress}
+            variant="horizontal"
+            blurhashPlaceholder={BLURHASH_PLACEHOLDER}
+          />
+        </View>
+      );
+    },
+    [category, handleProjectPress]
   );
 
   // Fixed getItemLayout - accounts for listContainer paddingLeft

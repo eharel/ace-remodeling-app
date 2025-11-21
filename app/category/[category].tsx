@@ -144,6 +144,7 @@ export default function CategoryScreen() {
           briefDescription: project.summary,
           thumbnail: getProjectThumbnail(project),
           status: project.status,
+          isFeatured: project.isFeatured,
           completedAt: getProjectCompletionDate(project),
         };
       });
