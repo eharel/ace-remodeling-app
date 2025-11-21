@@ -149,16 +149,18 @@ export function ProjectGallery({
     },
   });
 
+  // Memoize style object to prevent recreation on every render
+  const cardStyle = useMemo(
+    () => (itemWidth ? { width: itemWidth } : { flex: 1 }),
+    [itemWidth]
+  );
+
   // Memoize render function to prevent unnecessary re-renders
   const renderProject = useCallback(
     ({ item }: { item: ProjectSummary }) => (
-      <ProjectCard
-        project={item}
-        onPress={onProjectPress}
-        style={itemWidth ? { width: itemWidth } : { flex: 1 }}
-      />
+      <ProjectCard project={item} onPress={onProjectPress} style={cardStyle} />
     ),
-    [onProjectPress, itemWidth]
+    [onProjectPress, cardStyle]
   );
 
   // Memoize key extractor
@@ -212,9 +214,10 @@ export function ProjectGallery({
         })}
         key={columnCount} // Force re-render when column count changes
         removeClippedSubviews={true} // Performance optimization for large lists
-        maxToRenderPerBatch={10} // Render 10 items per batch
-        windowSize={10} // Keep 10 screens worth of items in memory
-        initialNumToRender={6} // Render 6 items initially
+        maxToRenderPerBatch={5} // Render 5 items per batch (reduced for better performance)
+        windowSize={5} // Keep 5 screens worth of items in memory (reduced for better performance)
+        initialNumToRender={columnCount * 2} // Render 2 rows initially
+        updateCellsBatchingPeriod={50} // Batch updates every 50ms
         refreshControl={
           enableRefresh ? (
             <RefreshControl

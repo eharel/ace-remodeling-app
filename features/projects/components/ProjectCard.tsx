@@ -55,7 +55,7 @@ const HORIZONTAL_CARD_WIDTH = 300;
 const HORIZONTAL_CARD_HEIGHT = 240;
 const HORIZONTAL_IMAGE_HEIGHT = 160;
 
-export function ProjectCard({
+function ProjectCardComponent({
   project,
   onPress,
   style,
@@ -455,3 +455,29 @@ export function ProjectCard({
     </Pressable>
   );
 }
+
+// Memoize ProjectCard to prevent unnecessary re-renders in FlatList
+// This improves performance for large lists by only re-rendering when props actually change
+export const ProjectCard = React.memo(ProjectCardComponent, (prevProps, nextProps) => {
+  // Custom comparison function for better performance
+  // Only re-render if these key props change
+  // Note: We don't compare onPress or style as they may change reference but not meaning
+  return (
+    prevProps.project.id === nextProps.project.id &&
+    prevProps.project.thumbnail === nextProps.project.thumbnail &&
+    prevProps.project.name === nextProps.project.name &&
+    prevProps.project.briefDescription === nextProps.project.briefDescription &&
+    prevProps.project.isFeatured === nextProps.project.isFeatured &&
+    prevProps.project.status === nextProps.project.status &&
+    prevProps.project.subcategory === nextProps.project.subcategory &&
+    prevProps.project.category === nextProps.project.category &&
+    prevProps.variant === nextProps.variant &&
+    prevProps.showStatus === nextProps.showStatus &&
+    prevProps.showCategory === nextProps.showCategory &&
+    prevProps.enableAnimations === nextProps.enableAnimations &&
+    // Compare style by checking if width/flex values are the same
+    (prevProps.style === nextProps.style ||
+      (prevProps.style?.width === nextProps.style?.width &&
+        prevProps.style?.flex === nextProps.style?.flex))
+  );
+});
