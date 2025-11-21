@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   RefreshControl,
@@ -13,6 +13,9 @@ import { ProjectSummary } from "@/core/types";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import { ProjectCard } from "./ProjectCard";
+
+// Minimum duration for refresh animation to feel smooth (in milliseconds)
+const MIN_REFRESH_DURATION = 500;
 
 interface ProjectGalleryProps {
   projects: ProjectSummary[];
@@ -43,6 +46,41 @@ export function ProjectGallery({
   const { width } = useWindowDimensions();
   const { theme } = useTheme();
   const { refetchProjects, loading } = useProjects();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const refreshStartTime = useRef<number | null>(null);
+
+  // Handle smooth refresh animation when refresh is enabled
+  useEffect(() => {
+    if (!enableRefresh) return;
+
+    if (loading) {
+      // Refresh started - record start time
+      if (!refreshStartTime.current) {
+        refreshStartTime.current = Date.now();
+        setIsRefreshing(true);
+      }
+    } else {
+      // Refresh completed - wait for minimum duration before hiding spinner
+      if (refreshStartTime.current) {
+        const elapsed = Date.now() - refreshStartTime.current;
+        const remaining = Math.max(0, MIN_REFRESH_DURATION - elapsed);
+
+        const timeoutId = setTimeout(() => {
+          setIsRefreshing(false);
+          refreshStartTime.current = null;
+        }, remaining);
+
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [loading, enableRefresh]);
+
+  const handleRefresh = useCallback(async () => {
+    if (!enableRefresh) return;
+    refreshStartTime.current = Date.now();
+    setIsRefreshing(true);
+    await refetchProjects();
+  }, [enableRefresh, refetchProjects]);
 
   // Error handling: Ensure projects is an array
   const safeProjects = Array.isArray(projects) ? projects : [];
@@ -174,8 +212,8 @@ export function ProjectGallery({
         refreshControl={
           enableRefresh ? (
             <RefreshControl
-              refreshing={loading}
-              onRefresh={refetchProjects}
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
               tintColor={theme.colors.text.secondary}
               colors={[theme.colors.text.secondary]} // Android
             />
