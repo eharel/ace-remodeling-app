@@ -5,6 +5,7 @@ import { collection, getDocs } from "firebase/firestore";
 import React, {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -59,6 +60,12 @@ interface ProjectsContextType {
    * Includes full-home, adu-addition, outdoor, pools, commercial, new-construction.
    */
   featuredGeneralProjects: Project[];
+  /**
+   * Refetch projects from Firestore.
+   * Manually triggers a refresh of project data.
+   * Useful for pull-to-refresh functionality.
+   */
+  refetchProjects: () => Promise<void>;
 }
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(
@@ -76,38 +83,51 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  /**
+   * Fetch projects from Firestore.
+   * Extracted into a separate function so it can be reused for refetch.
+   */
+  const fetchProjects = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const projectsCollection = collection(db, PROJECTS_COLLECTION);
-        const querySnapshot = await getDocs(projectsCollection);
+      const projectsCollection = collection(db, PROJECTS_COLLECTION);
+      const querySnapshot = await getDocs(projectsCollection);
 
-        const projectsData: Project[] = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          projectsData.push({
-            id: doc.id,
-            ...data,
-            // Default isFeatured to false if not present in Firestore
-            isFeatured: data.isFeatured ?? false,
-          } as Project);
-        });
+      const projectsData: Project[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        projectsData.push({
+          id: doc.id,
+          ...data,
+          // Default isFeatured to false if not present in Firestore
+          isFeatured: data.isFeatured ?? false,
+        } as Project);
+      });
 
-        setProjects(projectsData);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to fetch projects";
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
+      setProjects(projectsData);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch projects";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  /**
+   * Refetch projects from Firestore.
+   * Exposed for pull-to-refresh functionality.
+   * Uses useCallback to avoid unnecessary re-creates.
+   */
+  const refetchProjects = useCallback(async () => {
+    await fetchProjects();
+  }, [fetchProjects]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
 
   // Memoized filtered projects to prevent unnecessary recalculations
   const bathroomProjects = useMemo(
@@ -198,6 +218,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       featuredBathroomProjects,
       featuredKitchenProjects,
       featuredGeneralProjects,
+      refetchProjects,
     }),
     [
       projects,
@@ -209,6 +230,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       featuredBathroomProjects,
       featuredKitchenProjects,
       featuredGeneralProjects,
+      refetchProjects,
     ]
   );
 

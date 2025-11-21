@@ -2,6 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useCallback, useMemo } from "react";
 import {
   FlatList,
+  RefreshControl,
   StyleSheet,
   useWindowDimensions,
   ViewStyle,
@@ -10,7 +11,7 @@ import {
 import { DesignTokens } from "@/core/themes";
 import { ProjectSummary } from "@/core/types";
 import { ThemedText, ThemedView } from "@/shared/components";
-import { useTheme } from "@/shared/contexts";
+import { useProjects, useTheme } from "@/shared/contexts";
 import { ProjectCard } from "./ProjectCard";
 
 interface ProjectGalleryProps {
@@ -18,6 +19,11 @@ interface ProjectGalleryProps {
   onProjectPress?: (project: ProjectSummary) => void;
   style?: ViewStyle; // Allow custom styling
   testID?: string; // For testing purposes
+  /**
+   * Enable pull-to-refresh functionality.
+   * When true, adds RefreshControl to the FlatList.
+   */
+  enableRefresh?: boolean;
 }
 
 // Calculate number of columns based on screen width - moved outside component for performance
@@ -32,9 +38,11 @@ export function ProjectGallery({
   onProjectPress,
   style,
   testID,
+  enableRefresh = false,
 }: ProjectGalleryProps) {
   const { width } = useWindowDimensions();
   const { theme } = useTheme();
+  const { refetchProjects, loading } = useProjects();
 
   // Error handling: Ensure projects is an array
   const safeProjects = Array.isArray(projects) ? projects : [];
@@ -163,6 +171,16 @@ export function ProjectGallery({
         maxToRenderPerBatch={10} // Render 10 items per batch
         windowSize={10} // Keep 10 screens worth of items in memory
         initialNumToRender={6} // Render 6 items initially
+        refreshControl={
+          enableRefresh ? (
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={refetchProjects}
+              tintColor={theme.colors.text.secondary}
+              colors={[theme.colors.text.secondary]} // Android
+            />
+          ) : undefined
+        }
         accessibilityLabel="Project list"
         accessibilityRole="list"
         testID={testID ? `${testID}-list` : "project-gallery-list"}

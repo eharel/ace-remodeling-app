@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -14,7 +14,13 @@ import {
   CoreCategory,
 } from "@/core/types/ComponentCategory";
 import { FeaturedCategorySection, HeroCarousel } from "@/features/showcase";
-import { LoadingState, PageHeader, ThemedText, ThemedView } from "@/shared/components";
+import {
+  LoadingState,
+  PageHeader,
+  RefreshableScrollView,
+  ThemedText,
+  ThemedView,
+} from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import { CATEGORY_DISPLAY_ORDER } from "@/shared/utils";
 
@@ -169,12 +175,12 @@ export default function ShowcaseScreen() {
         </View>
       </PageHeader>
 
-      <ScrollView
+      <RefreshableScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        {/* Loading State - Show while fetching projects */}
-        {loading ? (
+        {/* Loading State - Only show on initial load, not during refresh */}
+        {loading && featuredProjects.length === 0 ? (
           <LoadingState message="Loading showcase..." />
         ) : (
           <>
@@ -235,7 +241,7 @@ export default function ShowcaseScreen() {
             )}
           </>
         )}
-      </ScrollView>
+      </RefreshableScrollView>
     </ThemedView>
   );
 }

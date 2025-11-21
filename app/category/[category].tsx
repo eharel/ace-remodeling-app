@@ -131,7 +131,9 @@ export default function CategoryScreen() {
     router.replace(`/category/${newCategory}`);
   };
 
-  if (loading) {
+  // Show loading state only on initial load (when no projects exist yet)
+  // During refresh, keep content visible and just show refresh spinner
+  if (loading && projects.length === 0) {
     return (
       <ThemedView style={styles.container}>
         <Stack.Screen
@@ -247,6 +249,7 @@ export default function CategoryScreen() {
         <ProjectGallery
           projects={categoryProjects}
           onProjectPress={handleProjectPress}
+          enableRefresh={true}
         />
       </View>
     </ThemedView>
