@@ -3,10 +3,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
-  Button,
+  Alert,
+  Platform,
+  TextInput as RNTextInput,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -26,17 +27,59 @@ import { useVersionCheck } from "@/shared/hooks";
 export default function SettingsScreen() {
   const { theme } = useTheme();
   const router = useRouter();
-  const { updateRequired, isLoading } = useVersionCheck();
+  const { updateRequired } = useVersionCheck();
 
-  // Temporary test code to verify PIN authentication
-  const { user, isAuthenticated, signIn, signOut } = useAuth();
+  const { isAuthenticated, signIn, signOut } = useAuth();
   const [pinInput, setPinInput] = useState("");
-  const [message, setMessage] = useState("");
+  const [isEnabling, setIsEnabling] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSignIn = async () => {
-    const success = await signIn(pinInput);
-    setMessage(success ? "Sign in successful!" : "Invalid PIN");
+  const handleEnableEditMode = () => {
+    setIsEnabling(true);
+    setErrorMessage("");
+  };
+
+  const handleCancelPin = () => {
+    setIsEnabling(false);
     setPinInput("");
+    setErrorMessage("");
+  };
+
+  const handleSubmitPin = async () => {
+    if (!pinInput.trim()) {
+      setErrorMessage("Please enter a PIN");
+      return;
+    }
+
+    const success = await signIn(pinInput);
+
+    if (success) {
+      setIsEnabling(false);
+      setPinInput("");
+      setErrorMessage("");
+    } else {
+      setErrorMessage("Invalid PIN. Please try again.");
+      setPinInput("");
+    }
+  };
+
+  const handleDisableEditMode = () => {
+    if (Platform.OS === "ios") {
+      Alert.alert(
+        "Disable Edit Mode",
+        "Are you sure you want to return to read-only mode?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Disable",
+            style: "destructive",
+            onPress: signOut,
+          },
+        ]
+      );
+    } else {
+      signOut();
+    }
   };
 
   const styles = useMemo(
@@ -94,6 +137,83 @@ export default function SettingsScreen() {
           opacity: 0.6,
           marginTop: DesignTokens.spacing[2],
         },
+        editModeSection: {
+          marginBottom: DesignTokens.spacing[6],
+          padding: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.lg,
+        },
+        sectionHeader: {
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: DesignTokens.spacing[2],
+        },
+        sectionDescription: {
+          marginBottom: DesignTokens.spacing[4],
+        },
+        badge: {
+          paddingHorizontal: DesignTokens.spacing[2],
+          paddingVertical: DesignTokens.spacing[1],
+          borderRadius: DesignTokens.borderRadius.sm,
+        },
+        badgeText: {
+          fontSize: DesignTokens.typography.fontSize.xs,
+          fontWeight: DesignTokens.typography.fontWeight.bold as any,
+          letterSpacing: 0.5,
+        },
+        button: {
+          paddingVertical: DesignTokens.spacing[3],
+          paddingHorizontal: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.md,
+          alignItems: "center",
+          alignSelf: "flex-start",
+        },
+        disableButton: {
+          backgroundColor: "transparent",
+          borderWidth: 1,
+        },
+        buttonText: {
+          fontSize: DesignTokens.typography.fontSize.base,
+          fontWeight: DesignTokens.typography.fontWeight.semibold as any,
+        },
+        pinInputContainer: {
+          marginTop: DesignTokens.spacing[2],
+        },
+        pinLabel: {
+          marginBottom: DesignTokens.spacing[2],
+        },
+        pinInput: {
+          paddingVertical: DesignTokens.spacing[3],
+          paddingHorizontal: DesignTokens.spacing[4],
+          borderRadius: DesignTokens.borderRadius.md,
+          borderWidth: 1,
+          fontSize: DesignTokens.typography.fontSize.lg,
+          fontWeight: DesignTokens.typography.fontWeight.medium as any,
+          letterSpacing: 4,
+          textAlign: "center",
+        },
+        errorText: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          marginTop: DesignTokens.spacing[2],
+        },
+        pinButtonRow: {
+          flexDirection: "row",
+          marginTop: DesignTokens.spacing[4],
+        },
+        pinButton: {
+          flex: 1,
+          paddingVertical: DesignTokens.spacing[3],
+          borderRadius: DesignTokens.borderRadius.md,
+          alignItems: "center",
+        },
+        cancelButton: {
+          backgroundColor: "transparent",
+          borderWidth: 1,
+          marginRight: DesignTokens.spacing[2],
+        },
+        submitButton: {
+          // Background color set dynamically
+        },
       }),
     [theme]
   );
@@ -105,49 +225,6 @@ export default function SettingsScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.content}
       >
-        {/* Temporary test UI for PIN authentication */}
-        <View style={{ padding: DesignTokens.spacing[4] }}>
-          <ThemedText variant="body">
-            Current user: {user?.displayName}
-          </ThemedText>
-          <ThemedText variant="body">Role: {user?.role}</ThemedText>
-          <ThemedText variant="body">
-            Authenticated: {isAuthenticated ? "Yes" : "No"}
-          </ThemedText>
-
-          {!isAuthenticated && (
-            <>
-              <TextInput
-                value={pinInput}
-                onChangeText={setPinInput}
-                placeholder="Enter PIN"
-                secureTextEntry
-                style={{
-                  borderWidth: 1,
-                  padding: DesignTokens.spacing[3],
-                  marginVertical: DesignTokens.spacing[3],
-                  borderRadius: DesignTokens.borderRadius.md,
-                  borderColor: theme.colors.border.primary,
-                  color: theme.colors.text.primary,
-                  backgroundColor: theme.colors.background.card,
-                }}
-              />
-              <Button title="Sign In" onPress={handleSignIn} />
-            </>
-          )}
-
-          {isAuthenticated && <Button title="Sign Out" onPress={signOut} />}
-
-          {message ? (
-            <ThemedText
-              variant="body"
-              style={{ marginTop: DesignTokens.spacing[2] }}
-            >
-              {message}
-            </ThemedText>
-          ) : null}
-        </View>
-
         {/* Update Banner - Shows when app needs updating */}
         {updateRequired && <UpdateBanner updateRequired={updateRequired} />}
 
@@ -158,6 +235,152 @@ export default function SettingsScreen() {
           </ThemedText>
           <ThemeToggle />
         </View>
+
+        {/* Edit Mode Section */}
+        <ThemedView variant="card" style={styles.editModeSection}>
+          <View style={styles.sectionHeader}>
+            <ThemedText variant="subtitle" style={styles.sectionTitle}>
+              Edit Mode
+            </ThemedText>
+            {isAuthenticated && (
+              <View
+                style={[
+                  styles.badge,
+                  { backgroundColor: theme.colors.status.success },
+                ]}
+              >
+                <ThemedText
+                  style={[
+                    styles.badgeText,
+                    { color: theme.colors.text.inverse },
+                  ]}
+                >
+                  ENABLED
+                </ThemedText>
+              </View>
+            )}
+          </View>
+          <ThemedText variant="caption" style={styles.sectionDescription}>
+            {isAuthenticated
+              ? "Edit mode is enabled. You can add photos and update project information."
+              : "Enable edit mode to add photos, update projects, and manage content."}
+          </ThemedText>
+
+          {!isAuthenticated && !isEnabling && (
+            <TouchableOpacity
+              style={[
+                styles.button,
+                { backgroundColor: theme.colors.components.button.primary },
+              ]}
+              onPress={handleEnableEditMode}
+              activeOpacity={DesignTokens.interactions.activeOpacity}
+            >
+              <ThemedText
+                style={[
+                  styles.buttonText,
+                  { color: theme.colors.text.inverse },
+                ]}
+              >
+                Enable Edit Mode
+              </ThemedText>
+            </TouchableOpacity>
+          )}
+
+          {!isAuthenticated && isEnabling && (
+            <View style={styles.pinInputContainer}>
+              <ThemedText variant="body" style={styles.pinLabel}>
+                Enter PIN to enable edit mode:
+              </ThemedText>
+
+              <RNTextInput
+                value={pinInput}
+                onChangeText={(text) => {
+                  setPinInput(text);
+                  setErrorMessage("");
+                }}
+                placeholder="Enter PIN"
+                placeholderTextColor={theme.colors.components.input.placeholder}
+                secureTextEntry
+                keyboardType="number-pad"
+                maxLength={4}
+                autoFocus
+                returnKeyType="done"
+                onSubmitEditing={handleSubmitPin}
+                style={[
+                  styles.pinInput,
+                  {
+                    backgroundColor: theme.colors.components.input.background,
+                    borderColor: errorMessage
+                      ? theme.colors.status.error
+                      : theme.colors.components.input.border,
+                    color: theme.colors.text.primary,
+                  },
+                ]}
+              />
+              {errorMessage && (
+                <ThemedText
+                  style={[
+                    styles.errorText,
+                    { color: theme.colors.status.error },
+                  ]}
+                >
+                  {errorMessage}
+                </ThemedText>
+              )}
+              <View style={styles.pinButtonRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.pinButton,
+                    styles.cancelButton,
+                    { borderColor: theme.colors.border.primary },
+                  ]}
+                  onPress={handleCancelPin}
+                  activeOpacity={DesignTokens.interactions.activeOpacity}
+                >
+                  <ThemedText style={{ color: theme.colors.text.secondary }}>
+                    Cancel
+                  </ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.pinButton,
+                    styles.submitButton,
+                    {
+                      backgroundColor: theme.colors.components.button.primary,
+                    },
+                  ]}
+                  onPress={handleSubmitPin}
+                  activeOpacity={DesignTokens.interactions.activeOpacity}
+                >
+                  <ThemedText style={{ color: theme.colors.text.inverse }}>
+                    Submit
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {isAuthenticated && (
+            <TouchableOpacity
+              style={[
+                styles.button,
+                styles.disableButton,
+                { borderColor: theme.colors.status.error },
+              ]}
+              onPress={handleDisableEditMode}
+              activeOpacity={DesignTokens.interactions.activeOpacity}
+            >
+              <ThemedText
+                style={[
+                  styles.buttonText,
+                  { color: theme.colors.status.error },
+                ]}
+              >
+                Disable Edit Mode
+              </ThemedText>
+            </TouchableOpacity>
+          )}
+        </ThemedView>
 
         {/* About Section */}
         <View style={styles.section}>
