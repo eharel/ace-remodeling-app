@@ -13,13 +13,16 @@ import {
   ThemedView,
   ThemeToggle,
 } from "@/shared/components";
-import { useTheme } from "@/shared/contexts";
+import { useAuth, useTheme } from "@/shared/contexts";
 import { useVersionCheck } from "@/shared/hooks";
 
 export default function SettingsScreen() {
   const { theme } = useTheme();
   const router = useRouter();
   const { updateRequired, isLoading } = useVersionCheck();
+
+  // Temporary test code to verify auth context works
+  const { user, isAuthenticated, hasPermission, canEdit } = useAuth();
 
   const styles = useMemo(
     () =>

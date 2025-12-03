@@ -14,7 +14,12 @@ import { LogBox } from "react-native";
 
 import { FloatingChecklistButton } from "@/features/checklist";
 import { ErrorBoundary } from "@/shared/components";
-import { ProjectsProvider, ThemeProvider, useTheme } from "@/shared/contexts";
+import {
+  AuthProvider,
+  ProjectsProvider,
+  ThemeProvider,
+  useTheme,
+} from "@/shared/contexts";
 LogBox.ignoreAllLogs(true);
 
 // Disable error overlay in development
@@ -79,11 +84,15 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* Provider hierarchy: Theme -> Auth -> Projects */}
+      {/* ThemeProvider must be outermost as auth UI may need theme */}
       <ThemeProvider>
-        <ProjectsProvider>
-          <Navigation />
-          <FloatingChecklistButton />
-        </ProjectsProvider>
+        <AuthProvider>
+          <ProjectsProvider>
+            <Navigation />
+            <FloatingChecklistButton />
+          </ProjectsProvider>
+        </AuthProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   );
