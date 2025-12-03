@@ -178,38 +178,52 @@ export default function SettingsScreen() {
         },
         pinInputContainer: {
           marginTop: DesignTokens.spacing[2],
+          alignItems: "center",
         },
         pinLabel: {
-          marginBottom: DesignTokens.spacing[2],
+          marginBottom: DesignTokens.spacing[3],
+          textAlign: "center",
         },
         pinInput: {
+          width: 200,
           paddingVertical: DesignTokens.spacing[3],
           paddingHorizontal: DesignTokens.spacing[4],
           borderRadius: DesignTokens.borderRadius.md,
-          borderWidth: 1,
-          fontSize: DesignTokens.typography.fontSize.lg,
-          fontWeight: DesignTokens.typography.fontWeight.medium as any,
-          letterSpacing: 4,
+          borderWidth: 2,
+          fontSize: DesignTokens.typography.fontSize["2xl"],
+          fontWeight: DesignTokens.typography.fontWeight.semibold as any,
+          letterSpacing: 8,
+          textAlign: "center",
+        },
+        pinHint: {
+          fontSize: DesignTokens.typography.fontSize.xs,
+          marginTop: DesignTokens.spacing[1],
           textAlign: "center",
         },
         errorText: {
           fontSize: DesignTokens.typography.fontSize.sm,
           marginTop: DesignTokens.spacing[2],
+          textAlign: "center",
         },
         pinButtonRow: {
           flexDirection: "row",
           marginTop: DesignTokens.spacing[4],
+          width: "100%",
+          maxWidth: 320,
+          alignSelf: "center",
         },
         pinButton: {
           flex: 1,
           paddingVertical: DesignTokens.spacing[3],
+          paddingHorizontal: DesignTokens.spacing[4],
           borderRadius: DesignTokens.borderRadius.md,
           alignItems: "center",
+          minWidth: 120,
         },
         cancelButton: {
           backgroundColor: "transparent",
           borderWidth: 1,
-          marginRight: DesignTokens.spacing[2],
+          marginRight: DesignTokens.spacing[3],
         },
         submitButton: {
           // Background color set dynamically
@@ -298,7 +312,7 @@ export default function SettingsScreen() {
                   setPinInput(text);
                   setErrorMessage("");
                 }}
-                placeholder="Enter PIN"
+                placeholder="••••"
                 placeholderTextColor={theme.colors.components.input.placeholder}
                 secureTextEntry
                 keyboardType="number-pad"
@@ -312,11 +326,22 @@ export default function SettingsScreen() {
                     backgroundColor: theme.colors.components.input.background,
                     borderColor: errorMessage
                       ? theme.colors.status.error
-                      : theme.colors.components.input.border,
+                      : theme.colors.components.input.borderFocus,
                     color: theme.colors.text.primary,
                   },
                 ]}
               />
+              {!errorMessage && (
+                <ThemedText
+                  variant="caption"
+                  style={[
+                    styles.pinHint,
+                    { color: theme.colors.text.tertiary },
+                  ]}
+                >
+                  Enter 4-digit PIN
+                </ThemedText>
+              )}
               {errorMessage && (
                 <ThemedText
                   style={[
