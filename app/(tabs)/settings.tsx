@@ -1,8 +1,15 @@
 import { currentEnvironment, currentProjectId } from "@/core/config";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useMemo } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useMemo, useState } from "react";
+import {
+  Button,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import packageJson from "../../package.json";
 
 import { DesignTokens } from "@/core/themes";
@@ -13,13 +20,24 @@ import {
   ThemedView,
   ThemeToggle,
 } from "@/shared/components";
-import { useTheme } from "@/shared/contexts";
+import { useAuth, useTheme } from "@/shared/contexts";
 import { useVersionCheck } from "@/shared/hooks";
 
 export default function SettingsScreen() {
   const { theme } = useTheme();
   const router = useRouter();
   const { updateRequired, isLoading } = useVersionCheck();
+
+  // Temporary test code to verify PIN authentication
+  const { user, isAuthenticated, signIn, signOut } = useAuth();
+  const [pinInput, setPinInput] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSignIn = async () => {
+    const success = await signIn(pinInput);
+    setMessage(success ? "Sign in successful!" : "Invalid PIN");
+    setPinInput("");
+  };
 
   const styles = useMemo(
     () =>
@@ -87,6 +105,49 @@ export default function SettingsScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.content}
       >
+        {/* Temporary test UI for PIN authentication */}
+        <View style={{ padding: DesignTokens.spacing[4] }}>
+          <ThemedText variant="body">
+            Current user: {user?.displayName}
+          </ThemedText>
+          <ThemedText variant="body">Role: {user?.role}</ThemedText>
+          <ThemedText variant="body">
+            Authenticated: {isAuthenticated ? "Yes" : "No"}
+          </ThemedText>
+
+          {!isAuthenticated && (
+            <>
+              <TextInput
+                value={pinInput}
+                onChangeText={setPinInput}
+                placeholder="Enter PIN"
+                secureTextEntry
+                style={{
+                  borderWidth: 1,
+                  padding: DesignTokens.spacing[3],
+                  marginVertical: DesignTokens.spacing[3],
+                  borderRadius: DesignTokens.borderRadius.md,
+                  borderColor: theme.colors.border.primary,
+                  color: theme.colors.text.primary,
+                  backgroundColor: theme.colors.background.card,
+                }}
+              />
+              <Button title="Sign In" onPress={handleSignIn} />
+            </>
+          )}
+
+          {isAuthenticated && <Button title="Sign Out" onPress={signOut} />}
+
+          {message ? (
+            <ThemedText
+              variant="body"
+              style={{ marginTop: DesignTokens.spacing[2] }}
+            >
+              {message}
+            </ThemedText>
+          ) : null}
+        </View>
+
         {/* Update Banner - Shows when app needs updating */}
         {updateRequired && <UpdateBanner updateRequired={updateRequired} />}
 

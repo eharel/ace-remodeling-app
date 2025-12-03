@@ -7,12 +7,16 @@ import React, {
   ReactNode,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { doc, getDoc } from 'firebase/firestore';
 
+import { db } from '@/core/config';
 import type { User, Permission } from '@/shared/types/Auth';
 import { getRolePermissions, canEditResource } from '@/shared/utils/permissions';
 
-// Storage key for persisting auth state
+// Storage keys for persisting auth state
 const AUTH_STATE_KEY = 'auth_state';
+const CACHED_PIN_KEY = 'cached_edit_pin';
+const EDIT_MODE_ENABLED_KEY = 'edit_mode_enabled';
 
 interface AuthContextValue {
   // Current user state
@@ -49,28 +53,73 @@ interface AuthProviderProps {
 
 /**
  * Provides authentication state and utilities to the app
- * Phase 1: Initializes with a hardcoded viewer user (read-only access)
+ * Phase 3: Implements PIN-based authentication with Firestore integration
  */
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [editPin, setEditPin] = useState<string | null>(null);
 
-  // Initialize with default viewer user
+  // Initialize auth state and fetch PIN from Firestore
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Phase 1: Hardcoded viewer user (read-only)
-        // Later phases will check AsyncStorage and Firebase Auth
+        // Step 1: Fetch PIN from Firestore (with offline fallback)
+        try {
+          const configRef = doc(db, 'config', 'editMode');
+          const configSnap = await getDoc(configRef);
+
+          if (configSnap.exists()) {
+            const pin = configSnap.data().pin;
+            setEditPin(pin);
+            // Cache for offline use
+            await AsyncStorage.setItem(CACHED_PIN_KEY, pin);
+            console.log('PIN loaded from Firestore');
+          }
+        } catch (pinError) {
+          // If offline or Firestore fails, use cached PIN
+          console.log('Using cached PIN (offline mode)');
+          const cachedPin = await AsyncStorage.getItem(CACHED_PIN_KEY);
+          if (cachedPin) {
+            setEditPin(cachedPin);
+            console.log('PIN loaded from cache');
+          }
+        }
+
+        // Step 2: Check if user was previously authenticated
+        const wasAuthenticated = await AsyncStorage.getItem(EDIT_MODE_ENABLED_KEY);
+
+        if (wasAuthenticated === 'true') {
+          // Restore editor user
+          const editorUser: User = {
+            id: 'authenticated-editor',
+            displayName: 'Editor',
+            role: 'editor',
+            permissions: getRolePermissions('editor'),
+          };
+          setUser(editorUser);
+          console.log('Restored authenticated editor session');
+        } else {
+          // Default viewer user
+          const defaultUser: User = {
+            id: 'guest-viewer',
+            displayName: 'Guest',
+            role: 'viewer',
+            permissions: getRolePermissions('viewer'),
+          };
+          setUser(defaultUser);
+          console.log('Initialized as viewer');
+        }
+      } catch (error) {
+        console.error('Failed to initialize auth:', error);
+        // Fallback to viewer on any error
         const defaultUser: User = {
           id: 'guest-viewer',
           displayName: 'Guest',
           role: 'viewer',
           permissions: getRolePermissions('viewer'),
         };
-
         setUser(defaultUser);
-      } catch (error) {
-        console.error('Failed to initialize auth:', error);
       } finally {
         setIsLoading(false);
       }
@@ -105,22 +154,69 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 
   /**
-   * Sign in with PIN (placeholder for Phase 3)
-   * @param pin - The PIN to authenticate with
-   * @returns true if authentication successful
+   * Sign in with PIN to enable edit mode
+   * @param enteredPin - The PIN to authenticate with
+   * @returns true if authentication successful, false otherwise
    */
-  const signIn = useCallback(async (pin: string): Promise<boolean> => {
-    // Phase 1: Not implemented yet
-    console.log('signIn called (not implemented in Phase 1)');
-    return false;
-  }, []);
+  const signIn = useCallback(
+    async (enteredPin: string): Promise<boolean> => {
+      try {
+        // Validate PIN
+        if (!editPin) {
+          console.error('PIN not loaded yet');
+          return false;
+        }
+
+        if (enteredPin !== editPin) {
+          console.log('Invalid PIN');
+          return false;
+        }
+
+        // PIN is correct - upgrade user to editor
+        const editorUser: User = {
+          id: 'authenticated-editor',
+          displayName: 'Editor',
+          role: 'editor',
+          permissions: getRolePermissions('editor'),
+        };
+
+        setUser(editorUser);
+
+        // Persist authentication state
+        await AsyncStorage.setItem(EDIT_MODE_ENABLED_KEY, 'true');
+
+        console.log('Authentication successful - edit mode enabled');
+        return true;
+      } catch (error) {
+        console.error('Sign in failed:', error);
+        return false;
+      }
+    },
+    [editPin]
+  );
 
   /**
-   * Sign out current user (placeholder for Phase 3)
+   * Sign out and return to viewer mode
    */
   const signOut = useCallback(async (): Promise<void> => {
-    // Phase 1: Not implemented yet
-    console.log('signOut called (not implemented in Phase 1)');
+    try {
+      // Downgrade to viewer
+      const viewerUser: User = {
+        id: 'guest-viewer',
+        displayName: 'Guest',
+        role: 'viewer',
+        permissions: getRolePermissions('viewer'),
+      };
+
+      setUser(viewerUser);
+
+      // Clear authentication state
+      await AsyncStorage.setItem(EDIT_MODE_ENABLED_KEY, 'false');
+
+      console.log('Signed out - returned to viewer mode');
+    } catch (error) {
+      console.error('Sign out failed:', error);
+    }
   }, []);
 
   const value: AuthContextValue = {
