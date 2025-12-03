@@ -9,6 +9,7 @@ import React, {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import type { User, Permission } from '@/shared/types/Auth';
+import { getRolePermissions, canEditResource } from '@/shared/utils/permissions';
 
 // Storage key for persisting auth state
 const AUTH_STATE_KEY = 'auth_state';
@@ -64,7 +65,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           id: 'guest-viewer',
           displayName: 'Guest',
           role: 'viewer',
-          permissions: ['read:projects'],
+          permissions: getRolePermissions('viewer'),
         };
 
         setUser(defaultUser);
@@ -98,22 +99,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const canEdit = useCallback(
     (resourceOwnerId?: string): boolean => {
-      if (!user) return false;
-
-      // Admin can edit everything
-      if (hasPermission('edit:all_notes')) return true;
-
-      // Check project-level edit permission
-      if (hasPermission('edit:projects')) return true;
-
-      // Check ownership-based permissions (for PM-specific content)
-      if (resourceOwnerId && hasPermission('edit:own_notes')) {
-        return user.pmId === resourceOwnerId;
-      }
-
-      return false;
+      return canEditResource(user, resourceOwnerId);
     },
-    [user, hasPermission]
+    [user]
   );
 
   /**

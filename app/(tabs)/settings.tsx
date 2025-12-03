@@ -1,8 +1,8 @@
+import { currentEnvironment, currentProjectId } from "@/core/config";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { currentEnvironment, currentProjectId } from "@/core/config";
 import packageJson from "../../package.json";
 
 import { DesignTokens } from "@/core/themes";
@@ -13,16 +13,13 @@ import {
   ThemedView,
   ThemeToggle,
 } from "@/shared/components";
-import { useAuth, useTheme } from "@/shared/contexts";
+import { useTheme } from "@/shared/contexts";
 import { useVersionCheck } from "@/shared/hooks";
 
 export default function SettingsScreen() {
   const { theme } = useTheme();
   const router = useRouter();
   const { updateRequired, isLoading } = useVersionCheck();
-
-  // Temporary test code to verify auth context works
-  const { user, isAuthenticated, hasPermission, canEdit } = useAuth();
 
   const styles = useMemo(
     () =>
