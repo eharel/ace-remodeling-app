@@ -1,4 +1,4 @@
-import { Project, ProjectCardView, ProjectSummary } from "@/core/types";
+import { Project, ProjectCardView } from "@/core/types";
 import {
   ComponentCategory,
   CORE_CATEGORIES,
@@ -167,52 +167,6 @@ export function getSubcategoryCount(
       );
     })
   ).length;
-}
-
-/**
- * Filter ProjectSummary array by subcategory
- *
- * This is a helper for when working with ProjectSummary instead of full Project objects.
- * Note: ProjectSummary doesn't contain subcategory info, so this filters based on
- * the original projects array and maps back to summaries.
- *
- * @param projectSummaries - Array of project summaries
- * @param projects - Full project objects (for subcategory lookup)
- * @param category - Category to filter by
- * @param selectedSubcategory - Selected subcategory ('all' shows everything)
- * @returns Filtered array of project summaries
- */
-export function filterSummariesBySubcategory(
-  projectSummaries: ProjectSummary[],
-  projects: Project[],
-  category: ComponentCategory,
-  selectedSubcategory: string
-): ProjectSummary[] {
-  // Create a map of project IDs to full projects for quick lookup
-  const projectMap = new Map(projects.map((p) => [p.id, p]));
-
-  // Filter summaries based on their corresponding full project's subcategory
-  return projectSummaries.filter((summary) => {
-    const fullProject = projectMap.get(summary.id);
-    if (!fullProject) return false;
-
-    if (selectedSubcategory === "all") {
-      return fullProject.components.some((component) => {
-        const normalizedComponentCategory = normalizeCategory(
-          component.category
-        );
-        return normalizedComponentCategory === category;
-      });
-    }
-
-    return fullProject.components.some((component) => {
-      const normalizedComponentCategory = normalizeCategory(component.category);
-      return (
-        normalizedComponentCategory === category &&
-        component.subcategory === selectedSubcategory
-      );
-    });
-  });
 }
 
 /**

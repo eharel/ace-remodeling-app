@@ -1,4 +1,3 @@
-import { ComponentCategory } from "./ComponentCategory";
 import { Document } from "./Document";
 import { Log } from "./Log";
 import { MediaAsset } from "./MediaAsset";
@@ -169,24 +168,8 @@ export interface Project {
 }
 
 /**
- * Lightweight project summary for lists and cards
- *
- * Used for displaying projects in galleries, search results, and category pages.
- * Contains only the essential fields needed for preview display.
+ * @deprecated ProjectSummary has been replaced by ProjectCardView.
+ * Use ProjectCardView from @/core/types/ProjectCardView instead.
+ * This type is kept temporarily for migration purposes and will be removed in a future version.
  */
-export interface ProjectSummary {
-  id: string;
-  projectNumber: string;
-  name: string;
-  briefDescription?: string;
-  thumbnail: string;
-  status: ProjectStatus | string; // Allow string for flexibility
-  category: ComponentCategory | string; // Allow string for flexibility
-  subcategory?: string; // Optional subcategory (e.g., "pool", "deck" for outdoor-living)
-  isFeatured?: boolean; // Whether this project is featured
-  completedAt?: string;
-  location?: {
-    neighborhood?: string;
-    zipCode?: string;
-  };
-}
+export type ProjectSummary = never;
