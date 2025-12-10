@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { commonStyles } from "@/shared/utils";
+import { ProjectCardView } from "@/core/types";
 import { ComponentCategory } from "@/core/types/ComponentCategory";
-import { ProjectSummary } from "@/core/types";
 import { ProjectGallery } from "@/features/projects";
 import { ThemedText, ThemedView } from "@/shared/components";
+import { commonStyles } from "@/shared/utils";
 
 interface CategoryPageProps {
   category: ComponentCategory;
@@ -13,8 +13,8 @@ interface CategoryPageProps {
   subtitle: string;
   galleryTitle: string;
   gallerySubtitle: string;
-  projects: ProjectSummary[];
-  onProjectPress: (project: ProjectSummary) => void;
+  cardViews: ProjectCardView[];
+  onCardPress: (cardView: ProjectCardView) => void;
 }
 
 export function CategoryPage({
@@ -22,13 +22,13 @@ export function CategoryPage({
   subtitle,
   galleryTitle,
   gallerySubtitle,
-  projects,
-  onProjectPress,
+  cardViews,
+  onCardPress,
 }: CategoryPageProps) {
-  // Error handling: Ensure projects is an array and onProjectPress is a function
-  const safeProjects = Array.isArray(projects) ? projects : [];
-  const safeOnProjectPress =
-    typeof onProjectPress === "function" ? onProjectPress : () => {};
+  // Error handling: Ensure cardViews is an array and onCardPress is a function
+  const safeCardViews = Array.isArray(cardViews) ? cardViews : [];
+  const safeOnCardPress =
+    typeof onCardPress === "function" ? onCardPress : () => {};
 
   return (
     <ThemedView
@@ -81,8 +81,8 @@ export function CategoryPage({
       </ThemedView>
 
       <ProjectGallery
-        projects={safeProjects}
-        onProjectPress={safeOnProjectPress}
+        cardViews={safeCardViews}
+        onCardPress={safeOnCardPress}
         testID={`${title.toLowerCase().replace(/\s+/g, "-")}-gallery`}
       />
     </ThemedView>
