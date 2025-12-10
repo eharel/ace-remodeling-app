@@ -15,7 +15,7 @@ import {
 } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectSummary } from "@/core/types";
+import { ProjectCardView } from "@/core/types";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import { ProjectCard } from "./ProjectCard";
@@ -24,8 +24,8 @@ import { ProjectCard } from "./ProjectCard";
 const MIN_REFRESH_DURATION = 500;
 
 interface ProjectGalleryProps {
-  projects: ProjectSummary[];
-  onProjectPress?: (project: ProjectSummary) => void;
+  cardViews: ProjectCardView[];
+  onCardPress?: (cardView: ProjectCardView) => void;
   style?: ViewStyle; // Allow custom styling
   testID?: string; // For testing purposes
   /**
@@ -43,8 +43,8 @@ const getColumnCount = (width: number): number => {
 };
 
 export function ProjectGallery({
-  projects,
-  onProjectPress,
+  cardViews,
+  onCardPress,
   style,
   testID,
   enableRefresh = false,
@@ -88,8 +88,8 @@ export function ProjectGallery({
     await refetchProjects();
   }, [enableRefresh, refetchProjects]);
 
-  // Error handling: Ensure projects is an array
-  const safeProjects = Array.isArray(projects) ? projects : [];
+  // Error handling: Ensure cardViews is an array
+  const safeCardViews = Array.isArray(cardViews) ? cardViews : [];
 
   // Memoize column count calculation
   const columnCount = useMemo(() => getColumnCount(width), [width]);
@@ -156,17 +156,20 @@ export function ProjectGallery({
   );
 
   // Memoize render function to prevent unnecessary re-renders
-  const renderProject = useCallback(
-    ({ item }: { item: ProjectSummary }) => (
-      <ProjectCard project={item} onPress={onProjectPress} style={cardStyle} />
+  const renderCard = useCallback(
+    ({ item }: { item: ProjectCardView }) => (
+      <ProjectCard cardView={item} onPress={onCardPress} style={cardStyle} />
     ),
-    [onProjectPress, cardStyle]
+    [onCardPress, cardStyle]
   );
 
-  // Memoize key extractor
-  const keyExtractor = useCallback((item: ProjectSummary) => item.id, []);
+  // Memoize key extractor - use componentId for uniqueness since each cardView represents a project-component pair
+  const keyExtractor = useCallback(
+    (item: ProjectCardView) => item.componentId,
+    []
+  );
 
-  if (safeProjects.length === 0) {
+  if (safeCardViews.length === 0) {
     return (
       <ThemedView
         style={styles.emptyState}
@@ -195,13 +198,13 @@ export function ProjectGallery({
     <ThemedView
       style={[styles.container, style]}
       testID={testID || "project-gallery"}
-      accessibilityLabel={`Project gallery with ${safeProjects.length} projects`}
+      accessibilityLabel={`Project gallery with ${safeCardViews.length} projects`}
       accessibilityRole="list"
     >
       {/* Project Grid */}
       <FlatList
-        data={safeProjects}
-        renderItem={renderProject}
+        data={safeCardViews}
+        renderItem={renderCard}
         keyExtractor={keyExtractor}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
@@ -209,7 +212,7 @@ export function ProjectGallery({
         {...(columnCount > 1 && {
           columnWrapperStyle: [
             styles.row,
-            safeProjects.length < columnCount && styles.rowCentered,
+            safeCardViews.length < columnCount && styles.rowCentered,
           ],
         })}
         key={columnCount} // Force re-render when column count changes
