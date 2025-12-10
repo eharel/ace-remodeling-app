@@ -16,16 +16,16 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectSummary, ProjectStatus } from "@/core/types";
+import { ProjectCardView, ProjectStatus } from "@/core/types";
 import { getSubcategoryLabel } from "@/core/types/ComponentCategory";
 import { getStatusDisplayText, getStatusStyleKey } from "@/core/types/Status";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
-import { getCategoryDisplayName, logError } from "@/shared/utils";
+import { getCategoryDisplayName } from "@/shared/utils";
 
 interface ProjectCardProps {
-  project: ProjectSummary;
-  onPress?: (project: ProjectSummary) => void;
+  cardView: ProjectCardView;
+  onPress?: (cardView: ProjectCardView) => void;
   style?: ViewStyle;
   /**
    * Layout variant - "vertical" for flexible width cards in lists,
@@ -56,7 +56,7 @@ const HORIZONTAL_CARD_HEIGHT = 240;
 const HORIZONTAL_IMAGE_HEIGHT = 160;
 
 function ProjectCardComponent({
-  project,
+  cardView,
   onPress,
   style,
   variant = "vertical",
@@ -68,9 +68,9 @@ function ProjectCardComponent({
   const { theme } = useTheme();
 
   // Determine defaults based on variant
-  const shouldShowStatus = showStatus ?? (variant === "vertical");
-  const shouldShowCategory = showCategory ?? (variant === "vertical");
-  const shouldEnableAnimations = enableAnimations ?? (variant === "horizontal");
+  const shouldShowStatus = showStatus ?? variant === "vertical";
+  const shouldShowCategory = showCategory ?? variant === "vertical";
+  const shouldEnableAnimations = enableAnimations ?? variant === "horizontal";
 
   // Animation values - always create (hooks must be unconditional)
   // But only use them when animations are enabled
@@ -85,8 +85,8 @@ function ProjectCardComponent({
     if (shouldEnableAnimations) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    onPress?.(project);
-  }, [onPress, project, shouldEnableAnimations]);
+    onPress?.(cardView);
+  }, [onPress, cardView, shouldEnableAnimations]);
 
   const handlePressIn = useCallback(() => {
     if (shouldEnableAnimations) {
@@ -118,20 +118,17 @@ function ProjectCardComponent({
 
   // Always call useAnimatedStyle (hooks must be unconditional)
   // Return identity transform when animations disabled to avoid issues
-  const animatedCardStyle = useAnimatedStyle(
-    () => {
-      if (!shouldEnableAnimations) {
-        return {};
-      }
-      return {
-        transform: [{ scale: scale.value }],
-        shadowOpacity: shadowElevation.value / 10,
-        shadowRadius: shadowElevation.value * 1.5,
-        elevation: shadowElevation.value,
-      };
-    },
-    [scale, shadowElevation, shouldEnableAnimations]
-  );
+  const animatedCardStyle = useAnimatedStyle(() => {
+    if (!shouldEnableAnimations) {
+      return {};
+    }
+    return {
+      transform: [{ scale: scale.value }],
+      shadowOpacity: shadowElevation.value / 10,
+      shadowRadius: shadowElevation.value * 1.5,
+      elevation: shadowElevation.value,
+    };
+  }, [scale, shadowElevation, shouldEnableAnimations]);
 
   const handleImageError = (error: any) => {
     // Image load error - silently fail
@@ -180,7 +177,10 @@ function ProjectCardComponent({
           height: variant === "horizontal" ? HORIZONTAL_IMAGE_HEIGHT : 200,
         },
         content: {
-          padding: variant === "horizontal" ? DesignTokens.spacing[3] : DesignTokens.spacing[4],
+          padding:
+            variant === "horizontal"
+              ? DesignTokens.spacing[3]
+              : DesignTokens.spacing[4],
           gap: DesignTokens.spacing[2],
           ...(variant === "horizontal" && {
             flex: 1,
@@ -210,9 +210,7 @@ function ProjectCardComponent({
             DesignTokens.typography.fontSize.sm *
             DesignTokens.typography.lineHeight.normal,
           color:
-            variant === "horizontal"
-              ? theme.colors.text.secondary
-              : undefined,
+            variant === "horizontal" ? theme.colors.text.secondary : undefined,
           opacity: variant === "horizontal" ? 1 : 0.7,
         },
         meta: {
@@ -300,7 +298,8 @@ function ProjectCardComponent({
           paddingHorizontal: DesignTokens.spacing[2],
           paddingVertical: DesignTokens.spacing[1],
           borderRadius: DesignTokens.borderRadius.md,
-          shadowColor: theme.colors.showcase?.accent || theme.colors.interactive.primary,
+          shadowColor:
+            theme.colors.showcase?.accent || theme.colors.interactive.primary,
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.4,
           shadowRadius: 3,
@@ -325,7 +324,7 @@ function ProjectCardComponent({
       {/* Project Image */}
       <View style={styles.imageContainer}>
         <Image
-          source={{ uri: project.thumbnail }}
+          source={{ uri: cardView.thumbnailUrl }}
           style={styles.thumbnail}
           contentFit="cover"
           onError={handleImageError}
@@ -360,17 +359,18 @@ function ProjectCardComponent({
         )}
 
         {/* Featured Badge */}
-        {project.isFeatured && (
+        {cardView.isFeatured && (
           <View style={styles.featuredBadge}>
             <MaterialIcons
               name="star"
               size={14}
-              color={theme.colors.showcase?.accent || theme.colors.interactive.primary}
+              color={
+                theme.colors.showcase?.accent ||
+                theme.colors.interactive.primary
+              }
               style={styles.featuredIcon}
             />
-            <ThemedText style={styles.featuredText}>
-              Featured
-            </ThemedText>
+            <ThemedText style={styles.featuredText}>Featured</ThemedText>
           </View>
         )}
       </View>
@@ -382,11 +382,11 @@ function ProjectCardComponent({
           style={styles.title}
           numberOfLines={variant === "horizontal" ? 1 : undefined}
         >
-          {project.name}
+          {cardView.displayName}
         </ThemedText>
 
         <ThemedText style={styles.description} numberOfLines={2}>
-          {project.briefDescription || "No description available"}
+          {cardView.summary || "No description available"}
         </ThemedText>
 
         {/* Status and Category - only shown if enabled */}
@@ -397,22 +397,22 @@ function ProjectCardComponent({
                 style={[
                   styles.statusBadge,
                   styles[
-                    getStatusStyleKey(project.status as ProjectStatus)
+                    getStatusStyleKey(cardView.status as ProjectStatus)
                   ] as ViewStyle,
                 ]}
               >
                 <ThemedText style={styles.statusText}>
-                  {getStatusDisplayText(project.status as ProjectStatus)}
+                  {getStatusDisplayText(cardView.status as ProjectStatus)}
                 </ThemedText>
               </View>
             )}
 
             {shouldShowCategory && (
               <ThemedText style={styles.category}>
-                {project.subcategory
-                  ? getSubcategoryLabel(project.subcategory)
-                  : project.category
-                  ? getCategoryDisplayName(project.category)
+                {cardView.subcategory
+                  ? getSubcategoryLabel(cardView.subcategory)
+                  : cardView.category
+                  ? getCategoryDisplayName(cardView.category)
                   : "Miscellaneous"}
               </ThemedText>
             )}
@@ -445,39 +445,38 @@ function ProjectCardComponent({
   }
 
   return (
-    <Pressable
-      onPress={handlePress}
-      style={[styles.container, style]}
-    >
-      <ThemedView style={styles.card}>
-        {cardContent}
-      </ThemedView>
+    <Pressable onPress={handlePress} style={[styles.container, style]}>
+      <ThemedView style={styles.card}>{cardContent}</ThemedView>
     </Pressable>
   );
 }
 
 // Memoize ProjectCard to prevent unnecessary re-renders in FlatList
 // This improves performance for large lists by only re-rendering when props actually change
-export const ProjectCard = React.memo(ProjectCardComponent, (prevProps, nextProps) => {
-  // Custom comparison function for better performance
-  // Only re-render if these key props change
-  // Note: We don't compare onPress or style as they may change reference but not meaning
-  return (
-    prevProps.project.id === nextProps.project.id &&
-    prevProps.project.thumbnail === nextProps.project.thumbnail &&
-    prevProps.project.name === nextProps.project.name &&
-    prevProps.project.briefDescription === nextProps.project.briefDescription &&
-    prevProps.project.isFeatured === nextProps.project.isFeatured &&
-    prevProps.project.status === nextProps.project.status &&
-    prevProps.project.subcategory === nextProps.project.subcategory &&
-    prevProps.project.category === nextProps.project.category &&
-    prevProps.variant === nextProps.variant &&
-    prevProps.showStatus === nextProps.showStatus &&
-    prevProps.showCategory === nextProps.showCategory &&
-    prevProps.enableAnimations === nextProps.enableAnimations &&
-    // Compare style by checking if width/flex values are the same
-    (prevProps.style === nextProps.style ||
-      (prevProps.style?.width === nextProps.style?.width &&
-        prevProps.style?.flex === nextProps.style?.flex))
-  );
-});
+export const ProjectCard = React.memo(
+  ProjectCardComponent,
+  (prevProps, nextProps) => {
+    // Custom comparison function for better performance
+    // Only re-render if these key props change
+    // Note: We don't compare onPress or style as they may change reference but not meaning
+    return (
+      prevProps.cardView.projectId === nextProps.cardView.projectId &&
+      prevProps.cardView.componentId === nextProps.cardView.componentId &&
+      prevProps.cardView.thumbnailUrl === nextProps.cardView.thumbnailUrl &&
+      prevProps.cardView.displayName === nextProps.cardView.displayName &&
+      prevProps.cardView.summary === nextProps.cardView.summary &&
+      prevProps.cardView.isFeatured === nextProps.cardView.isFeatured &&
+      prevProps.cardView.status === nextProps.cardView.status &&
+      prevProps.cardView.subcategory === nextProps.cardView.subcategory &&
+      prevProps.cardView.category === nextProps.cardView.category &&
+      prevProps.variant === nextProps.variant &&
+      prevProps.showStatus === nextProps.showStatus &&
+      prevProps.showCategory === nextProps.showCategory &&
+      prevProps.enableAnimations === nextProps.enableAnimations &&
+      // Compare style by checking if width/flex values are the same
+      (prevProps.style === nextProps.style ||
+        (prevProps.style?.width === nextProps.style?.width &&
+          prevProps.style?.flex === nextProps.style?.flex))
+    );
+  }
+);

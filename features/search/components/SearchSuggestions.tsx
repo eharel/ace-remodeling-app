@@ -3,10 +3,10 @@ import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectSummary } from "@/core/types/Project";
+import { ProjectCardView } from "@/core/types";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
-import { calculateProjectScore } from "../utils/searchScoring";
+import { calculateCardViewScore } from "../utils/searchScoring";
 
 /**
  * Constants for SearchSuggestions component UI behavior
@@ -27,9 +27,9 @@ const SEARCH_SUGGESTIONS_CONSTANTS = {
 const MAX_SUGGESTIONS = 10;
 
 interface SearchSuggestionsProps {
-  projects: ProjectSummary[];
+  cardViews: ProjectCardView[];
   query: string;
-  onSelectProject: (projectId: string) => void;
+  onSelectCard: (cardView: ProjectCardView) => void;
   maxSuggestions?: number;
 }
 
@@ -38,14 +38,14 @@ interface SearchSuggestionsProps {
  * Shows live project suggestions as user types
  */
 export function SearchSuggestions({
-  projects,
+  cardViews,
   query,
-  onSelectProject,
+  onSelectCard,
   maxSuggestions = MAX_SUGGESTIONS,
 }: SearchSuggestionsProps) {
   const { theme } = useTheme();
 
-  // Filter and sort projects based on query
+  // Filter and sort card views based on query
   /**
    * Generates project suggestions based on search query using a scoring algorithm
    *
@@ -59,7 +59,7 @@ export function SearchSuggestions({
    * Results are sorted by score (highest first) and limited to MAX_SUGGESTIONS.
    * Only shows suggestions for queries ≥2 characters.
    *
-   * @returns Array of ProjectSummary objects matching the query, sorted by relevance
+   * @returns Array of ProjectCardView objects matching the query, sorted by relevance
    */
   const suggestions = useMemo(() => {
     if (
@@ -72,18 +72,18 @@ export function SearchSuggestions({
     const lowerQuery = query.toLowerCase().trim();
 
     // Create scored matches using pure utility function
-    const matches = projects
-      .map((project) => ({
-        project,
-        score: calculateProjectScore(lowerQuery, project),
+    const matches = cardViews
+      .map((cardView) => ({
+        cardView,
+        score: calculateCardViewScore(lowerQuery, cardView),
       }))
       .filter((match) => match.score > 0) // Only include matches
       .sort((a, b) => b.score - a.score) // Sort by relevance
       .slice(0, maxSuggestions) // Limit results
-      .map((match) => match.project);
+      .map((match) => match.cardView);
 
     return matches;
-  }, [projects, query, maxSuggestions]);
+  }, [cardViews, query, maxSuggestions]);
 
   // Don't render if no suggestions
   if (suggestions.length === 0) {
@@ -145,10 +145,10 @@ export function SearchSuggestions({
 
       {/* Suggestions List */}
       <View style={styles.suggestionsList}>
-        {suggestions.map((project) => (
+        {suggestions.map((cardView) => (
           <Pressable
-            key={project.id}
-            onPress={() => onSelectProject(project.id)}
+            key={cardView.componentId}
+            onPress={() => onSelectCard(cardView)}
             style={({ pressed }) => [
               styles.suggestionItem,
               {
@@ -169,14 +169,14 @@ export function SearchSuggestions({
               numberOfLines={1}
               style={styles.suggestionText}
             >
-              {project.name}
+              {cardView.displayName}
             </ThemedText>
             <View style={styles.categoryBadge}>
               <ThemedText
                 variant="caption"
                 style={{ fontSize: DesignTokens.typography.fontSize.xs }}
               >
-                {project.category || "Miscellaneous"}
+                {cardView.category || "Miscellaneous"}
               </ThemedText>
             </View>
           </Pressable>

@@ -1,4 +1,4 @@
-import { Project, ProjectSummary } from "@/core/types";
+import { Project, ProjectCardView } from "@/core/types";
 import {
   ComponentCategory,
   CORE_CATEGORIES,
@@ -170,47 +170,28 @@ export function getSubcategoryCount(
 }
 
 /**
- * Filter ProjectSummary array by subcategory
+ * Filter ProjectCardView array by subcategory
  *
- * This is a helper for when working with ProjectSummary instead of full Project objects.
- * Note: ProjectSummary doesn't contain subcategory info, so this filters based on
- * the original projects array and maps back to summaries.
+ * ProjectCardView includes subcategory information directly, so filtering
+ * is straightforward - no need to look up full project objects.
  *
- * @param projectSummaries - Array of project summaries
- * @param projects - Full project objects (for subcategory lookup)
- * @param category - Category to filter by
+ * @param cardViews - Array of project card views
  * @param selectedSubcategory - Selected subcategory ('all' shows everything)
- * @returns Filtered array of project summaries
+ * @returns Filtered array of project card views
+ *
+ * @example
+ * filterCardViewsBySubcategory(cardViews, 'all') // returns all cardViews
+ * filterCardViewsBySubcategory(cardViews, 'pool') // returns only pool cardViews
  */
-export function filterSummariesBySubcategory(
-  projectSummaries: ProjectSummary[],
-  projects: Project[],
-  category: ComponentCategory,
+export function filterCardViewsBySubcategory(
+  cardViews: ProjectCardView[],
   selectedSubcategory: string
-): ProjectSummary[] {
-  // Create a map of project IDs to full projects for quick lookup
-  const projectMap = new Map(projects.map((p) => [p.id, p]));
+): ProjectCardView[] {
+  if (selectedSubcategory === "all") {
+    return cardViews;
+  }
 
-  // Filter summaries based on their corresponding full project's subcategory
-  return projectSummaries.filter((summary) => {
-    const fullProject = projectMap.get(summary.id);
-    if (!fullProject) return false;
-
-    if (selectedSubcategory === "all") {
-      return fullProject.components.some((component) => {
-        const normalizedComponentCategory = normalizeCategory(
-          component.category
-        );
-        return normalizedComponentCategory === category;
-      });
-    }
-
-    return fullProject.components.some((component) => {
-      const normalizedComponentCategory = normalizeCategory(component.category);
-      return (
-        normalizedComponentCategory === category &&
-        component.subcategory === selectedSubcategory
-      );
-    });
-  });
+  return cardViews.filter(
+    (cardView) => cardView.subcategory === selectedSubcategory
+  );
 }
