@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectSummary } from "@/core/types/Project";
+import { ProjectCardView } from "@/core/types";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { SearchHistoryItem } from "@/shared/utils";
@@ -44,10 +44,10 @@ interface SearchInputWithHistoryProps {
   onClearHistory: () => void;
   /** Callback to add current query to history */
   onAddToHistory: (query: string) => void;
-  /** Projects to search through for suggestions */
-  projects: ProjectSummary[];
-  /** Callback when user selects a project from suggestions */
-  onSelectProject: (projectId: string) => void;
+  /** Card views to search through for suggestions */
+  cardViews: ProjectCardView[];
+  /** Callback when user selects a card view from suggestions */
+  onSelectCard: (cardView: ProjectCardView) => void;
 }
 
 /**
@@ -64,8 +64,8 @@ export function SearchInputWithHistory({
   onRemoveHistory,
   onClearHistory,
   onAddToHistory,
-  projects,
-  onSelectProject,
+  cardViews,
+  onSelectCard,
 }: SearchInputWithHistoryProps) {
   const { theme } = useTheme();
   const inputRef = useRef<TextInput>(null);
@@ -237,9 +237,9 @@ export function SearchInputWithHistory({
       {/* Phase 9: Show suggestions when typing, history when empty */}
       {shouldShowSuggestions && (
         <SearchSuggestions
-          projects={projects}
+          cardViews={cardViews}
           query={value}
-          onSelectProject={onSelectProject}
+          onSelectCard={onSelectCard}
         />
       )}
 

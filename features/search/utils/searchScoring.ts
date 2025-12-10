@@ -1,4 +1,4 @@
-import { ProjectSummary } from "@/core/types/Project";
+import { ProjectCardView } from "@/core/types";
 
 /**
  * Constants for search scoring algorithm
@@ -112,35 +112,35 @@ export function calculateLocationScore(
 }
 
 /**
- * Calculates total relevance score for a project against a search query
+ * Calculates total relevance score for a card view against a search query
  *
  * Combines all scoring aspects to determine overall relevance.
  * Returns the highest score found (doesn't sum multiple matches).
  *
  * @param query - Search query (should be lowercase)
- * @param project - Project to score
+ * @param cardView - Project card view to score
  * @returns Total relevance score (0 if no matches)
  *
  * @example
  * ```typescript
- * const score = calculateProjectScore("kitchen", {
- *   name: "Kitchen Renovation",
- *   briefDescription: "Modern kitchen design",
+ * const score = calculateCardViewScore("kitchen", {
+ *   displayName: "Kitchen Renovation",
+ *   summary: "Modern kitchen design",
  *   location: { neighborhood: "Downtown", zipCode: "12345" }
  * });
  * // Returns 50 (name starts with "kitchen")
  * ```
  */
-export function calculateProjectScore(
+export function calculateCardViewScore(
   query: string,
-  project: ProjectSummary
+  cardView: ProjectCardView
 ): number {
-  const nameScore = calculateNameScore(query, project.name);
-  const descriptionScore = calculateDescriptionScore(
+  const nameScore = calculateNameScore(query, cardView.displayName);
+  const descriptionScore = calculateDescriptionScore(query, cardView.summary);
+  const locationScore = calculateLocationScore(
     query,
-    project.briefDescription
+    cardView.location || undefined
   );
-  const locationScore = calculateLocationScore(query, project.location || undefined);
 
   // Return the highest score (don't sum multiple matches)
   return Math.max(nameScore, descriptionScore, locationScore);
