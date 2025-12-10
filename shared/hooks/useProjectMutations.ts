@@ -38,8 +38,8 @@ export interface UseProjectMutationsReturn {
  * Hook for mutating project and component data.
  *
  * Provides a clean API for updating component fields with built-in
- * loading states and error handling. Automatically refetches projects
- * from the ProjectsContext after successful mutations.
+ * loading states and error handling. Uses optimistic updates for
+ * instant UI feedback, with automatic rollback on error.
  *
  * @returns Object containing mutation functions and state
  *
@@ -50,9 +50,9 @@ export interface UseProjectMutationsReturn {
  *   const handleToggleFeatured = async () => {
  *     try {
  *       await updateComponentField("project-123", "component-456", "isFeatured", true);
- *       // Projects context will automatically refetch
+ *       // UI updates immediately via optimistic update
  *     } catch (e) {
- *       // Error is captured in error state
+ *       // Error is captured in error state, UI automatically rolls back
  *     }
  *   };
  *
@@ -64,7 +64,8 @@ export interface UseProjectMutationsReturn {
  * }
  */
 export function useProjectMutations(): UseProjectMutationsReturn {
-  const { refetchProjects } = useProjects();
+  const { projects, updateProjectOptimistically, rollbackProject } =
+    useProjects();
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -79,15 +80,36 @@ export function useProjectMutations(): UseProjectMutationsReturn {
       field: keyof ProjectComponent,
       value: any
     ) => {
+      // 1. Find current project for rollback
+      const originalProject = projects.find((p) => p.id === projectId);
+      if (!originalProject) {
+        const notFoundError = new Error(
+          `Project with ID "${projectId}" not found`
+        );
+        setError(notFoundError);
+        throw notFoundError;
+      }
+
       try {
         setIsUpdating(true);
         setError(null);
 
-        await updateComponentField(projectId, componentId, field, value);
+        // 2. Optimistically update UI
+        updateProjectOptimistically(projectId, (project) => ({
+          ...project,
+          components: project.components.map((c) =>
+            c.id === componentId
+              ? { ...c, [field]: value, updatedAt: new Date().toISOString() }
+              : c
+          ),
+          updatedAt: new Date().toISOString(),
+        }));
 
-        // Refetch projects to reflect changes in UI
-        await refetchProjects();
+        // 3. Persist to Firestore
+        await updateComponentField(projectId, componentId, field, value);
       } catch (e) {
+        // 4. Rollback on failure
+        rollbackProject(projectId, originalProject);
         const caughtError =
           e instanceof Error ? e : new Error("Unknown error occurred");
         setError(caughtError);
@@ -97,7 +119,7 @@ export function useProjectMutations(): UseProjectMutationsReturn {
         setIsUpdating(false);
       }
     },
-    [refetchProjects]
+    [projects, updateProjectOptimistically, rollbackProject]
   );
 
   return {

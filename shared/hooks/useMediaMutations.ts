@@ -70,8 +70,8 @@ export interface UseMediaMutationsReturn {
  * Hook for mutating media data on components.
  *
  * Provides a clean API for managing component media arrays with built-in
- * loading states and error handling. Automatically refetches projects
- * from the ProjectsContext after successful mutations.
+ * loading states and error handling. Uses optimistic updates for instant
+ * UI feedback, with automatic rollback on error.
  *
  * @returns Object containing mutation functions and state
  *
@@ -82,9 +82,9 @@ export interface UseMediaMutationsReturn {
  *   const handleAddPhoto = async () => {
  *     try {
  *       await addMedia("project-123", "component-456", newMediaAsset);
- *       // Projects context will automatically refetch
+ *       // UI updates immediately via optimistic update
  *     } catch (e) {
- *       // Error is captured in error state
+ *       // Error is captured in error state, UI automatically rolls back
  *     }
  *   };
  *
@@ -96,7 +96,8 @@ export interface UseMediaMutationsReturn {
  * }
  */
 export function useMediaMutations(): UseMediaMutationsReturn {
-  const { refetchProjects } = useProjects();
+  const { projects, updateProjectOptimistically, rollbackProject } =
+    useProjects();
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -106,15 +107,40 @@ export function useMediaMutations(): UseMediaMutationsReturn {
 
   const handleAddMedia = useCallback(
     async (projectId: string, componentId: string, media: MediaAsset) => {
+      // 1. Find current project for rollback
+      const originalProject = projects.find((p) => p.id === projectId);
+      if (!originalProject) {
+        const notFoundError = new Error(
+          `Project with ID "${projectId}" not found`
+        );
+        setError(notFoundError);
+        throw notFoundError;
+      }
+
       try {
         setIsUpdating(true);
         setError(null);
 
-        await addMediaToComponent(projectId, componentId, media);
+        // 2. Optimistically update UI
+        updateProjectOptimistically(projectId, (project) => ({
+          ...project,
+          components: project.components.map((c) =>
+            c.id === componentId
+              ? {
+                  ...c,
+                  media: [...(c.media || []), media],
+                  updatedAt: new Date().toISOString(),
+                }
+              : c
+          ),
+          updatedAt: new Date().toISOString(),
+        }));
 
-        // Refetch projects to reflect changes in UI
-        await refetchProjects();
+        // 3. Persist to Firestore
+        await addMediaToComponent(projectId, componentId, media);
       } catch (e) {
+        // 4. Rollback on failure
+        rollbackProject(projectId, originalProject);
         const caughtError =
           e instanceof Error ? e : new Error("Unknown error occurred");
         setError(caughtError);
@@ -124,20 +150,45 @@ export function useMediaMutations(): UseMediaMutationsReturn {
         setIsUpdating(false);
       }
     },
-    [refetchProjects]
+    [projects, updateProjectOptimistically, rollbackProject]
   );
 
   const handleRemoveMedia = useCallback(
     async (projectId: string, componentId: string, mediaId: string) => {
+      // 1. Find current project for rollback
+      const originalProject = projects.find((p) => p.id === projectId);
+      if (!originalProject) {
+        const notFoundError = new Error(
+          `Project with ID "${projectId}" not found`
+        );
+        setError(notFoundError);
+        throw notFoundError;
+      }
+
       try {
         setIsUpdating(true);
         setError(null);
 
-        await removeMediaFromComponent(projectId, componentId, mediaId);
+        // 2. Optimistically update UI
+        updateProjectOptimistically(projectId, (project) => ({
+          ...project,
+          components: project.components.map((c) =>
+            c.id === componentId
+              ? {
+                  ...c,
+                  media: (c.media || []).filter((m) => m.id !== mediaId),
+                  updatedAt: new Date().toISOString(),
+                }
+              : c
+          ),
+          updatedAt: new Date().toISOString(),
+        }));
 
-        // Refetch projects to reflect changes in UI
-        await refetchProjects();
+        // 3. Persist to Firestore
+        await removeMediaFromComponent(projectId, componentId, mediaId);
       } catch (e) {
+        // 4. Rollback on failure
+        rollbackProject(projectId, originalProject);
         const caughtError =
           e instanceof Error ? e : new Error("Unknown error occurred");
         setError(caughtError);
@@ -147,20 +198,45 @@ export function useMediaMutations(): UseMediaMutationsReturn {
         setIsUpdating(false);
       }
     },
-    [refetchProjects]
+    [projects, updateProjectOptimistically, rollbackProject]
   );
 
   const handleReorderMedia = useCallback(
     async (projectId: string, componentId: string, newOrder: MediaAsset[]) => {
+      // 1. Find current project for rollback
+      const originalProject = projects.find((p) => p.id === projectId);
+      if (!originalProject) {
+        const notFoundError = new Error(
+          `Project with ID "${projectId}" not found`
+        );
+        setError(notFoundError);
+        throw notFoundError;
+      }
+
       try {
         setIsUpdating(true);
         setError(null);
 
-        await reorderComponentMedia(projectId, componentId, newOrder);
+        // 2. Optimistically update UI
+        updateProjectOptimistically(projectId, (project) => ({
+          ...project,
+          components: project.components.map((c) =>
+            c.id === componentId
+              ? {
+                  ...c,
+                  media: newOrder,
+                  updatedAt: new Date().toISOString(),
+                }
+              : c
+          ),
+          updatedAt: new Date().toISOString(),
+        }));
 
-        // Refetch projects to reflect changes in UI
-        await refetchProjects();
+        // 3. Persist to Firestore
+        await reorderComponentMedia(projectId, componentId, newOrder);
       } catch (e) {
+        // 4. Rollback on failure
+        rollbackProject(projectId, originalProject);
         const caughtError =
           e instanceof Error ? e : new Error("Unknown error occurred");
         setError(caughtError);
@@ -170,7 +246,7 @@ export function useMediaMutations(): UseMediaMutationsReturn {
         setIsUpdating(false);
       }
     },
-    [refetchProjects]
+    [projects, updateProjectOptimistically, rollbackProject]
   );
 
   return {

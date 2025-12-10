@@ -1,5 +1,5 @@
 import { db } from "@/core/config";
-import { Project, MediaAsset } from "@/core/types";
+import { MediaAsset, Project } from "@/core/types";
 import { CORE_CATEGORIES } from "@/core/types/ComponentCategory";
 import { collection, getDocs } from "firebase/firestore";
 import React, {
@@ -17,9 +17,9 @@ const PROJECTS_COLLECTION = "projects";
 
 /**
  * Gets all media assets from a project's components
- * 
+ *
  * Collects all media from all components in a project.
- * 
+ *
  * @param project - The project to get media from
  * @returns Array of MediaAsset objects from all components
  */
@@ -66,6 +66,33 @@ interface ProjectsContextType {
    * Useful for pull-to-refresh functionality.
    */
   refetchProjects: () => Promise<void>;
+  /**
+   * Optimistically update a project in the local state.
+   * Immediately updates the UI before the Firestore write completes.
+   * Use this for instant UI feedback, then persist changes to Firestore.
+   *
+   * @param projectId - The ID of the project to update
+   * @param updater - Function that takes the current project and returns the updated project
+   */
+  updateProjectOptimistically: (
+    projectId: string,
+    updater: (project: Project) => Project
+  ) => void;
+  /**
+   * Rollback a project to its original state.
+   * Use this if a Firestore write fails after an optimistic update.
+   *
+   * @param projectId - The ID of the project to rollback
+   * @param originalProject - The original project state before the optimistic update
+   */
+  rollbackProject: (projectId: string, originalProject: Project) => void;
+  /**
+   * Set the projects array directly.
+   * Useful for batch updates or replacing the entire projects state.
+   *
+   * @param projects - The new projects array
+   */
+  setProjects: (projects: Project[]) => void;
 }
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(
@@ -125,6 +152,61 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
     await fetchProjects();
   }, [fetchProjects]);
 
+  /**
+   * Optimistically update a project in the local state.
+   * Immediately updates the UI before the Firestore write completes.
+   * All updates are immutable to maintain React's state update rules.
+   */
+  const updateProjectOptimistically = useCallback(
+    (projectId: string, updater: (project: Project) => Project) => {
+      setProjects((currentProjects) => {
+        const projectIndex = currentProjects.findIndex(
+          (p) => p.id === projectId
+        );
+        if (projectIndex === -1) {
+          // Project not found, return current state unchanged
+          console.warn(
+            `Attempted to optimistically update project "${projectId}" but it was not found`
+          );
+          return currentProjects;
+        }
+
+        // Create new array with updated project
+        const updatedProjects = [...currentProjects];
+        updatedProjects[projectIndex] = updater(updatedProjects[projectIndex]);
+        return updatedProjects;
+      });
+    },
+    []
+  );
+
+  /**
+   * Rollback a project to its original state.
+   * Used when a Firestore write fails after an optimistic update.
+   */
+  const rollbackProject = useCallback(
+    (projectId: string, originalProject: Project) => {
+      setProjects((currentProjects) => {
+        const projectIndex = currentProjects.findIndex(
+          (p) => p.id === projectId
+        );
+        if (projectIndex === -1) {
+          // Project not found, return current state unchanged
+          console.warn(
+            `Attempted to rollback project "${projectId}" but it was not found`
+          );
+          return currentProjects;
+        }
+
+        // Create new array with original project restored
+        const rolledBackProjects = [...currentProjects];
+        rolledBackProjects[projectIndex] = originalProject;
+        return rolledBackProjects;
+      });
+    },
+    []
+  );
+
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
@@ -133,9 +215,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   const bathroomProjects = useMemo(
     () =>
       projects.filter((project) =>
-        project.components.some(
-          (c) => c.category === CORE_CATEGORIES.BATHROOM
-        )
+        project.components.some((c) => c.category === CORE_CATEGORIES.BATHROOM)
       ),
     [projects]
   );
@@ -170,9 +250,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   const featuredBathroomProjects = useMemo(
     () =>
       featuredProjects.filter((project) =>
-        project.components.some(
-          (c) => c.category === CORE_CATEGORIES.BATHROOM
-        )
+        project.components.some((c) => c.category === CORE_CATEGORIES.BATHROOM)
       ),
     [featuredProjects]
   );
@@ -219,6 +297,9 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       featuredKitchenProjects,
       featuredGeneralProjects,
       refetchProjects,
+      updateProjectOptimistically,
+      rollbackProject,
+      setProjects,
     }),
     [
       projects,
@@ -231,6 +312,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       featuredKitchenProjects,
       featuredGeneralProjects,
       refetchProjects,
+      updateProjectOptimistically,
+      rollbackProject,
     ]
   );
 
