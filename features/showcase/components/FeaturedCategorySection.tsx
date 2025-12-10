@@ -1,20 +1,19 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
-import {
-  FlatList,
-  ListRenderItemInfo,
-  StyleSheet,
-  View,
-} from "react-native";
+import { FlatList, ListRenderItemInfo, StyleSheet, View } from "react-native";
 
 import { getCategoryConfig } from "@/core/constants/categoryConfig";
 import { DesignTokens } from "@/core/themes";
-import { Project, ProjectSummary, getProjectThumbnail } from "@/core/types";
 import {
-  getProjectCompletionDate,
-} from "@/core/types/ProjectUtils";
-import { ComponentCategory, CoreCategory } from "@/core/types/ComponentCategory";
+  Project,
+  ProjectCardView,
+  toProjectCardViewsByCategory,
+} from "@/core/types";
+import {
+  ComponentCategory,
+  CoreCategory,
+} from "@/core/types/ComponentCategory";
 import { ProjectCard } from "@/features/projects";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
@@ -66,32 +65,6 @@ const staticSectionStyles = StyleSheet.create({
 });
 
 /**
- * Convert Project to ProjectSummary for use with ProjectCard
- */
-function convertProjectToSummary(
-  project: Project,
-  category: ComponentCategory
-): ProjectSummary {
-  // Find the matching component for this category
-  const matchingComponent = project.components.find(
-    (c) => c.category === category
-  );
-
-  return {
-    id: project.id,
-    projectNumber: project.number,
-    name: project.name,
-    category: category,
-    subcategory: matchingComponent?.subcategory,
-    briefDescription: project.summary,
-    thumbnail: getProjectThumbnail(project),
-    status: project.status,
-    isFeatured: project.isFeatured,
-    completedAt: getProjectCompletionDate(project),
-  };
-}
-
-/**
  * FeaturedCategorySection - Horizontal scrolling section for featured projects by category
  *
  * Displays a section header with category icon and title, followed by a
@@ -111,6 +84,12 @@ export function FeaturedCategorySection({
   const categoryConfig = getCategoryConfig(category as CoreCategory);
   const categoryIcon = getCategoryIcon(category);
 
+  // Transform projects to ProjectCardView[] using centralized transformer
+  const cardViews = useMemo(
+    () => toProjectCardViewsByCategory(projects, category),
+    [projects, category]
+  );
+
   // Dynamic styles - only theme-dependent colors
   const dynamicStyles = useMemo(
     () =>
@@ -127,46 +106,32 @@ export function FeaturedCategorySection({
     [theme]
   );
 
-  const handleProjectPress = useCallback(
-    (projectSummary: ProjectSummary) => {
-      // Find the original project to get component information
-      const project = projects.find((p) => p.id === projectSummary.id);
-      if (!project) return;
-
-      // Find the component that matches the category for this section
-      const matchingComponent = project.components.find(
-        (c) => c.category === category
-      );
-
-      if (matchingComponent) {
-        // Navigate with componentId param to open directly to that component
-        router.push({
-          pathname: `/project/${project.id}`,
-          params: { componentId: matchingComponent.id },
-        });
-      } else {
-        // Fallback: no matching component found, just navigate to project
-        router.push(`/project/${project.id}`);
-      }
-    },
-    [projects, category]
-  );
+  const handleCardPress = useCallback((cardView: ProjectCardView) => {
+    try {
+      router.push({
+        // @ts-expect-error - Expo Router generated types are overly strict
+        pathname: `/project/${cardView.projectId}`,
+        params: { componentId: cardView.componentId },
+      });
+    } catch {
+      // Navigation error - silently fail
+    }
+  }, []);
 
   const renderCard = useCallback(
-    ({ item }: ListRenderItemInfo<Project>) => {
-      const projectSummary = convertProjectToSummary(item, category);
+    ({ item }: ListRenderItemInfo<ProjectCardView>) => {
       return (
         <View style={staticSectionStyles.cardWrapper}>
           <ProjectCard
-            project={projectSummary}
-            onPress={handleProjectPress}
+            cardView={item}
+            onPress={handleCardPress}
             variant="horizontal"
             blurhashPlaceholder={BLURHASH_PLACEHOLDER}
           />
         </View>
       );
     },
-    [category, handleProjectPress]
+    [handleCardPress]
   );
 
   // Fixed getItemLayout - accounts for listContainer paddingLeft
@@ -181,7 +146,7 @@ export function FeaturedCategorySection({
   );
 
   // Early returns after all hooks
-  if (projects.length === 0) {
+  if (cardViews.length === 0) {
     return null;
   }
 
@@ -208,9 +173,9 @@ export function FeaturedCategorySection({
 
       {/* Horizontal Project List */}
       <FlatList
-        data={projects}
+        data={cardViews}
         renderItem={renderCard}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.componentId}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={staticSectionStyles.listContainer}
