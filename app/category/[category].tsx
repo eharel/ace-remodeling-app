@@ -3,17 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ProjectSummary } from "@/core/types";
+import { ProjectCardView, toProjectCardViewsByCategory } from "@/core/types";
 import {
   ComponentCategory,
-  CORE_CATEGORIES,
   CoreCategory,
   getSubcategoryLabel,
 } from "@/core/types/ComponentCategory";
-import {
-  getProjectCompletionDate,
-  getProjectThumbnail,
-} from "@/core/types/ProjectUtils";
 import { CategoryPicker } from "@/features/category";
 import { ProjectGallery } from "@/features/projects";
 import {
@@ -26,7 +21,7 @@ import {
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
 import {
-  filterSummariesBySubcategory,
+  filterCardViewsBySubcategory,
   getAllCategories,
   getCategoryDisplayName,
   getSubcategories,
@@ -81,8 +76,71 @@ export default function CategoryScreen() {
   // Validate category parameter
   const validCategory = category as ComponentCategory;
   const allCategories = getAllCategories();
+  const isValidCategory =
+    category && allCategories.includes(category as CoreCategory);
 
-  if (!category || !allCategories.includes(category as CoreCategory)) {
+  // Transform projects to ProjectCardView[] using centralized transformer
+  // Use empty array if category is invalid to avoid errors
+  const allCategoryCardViews = useMemo(
+    () =>
+      isValidCategory
+        ? toProjectCardViewsByCategory(projects, validCategory)
+        : [],
+    [projects, validCategory, isValidCategory]
+  );
+
+  // Extract available subcategories for this category
+  const subcategories = useMemo(() => {
+    if (!projects || !isValidCategory) return [];
+    return getSubcategories(projects, validCategory);
+  }, [projects, validCategory, isValidCategory]);
+
+  // Determine if we should show the subcategory filter
+  const showSubcategoryFilter = useMemo(() => {
+    return shouldShowSubcategoryFilter(subcategories);
+  }, [subcategories]);
+
+  // Reset selected subcategory if it's no longer available
+  useEffect(() => {
+    if (!subcategories.includes(selectedSubcategory)) {
+      setSelectedSubcategory("all");
+    }
+  }, [subcategories, selectedSubcategory]);
+
+  // Apply subcategory filter to card views
+  const categoryCardViews = useMemo((): ProjectCardView[] => {
+    if (!showSubcategoryFilter) {
+      return allCategoryCardViews;
+    }
+    return filterCardViewsBySubcategory(
+      allCategoryCardViews,
+      selectedSubcategory
+    );
+  }, [allCategoryCardViews, selectedSubcategory, showSubcategoryFilter]);
+
+  const categoryDisplayName = isValidCategory
+    ? getCategoryDisplayName(validCategory)
+    : "";
+
+  const handleCardPress = (cardView: ProjectCardView) => {
+    try {
+      router.push({
+        // @ts-expect-error - Expo Router generated types are overly strict
+        pathname: `/project/${cardView.projectId}`,
+        params: { componentId: cardView.componentId },
+      });
+    } catch {
+      // Navigation error - silently fail
+    }
+  };
+
+  const handleCategoryChange = (newCategory: ComponentCategory) => {
+    // Use replace to avoid building up navigation stack
+    router.replace(`/category/${newCategory}`);
+  };
+
+  // Validate category parameter - show error if invalid
+  if (!isValidCategory) {
     return (
       <ThemedView style={styles.container}>
         <Stack.Screen
@@ -101,126 +159,12 @@ export default function CategoryScreen() {
           message="The requested category does not exist."
           actionText="Go to Browse"
           onAction={() => {
-            // @ts-expect-error - Expo Router generated types are overly strict
             router.push("/(tabs)/browse");
           }}
         />
       </ThemedView>
     );
   }
-
-  // Normalize category names (e.g., "outdoor" -> "outdoor-living")
-  // This handles legacy data where projects may use "outdoor" instead of "outdoor-living"
-  const normalizeCategory = (category: string): ComponentCategory => {
-    if (category === "outdoor") {
-      return CORE_CATEGORIES.OUTDOOR_LIVING;
-    }
-    return category as ComponentCategory;
-  };
-
-  // Filter projects by category (check if any component matches) and convert to ProjectSummary
-  const allCategoryProjects = useMemo((): ProjectSummary[] => {
-    if (!projects) return [];
-    return projects
-      .filter((project) =>
-        project.components.some((c) => {
-          const normalizedComponentCategory = normalizeCategory(c.category);
-          return normalizedComponentCategory === validCategory;
-        })
-      )
-      .map((project) => {
-        // Find the matching component to get its subcategory
-        const matchingComponent = project.components.find((c) => {
-          const normalizedComponentCategory = normalizeCategory(c.category);
-          return normalizedComponentCategory === validCategory;
-        });
-        
-        return {
-          id: project.id,
-          projectNumber: project.number,
-          name: project.name,
-          category: validCategory,
-          subcategory: matchingComponent?.subcategory,
-          briefDescription: project.summary,
-          thumbnail: getProjectThumbnail(project),
-          status: project.status,
-          isFeatured: project.isFeatured,
-          completedAt: getProjectCompletionDate(project),
-        };
-      });
-  }, [projects, validCategory]);
-
-  // Extract available subcategories for this category
-  const subcategories = useMemo(() => {
-    if (!projects) return [];
-    return getSubcategories(projects, validCategory);
-  }, [projects, validCategory]);
-
-  // Determine if we should show the subcategory filter
-  const showSubcategoryFilter = useMemo(() => {
-    return shouldShowSubcategoryFilter(subcategories);
-  }, [subcategories]);
-
-  // Reset selected subcategory if it's no longer available
-  useEffect(() => {
-    if (!subcategories.includes(selectedSubcategory)) {
-      setSelectedSubcategory("all");
-    }
-  }, [subcategories, selectedSubcategory]);
-
-  // Apply subcategory filter to projects
-  const categoryProjects = useMemo((): ProjectSummary[] => {
-    if (!projects || !showSubcategoryFilter) {
-      return allCategoryProjects;
-    }
-    return filterSummariesBySubcategory(
-      allCategoryProjects,
-      projects,
-      validCategory,
-      selectedSubcategory
-    );
-  }, [
-    allCategoryProjects,
-    projects,
-    validCategory,
-    selectedSubcategory,
-    showSubcategoryFilter,
-  ]);
-
-  const categoryDisplayName = getCategoryDisplayName(validCategory);
-
-  const handleProjectPress = (projectSummary: any) => {
-    // Find the full project object to get component information
-    const fullProject = projects.find((p) => p.id === projectSummary.id);
-
-    if (fullProject) {
-      // Find the component that matches the current category
-      // Use normalization to handle legacy "outdoor" category
-      const matchingComponent = fullProject.components.find((c) => {
-        const normalizedComponentCategory = normalizeCategory(c.category);
-        return normalizedComponentCategory === validCategory;
-      });
-
-      if (matchingComponent) {
-        // Navigate with componentId param to open directly to that component
-        router.push({
-          pathname: `/project/${fullProject.id}` as any,
-          params: { componentId: matchingComponent.id },
-        });
-      } else {
-        // Fallback: no matching component found, just navigate to project
-        router.push(`/project/${fullProject.id}` as any);
-      }
-    } else {
-      // Fallback: project not found in full list, use summary ID
-      router.push(`/project/${projectSummary.id}` as any);
-    }
-  };
-
-  const handleCategoryChange = (newCategory: ComponentCategory) => {
-    // Use replace to avoid building up navigation stack
-    router.replace(`/category/${newCategory}`);
-  };
 
   // Show loading state only on initial load (when no projects exist yet)
   // During refresh, keep content visible and just show refresh spinner
@@ -279,7 +223,7 @@ export default function CategoryScreen() {
     );
   }
 
-  if (categoryProjects.length === 0) {
+  if (categoryCardViews.length === 0) {
     return (
       <ThemedView style={styles.container}>
         <Stack.Screen
@@ -303,7 +247,6 @@ export default function CategoryScreen() {
           message={`We don't have any ${categoryDisplayName.toLowerCase()} projects to show at the moment.`}
           actionText="Browse Other Projects"
           onAction={() => {
-            // @ts-expect-error - Expo Router generated types are overly strict
             router.push("/(tabs)/browse");
           }}
         />
@@ -326,13 +269,13 @@ export default function CategoryScreen() {
           />
         }
         showBack={true}
-          backLabel="Browse"
+        backLabel="Browse"
         layoutMode="inline"
         subtitle={`Explore our ${categoryDisplayName.toLowerCase()} portfolio`}
       >
         <ThemedText style={styles.projectCount}>
-          {categoryProjects.length} project
-          {categoryProjects.length !== 1 ? "s" : ""}
+          {categoryCardViews.length} project
+          {categoryCardViews.length !== 1 ? "s" : ""}
         </ThemedText>
       </PageHeader>
 
@@ -362,7 +305,7 @@ export default function CategoryScreen() {
         )}
 
         {/* Project gallery or empty state */}
-        {categoryProjects.length === 0 ? (
+        {categoryCardViews.length === 0 ? (
           <ThemedView style={styles.emptyState}>
             <ThemedText
               style={{
@@ -380,8 +323,8 @@ export default function CategoryScreen() {
           </ThemedView>
         ) : (
           <ProjectGallery
-            projects={categoryProjects}
-            onProjectPress={handleProjectPress}
+            cardViews={categoryCardViews}
+            onCardPress={handleCardPress}
             enableRefresh={true}
           />
         )}

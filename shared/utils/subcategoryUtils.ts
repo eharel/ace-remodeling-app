@@ -1,4 +1,4 @@
-import { Project, ProjectSummary } from "@/core/types";
+import { Project, ProjectCardView, ProjectSummary } from "@/core/types";
 import {
   ComponentCategory,
   CORE_CATEGORIES,
@@ -213,4 +213,31 @@ export function filterSummariesBySubcategory(
       );
     });
   });
+}
+
+/**
+ * Filter ProjectCardView array by subcategory
+ *
+ * ProjectCardView includes subcategory information directly, so filtering
+ * is straightforward - no need to look up full project objects.
+ *
+ * @param cardViews - Array of project card views
+ * @param selectedSubcategory - Selected subcategory ('all' shows everything)
+ * @returns Filtered array of project card views
+ *
+ * @example
+ * filterCardViewsBySubcategory(cardViews, 'all') // returns all cardViews
+ * filterCardViewsBySubcategory(cardViews, 'pool') // returns only pool cardViews
+ */
+export function filterCardViewsBySubcategory(
+  cardViews: ProjectCardView[],
+  selectedSubcategory: string
+): ProjectCardView[] {
+  if (selectedSubcategory === "all") {
+    return cardViews;
+  }
+
+  return cardViews.filter(
+    (cardView) => cardView.subcategory === selectedSubcategory
+  );
 }
