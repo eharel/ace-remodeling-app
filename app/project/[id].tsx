@@ -14,7 +14,11 @@ import {
   MorePhotosCard,
   type PhotoTabValue,
 } from "@/features/gallery";
-import { AddPhotoCard, PhotoUploadButton } from "@/features/media";
+import {
+  AddPhotoCard,
+  DraggablePhotoGrid,
+  PhotoUploadButton,
+} from "@/features/media";
 import {
   LoadingState,
   PageHeader,
@@ -68,6 +72,7 @@ export default function ProjectDetailScreen() {
   // Asset gallery state (for viewing images in Assets section)
   const [assetGalleryVisible, setAssetGalleryVisible] = useState(false);
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
+  const [isEditMode, setIsEditMode] = useState(false);
   const { theme } = useTheme();
 
   // Show 3 preview photos (Flexbox will handle equal sizing)
@@ -524,15 +529,14 @@ export default function ProjectDetailScreen() {
     return photoCounts[activePhotoTab] - previewPhotos.length;
   }, [photoCounts, activePhotoTab, previewPhotos.length]);
 
-  // Get filtered images for gallery based on active tab
-  const galleryImages = useMemo(() => {
+  // Get filtered MediaAssets for current tab (for DraggablePhotoGrid)
+  const filteredMediaAssets = useMemo(() => {
     if (aggregatedPictures.length === 0) {
       return [];
     }
 
-    let filteredMedia: typeof aggregatedPictures;
     if (activePhotoTab === "all") {
-      filteredMedia = aggregatedPictures;
+      return aggregatedPictures.filter((m) => m.mediaType === "image");
     } else {
       // Map tab value to MediaAsset stage
       const stageMap: Record<string, string> = {
@@ -541,14 +545,17 @@ export default function ProjectDetailScreen() {
         progress: "in-progress",
       };
       const targetStage = stageMap[activePhotoTab] || activePhotoTab;
-      filteredMedia = aggregatedPictures.filter(
+      return aggregatedPictures.filter(
         (m) => m.mediaType === "image" && m.stage === targetStage
       );
     }
-
-    // Convert MediaAsset to Picture format
-    return convertMediaToPictures(filteredMedia);
   }, [aggregatedPictures, activePhotoTab]);
+
+  // Get filtered images for gallery based on active tab
+  const galleryImages = useMemo(() => {
+    // Convert MediaAsset to Picture format for gallery modal
+    return convertMediaToPictures(filteredMediaAssets);
+  }, [filteredMediaAssets]);
 
   // Debug logging for asset filtering (current issue)
   useEffect(() => {
@@ -1408,21 +1415,61 @@ export default function ProjectDetailScreen() {
 
           {/* Pictures Section */}
           <ThemedView style={styles.section}>
-            <ThemedText
-              style={[
-                styles.sectionTitle,
-                { color: theme.colors.text.primary },
-              ]}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: DesignTokens.spacing[2],
+              }}
             >
-              Project Photos ({currentMedia.length})
-            </ThemedText>
+              <ThemedText
+                style={[
+                  styles.sectionTitle,
+                  { color: theme.colors.text.primary },
+                ]}
+              >
+                Project Photos ({currentMedia.length})
+              </ThemedText>
+              {project && currentComponent && (
+                <Pressable
+                  onPress={() => setIsEditMode(!isEditMode)}
+                  style={{
+                    paddingHorizontal: DesignTokens.spacing[3],
+                    paddingVertical: DesignTokens.spacing[2],
+                    borderRadius: DesignTokens.borderRadius.md,
+                    backgroundColor: isEditMode
+                      ? theme.colors.interactive.primary
+                      : theme.colors.background.secondary,
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    isEditMode ? "Exit edit mode" : "Enter edit mode"
+                  }
+                >
+                  <ThemedText
+                    style={{
+                      fontSize: DesignTokens.typography.fontSize.sm,
+                      fontWeight: DesignTokens.typography.fontWeight.medium,
+                      color: isEditMode
+                        ? theme.colors.text.inverse
+                        : theme.colors.text.primary,
+                    }}
+                  >
+                    {isEditMode ? "Done" : "Edit"}
+                  </ThemedText>
+                </Pressable>
+              )}
+            </View>
             <ThemedText
               style={[
                 styles.sectionSubtitle,
                 { color: theme.colors.text.secondary },
               ]}
             >
-              Tap any photo to view gallery
+              {isEditMode
+                ? "Drag to reorder, tap delete to remove photos"
+                : "Tap any photo to view gallery"}
             </ThemedText>
 
             {aggregatedPictures.length > 0 ? (
@@ -1448,46 +1495,77 @@ export default function ProjectDetailScreen() {
                 />
 
                 {/* Photo Grid */}
-                {previewPhotos.length > 0 ? (
-                  <ThemedView variant="ghost" style={styles.picturesGrid}>
-                    {previewPhotos.map((item, previewIndex) => {
-                      // Find the index in the filtered gallery images for correct navigation
-                      const galleryIndex = galleryImages.findIndex(
-                        (p: { id?: string }) => p.id === item.id
-                      );
-                      // If not found, use previewIndex as fallback (but ensure it's in bounds)
-                      const safeIndex =
-                        galleryIndex >= 0
-                          ? galleryIndex
-                          : Math.min(previewIndex, galleryImages.length - 1);
-
-                      return renderGridImage(item, safeIndex);
-                    })}
-                    {/* Add Photo Card */}
-                    {project && currentComponent && (
-                      <AddPhotoCard
-                        projectId={project.id}
-                        componentId={currentComponent.id}
-                        stage={getUploadStage(activePhotoTab)}
-                        size="medium"
-                      />
-                    )}
-                    {/* "+X more" card */}
-                    {hasMorePhotos && (
-                      <MorePhotosCard
-                        count={remainingCount}
-                        backgroundPhoto={
-                          galleryImages[previewPhotos.length] ||
-                          galleryImages[0]
-                        }
-                        onPress={() => {
-                          // Open gallery starting from first photo in filtered set
-                          setSelectedImageIndex(0);
+                {filteredMediaAssets.length > 0 ? (
+                  <>
+                    {isEditMode ? (
+                      // Edit mode: show all photos with drag-and-drop
+                      <DraggablePhotoGrid
+                        photos={filteredMediaAssets}
+                        projectId={project?.id || ""}
+                        componentId={currentComponent?.id || ""}
+                        editable={true}
+                        onPhotoPress={(photo, index) => {
+                          // Find the index in galleryImages for correct navigation
+                          const galleryIndex = galleryImages.findIndex(
+                            (p: { id?: string }) => p.id === photo.id
+                          );
+                          const safeIndex =
+                            galleryIndex >= 0
+                              ? galleryIndex
+                              : Math.min(index, galleryImages.length - 1);
+                          setSelectedImageIndex(safeIndex);
                           setGalleryVisible(true);
                         }}
+                        showAddButton={true}
+                        stage={getUploadStage(activePhotoTab)}
+                        columns={3}
                       />
+                    ) : (
+                      // View mode: show preview with "+X more" card
+                      <ThemedView variant="ghost" style={styles.picturesGrid}>
+                        {previewPhotos.map((item, previewIndex) => {
+                          // Find the index in the filtered gallery images for correct navigation
+                          const galleryIndex = galleryImages.findIndex(
+                            (p: { id?: string }) => p.id === item.id
+                          );
+                          // If not found, use previewIndex as fallback (but ensure it's in bounds)
+                          const safeIndex =
+                            galleryIndex >= 0
+                              ? galleryIndex
+                              : Math.min(
+                                  previewIndex,
+                                  galleryImages.length - 1
+                                );
+
+                          return renderGridImage(item, safeIndex);
+                        })}
+                        {/* Add Photo Card */}
+                        {project && currentComponent && (
+                          <AddPhotoCard
+                            projectId={project.id}
+                            componentId={currentComponent.id}
+                            stage={getUploadStage(activePhotoTab)}
+                            size="medium"
+                          />
+                        )}
+                        {/* "+X more" card */}
+                        {hasMorePhotos && (
+                          <MorePhotosCard
+                            count={remainingCount}
+                            backgroundPhoto={
+                              galleryImages[previewPhotos.length] ||
+                              galleryImages[0]
+                            }
+                            onPress={() => {
+                              // Open gallery starting from first photo in filtered set
+                              setSelectedImageIndex(0);
+                              setGalleryVisible(true);
+                            }}
+                          />
+                        )}
+                      </ThemedView>
                     )}
-                  </ThemedView>
+                  </>
                 ) : (
                   <ThemedView style={styles.emptyState}>
                     <MaterialIcons

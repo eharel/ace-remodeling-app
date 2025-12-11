@@ -5,6 +5,10 @@
  */
 
 export * from "./AddPhotoCard";
+export * from "./DeleteConfirmDialog";
+export * from "./DraggablePhotoGrid";
+export * from "./PhotoCard";
+export * from "./PhotoOptionsMenu";
 export * from "./PhotoUploadButton";
 export * from "./UploadProgressItem";
 export * from "./UploadProgressOverlay";

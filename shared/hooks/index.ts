@@ -4,6 +4,7 @@
  */
 
 export * from "./useMediaMutations";
+export * from "./usePhotoDelete";
 export * from "./usePhotoUpload";
 export * from "./useProjectMutations";
 export * from "./useVersionCheck";
