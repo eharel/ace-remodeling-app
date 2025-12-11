@@ -18,6 +18,7 @@ import {
   AddPhotoCard,
   DraggablePhotoGrid,
   PhotoUploadButton,
+  ThumbnailEditor,
 } from "@/features/media";
 import {
   LoadingState,
@@ -1272,8 +1273,25 @@ export default function ProjectDetailScreen() {
           style={styles.scrollView}
           contentContainerStyle={{ paddingBottom: DesignTokens.spacing[20] }}
         >
-          {/* Hero Image - OPTIMIZED with caching and transitions */}
-          {heroImageUrl ? (
+          {/* Hero Image / Thumbnail Editor */}
+          {isEditMode && project && currentComponent ? (
+            <ThemedView
+              style={{
+                marginHorizontal: DesignTokens.spacing[4],
+                marginBottom: DesignTokens.spacing[4],
+              }}
+            >
+              <ThumbnailEditor
+                projectId={project.id}
+                componentId={currentComponent.id}
+                currentThumbnail={currentComponent.thumbnail}
+                media={currentMedia}
+                editable={true}
+                size="large"
+                aspectRatio={16 / 9}
+              />
+            </ThemedView>
+          ) : heroImageUrl ? (
             <Animated.View
               key={`hero-container-${selectedComponentId || "default"}`}
               entering={FadeIn.duration(200)}

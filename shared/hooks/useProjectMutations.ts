@@ -24,6 +24,21 @@ export interface UseProjectMutationsReturn {
     value: any
   ) => Promise<void>;
 
+  /**
+   * Update the component's thumbnail image URL.
+   * Convenience wrapper around updateComponentField for the thumbnail field.
+   *
+   * @param projectId - The ID of the project containing the component
+   * @param componentId - The ID of the component to update
+   * @param thumbnailUrl - The new thumbnail URL (or empty string to clear)
+   * @throws Error if the mutation fails
+   */
+  updateComponentThumbnail: (
+    projectId: string,
+    componentId: string,
+    thumbnailUrl: string
+  ) => Promise<void>;
+
   /** Whether a mutation is currently in progress */
   isUpdating: boolean;
 
@@ -122,8 +137,28 @@ export function useProjectMutations(): UseProjectMutationsReturn {
     [projects, updateProjectOptimistically, rollbackProject]
   );
 
+  const handleUpdateComponentThumbnail = useCallback(
+    async (
+      projectId: string,
+      componentId: string,
+      thumbnailUrl: string
+    ): Promise<void> => {
+      // Use updateComponentField with "thumbnail" field
+      // Convert empty string to undefined to clear thumbnail
+      const value = thumbnailUrl === "" ? undefined : thumbnailUrl;
+      await handleUpdateComponentField(
+        projectId,
+        componentId,
+        "thumbnail",
+        value
+      );
+    },
+    [handleUpdateComponentField]
+  );
+
   return {
     updateComponentField: handleUpdateComponentField,
+    updateComponentThumbnail: handleUpdateComponentThumbnail,
     isUpdating,
     error,
     clearError,

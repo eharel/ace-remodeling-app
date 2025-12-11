@@ -10,5 +10,7 @@ export * from "./DraggablePhotoGrid";
 export * from "./PhotoCard";
 export * from "./PhotoOptionsMenu";
 export * from "./PhotoUploadButton";
+export * from "./ThumbnailEditor";
+export * from "./ThumbnailPickerModal";
 export * from "./UploadProgressItem";
 export * from "./UploadProgressOverlay";
