@@ -5,7 +5,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { EditableText, EditableTextArea } from "@/features/forms";
+import {
+  CreateComponentModal,
+  EditableText,
+  EditableTextArea,
+} from "@/features/forms";
 import {
   type AssetCategoryValue,
   AssetThumbnail,
@@ -24,6 +28,8 @@ import {
   LoadingState,
   PageHeader,
   RefreshableScrollView,
+  ThemedButton,
+  ThemedIconButton,
   ThemedText,
   ThemedView,
 } from "@/shared/components";
@@ -149,6 +155,7 @@ export default function ProjectDetailScreen() {
   const [assetGalleryVisible, setAssetGalleryVisible] = useState(false);
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showCreateComponent, setShowCreateComponent] = useState(false);
   const { theme } = useTheme();
 
   // Show 3 preview photos (Flexbox will handle equal sizing)
@@ -1387,19 +1394,62 @@ export default function ProjectDetailScreen() {
 
           {/* Component Selector - only show if multiple components */}
           {project.components.length > 1 && sortedComponents.length > 0 && (
-            <SegmentedControl
-              variant="pills"
-              options={sortedComponents.map((c) => c.id) as readonly string[]}
-              selected={selectedComponentId || sortedComponents[0].id}
-              onSelect={setSelectedComponentId}
-              getLabel={(componentId) => {
-                const component = sortedComponents.find(
-                  (c) => c.id === componentId
-                );
-                return component ? getComponentLabel(component) : componentId;
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: DesignTokens.spacing[2],
+                marginHorizontal: DesignTokens.spacing[4],
+                marginBottom: DesignTokens.spacing[2],
               }}
-              ariaLabel="Select project component"
-            />
+            >
+              <View style={{ flex: 1 }}>
+                <SegmentedControl
+                  variant="pills"
+                  options={
+                    sortedComponents.map((c) => c.id) as readonly string[]
+                  }
+                  selected={selectedComponentId || sortedComponents[0].id}
+                  onSelect={setSelectedComponentId}
+                  getLabel={(componentId) => {
+                    const component = sortedComponents.find(
+                      (c) => c.id === componentId
+                    );
+                    return component
+                      ? getComponentLabel(component)
+                      : componentId;
+                  }}
+                  ariaLabel="Select project component"
+                />
+              </View>
+              {isEditMode && (
+                <ThemedIconButton
+                  icon="add"
+                  variant="primary"
+                  size="small"
+                  onPress={() => setShowCreateComponent(true)}
+                  accessibilityLabel="Add component"
+                />
+              )}
+            </View>
+          )}
+          {/* Add Component Button - show if single component or in edit mode */}
+          {project && (project.components.length === 1 || isEditMode) && (
+            <View
+              style={{
+                marginHorizontal: DesignTokens.spacing[4],
+                marginBottom: DesignTokens.spacing[2],
+              }}
+            >
+              <ThemedButton
+                variant="secondary"
+                icon="add"
+                onPress={() => setShowCreateComponent(true)}
+                accessibilityLabel="Add component"
+              >
+                Add Component
+              </ThemedButton>
+            </View>
           )}
 
           {/* Project Header */}
@@ -1918,6 +1968,22 @@ export default function ProjectDetailScreen() {
           )}
           onClose={() => {
             setAssetGalleryVisible(false);
+          }}
+        />
+      )}
+
+      {/* Create Component Modal */}
+      {project && (
+        <CreateComponentModal
+          visible={showCreateComponent}
+          onClose={() => setShowCreateComponent(false)}
+          projectId={project.id}
+          project={project}
+          onCreated={(component) => {
+            setShowCreateComponent(false);
+            // Select the newly created component
+            setSelectedComponentId(component.id);
+            setIsEditMode(true);
           }}
         />
       )}

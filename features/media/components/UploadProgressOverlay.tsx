@@ -1,5 +1,11 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useCallback, useMemo } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
@@ -37,6 +43,8 @@ export function UploadProgressOverlay({
   testID = "upload-progress-overlay",
 }: UploadProgressOverlayProps) {
   const { theme } = useTheme();
+  const [isDismissed, setIsDismissed] = useState(false);
+  const previousUploadCountRef = useRef(uploads.length);
 
   // Only show if there are any uploads (active or completed)
   const activeUploads = uploads.filter(
@@ -44,6 +52,14 @@ export function UploadProgressOverlay({
   );
   const hasActiveUploads = activeUploads.length > 0;
   const hasAnyUploads = uploads.length > 0;
+
+  // Reset dismissed state when new uploads start (upload count increases)
+  useEffect(() => {
+    if (uploads.length > previousUploadCountRef.current) {
+      setIsDismissed(false);
+    }
+    previousUploadCountRef.current = uploads.length;
+  }, [uploads.length]);
 
   const styles = useMemo(
     () =>
@@ -103,23 +119,34 @@ export function UploadProgressOverlay({
     [onCancelUpload]
   );
 
+  // Dismiss handler - updates internal state and calls optional callback
+  const handleDismiss = useCallback(() => {
+    setIsDismissed(true);
+    if (onDismiss) {
+      onDismiss();
+    }
+  }, [onDismiss]);
+
   // Only return null if there are no uploads at all
   if (!hasAnyUploads) {
     return null;
   }
 
+  // Don't show if user dismissed it (unless there are new active uploads)
+  const shouldShow = !isDismissed || hasActiveUploads;
+
   return (
     <Modal
-      visible={hasAnyUploads}
+      visible={shouldShow}
       transparent
       animationType="slide"
-      onRequestClose={onDismiss}
+      onRequestClose={handleDismiss}
       accessibilityViewIsModal={true}
       accessibilityLabel="Upload progress"
     >
       <Pressable
         style={styles.overlay}
-        onPress={onDismiss}
+        onPress={handleDismiss}
         accessibilityRole="button"
         accessibilityLabel="Close upload progress"
       >
@@ -137,20 +164,18 @@ export function UploadProgressOverlay({
                   }`
                 : "Upload Complete"}
             </ThemedText>
-            {onDismiss && (
-              <Pressable
-                style={styles.closeButton}
-                onPress={onDismiss}
-                accessibilityRole="button"
-                accessibilityLabel="Close"
-              >
-                <MaterialIcons
-                  name="close"
-                  size={24}
-                  color={theme.colors.text.primary}
-                />
-              </Pressable>
-            )}
+            <Pressable
+              style={styles.closeButton}
+              onPress={handleDismiss}
+              accessibilityRole="button"
+              accessibilityLabel="Close"
+            >
+              <MaterialIcons
+                name="close"
+                size={24}
+                color={theme.colors.text.primary}
+              />
+            </Pressable>
           </View>
 
           {/* Content */}

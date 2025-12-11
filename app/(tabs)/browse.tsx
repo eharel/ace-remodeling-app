@@ -1,23 +1,28 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
-import { ComponentCategory, CORE_CATEGORIES } from "@/core/types/ComponentCategory";
+import {
+  ComponentCategory,
+  CORE_CATEGORIES,
+} from "@/core/types/ComponentCategory";
+import { CreateProjectModal } from "@/features/forms";
 import {
   EmptyState,
   LoadingState,
   PageHeader,
+  ThemedButton,
   ThemedText,
   ThemedView,
 } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
-import { 
+import {
   CATEGORY_DISPLAY_ORDER,
-  getAllCategories, 
-  getCategoryDisplayName, 
-  getCategoryIcon 
+  getAllCategories,
+  getCategoryDisplayName,
+  getCategoryIcon,
 } from "@/shared/utils";
 
 interface CategoryItem {
@@ -30,6 +35,7 @@ interface CategoryItem {
 export default function ProjectsScreen() {
   const { theme } = useTheme();
   const { projects, loading, error } = useProjects();
+  const [showCreateProject, setShowCreateProject] = useState(false);
 
   // Get categories with projects, sorted by display order
   const categories = useMemo(() => {
@@ -60,7 +66,7 @@ export default function ProjectsScreen() {
 
     // Filter to only show categories that have projects
     const filtered = categoryData.filter((category) => category.count > 0);
-    
+
     // Sort by display order
     return filtered.sort((a, b) => {
       const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a.id);
@@ -205,9 +211,13 @@ export default function ProjectsScreen() {
       <ThemedView style={styles.container}>
         <EmptyState
           title="No Projects Available"
-          message="We don't have any projects to show at the moment."
-          actionText="Check Back Later"
-          onAction={() => {}}
+          message="Create your first project to get started"
+          actionText="Create Project"
+          onAction={() => setShowCreateProject(true)}
+        />
+        <CreateProjectModal
+          visible={showCreateProject}
+          onClose={() => setShowCreateProject(false)}
         />
       </ThemedView>
     );
@@ -215,10 +225,33 @@ export default function ProjectsScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <PageHeader
-        title="Projects"
-        subtitle="Browse our various projects by category"
-      />
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingHorizontal: DesignTokens.spacing[4],
+          paddingTop: DesignTokens.spacing[8],
+          paddingBottom: DesignTokens.spacing[2],
+        }}
+      >
+        <View style={{ flex: 1 }}>
+          <PageHeader
+            title="Projects"
+            subtitle="Browse our various projects by category"
+            variant="compact"
+          />
+        </View>
+        <ThemedButton
+          variant="primary"
+          icon="add"
+          onPress={() => setShowCreateProject(true)}
+          size="small"
+          accessibilityLabel="Create new project"
+        >
+          New
+        </ThemedButton>
+      </View>
 
       <FlatList
         data={categories}
@@ -230,7 +263,11 @@ export default function ProjectsScreen() {
           paddingBottom: DesignTokens.spacing[8],
         }}
       />
+
+      <CreateProjectModal
+        visible={showCreateProject}
+        onClose={() => setShowCreateProject(false)}
+      />
     </ThemedView>
   );
 }
-
