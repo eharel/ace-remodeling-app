@@ -13,6 +13,7 @@ import "react-native-reanimated";
 import { LogBox } from "react-native";
 
 import { FloatingChecklistButton } from "@/features/checklist";
+import { UploadProgressOverlay } from "@/features/media";
 import { ErrorBoundary } from "@/shared/components";
 import {
   AuthProvider,
@@ -20,6 +21,7 @@ import {
   ThemeProvider,
   useTheme,
 } from "@/shared/contexts";
+import { usePhotoUpload } from "@/shared/hooks";
 LogBox.ignoreAllLogs(true);
 
 // Disable error overlay in development
@@ -31,6 +33,7 @@ if (__DEV__) {
 // Navigation component that can use theme context
 function Navigation() {
   const { currentTheme } = useTheme();
+  const { uploadingPhotos, cancelUpload } = usePhotoUpload();
 
   return (
     <ErrorBoundary>
@@ -63,6 +66,12 @@ function Navigation() {
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />
+
+        {/* Global upload progress overlay */}
+        <UploadProgressOverlay
+          uploads={uploadingPhotos}
+          onCancelUpload={cancelUpload}
+        />
       </NavigationThemeProvider>
     </ErrorBoundary>
   );

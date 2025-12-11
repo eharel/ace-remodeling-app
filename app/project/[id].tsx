@@ -14,6 +14,7 @@ import {
   MorePhotosCard,
   type PhotoTabValue,
 } from "@/features/gallery";
+import { AddPhotoCard, PhotoUploadButton } from "@/features/media";
 import {
   LoadingState,
   PageHeader,
@@ -30,6 +31,7 @@ import {
   getCategoryLabel,
   getProjectThumbnail,
   getSubcategoryLabel,
+  MediaStage,
   Project,
   ProjectComponent,
 } from "@/core/types";
@@ -209,6 +211,20 @@ export default function ProjectDetailScreen() {
     const sharedMedia = project.sharedMedia || [];
     return [...componentMedia, ...sharedMedia];
   }, [project, currentComponent]);
+
+  /**
+   * Map PhotoTabValue to MediaStage for uploads
+   * Defaults to "after" for "all" tab
+   */
+  const getUploadStage = (tab: PhotoTabValue): MediaStage => {
+    const stageMap: Record<PhotoTabValue, MediaStage> = {
+      before: "before",
+      after: "after",
+      progress: "in-progress",
+      all: "after", // Default to "after" when "all" is selected
+    };
+    return stageMap[tab] || "after";
+  };
 
   /**
    * Documents for current component + shared documents
@@ -1447,6 +1463,15 @@ export default function ProjectDetailScreen() {
 
                       return renderGridImage(item, safeIndex);
                     })}
+                    {/* Add Photo Card */}
+                    {project && currentComponent && (
+                      <AddPhotoCard
+                        projectId={project.id}
+                        componentId={currentComponent.id}
+                        stage={getUploadStage(activePhotoTab)}
+                        size="medium"
+                      />
+                    )}
                     {/* "+X more" card */}
                     {hasMorePhotos && (
                       <MorePhotosCard
@@ -1479,6 +1504,18 @@ export default function ProjectDetailScreen() {
                       No {activePhotoTab === "all" ? "" : activePhotoTab} photos
                       available
                     </ThemedText>
+                    {project && currentComponent && (
+                      <View style={{ marginTop: DesignTokens.spacing[4] }}>
+                        <PhotoUploadButton
+                          projectId={project.id}
+                          componentId={currentComponent.id}
+                          stage={getUploadStage(activePhotoTab)}
+                          variant="button"
+                        >
+                          Add First Photo
+                        </PhotoUploadButton>
+                      </View>
+                    )}
                   </ThemedView>
                 )}
               </>
@@ -1497,6 +1534,18 @@ export default function ProjectDetailScreen() {
                 >
                   No pictures available
                 </ThemedText>
+                {project && currentComponent && (
+                  <View style={{ marginTop: DesignTokens.spacing[4] }}>
+                    <PhotoUploadButton
+                      projectId={project.id}
+                      componentId={currentComponent.id}
+                      stage={getUploadStage(activePhotoTab)}
+                      variant="button"
+                    >
+                      Add First Photo
+                    </PhotoUploadButton>
+                  </View>
+                )}
               </ThemedView>
             )}
           </ThemedView>
