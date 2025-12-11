@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
+import { EditableText, EditableTextArea } from "@/features/forms";
 import {
   type AssetCategoryValue,
   AssetThumbnail,
@@ -15,7 +16,6 @@ import {
   type PhotoTabValue,
 } from "@/features/gallery";
 import {
-  AddPhotoCard,
   DraggablePhotoGrid,
   PhotoUploadButton,
   ThumbnailEditor,
@@ -29,6 +29,7 @@ import {
 } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
+import { useFieldEdit } from "@/shared/hooks";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { DesignTokens } from "@/core/themes";
@@ -49,6 +50,80 @@ import {
   getProjectDuration,
   samplePreviewPhotos,
 } from "@/shared/utils";
+
+/**
+ * Component Name Field - Editable component name
+ */
+function ComponentNameField({
+  project,
+  component,
+  editable,
+}: {
+  project: Project;
+  component: ProjectComponent;
+  editable: boolean;
+}) {
+  const { value, isInherited, save } = useFieldEdit({
+    projectId: project.id,
+    componentId: component.id,
+    field: "name",
+    currentValue: component.name,
+    inheritedValue: project.name,
+  });
+
+  // Don't show if no value and not editable (inherited name is shown in project header)
+  if (!value && !editable) {
+    return null;
+  }
+
+  return (
+    <EditableText
+      value={value}
+      placeholder="Component name"
+      variant="title"
+      editable={editable}
+      isInherited={isInherited}
+      inheritedFrom={`Project ${project.number}`}
+      onSave={save}
+      required={false}
+    />
+  );
+}
+
+/**
+ * Component Description Field - Editable component description
+ */
+function ComponentDescriptionField({
+  project,
+  component,
+  editable,
+}: {
+  project: Project;
+  component: ProjectComponent;
+  editable: boolean;
+}) {
+  const { value, isInherited, save } = useFieldEdit({
+    projectId: project.id,
+    componentId: component.id,
+    field: "description",
+    currentValue: component.description,
+    inheritedValue: project.description,
+  });
+
+  return (
+    <EditableTextArea
+      value={value}
+      placeholder="Project description"
+      editable={editable}
+      isInherited={isInherited}
+      inheritedFrom={`Project ${project.number}`}
+      onSave={save}
+      maxLength={2000}
+      showCharCount={editable}
+      previewLines={3}
+    />
+  );
+}
 
 export default function ProjectDetailScreen() {
   const { id, componentId } = useLocalSearchParams<{
@@ -1330,26 +1405,22 @@ export default function ProjectDetailScreen() {
           {/* Project Header */}
           <ThemedView style={styles.header}>
             <ThemedView style={styles.headerContent}>
-              {/* Component Name - show if exists (project name is in header) */}
-              {currentComponent?.name && (
-                <ThemedText
-                  style={[
-                    styles.componentName,
-                    { color: theme.colors.text.primary },
-                  ]}
-                >
-                  {currentComponent.name}
-                </ThemedText>
+              {/* Component Name - editable in edit mode */}
+              {project && currentComponent && (
+                <ComponentNameField
+                  project={project}
+                  component={currentComponent}
+                  editable={isEditMode}
+                />
               )}
-              <ThemedText
-                key={`description-${selectedComponentId || "default"}`}
-                style={[
-                  styles.projectDescription,
-                  { color: theme.colors.text.secondary },
-                ]}
-              >
-                {displayDescription}
-              </ThemedText>
+              {/* Description - editable in edit mode */}
+              {project && currentComponent && (
+                <ComponentDescriptionField
+                  project={project}
+                  component={currentComponent}
+                  editable={isEditMode}
+                />
+              )}
             </ThemedView>
 
             {/* Project Meta */}
@@ -1557,15 +1628,6 @@ export default function ProjectDetailScreen() {
 
                           return renderGridImage(item, safeIndex);
                         })}
-                        {/* Add Photo Card */}
-                        {project && currentComponent && (
-                          <AddPhotoCard
-                            projectId={project.id}
-                            componentId={currentComponent.id}
-                            stage={getUploadStage(activePhotoTab)}
-                            size="medium"
-                          />
-                        )}
                         {/* "+X more" card */}
                         {hasMorePhotos && (
                           <MorePhotosCard

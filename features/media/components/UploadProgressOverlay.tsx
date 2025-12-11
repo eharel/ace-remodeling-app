@@ -38,11 +38,12 @@ export function UploadProgressOverlay({
 }: UploadProgressOverlayProps) {
   const { theme } = useTheme();
 
-  // Only show if there are active uploads
+  // Only show if there are any uploads (active or completed)
   const activeUploads = uploads.filter(
     (u) => u.status === "uploading" || u.status === "processing"
   );
   const hasActiveUploads = activeUploads.length > 0;
+  const hasAnyUploads = uploads.length > 0;
 
   const styles = useMemo(
     () =>
@@ -102,13 +103,14 @@ export function UploadProgressOverlay({
     [onCancelUpload]
   );
 
-  if (!hasActiveUploads && uploads.length === 0) {
+  // Only return null if there are no uploads at all
+  if (!hasAnyUploads) {
     return null;
   }
 
   return (
     <Modal
-      visible={hasActiveUploads || uploads.length > 0}
+      visible={hasAnyUploads}
       transparent
       animationType="slide"
       onRequestClose={onDismiss}
@@ -156,7 +158,7 @@ export function UploadProgressOverlay({
             style={styles.content}
             showsVerticalScrollIndicator={false}
           >
-            {uploads.length === 0 ? (
+            {!hasActiveUploads && hasAnyUploads ? (
               <View style={styles.emptyState}>
                 <MaterialIcons
                   name="check-circle"
