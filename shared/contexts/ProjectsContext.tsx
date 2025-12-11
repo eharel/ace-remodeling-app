@@ -314,6 +314,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       refetchProjects,
       updateProjectOptimistically,
       rollbackProject,
+      setProjects,
     ]
   );
 

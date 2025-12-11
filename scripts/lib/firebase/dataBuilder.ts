@@ -19,7 +19,11 @@ import {
   DiscoveredAsset,
   DiscoveredMedia,
 } from "../filesystem/types";
-import { ComponentUploadResult, UploadResult } from "./storage";
+import {
+  ComponentUploadResult,
+  generateProjectId,
+  UploadResult,
+} from "./storage";
 
 /**
  * All data sources needed to build a Project document
@@ -72,8 +76,14 @@ export function buildProjectDocument(sources: ProjectDataSources): BuildResult {
     console.log(`   • Merging...`);
 
     // Start with CSV data (has most metadata)
+    // Generate project ID to match storage path format (project_{number})
+    const projectId = generateProjectId(csvData.number);
+
     const project: Project = {
       ...csvData,
+
+      // Override ID to match storage path format
+      id: projectId,
 
       // Override components with fully populated data
       components: buildComponents(

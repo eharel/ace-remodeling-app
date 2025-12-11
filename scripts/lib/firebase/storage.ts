@@ -7,21 +7,13 @@
  * @module scripts/lib/firebase/storage
  */
 
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import * as fs from "fs/promises";
 import * as path from "path";
-import {
-  getDownloadURL,
-  ref,
-  uploadBytes,
-} from "firebase/storage";
-import { storage } from "./client";
-import { ProgressTracker } from "../utils/progressTracker";
-import {
-  ComponentFiles,
-  DiscoveredAsset,
-  DiscoveredMedia,
-} from "../filesystem/types";
+import { ComponentFiles } from "../filesystem/types";
 import { getFileSize } from "../utils/fileUtils";
+import { ProgressTracker } from "../utils/progressTracker";
+import { storage } from "./client";
 
 /**
  * Upload options
@@ -125,44 +117,75 @@ export interface UploadError {
 }
 
 /**
- * Build Firebase Storage path for a file
+ * Generate deterministic project ID from project number
  *
- * Constructs path preserving folder structure:
- * projects/{number}/{category}/{subcategory?}/{type}/{stage|category}/{filename}
+ * @param projectNumber - Project number (e.g., "187")
+ * @returns Project ID (e.g., "project_187")
+ */
+export function generateProjectId(projectNumber: string): string {
+  // Sanitize project number to ensure valid ID
+  const sanitized = projectNumber.replace(/[^a-zA-Z0-9._-]/g, "_");
+  return `project_${sanitized}`;
+}
+
+/**
+ * Generate deterministic component ID matching CSV parser format
  *
- * @param componentFiles - Component containing the file
- * @param file - Discovered media or asset file
+ * Format: {number}-{category}[-{subcategory}][-{index}]
+ * This matches the format used in scripts/lib/csv/parser.ts
+ *
+ * @param projectNumber - Project number (e.g., "187")
+ * @param category - Component category (e.g., "bathroom")
+ * @param subcategory - Optional subcategory (e.g., "pool")
+ * @param index - Optional index for multiple components with same category/subcategory
+ * @returns Component ID (e.g., "187-bathroom" or "187-outdoor-living-pool")
+ */
+export function generateComponentId(
+  projectNumber: string,
+  category: string,
+  subcategory?: string,
+  index?: number
+): string {
+  // Sanitize inputs
+  const sanitizedNumber = projectNumber.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const sanitizedCategory = category.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+  let componentId = `${sanitizedNumber}-${sanitizedCategory}`;
+
+  if (subcategory) {
+    const sanitizedSubcategory = subcategory.replace(/[^a-zA-Z0-9._-]/g, "_");
+    componentId += `-${sanitizedSubcategory}`;
+  }
+
+  if (index !== undefined && index > 0) {
+    componentId += `-${index}`;
+  }
+
+  return componentId;
+}
+
+/**
+ * Build Firebase Storage path for a file using ID-based structure
+ *
+ * New structure: projects/{projectId}/components/{componentId}/{filename}
+ * This matches the app's storage service structure.
+ *
+ * @param projectId - Project ID (e.g., "project_187")
+ * @param componentId - Component ID (e.g., "187-bathroom")
+ * @param filename - Filename (should include timestamp prefix for uniqueness)
  * @returns Storage path string
  */
-function buildStoragePath(
-  componentFiles: ComponentFiles,
-  file: DiscoveredMedia | DiscoveredAsset
+export function buildStoragePath(
+  projectId: string,
+  componentId: string,
+  filename: string
 ): string {
-  const { projectNumber, category, subcategory } = componentFiles;
+  // Sanitize IDs to prevent path injection
+  const safeProjectId = projectId.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const safeComponentId = componentId.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const safeFilename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
 
-  // Base: projects/{number}/{category}
-  let basePath = `projects/${projectNumber}/${category}`;
-
-  // Add subcategory if present
-  if (subcategory) {
-    basePath += `/${subcategory}`;
-  }
-
-  // Add type folder and stage/category
-  if ("mediaType" in file) {
-    // Media file (photo or video)
-    const mediaFile = file as DiscoveredMedia;
-    basePath += mediaFile.mediaType === "image" ? "/photos" : "/videos";
-    basePath += `/${mediaFile.stage}`; // before, after, in-progress, etc.
-  } else {
-    // Asset file
-    const assetFile = file as DiscoveredAsset;
-    basePath += "/assets";
-    basePath += `/${assetFile.category}`; // plans, materials, etc.
-  }
-
-  // Add filename
-  return `${basePath}/${file.filename}`;
+  return `projects/${safeProjectId}/components/${safeComponentId}/${safeFilename}`;
 }
 
 /**
@@ -201,11 +224,7 @@ export async function uploadFile(
   storagePath: string,
   options: UploadOptions = {}
 ): Promise<UploadResult> {
-  const {
-    dryRun = false,
-    retries = 3,
-    skipExisting = true,
-  } = options;
+  const { dryRun = false, retries = 3, skipExisting = true } = options;
 
   // Get file size
   const size = await getFileSize(localPath);
@@ -338,8 +357,7 @@ function getContentType(filepath: string): string {
     // Documents
     pdf: "application/pdf",
     doc: "application/msword",
-    docx:
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     // CAD
     dwg: "application/acad",
     dxf: "application/dxf",
@@ -376,33 +394,66 @@ async function uploadWithConcurrency<T>(
 }
 
 /**
+ * Generate filename with timestamp prefix for uniqueness
+ *
+ * Matches the format used in the app's storage service.
+ *
+ * @param originalFilename - Original filename from filesystem
+ * @returns Filename with timestamp prefix
+ */
+function generateFilename(originalFilename: string): string {
+  const timestamp = Date.now();
+  const sanitized = originalFilename.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const parts = sanitized.split(".");
+  const extension = parts.length > 1 ? parts.pop() : "";
+  const nameWithoutExt = parts.join(".");
+
+  if (extension) {
+    return `${timestamp}_${nameWithoutExt}.${extension}`;
+  }
+  return `${timestamp}_${sanitized}`;
+}
+
+/**
  * Upload all files for a component
  *
- * Uploads both media and asset files for a single component.
+ * Uploads both media and asset files for a single component using ID-based storage paths.
  *
  * @param componentFiles - Files discovered by scanner
+ * @param projectId - Project ID (e.g., "project_187")
+ * @param componentId - Component ID (e.g., "187-bathroom")
  * @param options - Upload options
  * @param progressTracker - Optional progress tracker
  * @returns Promise<ComponentUploadResult>
  */
 export async function uploadComponentFiles(
   componentFiles: ComponentFiles,
+  projectId: string,
+  componentId: string,
   options: UploadOptions = {},
   progressTracker?: ProgressTracker
 ): Promise<ComponentUploadResult> {
   const { media, assets } = componentFiles;
   const concurrency = options.concurrency || 5;
 
-  // Prepare upload tasks
+  // Prepare upload tasks with ID-based paths and timestamped filenames
   const mediaTasks = media.map((file) => ({
     localPath: file.filepath,
-    storagePath: buildStoragePath(componentFiles, file),
+    storagePath: buildStoragePath(
+      projectId,
+      componentId,
+      generateFilename(file.filename)
+    ),
     size: file.size,
   }));
 
   const assetTasks = assets.map((file) => ({
     localPath: file.filepath,
-    storagePath: buildStoragePath(componentFiles, file),
+    storagePath: buildStoragePath(
+      projectId,
+      componentId,
+      generateFilename(file.filename)
+    ),
     size: file.size,
   }));
 
@@ -410,10 +461,17 @@ export async function uploadComponentFiles(
   const mediaResults = await uploadWithConcurrency(
     mediaTasks,
     async (task) => {
-      const result = await uploadFile(task.localPath, task.storagePath, options);
+      const result = await uploadFile(
+        task.localPath,
+        task.storagePath,
+        options
+      );
       if (progressTracker) {
         if (result.success) {
-          progressTracker.fileCompleted(path.basename(task.localPath), task.size);
+          progressTracker.fileCompleted(
+            path.basename(task.localPath),
+            task.size
+          );
         } else if (result.error?.includes("already exists")) {
           progressTracker.fileSkipped(path.basename(task.localPath));
         } else {
@@ -429,10 +487,17 @@ export async function uploadComponentFiles(
   const assetResults = await uploadWithConcurrency(
     assetTasks,
     async (task) => {
-      const result = await uploadFile(task.localPath, task.storagePath, options);
+      const result = await uploadFile(
+        task.localPath,
+        task.storagePath,
+        options
+      );
       if (progressTracker) {
         if (result.success) {
-          progressTracker.fileCompleted(path.basename(task.localPath), task.size);
+          progressTracker.fileCompleted(
+            path.basename(task.localPath),
+            task.size
+          );
         } else if (result.error?.includes("already exists")) {
           progressTracker.fileSkipped(path.basename(task.localPath));
         } else {
@@ -474,6 +539,7 @@ export async function uploadComponentFiles(
  *
  * Main entry point for bulk uploads. Handles progress tracking,
  * error collection, and summary generation.
+ * Generates project and component IDs deterministically to match CSV parser format.
  *
  * @param allComponents - All component files from scanner
  * @param options - Upload options
@@ -515,64 +581,110 @@ export async function uploadAllFiles(
   // Create progress tracker
   const progressTracker = new ProgressTracker(totalFiles, totalBytes);
 
+  // Group components by project number to generate IDs
+  const componentsByProject = new Map<string, ComponentFiles[]>();
+  for (const component of allComponents) {
+    const existing = componentsByProject.get(component.projectNumber) || [];
+    existing.push(component);
+    componentsByProject.set(component.projectNumber, existing);
+  }
+
   // Upload each component
   const componentResults: ComponentUploadResult[] = [];
   const errors: UploadError[] = [];
 
-  for (const component of allComponents) {
-    try {
-      const result = await uploadComponentFiles(
-        component,
-        options,
-        progressTracker
-      );
-      componentResults.push(result);
+  for (const [projectNumber, projectComponents] of componentsByProject) {
+    // Generate project ID
+    const projectId = generateProjectId(projectNumber);
 
-      // Log component completion
-      if (result.successCount > 0) {
-        const mediaCount = result.mediaResults.filter((r) => r.success).length;
-        const assetCount = result.assetResults.filter((r) => r.success).length;
-        const componentLabel = component.subcategory
-          ? `${component.category}/${component.subcategory}`
-          : component.category;
+    // Track component counts per category to match CSV parser logic
+    // CSV parser tracks by category only (not category+subcategory)
+    const categoryCounts = new Map<string, number>();
 
-        console.log(`\n✅ Component uploaded: ${component.projectNumber}/${componentLabel}`);
-        if (mediaCount > 0) {
-          console.log(`   📷 Media: ${mediaCount}/${component.media.length} uploaded`);
-        }
-        if (assetCount > 0) {
-          console.log(`   📄 Assets: ${assetCount}/${component.assets.length} uploaded`);
-        }
-        console.log(`   💾 Size: ${formatBytes(result.totalBytes)}`);
+    for (const component of projectComponents) {
+      // Generate component ID matching CSV parser format exactly
+      // CSV uses: {number}-{category}[-{subcategory}][-{index}]
+      // where index is based on category count (not category+subcategory)
+      const categoryKey = component.category;
+      const count = categoryCounts.get(categoryKey) || 0;
+      categoryCounts.set(categoryKey, count + 1);
+
+      // Build component ID to match CSV format
+      let componentId = `${projectNumber}-${categoryKey}`;
+      if (component.subcategory) {
+        componentId += `-${component.subcategory}`;
+      }
+      // Add index if multiple components share same category (matches CSV logic)
+      if (count > 0) {
+        componentId += `-${count}`;
       }
 
-      // Collect errors
-      for (const mediaResult of result.mediaResults) {
-        if (!mediaResult.success) {
-          errors.push({
-            localPath: mediaResult.localPath,
-            storagePath: mediaResult.storagePath,
-            error: mediaResult.error || "Unknown error",
-          });
+      try {
+        const result = await uploadComponentFiles(
+          component,
+          projectId,
+          componentId,
+          options,
+          progressTracker
+        );
+        componentResults.push(result);
+
+        // Log component completion
+        if (result.successCount > 0) {
+          const mediaCount = result.mediaResults.filter(
+            (r) => r.success
+          ).length;
+          const assetCount = result.assetResults.filter(
+            (r) => r.success
+          ).length;
+          const componentLabel = component.subcategory
+            ? `${component.category}/${component.subcategory}`
+            : component.category;
+
+          console.log(
+            `\n✅ Component uploaded: ${component.projectNumber}/${componentLabel}`
+          );
+          if (mediaCount > 0) {
+            console.log(
+              `   📷 Media: ${mediaCount}/${component.media.length} uploaded`
+            );
+          }
+          if (assetCount > 0) {
+            console.log(
+              `   📄 Assets: ${assetCount}/${component.assets.length} uploaded`
+            );
+          }
+          console.log(`   💾 Size: ${formatBytes(result.totalBytes)}`);
         }
-      }
-      for (const assetResult of result.assetResults) {
-        if (!assetResult.success) {
-          errors.push({
-            localPath: assetResult.localPath,
-            storagePath: assetResult.storagePath,
-            error: assetResult.error || "Unknown error",
-          });
+
+        // Collect errors
+        for (const mediaResult of result.mediaResults) {
+          if (!mediaResult.success) {
+            errors.push({
+              localPath: mediaResult.localPath,
+              storagePath: mediaResult.storagePath,
+              error: mediaResult.error || "Unknown error",
+            });
+          }
         }
+        for (const assetResult of result.assetResults) {
+          if (!assetResult.success) {
+            errors.push({
+              localPath: assetResult.localPath,
+              storagePath: assetResult.storagePath,
+              error: assetResult.error || "Unknown error",
+            });
+          }
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        errors.push({
+          localPath: component.category,
+          storagePath: `projects/${projectId}/components/${componentId}`,
+          error: `Component upload failed: ${errorMessage}`,
+        });
       }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      errors.push({
-        localPath: component.category,
-        storagePath: `projects/${component.projectNumber}/${component.category}`,
-        error: `Component upload failed: ${errorMessage}`,
-      });
     }
   }
 
@@ -652,4 +764,3 @@ if (require.main === module) {
     console.log("Upload result:", result);
   })();
 }
-

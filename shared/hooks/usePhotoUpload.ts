@@ -122,26 +122,6 @@ function getMediaTypeFromMimeType(mimeType: string): "image" | "video" {
 }
 
 /**
- * Get MIME type from filename extension
- * Simplified version for use in MediaAsset creation
- */
-function getMimeTypeFromFilename(filename: string): string {
-  const extension = filename.toLowerCase().split(".").pop() || "";
-  const mimeTypes: Record<string, string> = {
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    png: "image/png",
-    gif: "image/gif",
-    webp: "image/webp",
-    heic: "image/heic",
-    heif: "image/heif",
-    mp4: "video/mp4",
-    mov: "video/quicktime",
-  };
-  return mimeTypes[extension] || "image/jpeg";
-}
-
-/**
  * Hook for uploading photos to Firebase Storage and adding them to Firestore.
  *
  * Provides a complete photo upload workflow:
@@ -273,7 +253,8 @@ export function usePhotoUpload(): UsePhotoUploadReturn {
         });
 
         // 6. Create MediaAsset object
-        const mimeType = getMimeTypeFromFilename(filename);
+        // Use mimeType from uploadResult (more accurate - uses blob type first)
+        const mimeType = uploadResult.mimeType;
         const mediaType = getMediaTypeFromMimeType(mimeType);
 
         // Get current order (find max order in component's media + 1)
