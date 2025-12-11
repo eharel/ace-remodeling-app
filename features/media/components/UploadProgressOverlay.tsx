@@ -5,7 +5,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { DesignTokens } from "@/core/themes";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
-import { UploadingPhoto, usePhotoUpload } from "@/shared/hooks";
+import { UploadingPhoto } from "@/shared/hooks";
 import { UploadProgressItem } from "./UploadProgressItem";
 
 /**
@@ -37,7 +37,6 @@ export function UploadProgressOverlay({
   testID = "upload-progress-overlay",
 }: UploadProgressOverlayProps) {
   const { theme } = useTheme();
-  const { cancelUpload } = usePhotoUpload();
 
   // Only show if there are active uploads
   const activeUploads = uploads.filter(
@@ -96,12 +95,11 @@ export function UploadProgressOverlay({
 
   const handleCancel = useCallback(
     (uploadId: string) => {
-      cancelUpload(uploadId);
       if (onCancelUpload) {
         onCancelUpload(uploadId);
       }
     },
-    [cancelUpload, onCancelUpload]
+    [onCancelUpload]
   );
 
   if (!hasActiveUploads && uploads.length === 0) {
