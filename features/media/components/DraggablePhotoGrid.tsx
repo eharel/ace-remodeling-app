@@ -1,5 +1,5 @@
 import * as Haptics from "expo-haptics";
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
@@ -109,7 +109,8 @@ export function DraggablePhotoGrid({
   );
 
   const renderItem = useCallback(
-    ({ item, index, drag, isActive }: RenderItemParams<MediaAsset>) => {
+    ({ item, drag, isActive, getIndex }: RenderItemParams<MediaAsset>) => {
+      const index = getIndex() ?? 0;
       const isLastInRow = (index + 1) % columns === 0;
       const itemIndex = index;
 
@@ -159,7 +160,13 @@ export function DraggablePhotoGrid({
   }, [photos, showAddButton, stage]);
 
   const renderItemWithAddButton = useCallback(
-    ({ item, index, drag, isActive }: RenderItemParams<MediaAsset | null>) => {
+    ({
+      item,
+      drag,
+      isActive,
+      getIndex,
+    }: RenderItemParams<MediaAsset | null>) => {
+      const index = getIndex() ?? 0;
       // Render add button as last item
       if (item === null && showAddButton && stage) {
         const isLastInRow = (index + 1) % columns === 0;
@@ -183,7 +190,6 @@ export function DraggablePhotoGrid({
       // Render photo item
       return renderItem({
         item: item as MediaAsset,
-        index,
         drag,
         isActive,
         getIndex: () => index,

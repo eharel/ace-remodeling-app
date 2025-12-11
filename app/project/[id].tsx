@@ -785,8 +785,14 @@ export default function ProjectDetailScreen() {
           elevation: 2,
         },
         headerContent: {
-          flex: 1,
           marginTop: DesignTokens.spacing[2], // Add space for status badge
+          width: "100%",
+        },
+        fieldContainer: {
+          marginBottom: DesignTokens.spacing[4],
+        },
+        descriptionContainer: {
+          marginBottom: DesignTokens.spacing[6],
         },
         statusBadge: {
           alignSelf: "flex-end",
@@ -1457,19 +1463,23 @@ export default function ProjectDetailScreen() {
             <ThemedView style={styles.headerContent}>
               {/* Component Name - editable in edit mode */}
               {project && currentComponent && (
-                <ComponentNameField
-                  project={project}
-                  component={currentComponent}
-                  editable={isEditMode}
-                />
+                <View style={styles.fieldContainer}>
+                  <ComponentNameField
+                    project={project}
+                    component={currentComponent}
+                    editable={isEditMode}
+                  />
+                </View>
               )}
               {/* Description - editable in edit mode */}
               {project && currentComponent && (
-                <ComponentDescriptionField
-                  project={project}
-                  component={currentComponent}
-                  editable={isEditMode}
-                />
+                <View style={styles.descriptionContainer}>
+                  <ComponentDescriptionField
+                    project={project}
+                    component={currentComponent}
+                    editable={isEditMode}
+                  />
+                </View>
               )}
             </ThemedView>
 

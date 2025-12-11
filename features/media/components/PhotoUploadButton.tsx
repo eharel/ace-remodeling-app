@@ -238,7 +238,7 @@ export function PhotoUploadButton({
       accessibilityHint="Opens photo picker to select and upload photos"
       testID={testID}
     >
-      {children || "Upload Photo"}
+      {typeof children === "string" ? children : "Upload Photo"}
     </ThemedButton>
   );
 }

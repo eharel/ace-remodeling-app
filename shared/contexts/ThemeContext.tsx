@@ -35,8 +35,20 @@ interface ThemeContextType {
   isMain: boolean;
 }
 
-// Theme Context
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+// Default context value to prevent errors during hot reload
+const defaultContextValue: ThemeContextType = {
+  themeSetting: DEFAULT_SETTING,
+  currentTheme: DEFAULT_THEME,
+  setThemeSetting: () => {},
+  toggleTheme: () => {},
+  theme: themes[DEFAULT_THEME],
+  isDark: false,
+  isLight: true,
+  isMain: true,
+};
+
+// Theme Context with default value
+const ThemeContext = createContext<ThemeContextType>(defaultContextValue);
 
 // Theme Provider Props
 interface ThemeProviderProps {
@@ -120,7 +132,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setThemeSetting(nextTheme);
   }, [currentTheme, setThemeSetting]);
 
-  // Context value
+  // Context value - always provide a valid context, even during loading
+  // This prevents "useTheme must be used within a ThemeProvider" errors
+  // during hot reload or initialization
   const contextValue = useMemo(
     () => ({
       themeSetting,
@@ -144,11 +158,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     ]
   );
 
-  // Don't render until theme is loaded
-  if (!isLoaded) {
-    return null; // Or a loading spinner
-  }
-
+  // Always render the provider, even during loading
+  // This ensures the context is always available to child components
+  // The default theme values are used until loading completes
   return (
     <ThemeContext.Provider value={contextValue}>
       {children}
@@ -159,8 +171,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 // Custom hook to use theme context
 export function useTheme(): ThemeContextType {
   const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+  // Context will always have a value (either from provider or default)
+  // This check is kept for extra safety but should never trigger
+  if (!context) {
+    return defaultContextValue;
   }
   return context;
 }

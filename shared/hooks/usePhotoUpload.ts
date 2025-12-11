@@ -163,7 +163,9 @@ export function usePhotoUpload(): UsePhotoUploadReturn {
   const { addMedia } = useMediaMutations();
   const [uploadingPhotos, setUploadingPhotos] = useState<UploadingPhoto[]>([]);
   const [error, setError] = useState<Error | null>(null);
-  const cleanupTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const cleanupTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map()
+  );
 
   // Cleanup timers on unmount
   useEffect(() => {
@@ -283,7 +285,7 @@ export function usePhotoUpload(): UsePhotoUploadReturn {
         });
 
         // 9. Remove from uploadingPhotos after 2 seconds
-        const cleanupTimer = setTimeout(() => {
+        const cleanupTimer: ReturnType<typeof setTimeout> = setTimeout(() => {
           removeUploadingPhoto(uploadId);
         }, 2000);
         cleanupTimersRef.current.set(uploadId, cleanupTimer);
@@ -301,7 +303,7 @@ export function usePhotoUpload(): UsePhotoUploadReturn {
         });
 
         // Remove error uploads after 5 seconds
-        const cleanupTimer = setTimeout(() => {
+        const cleanupTimer: ReturnType<typeof setTimeout> = setTimeout(() => {
           removeUploadingPhoto(uploadId);
         }, 5000);
         cleanupTimersRef.current.set(uploadId, cleanupTimer);

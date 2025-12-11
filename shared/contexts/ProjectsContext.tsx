@@ -95,9 +95,24 @@ interface ProjectsContextType {
   setProjects: (projects: Project[]) => void;
 }
 
-const ProjectsContext = createContext<ProjectsContextType | undefined>(
-  undefined
-);
+// Default context value to prevent errors during hot reload
+const defaultContextValue: ProjectsContextType = {
+  projects: [],
+  loading: false,
+  error: null,
+  bathroomProjects: [],
+  kitchenProjects: [],
+  featuredProjects: [],
+  featuredBathroomProjects: [],
+  featuredKitchenProjects: [],
+  featuredGeneralProjects: [],
+  refetchProjects: async () => {},
+  updateProjectOptimistically: () => {},
+  rollbackProject: () => {},
+  setProjects: () => {},
+};
+
+const ProjectsContext = createContext<ProjectsContextType>(defaultContextValue);
 
 interface ProjectsProviderProps {
   children: ReactNode;
@@ -327,8 +342,10 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
 
 export const useProjects = (): ProjectsContextType => {
   const context = useContext(ProjectsContext);
-  if (context === undefined) {
-    throw new Error("useProjects must be used within a ProjectsProvider");
+  // Context will always have a value (either from provider or default)
+  // This check is kept for extra safety but should never trigger
+  if (!context) {
+    return defaultContextValue;
   }
   return context;
 };

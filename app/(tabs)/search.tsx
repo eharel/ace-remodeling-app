@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
@@ -8,6 +8,7 @@ import { DesignTokens } from "@/core/themes";
 import {
   ComponentCategory,
   Project,
+  ProjectCardView,
   ProjectComponent,
   ProjectStatus,
   getProjectCompletionDate,
@@ -394,30 +395,27 @@ export default function SearchScreen() {
           onRemoveHistory={removeFromHistory}
           onClearHistory={clearHistory}
           onAddToHistory={addToHistory}
-          projects={searchResults.map((result) => ({
-            id: result.projectId,
-            projectNumber: result.projectNumber,
-            name: `${result.projectName}${
+          cardViews={searchResults.map((result) => ({
+            projectId: result.projectId,
+            componentId: result.componentId,
+            displayName: `${result.projectName}${
               result.componentName ? ` - ${result.componentName}` : ""
             }`,
-            category: result.componentCategory,
-            briefDescription: result.componentSummary || "",
-            thumbnail: result.thumbnail,
+            summary: result.componentSummary,
+            thumbnailUrl: result.thumbnail,
             status: result.status,
+            category: result.componentCategory,
             isFeatured: result.isFeatured,
             completedAt: result.completedAt,
+            isMultiComponent: false,
+            componentCount: 1,
           }))}
-          onSelectProject={(id) => {
-            // Find the result and navigate with componentId
-            const result = searchResults.find((r) => r.projectId === id);
-            if (result) {
-              router.push({
-                pathname: `/project/${result.projectId}` as any,
-                params: { componentId: result.componentId },
-              });
-            } else {
-              router.push(`/project/${id}` as any);
-            }
+          onSelectCard={(cardView: ProjectCardView) => {
+            // Navigate to the project with component context
+            router.push({
+              pathname: `/project/${cardView.projectId}` as any,
+              params: { componentId: cardView.componentId },
+            });
           }}
         />
       </PageHeader>
@@ -503,26 +501,27 @@ export default function SearchScreen() {
             </ThemedText>
           </ThemedView>
           <ProjectGallery
-            projects={searchResults.map((result) => ({
-              id: `${result.projectId}::${result.componentId}`, // Unique key: project + component (using :: separator to avoid UUID dash conflicts)
-              projectNumber: result.projectNumber,
-              name: `${result.projectName}${
+            cardViews={searchResults.map((result) => ({
+              projectId: result.projectId,
+              componentId: result.componentId,
+              displayName: `${result.projectName}${
                 result.componentName ? ` - ${result.componentName}` : ""
               }`,
-              category: result.componentCategory,
-              briefDescription: result.componentSummary || "",
-              thumbnail: result.thumbnail,
+              summary: result.componentSummary,
+              thumbnailUrl: result.thumbnail,
               status: result.status,
+              category: result.componentCategory,
               isFeatured: result.isFeatured,
               completedAt: result.completedAt,
+              isMultiComponent: false,
+              componentCount: 1,
             }))}
-            onProjectPress={(summary) => {
-              // Find the original result by extracting projectId and componentId from the composite key
-              // Format: "projectId::componentId" (using :: to avoid conflicts with UUID dashes)
-              const [projectId, componentId] = summary.id.split("::", 2);
+            onCardPress={(cardView: ProjectCardView) => {
+              // Find the original result using projectId and componentId
               const result = searchResults.find(
                 (r) =>
-                  r.projectId === projectId && r.componentId === componentId
+                  r.projectId === cardView.projectId &&
+                  r.componentId === cardView.componentId
               );
               if (result) {
                 handleProjectPress(result);

@@ -7,6 +7,7 @@ import { DesignTokens } from "@/core/themes";
 import {
   ComponentCategory,
   CORE_CATEGORIES,
+  CoreCategory,
 } from "@/core/types/ComponentCategory";
 import { CreateProjectModal } from "@/features/forms";
 import {
@@ -69,8 +70,8 @@ export default function ProjectsScreen() {
 
     // Sort by display order
     return filtered.sort((a, b) => {
-      const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a.id);
-      const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b.id);
+      const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a.id as CoreCategory);
+      const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b.id as CoreCategory);
       // If not in order array, put at end
       if (orderA === -1 && orderB === -1) return 0;
       if (orderA === -1) return 1;

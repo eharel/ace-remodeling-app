@@ -7,29 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		122DE9A5B2EE90FAE2FEC2D5 /* libPods-ACERemodelingTX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 028F820574F8331E79242CB2 /* libPods-ACERemodelingTX.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		24EF2A723B7DC38B3D7AD159 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A814FDB54D2B8C26796439 /* ExpoModulesProvider.swift */; };
-		2CECAE1DC58373D506CA2741 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 4C4516DFE549FA6A9AA9803C /* PrivacyInfo.xcprivacy */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		8CF0D67AE18BF3ED8DE8F864 /* libPods-ACERemodeling.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F8D2226687FEB42D7EFE373 /* libPods-ACERemodeling.a */; };
+		6D5865432237BBF7F33F7B36 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C3586BEF7E5133469466ECBC /* PrivacyInfo.xcprivacy */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		E23CA0C7A503520ACE17B22C /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798EBA7B1EECAE1174F3BF38 /* ExpoModulesProvider.swift */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		13B07F961A680F5B00A75B9A /* ACERemodeling.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ACERemodeling.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ACERemodeling/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ACERemodeling/Info.plist; sourceTree = "<group>"; };
-		4C4516DFE549FA6A9AA9803C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = ACERemodeling/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		4F8D2226687FEB42D7EFE373 /* libPods-ACERemodeling.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ACERemodeling.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		88A814FDB54D2B8C26796439 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-ACERemodeling/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = ACERemodeling/SplashScreen.storyboard; sourceTree = "<group>"; };
+		028F820574F8331E79242CB2 /* libPods-ACERemodelingTX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ACERemodelingTX.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* ACERemodelingTX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ACERemodelingTX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ACERemodelingTX/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ACERemodelingTX/Info.plist; sourceTree = "<group>"; };
+		4693D0CA6F0A530C0CE52916 /* Pods-ACERemodelingTX.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ACERemodelingTX.release.xcconfig"; path = "Target Support Files/Pods-ACERemodelingTX/Pods-ACERemodelingTX.release.xcconfig"; sourceTree = "<group>"; };
+		59A55043E8C459BC97419C8E /* Pods-ACERemodelingTX.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ACERemodelingTX.debug.xcconfig"; path = "Target Support Files/Pods-ACERemodelingTX/Pods-ACERemodelingTX.debug.xcconfig"; sourceTree = "<group>"; };
+		798EBA7B1EECAE1174F3BF38 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-ACERemodelingTX/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = ACERemodelingTX/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		D4829D2D52E51E8F5218557F /* Pods-ACERemodeling.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ACERemodeling.release.xcconfig"; path = "Target Support Files/Pods-ACERemodeling/Pods-ACERemodeling.release.xcconfig"; sourceTree = "<group>"; };
+		C3586BEF7E5133469466ECBC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = ACERemodelingTX/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ACERemodeling/AppDelegate.swift; sourceTree = "<group>"; };
-		F11748442D0722820044C1D9 /* ACERemodeling-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ACERemodeling-Bridging-Header.h"; path = "ACERemodeling/ACERemodeling-Bridging-Header.h"; sourceTree = "<group>"; };
-		FC6A5CC2C36FE8D38EA52695 /* Pods-ACERemodeling.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ACERemodeling.debug.xcconfig"; path = "Target Support Files/Pods-ACERemodeling/Pods-ACERemodeling.debug.xcconfig"; sourceTree = "<group>"; };
+		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = ACERemodelingTX/AppDelegate.swift; sourceTree = "<group>"; };
+		F11748442D0722820044C1D9 /* ACERemodelingTX-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ACERemodelingTX-Bridging-Header.h"; path = "ACERemodelingTX/ACERemodelingTX-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,58 +37,50 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8CF0D67AE18BF3ED8DE8F864 /* libPods-ACERemodeling.a in Frameworks */,
+				122DE9A5B2EE90FAE2FEC2D5 /* libPods-ACERemodelingTX.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0A708B34C4CF37E16EA4360B /* ACERemodeling */ = {
-			isa = PBXGroup;
-			children = (
-				88A814FDB54D2B8C26796439 /* ExpoModulesProvider.swift */,
-			);
-			name = ACERemodeling;
-			sourceTree = "<group>";
-		};
-		13B07FAE1A68108700A75B9A /* ACERemodeling */ = {
+		13B07FAE1A68108700A75B9A /* ACERemodelingTX */ = {
 			isa = PBXGroup;
 			children = (
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
-				F11748442D0722820044C1D9 /* ACERemodeling-Bridging-Header.h */,
+				F11748442D0722820044C1D9 /* ACERemodelingTX-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				4C4516DFE549FA6A9AA9803C /* PrivacyInfo.xcprivacy */,
+				C3586BEF7E5133469466ECBC /* PrivacyInfo.xcprivacy */,
 			);
-			name = ACERemodeling;
+			name = ACERemodelingTX;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				4F8D2226687FEB42D7EFE373 /* libPods-ACERemodeling.a */,
+				028F820574F8331E79242CB2 /* libPods-ACERemodelingTX.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3EE086446D3726CDAC013EFC /* Pods */ = {
+		46BC189E762C876DCB6859ED /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				FC6A5CC2C36FE8D38EA52695 /* Pods-ACERemodeling.debug.xcconfig */,
-				D4829D2D52E51E8F5218557F /* Pods-ACERemodeling.release.xcconfig */,
+				59A55043E8C459BC97419C8E /* Pods-ACERemodelingTX.debug.xcconfig */,
+				4693D0CA6F0A530C0CE52916 /* Pods-ACERemodelingTX.release.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		7F78D0F2EE3EF9B6AF3BDC13 /* ExpoModulesProviders */ = {
+		55E43276BF581C34E624E18F /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				0A708B34C4CF37E16EA4360B /* ACERemodeling */,
+				AF3CA40DC5A41377E62678B6 /* ACERemodelingTX */,
 			);
 			name = ExpoModulesProviders;
 			sourceTree = "<group>";
@@ -103,12 +95,12 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				13B07FAE1A68108700A75B9A /* ACERemodeling */,
+				13B07FAE1A68108700A75B9A /* ACERemodelingTX */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				3EE086446D3726CDAC013EFC /* Pods */,
-				7F78D0F2EE3EF9B6AF3BDC13 /* ExpoModulesProviders */,
+				46BC189E762C876DCB6859ED /* Pods */,
+				55E43276BF581C34E624E18F /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -118,9 +110,17 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* ACERemodeling.app */,
+				13B07F961A680F5B00A75B9A /* ACERemodelingTX.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AF3CA40DC5A41377E62678B6 /* ACERemodelingTX */ = {
+			isa = PBXGroup;
+			children = (
+				798EBA7B1EECAE1174F3BF38 /* ExpoModulesProvider.swift */,
+			);
+			name = ACERemodelingTX;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -129,32 +129,32 @@
 				BB2F792C24A3F905000567C9 /* Expo.plist */,
 			);
 			name = Supporting;
-			path = ACERemodeling/Supporting;
+			path = ACERemodelingTX/Supporting;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		13B07F861A680F5B00A75B9A /* ACERemodeling */ = {
+		13B07F861A680F5B00A75B9A /* ACERemodelingTX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ACERemodeling" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ACERemodelingTX" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				A29780AFA836D68DBF6E7A80 /* [Expo] Configure project */,
+				F21F7AD800AA7EF3B0EA94AC /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				6747A4FCE05ED134031BECC7 /* [CP] Embed Pods Frameworks */,
+				4121AA4ABDE4E917374D8468 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = ACERemodeling;
-			productName = ACERemodeling;
-			productReference = 13B07F961A680F5B00A75B9A /* ACERemodeling.app */;
+			name = ACERemodelingTX;
+			productName = ACERemodelingTX;
+			productReference = 13B07F961A680F5B00A75B9A /* ACERemodelingTX.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -170,7 +170,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ACERemodeling" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ACERemodelingTX" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -183,7 +183,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* ACERemodeling */,
+				13B07F861A680F5B00A75B9A /* ACERemodelingTX */,
 			);
 		};
 /* End PBXProject section */
@@ -196,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				2CECAE1DC58373D506CA2741 /* PrivacyInfo.xcprivacy in Resources */,
+				6D5865432237BBF7F33F7B36 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,20 +235,20 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ACERemodeling-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ACERemodelingTX-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6747A4FCE05ED134031BECC7 /* [CP] Embed Pods Frameworks */ = {
+		4121AA4ABDE4E917374D8468 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ACERemodeling/Pods-ACERemodeling-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-ACERemodelingTX/Pods-ACERemodelingTX-frameworks.sh",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
@@ -261,7 +261,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ACERemodeling/Pods-ACERemodeling-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ACERemodelingTX/Pods-ACERemodelingTX-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
@@ -270,7 +270,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ACERemodeling/Pods-ACERemodeling-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-ACERemodelingTX/Pods-ACERemodelingTX-resources.sh",
 				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/EXConstants.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/ExpoConstants_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/EXUpdates/EXUpdates.bundle",
@@ -299,10 +299,10 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ACERemodeling/Pods-ACERemodeling-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ACERemodelingTX/Pods-ACERemodelingTX-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A29780AFA836D68DBF6E7A80 /* [Expo] Configure project */ = {
+		F21F7AD800AA7EF3B0EA94AC /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -313,18 +313,18 @@
 			inputPaths = (
 				"$(SRCROOT)/.xcode.env",
 				"$(SRCROOT)/.xcode.env.local",
-				"$(SRCROOT)/ACERemodeling/ACERemodeling.entitlements",
-				"$(SRCROOT)/Pods/Target Support Files/Pods-ACERemodeling/expo-configure-project.sh",
+				"$(SRCROOT)/ACERemodelingTX/ACERemodelingTX.entitlements",
+				"$(SRCROOT)/Pods/Target Support Files/Pods-ACERemodelingTX/expo-configure-project.sh",
 			);
 			name = "[Expo] Configure project";
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/Pods/Target Support Files/Pods-ACERemodeling/ExpoModulesProvider.swift",
+				"$(SRCROOT)/Pods/Target Support Files/Pods-ACERemodelingTX/ExpoModulesProvider.swift",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-ACERemodeling/expo-configure-project.sh\"\n";
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-ACERemodelingTX/expo-configure-project.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -334,7 +334,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				24EF2A723B7DC38B3D7AD159 /* ExpoModulesProvider.swift in Sources */,
+				E23CA0C7A503520ACE17B22C /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,18 +343,18 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FC6A5CC2C36FE8D38EA52695 /* Pods-ACERemodeling.debug.xcconfig */;
+			baseConfigurationReference = 59A55043E8C459BC97419C8E /* Pods-ACERemodelingTX.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = ACERemodeling/ACERemodeling.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ACERemodelingTX/ACERemodelingTX.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"FB_SONARKIT_ENABLED=1",
 				);
-				INFOPLIST_FILE = ACERemodeling/Info.plist;
+				INFOPLIST_FILE = ACERemodelingTX/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -368,8 +368,8 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.aceremodelingtx.app;
-				PRODUCT_NAME = ACERemodeling;
-				SWIFT_OBJC_BRIDGING_HEADER = "ACERemodeling/ACERemodeling-Bridging-Header.h";
+				PRODUCT_NAME = ACERemodelingTX;
+				SWIFT_OBJC_BRIDGING_HEADER = "ACERemodelingTX/ACERemodelingTX-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -379,13 +379,13 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D4829D2D52E51E8F5218557F /* Pods-ACERemodeling.release.xcconfig */;
+			baseConfigurationReference = 4693D0CA6F0A530C0CE52916 /* Pods-ACERemodelingTX.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = ACERemodeling/ACERemodeling.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ACERemodelingTX/ACERemodelingTX.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_FILE = ACERemodeling/Info.plist;
+				INFOPLIST_FILE = ACERemodelingTX/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -399,8 +399,8 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.aceremodelingtx.app;
-				PRODUCT_NAME = ACERemodeling;
-				SWIFT_OBJC_BRIDGING_HEADER = "ACERemodeling/ACERemodeling-Bridging-Header.h";
+				PRODUCT_NAME = ACERemodelingTX;
+				SWIFT_OBJC_BRIDGING_HEADER = "ACERemodelingTX/ACERemodelingTX-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -528,7 +528,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ACERemodeling" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ACERemodelingTX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -537,7 +537,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ACERemodeling" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ACERemodelingTX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

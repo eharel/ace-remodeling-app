@@ -43,7 +43,7 @@ export function EditableTextArea({
     () =>
       StyleSheet.create({
         container: {
-          position: "relative",
+          width: "100%",
         },
         expandButton: {
           marginTop: DesignTokens.spacing[2],
@@ -62,10 +62,12 @@ export function EditableTextArea({
   const shouldShowExpand = hasMoreContent && !editableTextProps.editable;
 
   // Override multiline to true for text area
+  // Only set numberOfLines if we have content and it's not expanded
+  const shouldLimitLines = !isExpanded && value.length > 0;
   const textAreaProps: EditableTextProps = {
     ...editableTextProps,
     multiline: true,
-    numberOfLines: isExpanded ? undefined : previewLines,
+    numberOfLines: shouldLimitLines ? previewLines : undefined,
   };
 
   return (

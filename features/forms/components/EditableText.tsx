@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Keyboard, Pressable, StyleSheet, TextInput, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
@@ -96,22 +90,30 @@ export function EditableText({
       title: {
         fontSize: DesignTokens.typography.fontSize["2xl"],
         fontWeight: DesignTokens.typography.fontWeight.bold,
-        lineHeight: DesignTokens.typography.lineHeight.tight,
+        lineHeight:
+          DesignTokens.typography.fontSize["2xl"] *
+          DesignTokens.typography.lineHeight.tight,
       },
       subtitle: {
         fontSize: DesignTokens.typography.fontSize.xl,
         fontWeight: DesignTokens.typography.fontWeight.semibold,
-        lineHeight: DesignTokens.typography.lineHeight.normal,
+        lineHeight:
+          DesignTokens.typography.fontSize.xl *
+          DesignTokens.typography.lineHeight.normal,
       },
       body: {
         fontSize: DesignTokens.typography.fontSize.base,
-        fontWeight: DesignTokens.typography.fontWeight.regular,
-        lineHeight: DesignTokens.typography.lineHeight.relaxed,
+        fontWeight: DesignTokens.typography.fontWeight.normal,
+        lineHeight:
+          DesignTokens.typography.fontSize.base *
+          DesignTokens.typography.lineHeight.normal,
       },
       caption: {
         fontSize: DesignTokens.typography.fontSize.sm,
-        fontWeight: DesignTokens.typography.fontWeight.regular,
-        lineHeight: DesignTokens.typography.lineHeight.normal,
+        fontWeight: DesignTokens.typography.fontWeight.normal,
+        lineHeight:
+          DesignTokens.typography.fontSize.sm *
+          DesignTokens.typography.lineHeight.normal,
       },
     };
     return styles[variant];
@@ -121,20 +123,24 @@ export function EditableText({
     () =>
       StyleSheet.create({
         container: {
-          position: "relative",
+          width: "100%",
         },
         viewContainer: {
           flexDirection: "row",
           alignItems: "flex-start",
           gap: DesignTokens.spacing[2],
-          minHeight: 24,
+          width: "100%",
+          flexWrap: "wrap", // Allow content to wrap if needed
         },
         textContainer: {
           flex: 1,
+          minWidth: 0, // Allow text to wrap properly
         },
         text: {
           ...typographyStyles,
           color: theme.colors.text.primary,
+          // Ensure text is always visible
+          opacity: 1,
         },
         textEmpty: {
           color: theme.colors.text.tertiary,
@@ -164,7 +170,7 @@ export function EditableText({
             ? theme.colors.status.error
             : theme.colors.border.primary,
           color: theme.colors.text.primary,
-          fontFamily: DesignTokens.typography.fontFamily.normal,
+          fontFamily: DesignTokens.typography.fontFamily.regular,
         },
         inputMultiline: {
           minHeight: 80,
@@ -263,12 +269,16 @@ export function EditableText({
           accessibilityHint={editable ? "Tap to edit" : undefined}
         >
           <View style={styles.textContainer}>
-            {isInherited && inheritedFrom && (
-              <InheritanceIndicator source={inheritedFrom} />
+            {isInherited && inheritedFrom && editable && (
+              <View style={{ marginBottom: DesignTokens.spacing[2] }}>
+                <InheritanceIndicator source={inheritedFrom} />
+              </View>
             )}
             <ThemedText
               style={[styles.text, isEmpty && styles.textEmpty]}
               numberOfLines={numberOfLines}
+              ellipsizeMode="tail"
+              allowFontScaling={true}
             >
               {displayValue}
             </ThemedText>
