@@ -82,10 +82,33 @@ function ComponentNameField({
     inheritedValue: project.name,
   });
 
+  console.log("[ComponentNameField]", {
+    componentId: component.id,
+    value,
+    isInherited,
+    editable,
+    willRender: !!(value || editable),
+  });
+
   // Don't show if no value and not editable (inherited name is shown in project header)
   if (!value && !editable) {
+    console.log(
+      "[ComponentNameField] Returning null - no value and not editable"
+    );
     return null;
   }
+
+  // Don't show empty inherited fields in edit mode (they create white boxes)
+  // User can create a component-level override by typing in the field
+  if (!value && editable && isInherited) {
+    console.log(
+      "[ComponentNameField] Returning null - empty inherited field in edit mode"
+    );
+    return null;
+  }
+
+  // When value is empty and editable (but not inherited), EditableText will auto-enter edit mode
+  // to avoid showing white box in view mode
 
   return (
     <EditableText
@@ -120,6 +143,24 @@ function ComponentDescriptionField({
     currentValue: component.description,
     inheritedValue: project.description,
   });
+
+  console.log("[ComponentDescriptionField]", {
+    componentId: component.id,
+    value: value ? `${value.substring(0, 50)}...` : "",
+    valueLength: value?.length || 0,
+    isInherited,
+    editable,
+    willRender: !!(value || editable),
+  });
+
+  // Don't show empty inherited fields in edit mode (they create white boxes)
+  // User can create a component-level override by typing in the field
+  if (!value && editable && isInherited) {
+    console.log(
+      "[ComponentDescriptionField] Returning null - empty inherited field in edit mode"
+    );
+    return null;
+  }
 
   return (
     <EditableTextArea
@@ -988,14 +1029,7 @@ export default function ProjectDetailScreen() {
           elevation: 2,
         },
         headerContent: {
-          marginTop: DesignTokens.spacing[2], // Add space for status badge
           width: "100%",
-        },
-        fieldContainer: {
-          marginBottom: DesignTokens.spacing[4],
-        },
-        descriptionContainer: {
-          marginBottom: DesignTokens.spacing[6],
         },
         statusBadge: {
           alignSelf: "flex-end",
@@ -1654,23 +1688,19 @@ export default function ProjectDetailScreen() {
             <ThemedView style={styles.headerContent}>
               {/* Component Name - editable in edit mode */}
               {project && currentComponent && (
-                <View style={styles.fieldContainer}>
-                  <ComponentNameField
-                    project={project}
-                    component={currentComponent}
-                    editable={isAuthenticated && isEditMode}
-                  />
-                </View>
+                <ComponentNameField
+                  project={project}
+                  component={currentComponent}
+                  editable={isAuthenticated && isEditMode}
+                />
               )}
               {/* Description - editable in edit mode */}
               {project && currentComponent && (
-                <View style={styles.descriptionContainer}>
-                  <ComponentDescriptionField
-                    project={project}
-                    component={currentComponent}
-                    editable={isAuthenticated && isEditMode}
-                  />
-                </View>
+                <ComponentDescriptionField
+                  project={project}
+                  component={currentComponent}
+                  editable={isAuthenticated && isEditMode}
+                />
               )}
             </ThemedView>
 

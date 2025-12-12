@@ -134,6 +134,7 @@ export function EditableText({
       StyleSheet.create({
         container: {
           width: "100%",
+          backgroundColor: "transparent", // Prevent white box when empty
         },
         viewContainer: {
           flexDirection: "row",
@@ -162,9 +163,11 @@ export function EditableText({
         },
         editContainer: {
           gap: DesignTokens.spacing[2],
+          backgroundColor: "transparent", // Prevent white box
         },
         inputContainer: {
           width: "100%",
+          backgroundColor: "transparent", // Prevent white box
         },
         input: {
           width: "100%",
