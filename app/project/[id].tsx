@@ -242,7 +242,8 @@ export default function ProjectDetailScreen() {
         headerBackTitleVisible: false,
       });
     } else {
-      // View mode: Show Edit button (right)
+      // View mode: Show Edit button (right), restore default back button (left)
+      // Explicitly set headerLeft to undefined to restore default back button
       navigation.setOptions({
         headerShown: true,
         title: project?.name || "Project Details",
@@ -254,7 +255,8 @@ export default function ProjectDetailScreen() {
           color: theme.colors.text.primary,
           fontWeight: "600",
         },
-        headerLeft: undefined,
+        headerBackTitle: "Back", // Ensure back button shows "Back"
+        headerLeft: undefined, // Explicitly clear custom headerLeft to restore default back button
         headerRight: () => (
           <Pressable
             onPress={() => setIsEditMode(true)}
@@ -272,7 +274,6 @@ export default function ProjectDetailScreen() {
             </Text>
           </Pressable>
         ),
-        headerBackTitleVisible: false,
       });
     }
   }, [isAuthenticated, isEditMode, project?.name, navigation, theme]);
@@ -1469,6 +1470,7 @@ export default function ProjectDetailScreen() {
       <Stack.Screen
         options={{
           headerShown: isAuthenticated, // Show header when authenticated
+          headerBackTitle: "Back", // Set back button text
         }}
       />
       <ThemedView style={styles.container}>
