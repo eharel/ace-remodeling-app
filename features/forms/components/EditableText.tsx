@@ -204,12 +204,19 @@ export function EditableText({
     }
   }, [editable, value]);
 
-  const handleCancel = useCallback(() => {
-    setEditValue(value);
-    setError(null);
-    setIsEditing(false);
-    Keyboard.dismiss();
-  }, [value]);
+  const handleCancel = useCallback(
+    (e?: any) => {
+      // Stop event propagation to prevent double-tap
+      if (e) {
+        e.stopPropagation?.();
+      }
+      setEditValue(value);
+      setError(null);
+      setIsEditing(false);
+      Keyboard.dismiss();
+    },
+    [value]
+  );
 
   const handleSave = useCallback(async () => {
     // Validation
@@ -324,14 +331,19 @@ export function EditableText({
               onPress={handleSave}
               disabled={isSaving}
               accessibilityLabel={isSaving ? "Saving..." : "Save changes"}
+              hitSlop={8}
             />
             <ThemedIconButton
               icon="close"
               variant="ghost"
               size="small"
-              onPress={handleCancel}
+              onPress={(e) => {
+                e?.stopPropagation?.();
+                handleCancel(e);
+              }}
               disabled={isSaving}
               accessibilityLabel="Cancel editing"
+              hitSlop={8}
             />
           </View>
         </View>

@@ -1,4 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import {
   router,
@@ -162,6 +163,7 @@ export default function ProjectDetailScreen() {
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isEnteringEditMode, setIsEnteringEditMode] = useState(false);
+  const [isExitingEditMode, setIsExitingEditMode] = useState(false);
   const [showCreateComponent, setShowCreateComponent] = useState(false);
   const { theme } = useTheme();
 
@@ -177,13 +179,38 @@ export default function ProjectDetailScreen() {
 
   // Handle entering edit mode with loading feedback
   const handleEnterEditMode = useCallback(() => {
+    if (isEnteringEditMode) return; // Prevent double-tap
+    const startTime = Date.now();
+    console.log("[EditMode] Entering edit mode at", startTime);
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setIsEnteringEditMode(true);
     setIsEditMode(true);
+
     // Small delay to let UI update and show loading state
     setTimeout(() => {
       setIsEnteringEditMode(false);
+      const duration = Date.now() - startTime;
+      console.log("[EditMode] Edit mode entered in", duration, "ms");
     }, 150);
-  }, []);
+  }, [isEnteringEditMode]);
+
+  // Handle exiting edit mode with loading feedback
+  const handleExitEditMode = useCallback(() => {
+    if (isExitingEditMode) return; // Prevent double-tap
+    const startTime = Date.now();
+    console.log("[EditMode] Exiting edit mode at", startTime);
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setIsExitingEditMode(true);
+    setIsEditMode(false);
+
+    setTimeout(() => {
+      setIsExitingEditMode(false);
+      const duration = Date.now() - startTime;
+      console.log("[EditMode] Edit mode exited in", duration, "ms");
+    }, 100);
+  }, [isExitingEditMode]);
 
   // Configure navigation header buttons based on authentication and edit mode
   useEffect(() => {
@@ -216,10 +243,18 @@ export default function ProjectDetailScreen() {
         },
         headerLeft: () => (
           <Pressable
-            onPress={() => setIsEditMode(false)}
-            style={{ marginLeft: 16 }}
+            onPress={handleExitEditMode}
+            disabled={isExitingEditMode}
+            style={({ pressed }) => ({
+              marginLeft: 16,
+              paddingHorizontal: 8,
+              paddingVertical: 8,
+              opacity: pressed || isExitingEditMode ? 0.5 : 1,
+            })}
+            hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel="Cancel editing"
+            accessibilityState={{ disabled: isExitingEditMode }}
           >
             <Text
               style={{
@@ -227,16 +262,24 @@ export default function ProjectDetailScreen() {
                 color: theme.colors.interactive.primary,
               }}
             >
-              Cancel
+              {isExitingEditMode ? "..." : "Cancel"}
             </Text>
           </Pressable>
         ),
         headerRight: () => (
           <Pressable
-            onPress={() => setIsEditMode(false)}
-            style={{ marginRight: 16 }}
+            onPress={handleExitEditMode}
+            disabled={isExitingEditMode}
+            style={({ pressed }) => ({
+              marginRight: 16,
+              paddingHorizontal: 8,
+              paddingVertical: 8,
+              opacity: pressed || isExitingEditMode ? 0.5 : 1,
+            })}
+            hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel="Done editing"
+            accessibilityState={{ disabled: isExitingEditMode }}
           >
             <Text
               style={{
@@ -245,7 +288,7 @@ export default function ProjectDetailScreen() {
                 color: theme.colors.interactive.primary,
               }}
             >
-              Done
+              {isExitingEditMode ? "..." : "Done"}
             </Text>
           </Pressable>
         ),
@@ -271,12 +314,16 @@ export default function ProjectDetailScreen() {
           <Pressable
             onPress={handleEnterEditMode}
             disabled={isEnteringEditMode}
-            style={{
+            style={({ pressed }) => ({
               marginRight: 16,
-              opacity: isEnteringEditMode ? 0.5 : 1,
-            }}
+              paddingHorizontal: 8,
+              paddingVertical: 8,
+              opacity: pressed || isEnteringEditMode ? 0.5 : 1,
+            })}
+            hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel="Edit project"
+            accessibilityState={{ disabled: isEnteringEditMode }}
           >
             {isEnteringEditMode ? (
               <View style={{ width: 20, height: 20 }}>
@@ -304,10 +351,12 @@ export default function ProjectDetailScreen() {
     isAuthenticated,
     isEditMode,
     isEnteringEditMode,
+    isExitingEditMode,
     project?.name,
     navigation,
     theme,
     handleEnterEditMode,
+    handleExitEditMode,
   ]);
 
   // Initialize project and set initial component selection
