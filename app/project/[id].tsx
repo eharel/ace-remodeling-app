@@ -1,8 +1,13 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { router, Stack, useLocalSearchParams } from "expo-router";
+import {
+  router,
+  Stack,
+  useLocalSearchParams,
+  useNavigation,
+} from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import {
@@ -138,6 +143,7 @@ export default function ProjectDetailScreen() {
   }>();
   const { projects, loading } = useProjects();
   const { isAuthenticated } = useAuth();
+  const navigation = useNavigation();
   const [project, setProject] = useState<Project | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -168,6 +174,108 @@ export default function ProjectDetailScreen() {
       setIsEditMode(false);
     }
   }, [isAuthenticated]);
+
+  // Configure navigation header buttons based on authentication and edit mode
+  useEffect(() => {
+    // Debug logging
+    console.log("[ProjectDetail] isAuthenticated:", isAuthenticated);
+    console.log("[ProjectDetail] isEditMode:", isEditMode);
+    console.log("[ProjectDetail] project:", project?.name);
+
+    if (!isAuthenticated) {
+      // Hide header when not authenticated
+      navigation.setOptions({
+        headerShown: false,
+      });
+      return;
+    }
+
+    // Show header with buttons when authenticated
+    if (isEditMode) {
+      // Edit mode: Show Cancel (left) and Done (right)
+      navigation.setOptions({
+        headerShown: true,
+        title: project?.name || "Project Details",
+        headerStyle: {
+          backgroundColor: theme.colors.background.primary,
+        },
+        headerTintColor: theme.colors.text.primary,
+        headerTitleStyle: {
+          color: theme.colors.text.primary,
+          fontWeight: "600",
+        },
+        headerLeft: () => (
+          <Pressable
+            onPress={() => setIsEditMode(false)}
+            style={{ marginLeft: 16 }}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel editing"
+          >
+            <Text
+              style={{
+                fontSize: 17,
+                color: theme.colors.interactive.primary,
+              }}
+            >
+              Cancel
+            </Text>
+          </Pressable>
+        ),
+        headerRight: () => (
+          <Pressable
+            onPress={() => setIsEditMode(false)}
+            style={{ marginRight: 16 }}
+            accessibilityRole="button"
+            accessibilityLabel="Done editing"
+          >
+            <Text
+              style={{
+                fontSize: 17,
+                fontWeight: "600",
+                color: theme.colors.interactive.primary,
+              }}
+            >
+              Done
+            </Text>
+          </Pressable>
+        ),
+        headerBackTitleVisible: false,
+      });
+    } else {
+      // View mode: Show Edit button (right)
+      navigation.setOptions({
+        headerShown: true,
+        title: project?.name || "Project Details",
+        headerStyle: {
+          backgroundColor: theme.colors.background.primary,
+        },
+        headerTintColor: theme.colors.text.primary,
+        headerTitleStyle: {
+          color: theme.colors.text.primary,
+          fontWeight: "600",
+        },
+        headerLeft: undefined,
+        headerRight: () => (
+          <Pressable
+            onPress={() => setIsEditMode(true)}
+            style={{ marginRight: 16 }}
+            accessibilityRole="button"
+            accessibilityLabel="Edit project"
+          >
+            <Text
+              style={{
+                fontSize: 17,
+                color: theme.colors.interactive.primary,
+              }}
+            >
+              Edit
+            </Text>
+          </Pressable>
+        ),
+        headerBackTitleVisible: false,
+      });
+    }
+  }, [isAuthenticated, isEditMode, project?.name, navigation, theme]);
 
   // Initialize project and set initial component selection
   // Only runs when id, componentId param, or projects change - NOT when selectedComponentId changes
@@ -1360,16 +1468,18 @@ export default function ProjectDetailScreen() {
     <>
       <Stack.Screen
         options={{
-          headerShown: false, // Hide React Navigation's header
+          headerShown: isAuthenticated, // Show header when authenticated
         }}
       />
       <ThemedView style={styles.container}>
-        <PageHeader
-          title={project.name}
-          showBack={true}
-          backLabel="Back"
-          variant="compact"
-        />
+        {!isAuthenticated && (
+          <PageHeader
+            title={project.name}
+            showBack={true}
+            backLabel="Back"
+            variant="compact"
+          />
+        )}
         <RefreshableScrollView
           style={styles.scrollView}
           contentContainerStyle={{ paddingBottom: DesignTokens.spacing[20] }}
@@ -1579,52 +1689,14 @@ export default function ProjectDetailScreen() {
 
           {/* Pictures Section */}
           <ThemedView style={styles.section}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: DesignTokens.spacing[2],
-              }}
+            <ThemedText
+              style={[
+                styles.sectionTitle,
+                { color: theme.colors.text.primary },
+              ]}
             >
-              <ThemedText
-                style={[
-                  styles.sectionTitle,
-                  { color: theme.colors.text.primary },
-                ]}
-              >
-                Project Photos ({currentMedia.length})
-              </ThemedText>
-              {isAuthenticated && project && currentComponent && (
-                <Pressable
-                  onPress={() => setIsEditMode(!isEditMode)}
-                  style={{
-                    paddingHorizontal: DesignTokens.spacing[3],
-                    paddingVertical: DesignTokens.spacing[2],
-                    borderRadius: DesignTokens.borderRadius.md,
-                    backgroundColor: isEditMode
-                      ? theme.colors.interactive.primary
-                      : theme.colors.background.secondary,
-                  }}
-                  accessibilityRole="button"
-                  accessibilityLabel={
-                    isEditMode ? "Exit edit mode" : "Enter edit mode"
-                  }
-                >
-                  <ThemedText
-                    style={{
-                      fontSize: DesignTokens.typography.fontSize.sm,
-                      fontWeight: DesignTokens.typography.fontWeight.medium,
-                      color: isEditMode
-                        ? theme.colors.text.inverse
-                        : theme.colors.text.primary,
-                    }}
-                  >
-                    {isEditMode ? "Done" : "Edit"}
-                  </ThemedText>
-                </Pressable>
-              )}
-            </View>
+              Project Photos ({currentMedia.length})
+            </ThemedText>
             <ThemedText
               style={[
                 styles.sectionSubtitle,
