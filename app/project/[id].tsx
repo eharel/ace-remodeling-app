@@ -6,7 +6,7 @@ import {
   useLocalSearchParams,
   useNavigation,
 } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
@@ -33,7 +33,6 @@ import {
   LoadingState,
   PageHeader,
   RefreshableScrollView,
-  ThemedButton,
   ThemedIconButton,
   ThemedText,
   ThemedView,
@@ -162,6 +161,7 @@ export default function ProjectDetailScreen() {
   const [assetGalleryVisible, setAssetGalleryVisible] = useState(false);
   const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isEnteringEditMode, setIsEnteringEditMode] = useState(false);
   const [showCreateComponent, setShowCreateComponent] = useState(false);
   const { theme } = useTheme();
 
@@ -174,6 +174,16 @@ export default function ProjectDetailScreen() {
       setIsEditMode(false);
     }
   }, [isAuthenticated]);
+
+  // Handle entering edit mode with loading feedback
+  const handleEnterEditMode = useCallback(() => {
+    setIsEnteringEditMode(true);
+    setIsEditMode(true);
+    // Small delay to let UI update and show loading state
+    setTimeout(() => {
+      setIsEnteringEditMode(false);
+    }, 150);
+  }, []);
 
   // Configure navigation header buttons based on authentication and edit mode
   useEffect(() => {
@@ -259,24 +269,46 @@ export default function ProjectDetailScreen() {
         headerLeft: undefined, // Explicitly clear custom headerLeft to restore default back button
         headerRight: () => (
           <Pressable
-            onPress={() => setIsEditMode(true)}
-            style={{ marginRight: 16 }}
+            onPress={handleEnterEditMode}
+            disabled={isEnteringEditMode}
+            style={{
+              marginRight: 16,
+              opacity: isEnteringEditMode ? 0.5 : 1,
+            }}
             accessibilityRole="button"
             accessibilityLabel="Edit project"
           >
-            <Text
-              style={{
-                fontSize: 17,
-                color: theme.colors.interactive.primary,
-              }}
-            >
-              Edit
-            </Text>
+            {isEnteringEditMode ? (
+              <View style={{ width: 20, height: 20 }}>
+                <MaterialIcons
+                  name="hourglass-empty"
+                  size={17}
+                  color={theme.colors.interactive.primary}
+                />
+              </View>
+            ) : (
+              <Text
+                style={{
+                  fontSize: 17,
+                  color: theme.colors.interactive.primary,
+                }}
+              >
+                Edit
+              </Text>
+            )}
           </Pressable>
         ),
       });
     }
-  }, [isAuthenticated, isEditMode, project?.name, navigation, theme]);
+  }, [
+    isAuthenticated,
+    isEditMode,
+    isEnteringEditMode,
+    project?.name,
+    navigation,
+    theme,
+    handleEnterEditMode,
+  ]);
 
   // Initialize project and set initial component selection
   // Only runs when id, componentId param, or projects change - NOT when selectedComponentId changes
@@ -1488,7 +1520,8 @@ export default function ProjectDetailScreen() {
         >
           {/* Hero Image / Thumbnail Editor */}
           {isAuthenticated && isEditMode && project && currentComponent ? (
-            <ThemedView
+            <Animated.View
+              entering={FadeIn.duration(200)}
               style={{
                 marginHorizontal: DesignTokens.spacing[4],
                 marginBottom: DesignTokens.spacing[4],
@@ -1497,13 +1530,15 @@ export default function ProjectDetailScreen() {
               <ThumbnailEditor
                 projectId={project.id}
                 componentId={currentComponent.id}
-                currentThumbnail={currentComponent.thumbnail}
+                currentThumbnail={
+                  currentComponent.thumbnail || heroImageUrl || undefined
+                }
                 media={currentMedia}
                 editable={true}
                 size="large"
                 aspectRatio={16 / 9}
               />
-            </ThemedView>
+            </Animated.View>
           ) : heroImageUrl ? (
             <Animated.View
               key={`hero-container-${selectedComponentId || "default"}`}
@@ -1564,26 +1599,6 @@ export default function ProjectDetailScreen() {
               )}
             </View>
           )}
-          {/* Add Component Button - show if authenticated and (single component or in edit mode) */}
-          {isAuthenticated &&
-            project &&
-            (project.components.length === 1 || isEditMode) && (
-              <View
-                style={{
-                  marginHorizontal: DesignTokens.spacing[4],
-                  marginBottom: DesignTokens.spacing[2],
-                }}
-              >
-                <ThemedButton
-                  variant="secondary"
-                  icon="add"
-                  onPress={() => setShowCreateComponent(true)}
-                  accessibilityLabel="Add component"
-                >
-                  Add Component
-                </ThemedButton>
-              </View>
-            )}
 
           {/* Project Header */}
           <ThemedView style={styles.header}>
