@@ -1,7 +1,11 @@
 import { db } from "@/core/config";
 import { MediaAsset, Project } from "@/core/types";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { ComponentNotFoundError, ProjectNotFoundError } from "./projectService";
+import {
+  ComponentNotFoundError,
+  ProjectNotFoundError,
+  resolveProjectId,
+} from "./projectService";
 
 /**
  * Custom error class for media operations
@@ -35,8 +39,14 @@ export async function addMediaToComponent(
   media: MediaAsset
 ): Promise<void> {
   try {
-    // Read the full project
-    const projectRef = doc(db, "projects", projectId);
+    // Resolve the actual project ID first
+    const resolvedId = await resolveProjectId(projectId);
+    if (!resolvedId) {
+      throw new ProjectNotFoundError(projectId);
+    }
+
+    // Read the full project using resolved ID
+    const projectRef = doc(db, "projects", resolvedId);
     const projectSnap = await getDoc(projectRef);
 
     if (!projectSnap.exists()) {
@@ -106,8 +116,14 @@ export async function removeMediaFromComponent(
   mediaId: string
 ): Promise<void> {
   try {
-    // Read the full project
-    const projectRef = doc(db, "projects", projectId);
+    // Resolve the actual project ID first
+    const resolvedId = await resolveProjectId(projectId);
+    if (!resolvedId) {
+      throw new ProjectNotFoundError(projectId);
+    }
+
+    // Read the full project using resolved ID
+    const projectRef = doc(db, "projects", resolvedId);
     const projectSnap = await getDoc(projectRef);
 
     if (!projectSnap.exists()) {
@@ -185,8 +201,14 @@ export async function reorderComponentMedia(
   newMediaOrder: MediaAsset[]
 ): Promise<void> {
   try {
-    // Read the full project
-    const projectRef = doc(db, "projects", projectId);
+    // Resolve the actual project ID first
+    const resolvedId = await resolveProjectId(projectId);
+    if (!resolvedId) {
+      throw new ProjectNotFoundError(projectId);
+    }
+
+    // Read the full project using resolved ID
+    const projectRef = doc(db, "projects", resolvedId);
     const projectSnap = await getDoc(projectRef);
 
     if (!projectSnap.exists()) {

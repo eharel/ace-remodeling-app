@@ -88,6 +88,7 @@
     "@types/jest": "^30.0.0",
     "@types/papaparse": "^5.5.0",
     "@types/react": "~19.1.10",
+    "dotenv": "^17.2.3",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "tsx": "^4.20.6",

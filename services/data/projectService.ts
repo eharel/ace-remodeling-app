@@ -1,7 +1,14 @@
 import { db } from "@/core/config";
 import { Project, ProjectComponent } from "@/core/types";
 import { PROJECT_STATUSES } from "@/core/types/Status";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 
 const PROJECTS_COLLECTION = "projects";
 
@@ -31,9 +38,74 @@ export class ComponentNotFoundError extends Error {
  * @returns Promise resolving to the Project or null if not found
  * @throws Error if Firestore operation fails
  */
+/**
+ * Helper function to resolve the actual project ID in Firestore
+ * Tries multiple ID formats for backward compatibility
+ * @param projectId - The project ID to resolve (could be number, "project_{number}", etc.)
+ * @returns The actual document ID in Firestore, or null if not found
+ */
+export async function resolveProjectId(
+  projectId: string
+): Promise<string | null> {
+  // Try the provided ID first
+  let projectRef = doc(db, PROJECTS_COLLECTION, projectId);
+  let projectSnap = await getDoc(projectRef);
+
+  if (projectSnap.exists()) {
+    return projectSnap.id;
+  }
+
+  // If not found and ID doesn't start with "project_", try with "project_" prefix
+  if (!projectId.startsWith("project_")) {
+    const normalizedId = `project_${projectId}`;
+    projectRef = doc(db, PROJECTS_COLLECTION, normalizedId);
+    projectSnap = await getDoc(projectRef);
+    if (projectSnap.exists()) {
+      return projectSnap.id;
+    }
+  }
+
+  // If still not found and ID starts with "project_", try without prefix
+  if (projectId.startsWith("project_")) {
+    const numberOnly = projectId.replace(/^project_/, "");
+    projectRef = doc(db, PROJECTS_COLLECTION, numberOnly);
+    projectSnap = await getDoc(projectRef);
+    if (projectSnap.exists()) {
+      return projectSnap.id;
+    }
+  }
+
+  // Log for debugging - help identify if project exists with different ID format
+  // Also list available project IDs to help diagnose the issue
+  try {
+    const projectsCollection = collection(db, PROJECTS_COLLECTION);
+    const snapshot = await getDocs(projectsCollection);
+    const availableIds = snapshot.docs.map((d) => d.id).slice(0, 10); // First 10 for debugging
+    console.warn(
+      `[resolveProjectId] Project not found with ID "${projectId}". Tried: "${projectId}", ${
+        !projectId.startsWith("project_")
+          ? `"project_${projectId}"`
+          : `"${projectId.replace(/^project_/, "")}"`
+      }. Available project IDs (first 10): ${availableIds.join(", ")}`
+    );
+  } catch (listError) {
+    console.warn(
+      `[resolveProjectId] Project not found with ID "${projectId}" and failed to list available projects:`,
+      listError
+    );
+  }
+
+  return null;
+}
+
 export async function getProject(projectId: string): Promise<Project | null> {
   try {
-    const projectRef = doc(db, PROJECTS_COLLECTION, projectId);
+    const resolvedId = await resolveProjectId(projectId);
+    if (!resolvedId) {
+      return null;
+    }
+
+    const projectRef = doc(db, PROJECTS_COLLECTION, resolvedId);
     const projectSnap = await getDoc(projectRef);
 
     if (!projectSnap.exists()) {
@@ -67,7 +139,12 @@ export async function updateProject(
   updates: Partial<Project>
 ): Promise<void> {
   try {
-    const projectRef = doc(db, PROJECTS_COLLECTION, projectId);
+    const resolvedId = await resolveProjectId(projectId);
+    if (!resolvedId) {
+      throw new ProjectNotFoundError(projectId);
+    }
+
+    const projectRef = doc(db, PROJECTS_COLLECTION, resolvedId);
     const projectSnap = await getDoc(projectRef);
 
     if (!projectSnap.exists()) {
@@ -115,11 +192,35 @@ export async function updateComponentField(
   value: any
 ): Promise<void> {
   try {
-    // Read the full project
-    const project = await getProject(projectId);
-    if (!project) {
+    // Resolve the actual project ID first
+    const resolvedId = await resolveProjectId(projectId);
+    if (!resolvedId) {
+      // Log for debugging - this helps identify ID format mismatches
+      console.error(
+        `[updateComponentField] Could not resolve project ID "${projectId}". Tried: "${projectId}", "project_${projectId}", and "${projectId.replace(
+          /^project_/,
+          ""
+        )}"`
+      );
       throw new ProjectNotFoundError(projectId);
     }
+
+    // Read the full project using resolved ID (skip resolution since we already have it)
+    // Use direct Firestore access to avoid double resolution
+    const projectRef = doc(db, PROJECTS_COLLECTION, resolvedId);
+    const projectSnap = await getDoc(projectRef);
+
+    if (!projectSnap.exists()) {
+      console.error(
+        `[updateComponentField] Project with resolved ID "${resolvedId}" (from original "${projectId}") does not exist in Firestore`
+      );
+      throw new ProjectNotFoundError(projectId);
+    }
+
+    const project = {
+      id: projectSnap.id,
+      ...projectSnap.data(),
+    } as Project;
 
     // Find the component
     const componentIndex = project.components.findIndex(
@@ -137,8 +238,7 @@ export async function updateComponentField(
       updatedAt: new Date().toISOString(),
     };
 
-    // Write back the entire project with updated component
-    const projectRef = doc(db, PROJECTS_COLLECTION, projectId);
+    // Write back the entire project with updated component (reuse existing projectRef)
     await updateDoc(projectRef, {
       components: updatedComponents,
       updatedAt: new Date().toISOString(),
@@ -248,8 +348,14 @@ export async function createComponent(
   componentData: Omit<ProjectComponent, "id" | "createdAt" | "updatedAt">
 ): Promise<ProjectComponent> {
   try {
-    // Read the full project
-    const project = await getProject(projectId);
+    // Resolve the actual project ID first
+    const resolvedId = await resolveProjectId(projectId);
+    if (!resolvedId) {
+      throw new ProjectNotFoundError(projectId);
+    }
+
+    // Read the full project using resolved ID
+    const project = await getProject(resolvedId);
     if (!project) {
       throw new ProjectNotFoundError(projectId);
     }
@@ -291,8 +397,8 @@ export async function createComponent(
     // Append new component to project's components array
     const updatedComponents = [...project.components, newComponent];
 
-    // Write back the entire project with new component
-    const projectRef = doc(db, PROJECTS_COLLECTION, projectId);
+    // Write back the entire project with new component (use resolved ID)
+    const projectRef = doc(db, PROJECTS_COLLECTION, resolvedId);
     await updateDoc(projectRef, {
       components: updatedComponents,
       updatedAt: now,

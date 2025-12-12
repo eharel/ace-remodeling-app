@@ -256,6 +256,9 @@ export function DraggablePhotoGrid({
   }
 
   // Editable mode: draggable list
+  // Note: scrollEnabled is false because this is inside a ScrollView
+  // The parent ScrollView handles scrolling, and drag-and-drop still works
+  // because drag gestures are handled independently of scrolling
   return (
     <DraggableFlatList
       data={showAddButton ? dataWithAddButton : photos}
@@ -264,7 +267,7 @@ export function DraggablePhotoGrid({
       renderItem={showAddButton ? renderItemWithAddButton : renderItem}
       numColumns={columns}
       contentContainerStyle={styles.listContent}
-      scrollEnabled={true}
+      scrollEnabled={false}
       testID={testID}
     />
   );

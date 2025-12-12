@@ -96,21 +96,33 @@ export function useProjectMutations(): UseProjectMutationsReturn {
       value: any
     ) => {
       // 1. Find current project for rollback
-      const originalProject = projects.find((p) => p.id === projectId);
+      // Handle both ID formats: direct ID, project number, or "project_{number}" format
+      // This ensures compatibility with both old and new ID formats
+      const originalProject =
+        projects.find((p) => p.id === projectId) ||
+        projects.find((p) => p.number === projectId) ||
+        projects.find((p) => p.id === `project_${projectId}`);
+
       if (!originalProject) {
         const notFoundError = new Error(
-          `Project with ID "${projectId}" not found`
+          `Project with ID "${projectId}" not found in local state. Available projects: ${projects
+            .map((p) => p.id)
+            .join(", ")}`
         );
         setError(notFoundError);
         throw notFoundError;
       }
+
+      // Use the actual project ID from the found project
+      // Since projects are loaded from Firestore, this ID should match Firestore
+      const normalizedProjectId = originalProject.id;
 
       try {
         setIsUpdating(true);
         setError(null);
 
         // 2. Optimistically update UI
-        updateProjectOptimistically(projectId, (project) => ({
+        updateProjectOptimistically(normalizedProjectId, (project) => ({
           ...project,
           components: project.components.map((c) =>
             c.id === componentId
@@ -120,11 +132,16 @@ export function useProjectMutations(): UseProjectMutationsReturn {
           updatedAt: new Date().toISOString(),
         }));
 
-        // 3. Persist to Firestore
-        await updateComponentField(projectId, componentId, field, value);
+        // 3. Persist to Firestore (use normalized ID)
+        await updateComponentField(
+          normalizedProjectId,
+          componentId,
+          field,
+          value
+        );
       } catch (e) {
         // 4. Rollback on failure
-        rollbackProject(projectId, originalProject);
+        rollbackProject(normalizedProjectId, originalProject);
         const caughtError =
           e instanceof Error ? e : new Error("Unknown error occurred");
         setError(caughtError);

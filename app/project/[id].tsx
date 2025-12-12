@@ -34,7 +34,7 @@ import {
   ThemedView,
 } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
-import { useProjects, useTheme } from "@/shared/contexts";
+import { useAuth, useProjects, useTheme } from "@/shared/contexts";
 import { useFieldEdit } from "@/shared/hooks";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
@@ -137,6 +137,7 @@ export default function ProjectDetailScreen() {
     componentId?: string;
   }>();
   const { projects, loading } = useProjects();
+  const { isAuthenticated } = useAuth();
   const [project, setProject] = useState<Project | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -161,12 +162,24 @@ export default function ProjectDetailScreen() {
   // Show 3 preview photos (Flexbox will handle equal sizing)
   const previewCount = 3;
 
+  // Reset edit mode when user is not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setIsEditMode(false);
+    }
+  }, [isAuthenticated]);
+
   // Initialize project and set initial component selection
   // Only runs when id, componentId param, or projects change - NOT when selectedComponentId changes
   useEffect(() => {
     if (id) {
       // Use Firebase data instead of mock data
-      const foundProject = projects.find((p) => p.id === id);
+      // Try to find by ID first, then by number (for backward compatibility)
+      // Project IDs are in format "project_{number}" (e.g., "project_145")
+      const foundProject =
+        projects.find((p) => p.id === id) ||
+        projects.find((p) => p.number === id) ||
+        projects.find((p) => p.id === `project_${id}`);
       setProject(foundProject || null);
 
       // Set selected component: use componentId param if provided, otherwise default to first
@@ -1362,7 +1375,7 @@ export default function ProjectDetailScreen() {
           contentContainerStyle={{ paddingBottom: DesignTokens.spacing[20] }}
         >
           {/* Hero Image / Thumbnail Editor */}
-          {isEditMode && project && currentComponent ? (
+          {isAuthenticated && isEditMode && project && currentComponent ? (
             <ThemedView
               style={{
                 marginHorizontal: DesignTokens.spacing[4],
@@ -1428,7 +1441,7 @@ export default function ProjectDetailScreen() {
                   ariaLabel="Select project component"
                 />
               </View>
-              {isEditMode && (
+              {isAuthenticated && isEditMode && (
                 <ThemedIconButton
                   icon="add"
                   variant="primary"
@@ -1439,24 +1452,26 @@ export default function ProjectDetailScreen() {
               )}
             </View>
           )}
-          {/* Add Component Button - show if single component or in edit mode */}
-          {project && (project.components.length === 1 || isEditMode) && (
-            <View
-              style={{
-                marginHorizontal: DesignTokens.spacing[4],
-                marginBottom: DesignTokens.spacing[2],
-              }}
-            >
-              <ThemedButton
-                variant="secondary"
-                icon="add"
-                onPress={() => setShowCreateComponent(true)}
-                accessibilityLabel="Add component"
+          {/* Add Component Button - show if authenticated and (single component or in edit mode) */}
+          {isAuthenticated &&
+            project &&
+            (project.components.length === 1 || isEditMode) && (
+              <View
+                style={{
+                  marginHorizontal: DesignTokens.spacing[4],
+                  marginBottom: DesignTokens.spacing[2],
+                }}
               >
-                Add Component
-              </ThemedButton>
-            </View>
-          )}
+                <ThemedButton
+                  variant="secondary"
+                  icon="add"
+                  onPress={() => setShowCreateComponent(true)}
+                  accessibilityLabel="Add component"
+                >
+                  Add Component
+                </ThemedButton>
+              </View>
+            )}
 
           {/* Project Header */}
           <ThemedView style={styles.header}>
@@ -1467,7 +1482,7 @@ export default function ProjectDetailScreen() {
                   <ComponentNameField
                     project={project}
                     component={currentComponent}
-                    editable={isEditMode}
+                    editable={isAuthenticated && isEditMode}
                   />
                 </View>
               )}
@@ -1477,7 +1492,7 @@ export default function ProjectDetailScreen() {
                   <ComponentDescriptionField
                     project={project}
                     component={currentComponent}
-                    editable={isEditMode}
+                    editable={isAuthenticated && isEditMode}
                   />
                 </View>
               )}
@@ -1580,7 +1595,7 @@ export default function ProjectDetailScreen() {
               >
                 Project Photos ({currentMedia.length})
               </ThemedText>
-              {project && currentComponent && (
+              {isAuthenticated && project && currentComponent && (
                 <Pressable
                   onPress={() => setIsEditMode(!isEditMode)}
                   style={{
@@ -1646,7 +1661,7 @@ export default function ProjectDetailScreen() {
                 {/* Photo Grid */}
                 {filteredMediaAssets.length > 0 ? (
                   <>
-                    {isEditMode ? (
+                    {isAuthenticated && isEditMode ? (
                       // Edit mode: show all photos with drag-and-drop
                       <DraggablePhotoGrid
                         photos={filteredMediaAssets}
@@ -1722,7 +1737,7 @@ export default function ProjectDetailScreen() {
                       No {activePhotoTab === "all" ? "" : activePhotoTab} photos
                       available
                     </ThemedText>
-                    {project && currentComponent && (
+                    {isAuthenticated && project && currentComponent && (
                       <View style={{ marginTop: DesignTokens.spacing[4] }}>
                         <PhotoUploadButton
                           projectId={project.id}
@@ -1752,7 +1767,7 @@ export default function ProjectDetailScreen() {
                 >
                   No pictures available
                 </ThemedText>
-                {project && currentComponent && (
+                {isAuthenticated && project && currentComponent && (
                   <View style={{ marginTop: DesignTokens.spacing[4] }}>
                     <PhotoUploadButton
                       projectId={project.id}

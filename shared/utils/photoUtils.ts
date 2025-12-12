@@ -1,4 +1,4 @@
-import { MediaAsset, MEDIA_STAGES } from "@/core/types";
+import { MEDIA_STAGES, MediaAsset } from "@/core/types";
 
 /**
  * Photo counts for each category
@@ -22,14 +22,13 @@ export function getPhotoCounts(media: MediaAsset[]): PhotoCounts {
   }
 
   // Filter to images only (exclude videos)
-  const images = media.filter((m) => m.mediaType === "image");
+  // Also filter out null/undefined values to prevent crashes
+  const images = media.filter((m) => m && m.mediaType === "image");
 
   return {
     all: images.length,
     before: images.filter((m) => m.stage === MEDIA_STAGES.BEFORE).length,
-    progress: images.filter(
-      (m) => m.stage === MEDIA_STAGES.IN_PROGRESS
-    ).length,
+    progress: images.filter((m) => m.stage === MEDIA_STAGES.IN_PROGRESS).length,
     after: images.filter((m) => m.stage === MEDIA_STAGES.AFTER).length,
   };
 }
@@ -93,7 +92,8 @@ export function samplePreviewPhotos(
   previewCount: number
 ): MediaAsset[] {
   // Filter to images only
-  const allPhotos = allMedia.filter((m) => m.mediaType === "image");
+  // Also filter out null/undefined values to prevent crashes
+  const allPhotos = allMedia.filter((m) => m && m.mediaType === "image");
 
   if (!allPhotos || allPhotos.length === 0) {
     return [];
@@ -108,13 +108,11 @@ export function samplePreviewPhotos(
   const categorized = {
     after: allPhotos.filter((p) => p.stage === MEDIA_STAGES.AFTER),
     before: allPhotos.filter((p) => p.stage === MEDIA_STAGES.BEFORE),
-    progress: allPhotos.filter(
-      (p) => p.stage === MEDIA_STAGES.IN_PROGRESS
-    ),
+    progress: allPhotos.filter((p) => p.stage === MEDIA_STAGES.IN_PROGRESS),
   };
 
   const preview: MediaAsset[] = [];
-  const priorityOrder: Array<"after" | "before" | "progress"> = [
+  const priorityOrder: ("after" | "before" | "progress")[] = [
     "after",
     "before",
     "progress",
@@ -147,4 +145,3 @@ export function samplePreviewPhotos(
 
   return preview;
 }
-

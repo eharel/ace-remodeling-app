@@ -1,10 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  ScrollViewProps,
-  StyleSheet,
-} from "react-native";
+import { RefreshControl, ScrollView, ScrollViewProps } from "react-native";
 
 import { useProjects, useTheme } from "@/shared/contexts";
 
@@ -73,6 +68,7 @@ export function RefreshableScrollView({
   return (
     <ScrollView
       {...scrollViewProps}
+      nestedScrollEnabled={true}
       refreshControl={
         <RefreshControl
           refreshing={isRefreshing}
@@ -86,4 +82,3 @@ export function RefreshableScrollView({
     </ScrollView>
   );
 }
-

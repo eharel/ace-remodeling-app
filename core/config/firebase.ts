@@ -3,6 +3,28 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 /**
+ * Load environment variables from .env file (Node.js scripts only)
+ * This allows developers to set EXPO_PUBLIC_FIREBASE_ENV or NODE_ENV in .env
+ *
+ * Only loads in Node.js environment (scripts), not in React Native.
+ * Metro bundler is configured to exclude dotenv from the React Native bundle.
+ */
+if (
+  typeof __DEV__ === "undefined" &&
+  typeof process !== "undefined" &&
+  process.versions?.node
+) {
+  // Only load dotenv in Node.js context (scripts), not in React Native
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("dotenv").config();
+  } catch {
+    // dotenv is optional - scripts can still work without it
+    // (using npm script environment variables or system env vars)
+  }
+}
+
+/**
  * Firebase configuration
  * API keys are safe to be public in client applications
  */
