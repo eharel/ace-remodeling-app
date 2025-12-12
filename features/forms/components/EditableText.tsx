@@ -164,12 +164,10 @@ export function EditableText({
           gap: DesignTokens.spacing[2],
         },
         inputContainer: {
-          flexDirection: "row",
-          alignItems: multiline ? "flex-start" : "center",
-          gap: DesignTokens.spacing[2],
+          width: "100%",
         },
         input: {
-          flex: 1,
+          width: "100%",
           ...typographyStyles,
           borderWidth: 1,
           borderRadius: DesignTokens.borderRadius.md,
@@ -190,6 +188,8 @@ export function EditableText({
           flexDirection: "row",
           gap: DesignTokens.spacing[2],
           alignItems: "center",
+          justifyContent: "flex-end",
+          marginTop: DesignTokens.spacing[2],
         },
         errorText: {
           fontSize: DesignTokens.typography.fontSize.sm,
@@ -214,19 +214,13 @@ export function EditableText({
     }
   }, [editable, value]);
 
-  const handleCancel = useCallback(
-    (e?: any) => {
-      // Stop event propagation to prevent double-tap
-      if (e) {
-        e.stopPropagation?.();
-      }
-      setEditValue(value);
-      setError(null);
-      setIsEditing(false);
-      Keyboard.dismiss();
-    },
-    [value]
-  );
+  const handleCancel = useCallback(() => {
+    console.log("[EditableText] Cancel pressed");
+    setIsEditing(false);
+    setEditValue(value);
+    setError(null);
+    Keyboard.dismiss();
+  }, [value]);
 
   const handleSave = useCallback(async () => {
     // Validation
@@ -334,29 +328,26 @@ export function EditableText({
             autoFocus={true}
             accessibilityLabel={`Edit ${variant} text`}
           />
-          <View style={styles.actions}>
-            <ThemedIconButton
-              icon={isSaving ? "hourglass-empty" : "check"}
-              variant="primary"
-              size="small"
-              onPress={handleSave}
-              disabled={isSaving}
-              accessibilityLabel={isSaving ? "Saving..." : "Save changes"}
-              hitSlop={8}
-            />
-            <ThemedIconButton
-              icon="close"
-              variant="ghost"
-              size="small"
-              onPress={(e) => {
-                e?.stopPropagation?.();
-                handleCancel(e);
-              }}
-              disabled={isSaving}
-              accessibilityLabel="Cancel editing"
-              hitSlop={8}
-            />
-          </View>
+        </View>
+        <View style={styles.actions}>
+          <ThemedIconButton
+            icon={isSaving ? "hourglass-empty" : "check"}
+            variant="primary"
+            size="small"
+            onPress={handleSave}
+            disabled={isSaving}
+            accessibilityLabel={isSaving ? "Saving..." : "Save changes"}
+            hitSlop={8}
+          />
+          <ThemedIconButton
+            icon="close"
+            variant="ghost"
+            size="small"
+            onPress={handleCancel}
+            disabled={isSaving}
+            accessibilityLabel="Cancel editing"
+            hitSlop={12}
+          />
         </View>
         {error && <ThemedText style={styles.errorText}>{error}</ThemedText>}
         {maxLength && (
