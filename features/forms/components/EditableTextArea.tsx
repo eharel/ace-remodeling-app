@@ -1,4 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/core/themes";
@@ -38,6 +44,9 @@ export function EditableTextArea({
 }: EditableTextAreaProps) {
   const { theme } = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isTextTruncated, setIsTextTruncated] = useState(false);
+  const fullTextLinesRef = useRef<number | null>(null);
+  const limitedTextLinesRef = useRef<number | null>(null);
 
   const styles = useMemo(
     () =>
@@ -52,14 +61,69 @@ export function EditableTextArea({
           fontSize: DesignTokens.typography.fontSize.sm,
           color: theme.colors.interactive.primary,
         },
+        measureText: {
+          position: "absolute",
+          opacity: 0,
+          zIndex: -1,
+          width: "100%",
+          pointerEvents: "none",
+        },
       }),
     [theme]
   );
 
   const value = editableTextProps.value || "";
-  const hasMoreContent =
-    value.split("\n").length > previewLines || value.length > 200;
-  const shouldShowExpand = hasMoreContent && !editableTextProps.editable;
+
+  // Measure full text (unlimited) to get actual line count
+  const handleFullTextLayout = useCallback((event: any) => {
+    const lines = event.nativeEvent.lines || [];
+    fullTextLinesRef.current = lines.length;
+    checkTruncation();
+  }, []);
+
+  // Measure limited text (with numberOfLines) to see if it matches full text
+  const handleLimitedTextLayout = useCallback((event: any) => {
+    const lines = event.nativeEvent.lines || [];
+    limitedTextLinesRef.current = lines.length;
+    checkTruncation();
+  }, []);
+
+  // Check if text is actually truncated by comparing line counts
+  const checkTruncation = useCallback(() => {
+    if (
+      fullTextLinesRef.current !== null &&
+      limitedTextLinesRef.current !== null
+    ) {
+      // Text is truncated if full text has more lines than the limited version
+      // Also check if limited text shows exactly previewLines (might be truncated)
+      const isTruncated =
+        fullTextLinesRef.current > limitedTextLinesRef.current ||
+        (limitedTextLinesRef.current === previewLines &&
+          fullTextLinesRef.current > previewLines);
+      setIsTextTruncated(isTruncated);
+    } else if (fullTextLinesRef.current !== null) {
+      // If we only have full text measurement, check if it exceeds previewLines
+      setIsTextTruncated(fullTextLinesRef.current > previewLines);
+    }
+  }, [previewLines]);
+
+  // Reset measurements when value changes
+  useEffect(() => {
+    fullTextLinesRef.current = null;
+    limitedTextLinesRef.current = null;
+    setIsTextTruncated(false);
+  }, [value]);
+
+  // Show button when:
+  // - Not expanded AND text is truncated (show "Show more")
+  // - Expanded AND we know text was truncated (show "Show less")
+  const shouldShowExpand =
+    !editableTextProps.editable &&
+    value.length > 0 &&
+    (isExpanded
+      ? fullTextLinesRef.current !== null &&
+        fullTextLinesRef.current > previewLines
+      : isTextTruncated);
 
   // Override multiline to true for text area
   // Only set numberOfLines if we have content and it's not expanded
@@ -72,8 +136,32 @@ export function EditableTextArea({
 
   return (
     <View style={styles.container}>
-      <EditableText {...textAreaProps} />
-      {shouldShowExpand && !editableTextProps.editable && (
+      {/* Measure full text to detect truncation (both when expanded and not expanded) */}
+      {/* Use same variant as EditableText (body) and match styling */}
+      {!editableTextProps.editable && value.length > 0 && (
+        <ThemedText
+          variant="body"
+          numberOfLines={0}
+          onTextLayout={handleFullTextLayout}
+          style={[
+            styles.measureText,
+            {
+              fontSize: DesignTokens.typography.fontSize.base,
+              lineHeight:
+                DesignTokens.typography.fontSize.base *
+                DesignTokens.typography.lineHeight.normal,
+              fontFamily: DesignTokens.typography.fontFamily.regular,
+            },
+          ]}
+        >
+          {value}
+        </ThemedText>
+      )}
+      <EditableText
+        {...textAreaProps}
+        onTextLayout={shouldLimitLines ? handleLimitedTextLayout : undefined}
+      />
+      {shouldShowExpand && (
         <ThemedText
           style={styles.expandButtonText}
           onPress={() => setIsExpanded(!isExpanded)}

@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Keyboard, Pressable, StyleSheet, TextInput, View } from "react-native";
+import {
+  Keyboard,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+  type TextProps,
+} from "react-native";
 
 import { DesignTokens } from "@/core/themes";
 import { ThemedIconButton, ThemedText } from "@/shared/components";
@@ -34,6 +41,8 @@ export interface EditableTextProps {
   required?: boolean;
   /** Validation function - returns error message or null */
   validate?: (value: string) => string | null;
+  /** Callback when text layout is measured */
+  onTextLayout?: TextProps["onTextLayout"];
   /** Test ID for testing */
   testID?: string;
 }
@@ -59,6 +68,7 @@ export function EditableText({
   inheritedFrom,
   required = false,
   validate,
+  onTextLayout,
   testID = "editable-text",
 }: EditableTextProps) {
   const { theme } = useTheme();
@@ -286,6 +296,7 @@ export function EditableText({
               numberOfLines={numberOfLines}
               ellipsizeMode="tail"
               allowFontScaling={true}
+              onTextLayout={onTextLayout}
             >
               {displayValue}
             </ThemedText>
