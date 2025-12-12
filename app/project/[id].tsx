@@ -34,6 +34,7 @@ import {
   LoadingState,
   PageHeader,
   RefreshableScrollView,
+  ThemedButton,
   ThemedIconButton,
   ThemedText,
   ThemedView,
@@ -206,10 +207,34 @@ export default function ProjectDetailScreen() {
   const [isEnteringEditMode, setIsEnteringEditMode] = useState(false);
   const [isExitingEditMode, setIsExitingEditMode] = useState(false);
   const [showCreateComponent, setShowCreateComponent] = useState(false);
+  const [expandedPhotoTabs, setExpandedPhotoTabs] = useState<
+    Record<PhotoTabValue, boolean>
+  >({
+    after: false,
+    before: false,
+    progress: false,
+    all: false,
+  });
   const { theme } = useTheme();
 
   // Show 3 preview photos (Flexbox will handle equal sizing)
   const previewCount = 3;
+
+  // Toggle photo tab expansion
+  const togglePhotoTabExpansion = useCallback((tab: PhotoTabValue) => {
+    setExpandedPhotoTabs((prev) => ({
+      ...prev,
+      [tab]: !prev[tab],
+    }));
+  }, []);
+
+  // Reset expansion when switching tabs
+  useEffect(() => {
+    setExpandedPhotoTabs((prev) => ({
+      ...prev,
+      [activePhotoTab]: false,
+    }));
+  }, [activePhotoTab]);
 
   // Reset edit mode when user is not authenticated
   useEffect(() => {
@@ -828,7 +853,9 @@ export default function ProjectDetailScreen() {
 
     if (activePhotoTab === "all") {
       // Use intelligent sampling for "All Photos" tab
-      return samplePreviewPhotos(aggregatedPictures, previewCount);
+      // Filter out null values before sampling
+      const validPictures = aggregatedPictures.filter((m) => m != null);
+      return samplePreviewPhotos(validPictures, previewCount);
     } else {
       // Filter by specific stage and take first N
       // Map tab values to MediaAsset stages
@@ -839,7 +866,7 @@ export default function ProjectDetailScreen() {
       };
       const targetStage = stageMap[activePhotoTab] || activePhotoTab;
       const filtered = aggregatedPictures.filter(
-        (m) => m.mediaType === "image" && m.stage === targetStage
+        (m) => m && m.mediaType === "image" && m.stage === targetStage
       );
       return getPreviewPhotos(filtered, previewCount);
     }
@@ -863,7 +890,7 @@ export default function ProjectDetailScreen() {
     }
 
     if (activePhotoTab === "all") {
-      return aggregatedPictures.filter((m) => m.mediaType === "image");
+      return aggregatedPictures.filter((m) => m && m.mediaType === "image");
     } else {
       // Map tab value to MediaAsset stage
       const stageMap: Record<string, string> = {
@@ -873,7 +900,7 @@ export default function ProjectDetailScreen() {
       };
       const targetStage = stageMap[activePhotoTab] || activePhotoTab;
       return aggregatedPictures.filter(
-        (m) => m.mediaType === "image" && m.stage === targetStage
+        (m) => m && m.mediaType === "image" && m.stage === targetStage
       );
     }
   }, [aggregatedPictures, activePhotoTab]);
@@ -1830,28 +1857,67 @@ export default function ProjectDetailScreen() {
                 {filteredMediaAssets.length > 0 ? (
                   <>
                     {isAuthenticated && isEditMode ? (
-                      // Edit mode: show all photos with drag-and-drop
-                      <DraggablePhotoGrid
-                        photos={filteredMediaAssets}
-                        projectId={project?.id || ""}
-                        componentId={currentComponent?.id || ""}
-                        editable={true}
-                        onPhotoPress={(photo, index) => {
-                          // Find the index in galleryImages for correct navigation
-                          const galleryIndex = galleryImages.findIndex(
-                            (p: { id?: string }) => p.id === photo.id
-                          );
-                          const safeIndex =
-                            galleryIndex >= 0
-                              ? galleryIndex
-                              : Math.min(index, galleryImages.length - 1);
-                          setSelectedImageIndex(safeIndex);
-                          setGalleryVisible(true);
-                        }}
-                        showAddButton={true}
-                        stage={getUploadStage(activePhotoTab)}
-                        columns={3}
-                      />
+                      // Edit mode: show preview by default, all when expanded
+                      <>
+                        <DraggablePhotoGrid
+                          photos={
+                            expandedPhotoTabs[activePhotoTab]
+                              ? filteredMediaAssets // Show all when expanded
+                              : filteredMediaAssets.slice(0, previewCount) // Show preview when collapsed
+                          }
+                          projectId={project?.id || ""}
+                          componentId={currentComponent?.id || ""}
+                          editable={true}
+                          onPhotoPress={(photo, index) => {
+                            // Find the index in galleryImages for correct navigation
+                            const galleryIndex = galleryImages.findIndex(
+                              (p: { id?: string }) => p.id === photo.id
+                            );
+                            const safeIndex =
+                              galleryIndex >= 0
+                                ? galleryIndex
+                                : Math.min(index, galleryImages.length - 1);
+                            setSelectedImageIndex(safeIndex);
+                            setGalleryVisible(true);
+                          }}
+                          showAddButton={expandedPhotoTabs[activePhotoTab]} // Only show add button when expanded
+                          stage={getUploadStage(activePhotoTab)}
+                          columns={3}
+                        />
+                        {/* Toggle button */}
+                        {filteredMediaAssets.length > previewCount && (
+                          <ThemedButton
+                            onPress={() =>
+                              togglePhotoTabExpansion(activePhotoTab)
+                            }
+                            variant="secondary"
+                            style={{ marginTop: DesignTokens.spacing[4] }}
+                          >
+                            {expandedPhotoTabs[activePhotoTab]
+                              ? `Show Less (${
+                                  filteredMediaAssets.length - previewCount
+                                } hidden)`
+                              : `Show All ${filteredMediaAssets.length} Photos`}
+                          </ThemedButton>
+                        )}
+                        {/* Add Photos button - only show when collapsed */}
+                        {!expandedPhotoTabs[activePhotoTab] &&
+                          project &&
+                          currentComponent && (
+                            <View
+                              style={{ marginTop: DesignTokens.spacing[4] }}
+                            >
+                              <PhotoUploadButton
+                                projectId={project.id}
+                                componentId={currentComponent.id}
+                                stage={getUploadStage(activePhotoTab)}
+                                variant="button"
+                              >
+                                Add Photos
+                              </PhotoUploadButton>
+                            </View>
+                          )}
+                      </>
                     ) : (
                       // View mode: show preview with "+X more" card
                       <ThemedView variant="ghost" style={styles.picturesGrid}>
