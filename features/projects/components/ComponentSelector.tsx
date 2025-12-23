@@ -10,8 +10,8 @@ import * as Haptics from "expo-haptics";
 
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
-import { ProjectComponent } from "@/core/types";
-import { DesignTokens } from "@/core/themes";
+import { ProjectComponent } from "@/shared/types";
+import { DesignTokens } from "@/shared/themes";
 
 interface ComponentSelectorProps {
   components: ProjectComponent[];

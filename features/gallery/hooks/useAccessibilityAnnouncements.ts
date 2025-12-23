@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { AccessibilityInfo, View } from "react-native";
 
-import { Picture } from "@/core/types";
+import { Picture } from "@/shared/types";
 
 interface UseAccessibilityAnnouncementsProps {
   visible: boolean;

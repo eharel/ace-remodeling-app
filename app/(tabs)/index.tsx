@@ -6,13 +6,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   getCategoryConfig,
   isValidCategoryKey,
-} from "@/core/constants/categoryConfig";
-import { DesignTokens } from "@/core/themes";
+} from "@/shared/constants/categoryConfig";
+import { DesignTokens } from "@/shared/themes";
 import {
   ComponentCategory,
   CORE_CATEGORIES,
   CoreCategory,
-} from "@/core/types/ComponentCategory";
+} from "@/shared/types/ComponentCategory";
 import { FeaturedCategorySection, HeroCarousel } from "@/features/showcase";
 import {
   LoadingState,

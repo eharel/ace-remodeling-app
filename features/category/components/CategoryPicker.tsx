@@ -2,11 +2,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import {
   ComponentCategory,
   CORE_CATEGORIES,
-} from "@/core/types/ComponentCategory";
+} from "@/shared/types/ComponentCategory";
 import { ThemedText } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import {

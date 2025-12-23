@@ -1,5 +1,5 @@
-import { ComponentCategory } from "@/core/types/ComponentCategory";
-import { ProjectStatus } from "@/core/types/Status";
+import { ComponentCategory } from "@/shared/types/ComponentCategory";
+import { ProjectStatus } from "@/shared/types/Status";
 
 /**
  * Search filter state supporting multi-select functionality

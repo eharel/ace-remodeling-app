@@ -25,15 +25,15 @@ import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import {
   getCategoryLabel,
   getProjectThumbnail,
   getSubcategoryLabel,
   Project,
   ProjectComponent,
-} from "@/core/types";
-import { CoreCategory } from "@/core/types/ComponentCategory";
+} from "@/shared/types";
+import { CoreCategory } from "@/shared/types/ComponentCategory";
 import {
   CATEGORY_DISPLAY_ORDER,
   commonStyles,

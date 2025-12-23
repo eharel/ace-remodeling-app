@@ -1,4 +1,4 @@
-import { MediaAsset, MEDIA_STAGES } from "@/core/types";
+import { MediaAsset, MEDIA_STAGES } from "@/shared/types";
 
 /**
  * Photo counts for each category

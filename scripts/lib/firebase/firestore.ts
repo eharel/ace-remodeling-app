@@ -17,7 +17,7 @@ import {
   DocumentData,
 } from "firebase/firestore";
 import { db } from "./client";
-import { Project } from "../../../core/types/Project";
+import { Project } from "../../../shared/types/Project";
 
 /**
  * Options for creating projects

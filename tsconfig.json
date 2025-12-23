@@ -16,9 +16,6 @@
       "@/shared/*": [
         "./shared/*"
       ],
-      "@/core/*": [
-        "./core/*"
-      ],
       "@/scripts/*": [
         "./scripts/*"
       ],

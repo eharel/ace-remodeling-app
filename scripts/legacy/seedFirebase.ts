@@ -24,9 +24,9 @@ import {
 import * as fs from "fs";
 import * as path from "path";
 // @ts-ignore - Legacy script, paths may not exist
-import { db } from "../core/config";
+import { db } from "../../shared/config";
 // @ts-ignore - Legacy script, paths may not exist
-import { Document, Picture, Project, ProjectCategory } from "../core/types";
+import { Document, Picture, Project, ProjectCategory } from "../../shared/types";
 
 /**
  * Result summary from seeding operation

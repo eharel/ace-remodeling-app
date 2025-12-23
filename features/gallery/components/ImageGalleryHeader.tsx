@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import { ThemedIconButton, ThemedText } from "@/shared/components";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

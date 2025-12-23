@@ -1,9 +1,9 @@
-import { Project, ProjectCardView } from "@/core/types";
+import { Project, ProjectCardView } from "@/shared/types";
 import {
   ComponentCategory,
   CORE_CATEGORIES,
   getSubcategoryLabel,
-} from "@/core/types/ComponentCategory";
+} from "@/shared/types/ComponentCategory";
 
 /**
  * Normalize category names (e.g., "outdoor" -> "outdoor-living")

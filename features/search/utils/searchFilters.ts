@@ -1,6 +1,6 @@
-import { ComponentCategory } from "@/core/types/ComponentCategory";
-import { Project } from "@/core/types/Project";
-import { ProjectStatus } from "@/core/types/Status";
+import { ComponentCategory } from "@/shared/types/ComponentCategory";
+import { Project } from "@/shared/types/Project";
+import { ProjectStatus } from "@/shared/types/Status";
 
 /**
  * Pure utility functions for filtering projects

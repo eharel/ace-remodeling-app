@@ -6,8 +6,8 @@ import { useProjects } from "@/shared/contexts";
 import { CategoryPage } from "./CategoryPage";
 // Comment out mock data for now (keeping for fallback)
 // import { getProjectSummariesByCategory } from "@/data/mockProjects";
-import { CategoryKey, getCategoryConfig } from "@/core/constants";
-import { ProjectCardView, toProjectCardViewsByCategory } from "@/core/types";
+import { CategoryKey, getCategoryConfig } from "@/shared/constants";
+import { ProjectCardView, toProjectCardViewsByCategory } from "@/shared/types";
 import { MaterialIcons } from "@expo/vector-icons";
 
 interface CategoryScreenProps {

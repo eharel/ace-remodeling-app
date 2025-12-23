@@ -1,4 +1,4 @@
-import { ProjectCardView } from "@/core/types";
+import { ProjectCardView } from "@/shared/types";
 
 /**
  * Constants for search scoring algorithm

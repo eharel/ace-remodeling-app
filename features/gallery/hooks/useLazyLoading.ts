@@ -1,4 +1,4 @@
-import { Picture } from "@/core/types";
+import { Picture } from "@/shared/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   calculateLoadingDelay,

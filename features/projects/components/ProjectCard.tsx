@@ -15,10 +15,10 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-import { DesignTokens } from "@/core/themes";
-import { ProjectCardView, ProjectStatus } from "@/core/types";
-import { getSubcategoryLabel } from "@/core/types/ComponentCategory";
-import { getStatusDisplayText, getStatusStyleKey } from "@/core/types/Status";
+import { DesignTokens } from "@/shared/themes";
+import { ProjectCardView, ProjectStatus } from "@/shared/types";
+import { getSubcategoryLabel } from "@/shared/types/ComponentCategory";
+import { getStatusDisplayText, getStatusStyleKey } from "@/shared/types/Status";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { getCategoryDisplayName } from "@/shared/utils";

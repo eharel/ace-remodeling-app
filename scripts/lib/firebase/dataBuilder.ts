@@ -9,10 +9,10 @@
 
 import { randomUUID } from "crypto";
 
-import { Document, DOCUMENT_TYPES } from "../../../core/types/Document";
-import { MEDIA_STAGES, MediaAsset } from "../../../core/types/MediaAsset";
-import { Project } from "../../../core/types/Project";
-import { ProjectComponent } from "../../../core/types/ProjectComponent";
+import { Document, DOCUMENT_TYPES } from "../../../shared/types/Document";
+import { MEDIA_STAGES, MediaAsset } from "../../../shared/types/MediaAsset";
+import { Project } from "../../../shared/types/Project";
+import { ProjectComponent } from "../../../shared/types/ProjectComponent";
 import {
   AssetType,
   ComponentFiles,

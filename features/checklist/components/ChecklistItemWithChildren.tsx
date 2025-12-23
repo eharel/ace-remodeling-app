@@ -2,7 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import type { ChecklistItem as ChecklistItemType } from "@/features/checklist/utils/checklistHelpers";
 import { useTheme } from "@/shared/contexts";
 

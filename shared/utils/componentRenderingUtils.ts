@@ -4,7 +4,7 @@ import {
   Project,
   getCategoryLabel,
   isCoreCategory,
-} from "@/core/types";
+} from "@/shared/types";
 
 /**
  * Configuration for a component tab in project detail view

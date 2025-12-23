@@ -1,6 +1,6 @@
-import { db } from "@/core/config";
-import { Project, MediaAsset } from "@/core/types";
-import { CORE_CATEGORIES } from "@/core/types/ComponentCategory";
+import { db } from "@/shared/config";
+import { Project, MediaAsset } from "@/shared/types";
+import { CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
 import { collection, getDocs } from "firebase/firestore";
 import React, {
   createContext,

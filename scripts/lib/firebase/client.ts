@@ -7,7 +7,7 @@
  * @module scripts/lib/firebase/client
  */
 
-import { currentEnvironment, db, storage } from "../../../core/config/firebase";
+import { currentEnvironment, db, storage } from "../../../shared/config/firebase";
 
 export { db, storage };
 

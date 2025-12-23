@@ -13,11 +13,11 @@ import * as Papa from "papaparse";
 import {
   ComponentCategory,
   ComponentSubcategory,
-} from "../../../core/types/ComponentCategory";
-import { Project } from "../../../core/types/Project";
-import { ProjectComponent } from "../../../core/types/ProjectComponent";
-import { ProjectManager } from "../../../core/types/ProjectManager";
-import { PROJECT_STATUSES, ProjectStatus } from "../../../core/types/Status";
+} from "../../../shared/types/ComponentCategory";
+import { Project } from "../../../shared/types/Project";
+import { ProjectComponent } from "../../../shared/types/ProjectComponent";
+import { ProjectManager } from "../../../shared/types/ProjectManager";
+import { PROJECT_STATUSES, ProjectStatus } from "../../../shared/types/Status";
 
 /**
  * Raw CSV row structure (matches CSV columns exactly)

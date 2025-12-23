@@ -24,8 +24,8 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-import { DesignTokens } from "@/core/themes";
-import { Project, getProjectThumbnail } from "@/core/types";
+import { DesignTokens } from "@/shared/themes";
+import { Project, getProjectThumbnail } from "@/shared/types";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 

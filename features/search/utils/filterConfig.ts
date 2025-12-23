@@ -2,8 +2,8 @@ import {
   ComponentCategory,
   CoreCategory,
   getCategoryLabel,
-} from "@/core/types/ComponentCategory";
-import { getStatusDisplayText, ProjectStatus } from "@/core/types/Status";
+} from "@/shared/types/ComponentCategory";
+import { getStatusDisplayText, ProjectStatus } from "@/shared/types/Status";
 import { getAllCategories } from "@/shared/utils/categoryUtils";
 import { FilterOption } from "../types/types";
 

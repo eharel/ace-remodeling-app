@@ -1,8 +1,8 @@
 import { StyleSheet } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
-import { ProjectCardView } from "@/core/types";
-import { ComponentCategory } from "@/core/types/ComponentCategory";
+import { DesignTokens } from "@/shared/themes";
+import { ProjectCardView } from "@/shared/types";
+import { ComponentCategory } from "@/shared/types/ComponentCategory";
 import { ProjectGallery } from "@/features/projects";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { commonStyles } from "@/shared/utils";

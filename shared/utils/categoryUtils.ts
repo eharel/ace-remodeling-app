@@ -3,7 +3,7 @@ import {
   CoreCategory,
   ComponentCategory,
   getCategoryLabel,
-} from "@/core/types/ComponentCategory";
+} from "@/shared/types/ComponentCategory";
 
 /**
  * Default category order for consistent display throughout the app

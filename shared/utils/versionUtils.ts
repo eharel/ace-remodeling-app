@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/core/config";
-import type { VersionConfig } from "@/core/types/VersionConfig";
+import { db } from "@/shared/config";
+import type { VersionConfig } from "@/shared/types/VersionConfig";
 import appConfig from "../../app.json";
 
 /**

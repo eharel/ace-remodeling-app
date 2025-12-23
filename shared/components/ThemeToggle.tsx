@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { DesignTokens, ThemeSetting } from "@/core/themes";
+import { DesignTokens, ThemeSetting } from "@/shared/themes";
 import { useTheme } from "../contexts";
 import { ThemedIconButton, ThemedText } from "./themed";
 

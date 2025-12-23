@@ -1,4 +1,4 @@
-import { currentEnvironment, currentProjectId } from "@/core/config";
+import { currentEnvironment, currentProjectId } from "@/shared/config";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import packageJson from "../../package.json";
 
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import { UpdateBanner } from "@/features/settings";
 import {
   PageHeader,

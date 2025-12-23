@@ -21,7 +21,7 @@ import { scanProjectFiles } from "./lib/filesystem/scanner";
 import { uploadAllFiles, UploadOptions } from "./lib/firebase/storage";
 import { buildProjectDocument } from "./lib/firebase/dataBuilder";
 import { createProjects, CreateOptions } from "./lib/firebase/firestore";
-import { Project } from "../core/types/Project";
+import { Project } from "../shared/types/Project";
 
 // Constants
 const ASSETS_ROOT = "/Users/eliharel/Code/Projects/ace-remodeling-assets";

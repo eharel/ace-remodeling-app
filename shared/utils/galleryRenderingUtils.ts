@@ -2,7 +2,7 @@ import {
   MediaAsset,
   MediaStage,
   MEDIA_STAGES,
-} from "@/core/types";
+} from "@/shared/types";
 
 /**
  * Configuration for a gallery tab

@@ -3,17 +3,17 @@ import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
 import { FlatList, ListRenderItemInfo, StyleSheet, View } from "react-native";
 
-import { getCategoryConfig } from "@/core/constants/categoryConfig";
-import { DesignTokens } from "@/core/themes";
+import { getCategoryConfig } from "@/shared/constants/categoryConfig";
+import { DesignTokens } from "@/shared/themes";
 import {
   Project,
   ProjectCardView,
   toProjectCardViewsByCategory,
-} from "@/core/types";
+} from "@/shared/types";
 import {
   ComponentCategory,
   CoreCategory,
-} from "@/core/types/ComponentCategory";
+} from "@/shared/types/ComponentCategory";
 import { ProjectCard } from "@/features/projects";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";

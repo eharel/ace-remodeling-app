@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import { ThemedIconButton } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import type { ChecklistProgress } from "@/features/checklist/utils/checklistHelpers";

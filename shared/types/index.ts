@@ -1,3 +1,6 @@
+// Auth types
+export * from "./Auth";
+
 // Core entity types
 export * from "./Document";
 export * from "./FileAsset";
