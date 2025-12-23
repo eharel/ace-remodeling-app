@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import { useTheme } from "@/shared/contexts";
 import { SegmentedControlProps } from "./types";
 import { formatLabel } from "./utils";

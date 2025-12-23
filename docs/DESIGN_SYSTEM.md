@@ -81,7 +81,7 @@ Theme-aware, reusable components:
 ### Using Design Tokens
 
 ```typescript
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 
 const styles = StyleSheet.create({
   container: {

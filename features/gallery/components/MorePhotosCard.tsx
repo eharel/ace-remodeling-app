@@ -2,8 +2,8 @@ import { Image } from "expo-image";
 import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
-import { Picture } from "@/core/types";
+import { DesignTokens } from "@/shared/themes";
+import { Picture } from "@/shared/types";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 

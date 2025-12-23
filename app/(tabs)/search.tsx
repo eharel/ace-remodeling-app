@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useDebounce } from "use-debounce";
 
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import {
   ComponentCategory,
   Project,
@@ -13,7 +13,7 @@ import {
   getProjectCompletionDate,
   getProjectPMNames,
   getProjectThumbnail,
-} from "@/core/types";
+} from "@/shared/types";
 import { ProjectGallery } from "@/features/projects";
 import {
   SearchFilters,

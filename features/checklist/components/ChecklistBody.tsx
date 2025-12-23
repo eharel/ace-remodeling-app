@@ -1,8 +1,8 @@
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import { CHECKLIST_CONFIG } from "@/core/constants";
-import { DesignTokens } from "@/core/themes";
+import { CHECKLIST_CONFIG } from "@/shared/constants";
+import { DesignTokens } from "@/shared/themes";
 import { hasChildren } from "@/features/checklist/utils/checklistHelpers";
 import { useChecklistContext } from "@/features/checklist/contexts/ChecklistContext";
 import { ChecklistItem as ChecklistItemComponent } from "./ChecklistItem";

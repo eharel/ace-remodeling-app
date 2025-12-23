@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import { PageHeader, ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 

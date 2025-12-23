@@ -8,8 +8,8 @@ import {
   View,
 } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
-import { ProjectCardView } from "@/core/types";
+import { DesignTokens } from "@/shared/themes";
+import { ProjectCardView } from "@/shared/types";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { SearchHistoryItem } from "@/shared/utils";

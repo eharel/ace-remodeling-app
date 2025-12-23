@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 

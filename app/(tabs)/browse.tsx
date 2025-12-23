@@ -3,8 +3,8 @@ import { router } from "expo-router";
 import { useMemo } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
-import { ComponentCategory, CORE_CATEGORIES } from "@/core/types/ComponentCategory";
+import { DesignTokens } from "@/shared/themes";
+import { ComponentCategory, CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
 import {
   EmptyState,
   LoadingState,

@@ -169,7 +169,7 @@ export interface Project {
 
 /**
  * @deprecated ProjectSummary has been replaced by ProjectCardView.
- * Use ProjectCardView from @/core/types/ProjectCardView instead.
+ * Use ProjectCardView from @/shared/types/ProjectCardView instead.
  * This type is kept temporarily for migration purposes and will be removed in a future version.
  */
 export type ProjectSummary = never;

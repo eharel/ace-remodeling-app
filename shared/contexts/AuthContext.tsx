@@ -9,7 +9,7 @@ import React, {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { doc, getDoc } from 'firebase/firestore';
 
-import { db } from '@/core/config';
+import { db } from '@/shared/config';
 import type { User, Permission } from '@/shared/types/Auth';
 import { getRolePermissions, canEditResource } from '@/shared/utils/permissions';
 

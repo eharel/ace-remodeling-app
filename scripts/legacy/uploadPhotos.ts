@@ -24,7 +24,7 @@ import { getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage";
 import * as fs from "fs";
 import * as path from "path";
 // @ts-ignore - Legacy script, paths may not exist
-import { storage } from "../core/config";
+import { storage } from "../../shared/config";
 import {
   BASE_ASSETS_PATH,
   DOCUMENT_CATEGORY_MAPPINGS,

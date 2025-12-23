@@ -1,4 +1,4 @@
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";

@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Text, type TextProps } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
+import { DesignTokens } from "@/shared/themes";
 import { useTheme } from "../../contexts";
 
 /**

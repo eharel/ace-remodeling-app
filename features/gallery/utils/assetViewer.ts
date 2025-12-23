@@ -1,6 +1,6 @@
 import { Router } from "expo-router";
 
-import { Document, MediaAsset, Picture } from "@/core/types";
+import { Document, MediaAsset, Picture } from "@/shared/types";
 
 /**
  * Opens an asset in the appropriate viewer based on file type

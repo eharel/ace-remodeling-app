@@ -2,13 +2,13 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
-import { ProjectCardView, toProjectCardViewsByCategory } from "@/core/types";
+import { DesignTokens } from "@/shared/themes";
+import { ProjectCardView, toProjectCardViewsByCategory } from "@/shared/types";
 import {
   ComponentCategory,
   CoreCategory,
   getSubcategoryLabel,
-} from "@/core/types/ComponentCategory";
+} from "@/shared/types/ComponentCategory";
 import { CategoryPicker } from "@/features/category";
 import { ProjectGallery } from "@/features/projects";
 import {

@@ -1,4 +1,4 @@
-import { DesignTokens, ThemeName, themes } from "@/core/themes";
+import { DesignTokens, ThemeName, themes } from "@/shared/themes";
 
 // Legacy styling utilities (for backward compatibility)
 export const styling = {

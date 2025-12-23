@@ -2,7 +2,7 @@ import {
   Document,
   DocumentType,
   DOCUMENT_TYPES,
-} from "@/core/types";
+} from "@/shared/types";
 
 /**
  * Configuration for an asset section (group of documents by type)

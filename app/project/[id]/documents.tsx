@@ -9,8 +9,8 @@ import {
   View,
 } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
-import { Document } from "@/core/types";
+import { DesignTokens } from "@/shared/themes";
+import { Document } from "@/shared/types";
 import { LoadingState, PageHeader, ThemedText } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import { commonStyles } from "@/shared/utils";
@@ -33,7 +33,7 @@ export default function DocumentsPage({}: DocumentsPageProps) {
 
   // Find the project by ID using Firebase data
   const project = projects.find((p) => p.id === id);
-  
+
   // Collect all documents from all components plus shared documents
   const documents: Document[] = [];
   if (project) {
@@ -219,11 +219,7 @@ export default function DocumentsPage({}: DocumentsPageProps) {
           }}
         />
         <View style={styles.container}>
-          <PageHeader
-            title="Documents"
-            showBack
-            variant="compact"
-          />
+          <PageHeader title="Documents" showBack variant="compact" />
           <LoadingState message="Loading documents..." />
         </View>
       </>
@@ -241,11 +237,7 @@ export default function DocumentsPage({}: DocumentsPageProps) {
           }}
         />
         <View style={styles.container}>
-          <PageHeader
-            title="Documents"
-            showBack
-            variant="compact"
-          />
+          <PageHeader title="Documents" showBack variant="compact" />
           <View style={styles.emptyState}>
             <MaterialIcons
               name="error-outline"
@@ -257,7 +249,8 @@ export default function DocumentsPage({}: DocumentsPageProps) {
               Project not found
             </ThemedText>
             <ThemedText style={styles.emptyStateSubtext}>
-              The project you're looking for doesn't exist or has been removed.
+              The project you&apos;re looking for doesn&apos;t exist or has been
+              removed.
             </ThemedText>
           </View>
         </View>

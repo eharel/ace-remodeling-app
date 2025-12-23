@@ -13,4 +13,4 @@ export { ThemedView } from "./ThemedView";
 export { ThemeProvider, UnifiedTheme, useTheme } from "../../contexts";
 
 // Design tokens and types
-export { DesignTokens, ThemeVariant } from "@/core/themes";
+export { DesignTokens, ThemeVariant } from "@/shared/themes";

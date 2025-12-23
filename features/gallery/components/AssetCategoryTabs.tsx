@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
-import { Document } from "@/core/types";
+import { DesignTokens } from "@/shared/themes";
+import { Document } from "@/shared/types";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 

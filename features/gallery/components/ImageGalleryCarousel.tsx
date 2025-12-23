@@ -13,8 +13,8 @@ import {
   View,
 } from "react-native";
 
-import { DesignTokens } from "@/core/themes";
-import { Picture } from "@/core/types";
+import { DesignTokens } from "@/shared/themes";
+import { Picture } from "@/shared/types";
 import { Image } from "expo-image";
 import { accessibilityStrings } from "../constants/accessibilityStrings";
 import { useImageLoading } from "../hooks/useImageLoading";

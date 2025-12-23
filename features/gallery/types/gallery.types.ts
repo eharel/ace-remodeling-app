@@ -1,6 +1,6 @@
 import { TextStyle, ViewStyle } from "react-native";
 
-import { Picture } from "@/core/types";
+import { Picture } from "@/shared/types";
 
 /**
  * Performance metrics for a single measurement

@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { CHECKLIST_CONFIG } from "@/core/constants";
+import { CHECKLIST_CONFIG } from "@/shared/constants";
 import {
   flattenItems,
   findItemById,
