@@ -1,8 +1,9 @@
-import { FileAsset } from "./FileAsset";
+import { FileAsset, FileAssetSchema } from "./FileAsset";
+import { z } from "zod";
 
 /**
  * Document types for better type safety
- * 
+ *
  * Documents represent reference materials and supporting assets.
  * This includes PDFs (contracts, permits), images (floor plans, material samples),
  * and other file types that support the project but aren't gallery showcase photos.
@@ -18,6 +19,11 @@ export const DOCUMENT_TYPES = {
 } as const;
 
 export type DocumentType = (typeof DOCUMENT_TYPES)[keyof typeof DOCUMENT_TYPES];
+
+const documentTypeValues = Object.values(DOCUMENT_TYPES);
+export const DocumentTypeSchema = z.enum(
+  documentTypeValues as [DocumentType, ...DocumentType[]]
+);
 
 /**
  * Document represents project-related files (contracts, permits, plans, etc.)
@@ -37,16 +43,12 @@ export type DocumentType = (typeof DOCUMENT_TYPES)[keyof typeof DOCUMENT_TYPES];
  * Documents can be any file type (PDF, PNG, JPG, etc.). The fileType field
  * stores the MIME type for proper handling.
  */
-export interface Document extends FileAsset {
-  /** Display name for the document */
-  name: string;
 
-  /** Type-safe document type category */
-  type: DocumentType;
+export const DocumentSchema = FileAssetSchema.extend({
+  name: z.string(),
+  type: DocumentTypeSchema,
+  fileType: z.string(),
+  category: z.string().optional(),
+});
 
-  /** MIME type (e.g., "application/pdf", "image/jpeg") */
-  fileType: string;
-
-  /** @deprecated For compatibility with uploaded Firebase data */
-  category?: string;
-}
+export type Document = z.infer<typeof DocumentSchema>;

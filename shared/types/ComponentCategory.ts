@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 /**
  * Core project categories that appear in main navigation.
  * These are the primary categories users browse.
@@ -17,11 +19,13 @@ export const CORE_CATEGORIES = {
   MISCELLANEOUS: "miscellaneous",
 } as const;
 
-/**
- * Type-safe core category type derived from CORE_CATEGORIES
- */
 export type CoreCategory =
   (typeof CORE_CATEGORIES)[keyof typeof CORE_CATEGORIES];
+
+const coreCategoryValues = Object.values(CORE_CATEGORIES);
+export const CoreCategorySchema = z.enum(
+  coreCategoryValues as [CoreCategory, ...CoreCategory[]]
+);
 
 /**
  * Component category can be any core category OR a custom string.

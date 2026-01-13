@@ -1,6 +1,5 @@
-/**
- * Project status constants for type safety and consistency
- */
+import { z } from "zod";
+
 export const PROJECT_STATUSES = {
   PLANNING: "planning",
   IN_PROGRESS: "in-progress",
@@ -8,11 +7,13 @@ export const PROJECT_STATUSES = {
   ON_HOLD: "on-hold",
 } as const;
 
-/**
- * Type-safe project status type
- */
 export type ProjectStatus =
   (typeof PROJECT_STATUSES)[keyof typeof PROJECT_STATUSES];
+
+const statusValues = Object.values(PROJECT_STATUSES);
+export const ProjectStatusSchema = z.enum(
+  statusValues as [ProjectStatus, ...ProjectStatus[]]
+);
 
 /**
  * Status style mapping for consistent UI styling

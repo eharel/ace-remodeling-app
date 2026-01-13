@@ -1,4 +1,5 @@
-import { FileAsset } from "./FileAsset";
+import { FileAsset, FileAssetSchema } from "./FileAsset";
+import { z } from "zod";
 
 /**
  * Media type constants for distinguishing images from videos
@@ -10,10 +11,12 @@ export const MEDIA_TYPES = {
   VIDEO: "video",
 } as const;
 
-/**
- * Type-safe media type
- */
 export type MediaType = (typeof MEDIA_TYPES)[keyof typeof MEDIA_TYPES];
+
+const mediaTypeValues = Object.values(MEDIA_TYPES);
+export const MediaTypeSchema = z.enum(
+  mediaTypeValues as [MediaType, ...MediaType[]]
+);
 
 /**
  * Content stage constants for categorizing media by project phase
@@ -32,10 +35,12 @@ export const MEDIA_STAGES = {
   OTHER: "other",
 } as const;
 
-/**
- * Type-safe media stage type
- */
 export type MediaStage = (typeof MEDIA_STAGES)[keyof typeof MEDIA_STAGES];
+
+const mediaStageValues = Object.values(MEDIA_STAGES);
+export const MediaStageSchema = z.enum(
+  mediaStageValues as [MediaStage, ...MediaStage[]]
+);
 
 /**
  * MediaAsset represents images and videos for projects
@@ -56,59 +61,15 @@ export type MediaStage = (typeof MEDIA_STAGES)[keyof typeof MEDIA_STAGES];
  * (before → in-progress → after → renderings).
  * Materials and other reference photos belong in assets, not gallery.
  */
-export interface MediaAsset extends FileAsset {
-  /**
-   * CLASSIFICATION
-   */
+export const MediaAssetSchema = FileAssetSchema.extend({
+  mediaType: MediaTypeSchema,
+  stage: MediaStageSchema,
+  caption: z.string().optional(),
+  duration: z.number().optional(),
+  codec: z.string().optional(),
+});
 
-  /** Media format type: "image" or "video" */
-  mediaType: MediaType;
-
-  /**
-   * Project phase when this media was captured
-   * Indicates the stage of the project (before, after, in-progress, etc.)
-   */
-  stage: MediaStage;
-
-  /**
-   * DISPLAY
-   */
-
-  /**
-   * Caption for the media asset
-   * Replaces altText - more accurate term as it's not just for accessibility
-   */
-  caption?: string;
-
-  /**
-   * VIDEO-SPECIFIC
-   * Optional fields that are only relevant for video assets
-   */
-
-  /** Duration in seconds (only for videos) */
-  duration?: number;
-
-  /** Video codec (e.g., "h264", "vp9") - only for videos */
-  codec?: string;
-}
-
-/**
- * Before/after comparison pair for showcasing transformations
- *
- * Used to display side-by-side comparisons of project progress,
- * highlighting the transformation from initial state to completion.
- */
-export interface MediaPair {
-  /** Media asset captured before work began */
-  before: MediaAsset;
-  /** Media asset captured after work was completed */
-  after: MediaAsset;
-  /**
-   * Caption describing the transformation
-   * Optional description of what changed between before and after
-   */
-  caption?: string;
-}
+export type MediaAsset = z.infer<typeof MediaAssetSchema>;
 
 /**
  * Type guard to check if a media asset is a video

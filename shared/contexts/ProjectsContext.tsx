@@ -1,7 +1,6 @@
-import { db } from "@/shared/config";
 import { Project, MediaAsset } from "@/shared/types";
 import { CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
-import { collection, getDocs } from "firebase/firestore";
+import { fetchAllProjects } from "@/services/projects";
 import React, {
   createContext,
   ReactNode,
@@ -13,13 +12,12 @@ import React, {
 } from "react";
 
 // Constants
-const PROJECTS_COLLECTION = "projects";
 
 /**
  * Gets all media assets from a project's components
- * 
+ *
  * Collects all media from all components in a project.
- * 
+ *
  * @param project - The project to get media from
  * @returns Array of MediaAsset objects from all components
  */
@@ -83,36 +81,30 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Fetch projects from Firestore.
-   * Extracted into a separate function so it can be reused for refetch.
-   */
   const fetchProjects = useCallback(async () => {
+    console.log("[ProjectsContext] fetchProjects: Start fetching projects...");
     try {
       setLoading(true);
       setError(null);
-
-      const projectsCollection = collection(db, PROJECTS_COLLECTION);
-      const querySnapshot = await getDocs(projectsCollection);
-
-      const projectsData: Project[] = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        projectsData.push({
-          id: doc.id,
-          ...data,
-          // Default isFeatured to false if not present in Firestore
-          isFeatured: data.isFeatured ?? false,
-        } as Project);
-      });
-
-      setProjects(projectsData);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to fetch projects";
-      setError(errorMessage);
+      const projects = await fetchAllProjects();
+      console.log(
+        `[ProjectsContext] fetchProjects: Successfully fetched ${projects.length} projects.`
+      );
+      setProjects(projects);
+    } catch (error) {
+      const errorMsg =
+        error instanceof Error ? error.message : "Failed to fetch projects";
+      console.error(
+        "[ProjectsContext] fetchProjects: Error fetching projects:",
+        errorMsg,
+        error
+      );
+      setError(errorMsg);
     } finally {
       setLoading(false);
+      console.log(
+        "[ProjectsContext] fetchProjects: Finished fetching projects."
+      );
     }
   }, []);
 
@@ -133,9 +125,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   const bathroomProjects = useMemo(
     () =>
       projects.filter((project) =>
-        project.components.some(
-          (c) => c.category === CORE_CATEGORIES.BATHROOM
-        )
+        project.components.some((c) => c.category === CORE_CATEGORIES.BATHROOM)
       ),
     [projects]
   );
@@ -170,9 +160,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   const featuredBathroomProjects = useMemo(
     () =>
       featuredProjects.filter((project) =>
-        project.components.some(
-          (c) => c.category === CORE_CATEGORIES.BATHROOM
-        )
+        project.components.some((c) => c.category === CORE_CATEGORIES.BATHROOM)
       ),
     [featuredProjects]
   );
