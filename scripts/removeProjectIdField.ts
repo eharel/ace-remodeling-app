@@ -12,12 +12,12 @@
 
 import { initializeApp } from "firebase/app";
 import {
-  getFirestore,
   collection,
-  getDocs,
-  updateDoc,
-  doc,
   deleteField,
+  doc,
+  getDocs,
+  getFirestore,
+  updateDoc,
 } from "firebase/firestore";
 
 /**
@@ -61,7 +61,7 @@ async function removeIdFields() {
   // Parse command-line arguments
   const args = process.argv.slice(2);
   const isDryRun = !args.includes("--execute");
-  
+
   // Parse environment (default to dev for safety)
   let environment: Environment = "dev";
   const envArg = args.find((arg) => arg.startsWith("--env="));
@@ -74,9 +74,7 @@ async function removeIdFields() {
 
   console.log("🔧 Migration: Remove redundant id fields from projects");
   console.log("=".repeat(50));
-  console.log(
-    `📍 Running against ${environment.toUpperCase()} database`
-  );
+  console.log(`📍 Running against ${environment.toUpperCase()} database`);
   console.log(
     `🗄️  Target Database: ${
       environment === "prod" ? "ace-remodeling" : "ace-remodeling-dev"
@@ -87,11 +85,11 @@ async function removeIdFields() {
       isDryRun ? "DRY RUN (preview only)" : "EXECUTE (will modify data)"
     }`
   );
-  
+
   if (environment === "prod") {
     console.log("\n⚠️  WARNING: You are targeting PRODUCTION database!");
   }
-  
+
   console.log("");
 
   // Initialize Firebase with the specified environment

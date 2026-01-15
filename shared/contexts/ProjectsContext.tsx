@@ -1,9 +1,9 @@
-import { Project, MediaAsset, ProjectComponent } from "@/shared/types";
-import { CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
 import {
   fetchAllProjects,
   updateProject as updateProjectService,
 } from "@/services/projects";
+import { MediaAsset, Project, ProjectComponent } from "@/shared/types";
+import { CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
 import React, {
   createContext,
   ReactNode,
@@ -199,10 +199,11 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
         const now = new Date().toISOString();
 
         // 1. Optimistic update with best-guess timestamp
-        setProjects((prev) =>
-          prev.map((p) => {
+        let updatedProject: Project | undefined;
+        setProjects((prev) => {
+          const updated = prev.map((p) => {
             if (p.id === projectId) {
-              return {
+              const updatedProjectData = {
                 ...p,
                 components: p.components.map((c) =>
                   c.id === componentId
@@ -211,19 +212,21 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
                 ),
                 updatedAt: now,
               };
+              updatedProject = updatedProjectData;
+              return updatedProjectData;
             }
             return p;
-          })
-        );
+          });
+          return updated;
+        });
 
-        // 2. Find project to get current components
-        const project = projects.find((p) => p.id === projectId);
-        if (!project) {
+        // 2. Use the updated project from the state update
+        if (!updatedProject) {
           throw new Error("Project not found");
         }
 
         // 3. Update Firestore with modified components array
-        const updatedComponents = project.components.map((c) =>
+        const updatedComponents = updatedProject.components.map((c) =>
           c.id === componentId ? { ...c, ...updates, updatedAt: now } : c
         );
 
@@ -238,7 +241,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
         await fetchProjects();
       }
     },
-    [projects, fetchProjects]
+    [fetchProjects]
   );
 
   /**

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORY_DISPLAY_ORDER } from "@/shared/utils";
 import { CoreCategory } from "@/shared/types/ComponentCategory";
 import type { Project, ProjectComponent } from "@/shared/types";
@@ -16,15 +16,22 @@ export function useProjectComponentSelection(
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
     null
   );
+  // Track current selection to preserve it across project updates
+  const currentSelectionRef = useRef<string | null>(null);
+  // Track previous componentIdParam to only act when it actually changes
+  const previousComponentIdParamRef = useRef<string | undefined>(undefined);
 
   // Initialize project and set initial component selection
   // Only runs when id, componentId param, or projects change - NOT when selectedComponentId changes
   useEffect(() => {
+    const componentIdParamChanged = componentIdParam !== previousComponentIdParamRef.current;
+    previousComponentIdParamRef.current = componentIdParam;
+
     if (projectId) {
       const foundProject = projects.find((p) => p.id === projectId);
       setProject(foundProject || null);
 
-      // Set selected component: use componentId param if provided, otherwise default to first
+      // Set selected component: use componentId param if provided AND it changed, otherwise preserve current or default to first
       // Only set on initial load or when project/componentId param changes
       if (foundProject && foundProject.components.length > 0) {
         // Sort components by category display order to get consistent first component
@@ -41,38 +48,51 @@ export function useProjectComponentSelection(
           return orderA - orderB;
         });
 
-        // If componentId param is provided and exists in project, use it
-        if (componentIdParam) {
+        // If componentId param is provided AND it changed, use it
+        // Otherwise preserve current selection when projects array updates
+        if (componentIdParam && componentIdParamChanged) {
           const matchingComponent = foundProject.components.find(
             (c) => c.id === componentIdParam
           );
           if (matchingComponent) {
             setSelectedComponentId(componentIdParam);
+            currentSelectionRef.current = componentIdParam;
           } else {
             // componentId doesn't match, fall back to first component from sorted order
-            setSelectedComponentId(sorted[0].id);
+            const firstComponentId = sorted[0].id;
+            setSelectedComponentId(firstComponentId);
+            currentSelectionRef.current = firstComponentId;
           }
         } else {
-          // No componentId param - set to first component from sorted order
-          // This only happens on initial load or when project changes
-          setSelectedComponentId(sorted[0].id);
+          // No componentId param OR param hasn't changed - preserve current selection if it still exists, otherwise default to first
+          // This preserves the selected component when project data updates (e.g., after editing)
+          const currentSelection = currentSelectionRef.current || selectedComponentId;
+          if (currentSelection) {
+            const currentComponentStillExists = foundProject.components.some(
+              (c) => c.id === currentSelection
+            );
+            if (currentComponentStillExists) {
+              // Keep the current selection - don't reset
+              setSelectedComponentId(currentSelection);
+              return;
+            }
+          }
+          // No valid selection - set to first component from sorted order
+          const firstComponentId = sorted[0].id;
+          setSelectedComponentId(firstComponentId);
+          currentSelectionRef.current = firstComponentId;
         }
       }
     }
   }, [projectId, componentIdParam, projects]);
 
-  // Update selectedComponentId when componentId param changes (from URL navigation)
-  // Only runs when componentId param actually changes, not when selectedComponentId changes from user interaction
+
+  // Update ref when selectedComponentId changes from user interaction
   useEffect(() => {
-    if (componentIdParam && project) {
-      const matchingComponent = project.components.find(
-        (c) => c.id === componentIdParam
-      );
-      if (matchingComponent) {
-        setSelectedComponentId(componentIdParam);
-      }
+    if (selectedComponentId) {
+      currentSelectionRef.current = selectedComponentId;
     }
-  }, [componentIdParam, project]);
+  }, [selectedComponentId]);
 
   /**
    * Current selected component

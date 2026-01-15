@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { Modal, View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { DesignTokens } from "@/shared/themes";
-import { useProjects, useTheme } from "@/shared/contexts";
 import {
   ThemedButton,
   ThemedIconButton,
   ThemedText,
 } from "@/shared/components";
+import { useProjects, useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/shared/themes";
+import React, { useState } from "react";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 interface EditDescriptionModalProps {

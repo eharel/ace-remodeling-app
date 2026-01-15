@@ -1,5 +1,5 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { EditButton } from "@/shared/components/EditButton";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
@@ -23,6 +23,7 @@ import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
+import { EditDescriptionModal } from "@/features/projects/components/EditDescriptionModal";
 import { DesignTokens } from "@/shared/themes";
 import {
   getCategoryLabel,
@@ -31,11 +32,10 @@ import {
   ProjectComponent,
 } from "@/shared/types";
 import { getProjectDuration } from "@/shared/utils";
-import { EditDescriptionModal } from "@/features/projects/components/EditDescriptionModal";
 import { createProjectDetailStyles } from "./[id].styles";
-import { useProjectComponentSelection } from "./hooks/useProjectComponentSelection";
-import { usePhotoGallery } from "./hooks/usePhotoGallery";
 import { useAssetCategoryManagement } from "./hooks/useAssetCategoryManagement";
+import { usePhotoGallery } from "./hooks/usePhotoGallery";
+import { useProjectComponentSelection } from "./hooks/useProjectComponentSelection";
 
 export default function ProjectDetailScreen() {
   const { id, componentId } = useLocalSearchParams<{
@@ -44,7 +44,7 @@ export default function ProjectDetailScreen() {
   }>();
   const { projects, loading } = useProjects();
   const { theme } = useTheme();
-  
+
   // Component selection and project data
   const {
     project,
@@ -100,7 +100,6 @@ export default function ProjectDetailScreen() {
   // Modal state
   const [showEditDescriptionModal, setShowEditDescriptionModal] =
     useState<boolean>(false);
-
 
   // OPTIMIZATION 1: Preload all component images when project loads
   useEffect(() => {
@@ -297,10 +296,7 @@ export default function ProjectDetailScreen() {
     }
   };
 
-  const styles = useMemo(
-    () => createProjectDetailStyles(theme),
-    [theme]
-  );
+  const styles = useMemo(() => createProjectDetailStyles(theme), [theme]);
 
   // Show loading state only on initial load (when no project found yet)
   // During refresh, keep content visible and just show refresh spinner
