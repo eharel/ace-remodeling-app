@@ -42,15 +42,19 @@ export default function ProjectDetailScreen() {
     id: string;
     componentId?: string;
   }>();
-  const { projects, loading } = useProjects();
+  const {
+    projects,
+    loading,
+    updateProject: updateProjectContext,
+    updateComponent,
+  } = useProjects();
   const { theme } = useTheme();
 
   // Component selection and project data
   const {
     project,
-    selectedComponentId,
-    setSelectedComponentId,
-    currentComponent,
+    selectedComponent,
+    setSelectedComponent,
     sortedComponents,
     currentMedia,
     currentDocuments,
@@ -94,12 +98,15 @@ export default function ProjectDetailScreen() {
     getAssetCategoryLabel,
   } = useAssetCategoryManagement({
     documents: currentDocuments,
-    selectedComponentId,
+    selectedComponentId: selectedComponent?.id || null,
   });
 
   // Modal state
   const [showEditDescriptionModal, setShowEditDescriptionModal] =
     useState<boolean>(false);
+
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // OPTIMIZATION 1: Preload all component images when project loads
   useEffect(() => {
@@ -153,8 +160,8 @@ export default function ProjectDetailScreen() {
     return categoryLabel;
   };
 
-  const currentComponentLabel = currentComponent
-    ? getComponentLabel(currentComponent)
+  const selectedComponentLabel = selectedComponent
+    ? getComponentLabel(selectedComponent)
     : null;
 
   /**
@@ -164,8 +171,8 @@ export default function ProjectDetailScreen() {
   const displayDescription = useMemo(() => {
     if (!project) return "";
     // Use component description if it exists, otherwise fall back to project description
-    return currentComponent?.description ?? project.description ?? "";
-  }, [currentComponent, project]);
+    return selectedComponent?.description ?? project.description ?? "";
+  }, [selectedComponent, project]);
 
   /**
    * Display timeline/duration - component timeline with fallback to project timeline
@@ -173,16 +180,16 @@ export default function ProjectDetailScreen() {
   const displayTimeline = useMemo(() => {
     if (!project) return null;
     // Use component timeline if available, otherwise use project timeline
-    return currentComponent?.timeline || project.timeline || null;
-  }, [project, currentComponent]);
+    return selectedComponent?.timeline || project.timeline || null;
+  }, [project, selectedComponent]);
 
   /**
    * Hero image URL - component-specific thumbnail with fallback
    */
   const heroImageUrl = useMemo(() => {
     if (!project) return "";
-    return getProjectThumbnail(project, currentComponent || undefined);
-  }, [project, currentComponent]);
+    return getProjectThumbnail(project, selectedComponent || undefined);
+  }, [project, selectedComponent]);
 
   // Legacy: Keep aggregatedPictures for backward compatibility during transition
   // This will be replaced with currentMedia in next steps
@@ -195,8 +202,8 @@ export default function ProjectDetailScreen() {
     if (!project) return;
   }, [
     project,
-    currentComponent,
-    currentComponentLabel,
+    selectedComponent,
+    selectedComponentLabel,
     selectedAssetCategory,
     currentDocuments,
     filteredDocuments,
@@ -204,6 +211,29 @@ export default function ProjectDetailScreen() {
 
   const closeGallery = () => {
     setGalleryVisible(false);
+  };
+
+  const handleUpdateDescription = async (description: string) => {
+    if (!project) throw new Error("Project not found");
+
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      if (selectedComponent?.id) {
+        await updateComponent(project.id, selectedComponent.id, {
+          description,
+        });
+      } else {
+        await updateProjectContext(project.id, { description });
+      }
+      setShowEditDescriptionModal(false);
+    } catch (error) {
+      setSaveError(
+        error instanceof Error ? error.message : "Failed to update description"
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleImagePress = (index: number) => {
@@ -457,12 +487,12 @@ export default function ProjectDetailScreen() {
           {/* Hero Image - OPTIMIZED with caching and transitions */}
           {heroImageUrl ? (
             <Animated.View
-              key={`hero-container-${selectedComponentId || "default"}`}
+              key={`hero-container-${selectedComponent?.id || "default"}`}
               entering={FadeIn.duration(200)}
               exiting={FadeOut.duration(200)}
             >
               <Image
-                key={`hero-${selectedComponentId || "default"}`}
+                key={`hero-${selectedComponent?.id || "default"}`}
                 source={{ uri: heroImageUrl }}
                 style={styles.heroImage}
                 contentFit="cover"
@@ -479,8 +509,8 @@ export default function ProjectDetailScreen() {
             <SegmentedControl
               variant="pills"
               options={sortedComponents.map((c) => c.id) as readonly string[]}
-              selected={selectedComponentId || sortedComponents[0].id}
-              onSelect={setSelectedComponentId}
+              selected={selectedComponent?.id || sortedComponents[0].id}
+              onSelect={setSelectedComponent}
               getLabel={(componentId) => {
                 const component = sortedComponents.find(
                   (c) => c.id === componentId
@@ -495,21 +525,21 @@ export default function ProjectDetailScreen() {
           <ThemedView style={styles.header}>
             <ThemedView style={styles.headerContent}>
               {/* Component Name - show if exists (project name is in header) */}
-              {currentComponent?.name && (
+              {selectedComponent?.name && (
                 <ThemedText
                   style={[
                     styles.componentName,
                     { color: theme.colors.text.primary },
                   ]}
                 >
-                  {currentComponent.name}
+                  {selectedComponent.name}
                 </ThemedText>
               )}
               <View style={styles.editButtonContainer}>
                 <EditButton onPress={() => setShowEditDescriptionModal(true)} />
               </View>
               <ThemedText
-                key={`description-${selectedComponentId || "default"}`}
+                key={`description-${selectedComponent?.id || "default"}`}
                 style={[
                   styles.projectDescription,
                   { color: theme.colors.text.secondary },
@@ -561,8 +591,8 @@ export default function ProjectDetailScreen() {
                   Category
                 </ThemedText>
                 <ThemedText style={styles.metaValue}>
-                  {currentComponent
-                    ? getCategoryLabel(currentComponent.category)
+                  {selectedComponent
+                    ? getCategoryLabel(selectedComponent.category)
                     : "Miscellaneous"}
                 </ThemedText>
               </ThemedView>
@@ -923,16 +953,14 @@ export default function ProjectDetailScreen() {
         />
       )}
 
-      {showEditDescriptionModal && (
-        <EditDescriptionModal
-          visible={showEditDescriptionModal}
-          onClose={() => setShowEditDescriptionModal(false)}
-          onSave={() => {}}
-          currentDescription={displayDescription}
-          projectId={project?.id}
-          componentId={currentComponent?.id || undefined}
-        />
-      )}
+      <EditDescriptionModal
+        visible={showEditDescriptionModal}
+        onClose={() => setShowEditDescriptionModal(false)}
+        onSave={handleUpdateDescription}
+        currentDescription={displayDescription}
+        isSaving={isSaving}
+        error={saveError}
+      />
     </>
   );
 }

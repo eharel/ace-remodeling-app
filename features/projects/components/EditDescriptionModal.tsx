@@ -3,57 +3,46 @@ import {
   ThemedIconButton,
   ThemedText,
 } from "@/shared/components";
-import { useProjects, useTheme } from "@/shared/contexts";
+import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 interface EditDescriptionModalProps {
   visible: boolean;
   onClose: () => void;
-  onSave: () => void;
-  projectId: string;
-  componentId?: string;
+  onSave: (description: string) => Promise<void>;
   currentDescription: string;
+  isSaving: boolean;
+  error: string | null;
 }
 
 export function EditDescriptionModal({
   visible,
   onClose,
   onSave,
-  projectId,
-  componentId,
   currentDescription,
+  isSaving,
+  error,
 }: EditDescriptionModalProps) {
   const { theme } = useTheme();
-  const { updateProject, updateComponent } = useProjects();
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [description, setDescription] = useState<string>(currentDescription);
-  const [error, setError] = useState<string | null>(null);
+
+  // Reset the description to the latest prop value when the modal is opened
+  // Avoids stale state when switching components, for example
+  useEffect(() => {
+    if (visible) {
+      setDescription(currentDescription); // Reset to latest prop value
+    }
+  }, [visible, currentDescription]);
 
   const handleSave = async () => {
-    setIsSaving(true);
-    setError(null);
-    try {
-      if (componentId) {
-        await updateComponent(projectId, componentId, { description });
-      } else {
-        await updateProject(projectId, { description });
-      }
-      onClose();
-    } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Failed to update project"
-      );
-    } finally {
-      setIsSaving(false);
-    }
+    await onSave(description);
   };
 
   const handleCancel = () => {
     setDescription(currentDescription);
-    setError(null);
     onClose();
   };
 
@@ -121,7 +110,7 @@ export function EditDescriptionModal({
             accessibilityLabel="Description input"
             accessibilityHint="Enter your description"
             accessibilityRole="text"
-            editable={!isSaving && !error}
+            editable={!isSaving}
           />
 
           {/* ERROR MESSAGE - Show if save fails */}

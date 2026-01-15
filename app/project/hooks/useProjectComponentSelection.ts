@@ -68,10 +68,10 @@ export function useProjectComponentSelection(
           // This preserves the selected component when project data updates (e.g., after editing)
           const currentSelection = currentSelectionRef.current || selectedComponentId;
           if (currentSelection) {
-            const currentComponentStillExists = foundProject.components.some(
+            const selectedComponentStillExists = foundProject.components.some(
               (c) => c.id === currentSelection
             );
-            if (currentComponentStillExists) {
+            if (selectedComponentStillExists) {
               // Keep the current selection - don't reset
               setSelectedComponentId(currentSelection);
               return;
@@ -95,10 +95,10 @@ export function useProjectComponentSelection(
   }, [selectedComponentId]);
 
   /**
-   * Current selected component
-   * Filters project components to find the one matching selectedComponentId
+   * Selected component object
+   * Derived from selectedComponentId - the actual component data
    */
-  const currentComponent = useMemo(() => {
+  const selectedComponent = useMemo(() => {
     if (!project || !selectedComponentId) return null;
 
     return (
@@ -126,32 +126,38 @@ export function useProjectComponentSelection(
   }, [project]);
 
   /**
-   * Media for current component + shared media
+   * Media for selected component + shared media
    * Filters to show only the selected component's media plus project-wide shared media
    */
   const currentMedia = useMemo(() => {
     if (!project) return [];
-    const componentMedia = currentComponent?.media || [];
+    const componentMedia = selectedComponent?.media || [];
     const sharedMedia = project.sharedMedia || [];
     return [...componentMedia, ...sharedMedia];
-  }, [project, currentComponent]);
+  }, [project, selectedComponent]);
 
   /**
-   * Documents for current component + shared documents
+   * Documents for selected component + shared documents
    * Filters to show only the selected component's documents plus project-wide shared documents
    */
   const currentDocuments = useMemo(() => {
     if (!project) return [];
-    const componentDocuments = currentComponent?.documents || [];
+    const componentDocuments = selectedComponent?.documents || [];
     const sharedDocuments = project.sharedDocuments || [];
     return [...componentDocuments, ...sharedDocuments];
-  }, [project, currentComponent]);
+  }, [project, selectedComponent]);
+
+  /**
+   * Set the selected component by ID
+   */
+  const setSelectedComponent = (componentId: string) => {
+    setSelectedComponentId(componentId);
+  };
 
   return {
     project,
-    selectedComponentId,
-    setSelectedComponentId,
-    currentComponent,
+    selectedComponent,
+    setSelectedComponent,
     sortedComponents,
     currentMedia,
     currentDocuments,
