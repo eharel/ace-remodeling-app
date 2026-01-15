@@ -60,9 +60,6 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 // Wrapper component that provides error logging
 export function ErrorBoundary({ children }: { children: React.ReactNode }) {
   const handleError = (error: Error, errorInfo: ErrorInfo) => {
-    console.error("🚨 ErrorBoundary caught an error:", error);
-    console.error("🚨 Error Info:", errorInfo);
-
     // Log to our error logging system
     logError(
       `ErrorBoundary caught an error: ${error.message}`,
@@ -80,7 +77,6 @@ export function ErrorBoundary({ children }: { children: React.ReactNode }) {
       onError={handleError}
       onReset={() => {
         // Optional: Add any cleanup logic here
-        console.log("🔄 Error boundary reset");
       }}
     >
       {children}

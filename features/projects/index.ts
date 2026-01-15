@@ -4,3 +4,4 @@
 export { ProjectCard } from "./components/ProjectCard";
 export { ProjectGallery } from "./components/ProjectGallery";
 export { ComponentSelector } from "./components/ComponentSelector";
+export { EditDescriptionModal } from "./components/EditDescriptionModal";

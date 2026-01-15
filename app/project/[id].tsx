@@ -1,15 +1,13 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { EditButton } from "@/shared/components/EditButton";
 import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import {
-  type AssetCategoryValue,
   AssetThumbnail,
-  convertDocumentsToPictures,
-  convertMediaToPictures,
   ImageGalleryModal,
   MorePhotosCard,
   type PhotoTabValue,
@@ -30,18 +28,14 @@ import {
   getCategoryLabel,
   getProjectThumbnail,
   getSubcategoryLabel,
-  Project,
   ProjectComponent,
 } from "@/shared/types";
-import { CoreCategory } from "@/shared/types/ComponentCategory";
-import {
-  CATEGORY_DISPLAY_ORDER,
-  commonStyles,
-  getPhotoCounts,
-  getPreviewPhotos,
-  getProjectDuration,
-  samplePreviewPhotos,
-} from "@/shared/utils";
+import { getProjectDuration } from "@/shared/utils";
+import { EditDescriptionModal } from "@/features/projects/components/EditDescriptionModal";
+import { createProjectDetailStyles } from "./[id].styles";
+import { useProjectComponentSelection } from "./hooks/useProjectComponentSelection";
+import { usePhotoGallery } from "./hooks/usePhotoGallery";
+import { useAssetCategoryManagement } from "./hooks/useAssetCategoryManagement";
 
 export default function ProjectDetailScreen() {
   const { id, componentId } = useLocalSearchParams<{
@@ -49,85 +43,64 @@ export default function ProjectDetailScreen() {
     componentId?: string;
   }>();
   const { projects, loading } = useProjects();
-  const [project, setProject] = useState<Project | null>(null);
+  const { theme } = useTheme();
+  
+  // Component selection and project data
+  const {
+    project,
+    selectedComponentId,
+    setSelectedComponentId,
+    currentComponent,
+    sortedComponents,
+    currentMedia,
+    currentDocuments,
+  } = useProjectComponentSelection(id, componentId, projects);
+
+  // Photo gallery state
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [pressedImageIndex, setPressedImageIndex] = useState<number | null>(
     null
   );
   const [activePhotoTab, setActivePhotoTab] = useState<PhotoTabValue>("after");
-  // Component selection state - defaults to first component
-  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
-    null
-  );
-  // Asset category selection state - default to first available category
-  const [selectedAssetCategory, setSelectedAssetCategory] =
-    useState<AssetCategoryValue | null>(null);
-  // Asset gallery state (for viewing images in Assets section)
-  const [assetGalleryVisible, setAssetGalleryVisible] = useState(false);
-  const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
-  const { theme } = useTheme();
-
-  // Show 3 preview photos (Flexbox will handle equal sizing)
   const previewCount = 3;
 
-  // Initialize project and set initial component selection
-  // Only runs when id, componentId param, or projects change - NOT when selectedComponentId changes
-  useEffect(() => {
-    if (id) {
-      // Use Firebase data instead of mock data
-      const foundProject = projects.find((p) => p.id === id);
-      setProject(foundProject || null);
+  // Photo gallery logic
+  const {
+    photoCounts,
+    previewPhotos,
+    hasMorePhotos,
+    remainingCount,
+    galleryImages,
+  } = usePhotoGallery({
+    media: currentMedia,
+    activePhotoTab,
+    previewCount,
+  });
 
-      // Set selected component: use componentId param if provided, otherwise default to first
-      // Only set on initial load or when project/componentId param changes
-      if (foundProject && foundProject.components.length > 0) {
-        // Sort components by category display order to get consistent first component
-        const sorted = [...foundProject.components].sort((a, b) => {
-          const orderA = CATEGORY_DISPLAY_ORDER.indexOf(
-            a.category as CoreCategory
-          );
-          const orderB = CATEGORY_DISPLAY_ORDER.indexOf(
-            b.category as CoreCategory
-          );
-          if (orderA === -1 && orderB === -1) return 0;
-          if (orderA === -1) return 1;
-          if (orderB === -1) return -1;
-          return orderA - orderB;
-        });
+  // Asset category management
+  const {
+    selectedAssetCategory,
+    setSelectedAssetCategory,
+    selectedAssetIndex,
+    setSelectedAssetIndex,
+    assetGalleryVisible,
+    setAssetGalleryVisible,
+    assetCounts,
+    availableAssetCategories,
+    filteredDocuments,
+    assetGalleryImages,
+    documentToImageIndex,
+    getAssetCategoryLabel,
+  } = useAssetCategoryManagement({
+    documents: currentDocuments,
+    selectedComponentId,
+  });
 
-        // If componentId param is provided and exists in project, use it
-        if (componentId) {
-          const matchingComponent = foundProject.components.find(
-            (c) => c.id === componentId
-          );
-          if (matchingComponent) {
-            setSelectedComponentId(componentId);
-          } else {
-            // componentId doesn't match, fall back to first component from sorted order
-            setSelectedComponentId(sorted[0].id);
-          }
-        } else {
-          // No componentId param - set to first component from sorted order
-          // This only happens on initial load or when project changes
-          setSelectedComponentId(sorted[0].id);
-        }
-      }
-    }
-  }, [id, componentId, projects]);
+  // Modal state
+  const [showEditDescriptionModal, setShowEditDescriptionModal] =
+    useState<boolean>(false);
 
-  // Update selectedComponentId when componentId param changes (from URL navigation)
-  // Only runs when componentId param actually changes, not when selectedComponentId changes from user interaction
-  useEffect(() => {
-    if (componentId && project) {
-      const matchingComponent = project.components.find(
-        (c) => c.id === componentId
-      );
-      if (matchingComponent) {
-        setSelectedComponentId(componentId);
-      }
-    }
-  }, [componentId, project]);
 
   // OPTIMIZATION 1: Preload all component images when project loads
   useEffect(() => {
@@ -181,260 +154,9 @@ export default function ProjectDetailScreen() {
     return categoryLabel;
   };
 
-  /**
-   * Current selected component
-   * Filters project components to find the one matching selectedComponentId
-   */
-  const currentComponent = useMemo(() => {
-    if (!project || !selectedComponentId) return null;
-
-    return (
-      project.components.find((c) => c.id === selectedComponentId) ||
-      project.components[0] ||
-      null
-    );
-  }, [project, selectedComponentId]);
-
   const currentComponentLabel = currentComponent
     ? getComponentLabel(currentComponent)
     : null;
-
-  /**
-   * Media for current component + shared media
-   * Filters to show only the selected component's media plus project-wide shared media
-   */
-  const currentMedia = useMemo(() => {
-    if (!project) return [];
-    const componentMedia = currentComponent?.media || [];
-    const sharedMedia = project.sharedMedia || [];
-    return [...componentMedia, ...sharedMedia];
-  }, [project, currentComponent]);
-
-  /**
-   * Documents for current component + shared documents
-   * Filters to show only the selected component's documents plus project-wide shared documents
-   */
-  const currentDocuments = useMemo(() => {
-    if (!project) return [];
-    const componentDocuments = currentComponent?.documents || [];
-    const sharedDocuments = project.sharedDocuments || [];
-    return [...componentDocuments, ...sharedDocuments];
-  }, [project, currentComponent]);
-
-  // Reset asset category when component changes - set to first available category
-  useEffect(() => {
-    if (currentDocuments.length === 0) {
-      setSelectedAssetCategory(null);
-      return;
-    }
-
-    // Find first available category from documents in priority order
-    const categoryOrder: AssetCategoryValue[] = [
-      "floor-plan",
-      "materials",
-      "rendering-3d",
-      "contract",
-      "permit",
-      "invoice",
-      "other",
-    ];
-
-    const documentCategories = new Set<string>();
-    currentDocuments.forEach((doc) => {
-      const category = mapCategoryToTabValue(doc.category);
-      documentCategories.add(category);
-    });
-
-    // Find first category in priority order that exists in documents
-    const firstCategory = categoryOrder.find((cat) =>
-      documentCategories.has(cat)
-    );
-
-    if (firstCategory) {
-      setSelectedAssetCategory(firstCategory);
-    } else if (documentCategories.size > 0) {
-      // Fallback: use first category from set if not in priority order
-      setSelectedAssetCategory(
-        Array.from(documentCategories)[0] as AssetCategoryValue
-      );
-    } else {
-      setSelectedAssetCategory(null);
-    }
-  }, [selectedComponentId, currentDocuments]);
-
-  /**
-   * Sorted components by category display order
-   * Used for ComponentSelector to ensure consistent ordering
-   */
-  const sortedComponents = useMemo(() => {
-    if (!project) return [];
-    return [...project.components].sort((a, b) => {
-      const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a.category as CoreCategory);
-      const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b.category as CoreCategory);
-      // If not in order array, put at end
-      if (orderA === -1 && orderB === -1) return 0;
-      if (orderA === -1) return 1;
-      if (orderB === -1) return -1;
-      return orderA - orderB;
-    });
-  }, [project]);
-
-  /**
-   * Helper function to map category string to AssetCategoryValue
-   */
-  const mapCategoryToTabValue = (
-    category: string | undefined
-  ): AssetCategoryValue => {
-    if (!category) return "other";
-    const normalizedCategory = category.toLowerCase().trim();
-
-    // Map common category values to tab values
-    if (
-      normalizedCategory === "plans" ||
-      normalizedCategory === "floor-plan" ||
-      normalizedCategory === "floor plan"
-    ) {
-      return "floor-plan";
-    }
-    if (normalizedCategory === "materials") {
-      return "materials";
-    }
-    if (
-      normalizedCategory === "rendering" ||
-      normalizedCategory === "rendering-3d" ||
-      normalizedCategory === "3d rendering" ||
-      normalizedCategory === "3d"
-    ) {
-      return "rendering-3d";
-    }
-    if (
-      normalizedCategory === "contract" ||
-      normalizedCategory === "contracts"
-    ) {
-      return "contract";
-    }
-    if (normalizedCategory === "permit" || normalizedCategory === "permits") {
-      return "permit";
-    }
-    if (normalizedCategory === "invoice" || normalizedCategory === "invoices") {
-      return "invoice";
-    }
-    return "other";
-  };
-
-  /**
-   * Calculate asset counts for each category
-   * Used for SegmentedControl to show counts
-   */
-  const assetCounts = useMemo(() => {
-    const counts: Record<AssetCategoryValue, number> = {
-      "floor-plan": 0,
-      materials: 0,
-      "rendering-3d": 0,
-      contract: 0,
-      permit: 0,
-      invoice: 0,
-      other: 0,
-    };
-
-    currentDocuments.forEach((doc) => {
-      const tabValue = mapCategoryToTabValue(doc.category);
-      counts[tabValue]++;
-    });
-
-    return counts;
-  }, [currentDocuments]);
-
-  /**
-   * Available asset categories (only those with documents)
-   * Ordered by priority
-   */
-  const availableAssetCategories = useMemo(() => {
-    const categoryOrder: AssetCategoryValue[] = [
-      "floor-plan",
-      "materials",
-      "rendering-3d",
-      "contract",
-      "permit",
-      "invoice",
-      "other",
-    ];
-
-    return categoryOrder.filter((cat) => assetCounts[cat] > 0);
-  }, [assetCounts]);
-
-  /**
-   * Get label for asset category
-   */
-  const getAssetCategoryLabel = (category: AssetCategoryValue): string => {
-    const labels: Record<AssetCategoryValue, string> = {
-      "floor-plan": "Plans",
-      materials: "Materials",
-      "rendering-3d": "Renderings",
-      contract: "Contracts",
-      permit: "Permits",
-      invoice: "Invoices",
-      other: "Other",
-    };
-    return labels[category] || category;
-  };
-
-  /**
-   * Filtered documents based on selected asset category
-   * Uses doc.category instead of doc.type (which is legacy)
-   */
-  const filteredDocuments = useMemo(() => {
-    if (!selectedAssetCategory) {
-      return [];
-    }
-
-    return currentDocuments.filter((doc) => {
-      const docTabValue = mapCategoryToTabValue(doc.category);
-      return docTabValue === selectedAssetCategory;
-    });
-  }, [currentDocuments, selectedAssetCategory]);
-
-  /**
-   * Convert filtered documents to gallery format for images
-   * Used for displaying asset images in the gallery modal
-   */
-  const assetGalleryImages = useMemo(() => {
-    return convertDocumentsToPictures(filteredDocuments);
-  }, [filteredDocuments]);
-
-  // Create a map: document URL -> gallery image index
-  // Use URL as key since it's guaranteed to be unique and consistent
-  const documentToImageIndex = useMemo(() => {
-    const map = new Map<string, number>();
-
-    // For each image in the gallery, use its URI (URL) as the key
-    // URLs are unique and consistent between documents and gallery images
-    assetGalleryImages.forEach((galleryImage, galleryIndex) => {
-      map.set(galleryImage.uri, galleryIndex);
-    });
-
-    return map;
-  }, [assetGalleryImages]);
-
-  /**
-   * Ensure selectedAssetIndex is within bounds when assetGalleryImages changes
-   */
-  useEffect(() => {
-    if (assetGalleryImages.length > 0) {
-      if (
-        selectedAssetIndex >= assetGalleryImages.length ||
-        selectedAssetIndex < 0
-      ) {
-        setSelectedAssetIndex(0);
-      }
-    } else {
-      // If images array becomes empty, close the gallery
-      if (assetGalleryVisible) {
-        setAssetGalleryVisible(false);
-        setSelectedAssetIndex(0);
-      }
-    }
-  }, [assetGalleryImages.length, selectedAssetIndex, assetGalleryVisible]);
 
   /**
    * Display description - component description with fallback to project description
@@ -468,71 +190,6 @@ export default function ProjectDetailScreen() {
   const aggregatedPictures = useMemo(() => {
     return currentMedia;
   }, [currentMedia]);
-
-  // Calculate photo counts for each category
-  const photoCounts = useMemo(() => {
-    return getPhotoCounts(aggregatedPictures);
-  }, [aggregatedPictures]);
-
-  // Get preview photos based on active tab
-  const previewPhotos = useMemo(() => {
-    if (aggregatedPictures.length === 0) return [];
-
-    if (activePhotoTab === "all") {
-      // Use intelligent sampling for "All Photos" tab
-      return samplePreviewPhotos(aggregatedPictures, previewCount);
-    } else {
-      // Filter by specific stage and take first N
-      // Map tab values to MediaAsset stages
-      const stageMap: Record<string, string> = {
-        before: "before",
-        after: "after",
-        progress: "in-progress",
-      };
-      const targetStage = stageMap[activePhotoTab] || activePhotoTab;
-      const filtered = aggregatedPictures.filter(
-        (m) => m.mediaType === "image" && m.stage === targetStage
-      );
-      return getPreviewPhotos(filtered, previewCount);
-    }
-  }, [aggregatedPictures, activePhotoTab, previewCount]);
-
-  // Check if there are more photos beyond the preview
-  const hasMorePhotos = useMemo(() => {
-    const totalCount = photoCounts[activePhotoTab];
-    return totalCount > previewPhotos.length;
-  }, [photoCounts, activePhotoTab, previewPhotos.length]);
-
-  // Calculate remaining photo count
-  const remainingCount = useMemo(() => {
-    return photoCounts[activePhotoTab] - previewPhotos.length;
-  }, [photoCounts, activePhotoTab, previewPhotos.length]);
-
-  // Get filtered images for gallery based on active tab
-  const galleryImages = useMemo(() => {
-    if (aggregatedPictures.length === 0) {
-      return [];
-    }
-
-    let filteredMedia: typeof aggregatedPictures;
-    if (activePhotoTab === "all") {
-      filteredMedia = aggregatedPictures;
-    } else {
-      // Map tab value to MediaAsset stage
-      const stageMap: Record<string, string> = {
-        before: "before",
-        after: "after",
-        progress: "in-progress",
-      };
-      const targetStage = stageMap[activePhotoTab] || activePhotoTab;
-      filteredMedia = aggregatedPictures.filter(
-        (m) => m.mediaType === "image" && m.stage === targetStage
-      );
-    }
-
-    // Convert MediaAsset to Picture format
-    return convertMediaToPictures(filteredMedia);
-  }, [aggregatedPictures, activePhotoTab]);
 
   // Debug logging for asset filtering (current issue)
   useEffect(() => {
@@ -641,455 +298,7 @@ export default function ProjectDetailScreen() {
   };
 
   const styles = useMemo(
-    () =>
-      StyleSheet.create({
-        container: {
-          flex: 1,
-          backgroundColor: theme.colors.background.primary,
-        },
-        scrollView: {
-          flex: 1,
-        },
-        errorState: {
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          padding: DesignTokens.spacing[10],
-        },
-        errorText: {
-          fontSize: DesignTokens.typography.fontSize.lg,
-          opacity: 0.6,
-        },
-        heroImage: {
-          width: "100%",
-          height: 300,
-        },
-        header: {
-          paddingHorizontal: DesignTokens.spacing[6],
-          paddingTop: DesignTokens.spacing[8],
-          paddingBottom: DesignTokens.spacing[8],
-          backgroundColor: theme.colors.background.primary,
-          position: "relative",
-          borderTopWidth: 1,
-          borderTopColor: `${theme.colors.border.primary}1A`, // 10% opacity
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 8,
-          elevation: 2,
-        },
-        headerContent: {
-          flex: 1,
-          marginTop: DesignTokens.spacing[2], // Add space for status badge
-        },
-        statusBadge: {
-          alignSelf: "flex-end",
-          marginBottom: DesignTokens.spacing[2],
-          paddingHorizontal: DesignTokens.spacing[3],
-          paddingVertical: DesignTokens.spacing[1],
-          borderRadius: DesignTokens.borderRadius.full,
-          minWidth: 80,
-          alignItems: "center",
-        },
-        statusBadgeText: {
-          ...commonStyles.text.badge,
-        },
-        projectName: {
-          ...commonStyles.text.pageTitle,
-          marginBottom: DesignTokens.spacing[2],
-        },
-        componentName: {
-          fontSize: DesignTokens.typography.fontSize.lg,
-          fontWeight: DesignTokens.typography.fontWeight.semibold,
-          fontFamily: DesignTokens.typography.fontFamily.semibold,
-          marginBottom: DesignTokens.spacing[2],
-          opacity: 0.9,
-        },
-        projectDescription: {
-          ...commonStyles.text.description,
-          marginBottom: DesignTokens.spacing[6],
-        },
-        metaGrid: {
-          flexDirection: "column",
-        },
-        metaItem: {
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingVertical: DesignTokens.spacing[3],
-          borderBottomWidth: 1,
-          borderBottomColor: theme.colors.border.secondary,
-        },
-        metaItemLast: {
-          borderBottomWidth: 0,
-        },
-        metaLabel: {
-          ...commonStyles.text.label,
-          marginBottom: 0,
-          flex: 1,
-        },
-        metaValue: {
-          ...commonStyles.text.value,
-          flex: 1,
-          textAlign: "right",
-        },
-        metaValuePill: {
-          alignItems: "flex-end",
-        },
-        statusPill: {
-          paddingHorizontal: DesignTokens.spacing[3],
-          paddingVertical: DesignTokens.spacing[1],
-          borderRadius: DesignTokens.borderRadius.full,
-          minWidth: 80,
-          alignItems: "center",
-        },
-        statusPillText: {
-          ...commonStyles.text.badge,
-        },
-        section: {
-          backgroundColor: theme.colors.background.card,
-          marginBottom: DesignTokens.spacing[4],
-          marginHorizontal: DesignTokens.spacing[4],
-          padding: DesignTokens.spacing[6],
-          borderRadius: DesignTokens.borderRadius.xl,
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          ...DesignTokens.shadows.md,
-        },
-        sectionTitle: {
-          ...commonStyles.text.sectionTitle,
-          marginBottom: DesignTokens.spacing[2], // Tight spacing to instruction text
-        },
-        picturesGrid: {
-          flexDirection: "row",
-          gap: DesignTokens.spacing[3],
-          // NO marginTop - PhotoTabs component handles spacing above grid
-        },
-        gridImageContainer: {
-          flex: 1, // Each item takes equal space
-          aspectRatio: 4 / 3,
-          borderRadius: DesignTokens.borderRadius.lg,
-          overflow: "hidden",
-          ...DesignTokens.shadows.sm, // Subtle shadow for depth
-        },
-        gridImageContainerPressed: {
-          transform: [{ scale: 0.95 }],
-          ...DesignTokens.shadows.md,
-        },
-        gridImage: {
-          width: "100%",
-          height: "100%",
-        },
-        moreImagesOverlay: {
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: theme.colors.background.overlay,
-          justifyContent: "center",
-          alignItems: "center",
-        },
-        moreImagesText: {
-          fontSize: DesignTokens.typography.fontSize.xl,
-          fontWeight: DesignTokens.typography.fontWeight.bold,
-          color: theme.colors.text.inverse,
-          textAlign: "center",
-        },
-        sectionSubtitle: {
-          ...commonStyles.text.smallText,
-          marginBottom: DesignTokens.spacing[5], // Space before tabs
-        },
-        pictureContainer: {
-          width: 280,
-          marginRight: DesignTokens.spacing[4],
-          backgroundColor: theme.colors.background.secondary,
-          borderRadius: DesignTokens.borderRadius.lg,
-          overflow: "hidden",
-          borderWidth: 2,
-          borderColor: theme.colors.border.primary,
-          ...DesignTokens.shadows.sm,
-        },
-        pictureContainerPressed: {
-          transform: [{ scale: 0.98 }],
-          ...DesignTokens.shadows.md,
-        },
-        imageCounter: {
-          marginTop: DesignTokens.spacing[3],
-          textAlign: "center",
-          fontSize: DesignTokens.typography.fontSize.sm,
-          opacity: 0.7,
-        },
-        picture: {
-          width: "100%",
-          height: 200,
-        },
-        pictureOverlay: {
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: theme.colors.background.overlay,
-          justifyContent: "center",
-          alignItems: "center",
-          opacity: 0,
-        },
-        pictureOverlayVisible: {
-          opacity: 1,
-        },
-        zoomIcon: {
-          backgroundColor: theme.colors.background.card,
-          borderRadius: DesignTokens.borderRadius.lg,
-          width: DesignTokens.componentSizes.iconButton,
-          height: DesignTokens.componentSizes.iconButton,
-          justifyContent: "center",
-          alignItems: "center",
-        },
-        pictureInfo: {
-          padding: DesignTokens.spacing[4],
-        },
-        pictureType: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          fontWeight: "600",
-          marginBottom: DesignTokens.spacing[1],
-          textTransform: "capitalize",
-        },
-        pictureDescription: {
-          ...commonStyles.text.smallText,
-          opacity: 0.7,
-        },
-        documentsList: {
-          flexDirection: "column",
-          backgroundColor: theme.colors.background.card,
-          borderRadius: DesignTokens.borderRadius.lg,
-          overflow: "hidden",
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-        },
-        documentContainer: {
-          flexDirection: "row",
-          alignItems: "center",
-          paddingVertical: DesignTokens.spacing[4],
-          paddingHorizontal: DesignTokens.spacing[5],
-          backgroundColor: theme.colors.background.card,
-          borderBottomWidth: 1,
-          borderBottomColor: theme.colors.border.primary,
-          minHeight: 72,
-        },
-        documentContainerLast: {
-          borderBottomWidth: 0,
-        },
-        documentIcon: {
-          width: 40,
-          height: 40,
-          borderRadius: DesignTokens.borderRadius.md,
-          backgroundColor: theme.colors.background.secondary,
-          justifyContent: "center",
-          alignItems: "center",
-          marginRight: DesignTokens.spacing[4],
-        },
-        documentContent: {
-          flex: 1,
-          justifyContent: "center",
-        },
-        documentHeader: {
-          flexDirection: "row",
-          alignItems: "center",
-          marginBottom: DesignTokens.spacing[1],
-        },
-        documentName: {
-          fontSize: DesignTokens.typography.fontSize.base,
-          fontWeight: "600",
-          color: theme.colors.text.primary,
-          flex: 1,
-          marginRight: DesignTokens.spacing[2],
-        },
-        documentType: {
-          fontSize: DesignTokens.typography.fontSize.xs,
-          fontWeight: "500",
-          color: theme.colors.text.secondary,
-          backgroundColor: theme.colors.background.secondary,
-          paddingHorizontal: DesignTokens.spacing[2],
-          paddingVertical: DesignTokens.spacing[1],
-          borderRadius: DesignTokens.borderRadius.sm,
-          textTransform: "uppercase",
-          letterSpacing: 0.5,
-        },
-        documentDescription: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          color: theme.colors.text.secondary,
-          lineHeight:
-            DesignTokens.typography.fontSize.sm *
-            DesignTokens.typography.lineHeight.normal,
-          marginTop: DesignTokens.spacing[1],
-        },
-        documentAction: {
-          width: 32,
-          height: 32,
-          borderRadius: DesignTokens.borderRadius.sm,
-          backgroundColor: theme.colors.background.secondary,
-          justifyContent: "center",
-          alignItems: "center",
-          marginLeft: DesignTokens.spacing[2],
-        },
-        sectionHeader: {
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: DesignTokens.spacing[4],
-        },
-        viewAllButton: {
-          flexDirection: "row",
-          alignItems: "center",
-          paddingVertical: DesignTokens.spacing[2],
-          paddingHorizontal: DesignTokens.spacing[3],
-          backgroundColor: theme.colors.background.secondary,
-          borderRadius: DesignTokens.borderRadius.md,
-        },
-        viewAllButtonText: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          fontWeight: "600",
-          color: theme.colors.interactive.primary,
-          marginRight: DesignTokens.spacing[1],
-        },
-        documentsPreview: {
-          backgroundColor: theme.colors.background.secondary,
-          borderRadius: DesignTokens.borderRadius.md,
-          padding: DesignTokens.spacing[4],
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-        },
-        documentPreviewItem: {
-          flexDirection: "row",
-          alignItems: "center",
-          paddingVertical: DesignTokens.spacing[3],
-          paddingHorizontal: DesignTokens.spacing[3],
-          borderRadius: DesignTokens.borderRadius.md,
-          marginBottom: DesignTokens.spacing[2],
-        },
-        documentPreviewIcon: {
-          width: 32,
-          height: 32,
-          borderRadius: DesignTokens.borderRadius.sm,
-          backgroundColor: theme.colors.background.secondary,
-          justifyContent: "center",
-          alignItems: "center",
-          marginRight: DesignTokens.spacing[3],
-        },
-        documentPreviewContent: {
-          flex: 1,
-        },
-        documentPreviewName: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          fontWeight: "600",
-          color: theme.colors.text.primary,
-          marginBottom: DesignTokens.spacing[1],
-        },
-        documentPreviewType: {
-          fontSize: DesignTokens.typography.fontSize.xs,
-          color: theme.colors.text.secondary,
-          textTransform: "uppercase",
-          letterSpacing: 0.5,
-        },
-        moreDocumentsButton: {
-          alignItems: "center",
-          paddingVertical: DesignTokens.spacing[3],
-          paddingHorizontal: DesignTokens.spacing[4],
-          backgroundColor: theme.colors.background.secondary,
-          borderRadius: DesignTokens.borderRadius.md,
-          marginTop: DesignTokens.spacing[2],
-        },
-        moreDocumentsText: {
-          fontSize: DesignTokens.typography.fontSize.sm,
-          fontWeight: "600",
-          color: theme.colors.interactive.primary,
-        },
-        assetThumbnails: {
-          paddingHorizontal: DesignTokens.spacing[4],
-          gap: DesignTokens.spacing[4],
-          paddingBottom: DesignTokens.spacing[2],
-        },
-        moreAssetsButton: {
-          width: 120,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: theme.colors.background.secondary,
-          borderRadius: DesignTokens.borderRadius.lg,
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          padding: DesignTokens.spacing[3],
-        },
-        moreAssetsText: {
-          color: theme.colors.text.primary,
-          fontFamily: DesignTokens.typography.fontFamily.semibold,
-          fontSize: DesignTokens.typography.fontSize.sm,
-        },
-        logsList: {
-          flexDirection: "column",
-        },
-        logContainer: {
-          width: "100%",
-          marginBottom: DesignTokens.spacing[3],
-          padding: DesignTokens.spacing[4],
-          backgroundColor: theme.colors.background.secondary,
-          borderRadius: DesignTokens.borderRadius.md,
-          borderWidth: 1,
-          borderColor: theme.colors.border.primary,
-          flexDirection: "row",
-          alignItems: "flex-start",
-          position: "relative",
-        },
-        logTimeline: {
-          position: "absolute",
-          left: 20,
-          top: 0,
-          bottom: -DesignTokens.spacing[3],
-          width: 2,
-          backgroundColor: theme.colors.border.primary,
-        },
-        logTimelineLast: {
-          bottom: 0,
-        },
-        logIcon: {
-          marginRight: DesignTokens.spacing[3],
-          marginTop: DesignTokens.spacing[1],
-          zIndex: 1,
-        },
-        logContent: {
-          flex: 1,
-        },
-        emptyState: {
-          padding: DesignTokens.spacing[8],
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: theme.colors.background.secondary,
-          borderRadius: DesignTokens.borderRadius.md,
-        },
-        emptyStateText: {
-          fontSize: DesignTokens.typography.fontSize.base,
-          opacity: 0.6,
-          textAlign: "center",
-          marginTop: DesignTokens.spacing[2],
-        },
-        loadingSkeleton: {
-          backgroundColor: theme.colors.background.accent,
-          borderRadius: DesignTokens.borderRadius.lg,
-          height: 100,
-          marginBottom: DesignTokens.spacing[3],
-        },
-        logContainerLast: {
-          marginBottom: 0,
-        },
-        logDate: {
-          ...commonStyles.text.caption,
-          opacity: 0.6,
-          marginBottom: DesignTokens.spacing[1],
-        },
-        logDescription: {
-          ...commonStyles.text.smallText,
-        },
-      }),
+    () => createProjectDetailStyles(theme),
     [theme]
   );
 
@@ -1300,6 +509,9 @@ export default function ProjectDetailScreen() {
                   {currentComponent.name}
                 </ThemedText>
               )}
+              <View style={styles.editButtonContainer}>
+                <EditButton onPress={() => setShowEditDescriptionModal(true)} />
+              </View>
               <ThemedText
                 key={`description-${selectedComponentId || "default"}`}
                 style={[
@@ -1712,6 +924,17 @@ export default function ProjectDetailScreen() {
           onClose={() => {
             setAssetGalleryVisible(false);
           }}
+        />
+      )}
+
+      {showEditDescriptionModal && (
+        <EditDescriptionModal
+          visible={showEditDescriptionModal}
+          onClose={() => setShowEditDescriptionModal(false)}
+          onSave={() => {}}
+          currentDescription={displayDescription}
+          projectId={project?.id}
+          componentId={currentComponent?.id || undefined}
         />
       )}
     </>

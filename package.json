@@ -26,6 +26,7 @@
     "upload": "tsx scripts/uploadProjects.ts",
     "upload:dev": "NODE_ENV=development tsx scripts/uploadProjects.ts",
     "upload:prod": "NODE_ENV=production tsx scripts/uploadProjects.ts",
+    "migrate:remove-id": "tsx scripts/removeProjectIdField.ts",
     "add-featured:dev": "tsx scripts/utilities/addFeaturedField.ts --env=dev",
     "add-featured:prod": "tsx scripts/utilities/addFeaturedField.ts --env=prod",
     "legacy:upload": "tsx scripts/legacy/uploadPhotos.ts",

@@ -49,9 +49,6 @@ export async function scanProjectFiles(
 ): Promise<ScanResult> {
   const startTime = Date.now();
 
-  console.log(`📁 Scanning filesystem: ${assetsRoot}`);
-  console.log(`🔍 Looking for ${projectNumbers.length} projects...\n`);
-
   const components: ComponentFiles[] = [];
   const errors: ScanError[] = [];
   const warnings: ScanWarning[] = [];
@@ -68,12 +65,10 @@ export async function scanProjectFiles(
         projectNumber,
         message: `Project folder not found: ${projectPath}`,
       });
-      console.log(`❌ Project ${projectNumber}: Folder not found`);
       continue;
     }
 
     foundProjects.add(projectNumber);
-    console.log(`📦 Project ${projectNumber}:`);
 
     try {
       // Find all component directories in this project
@@ -87,7 +82,6 @@ export async function scanProjectFiles(
           projectNumber,
           message: "No component directories found",
         });
-        console.log(`   ⚠️  No component directories found`);
         continue;
       }
 
@@ -111,9 +105,6 @@ export async function scanProjectFiles(
             component: componentDir.category,
             message: `Failed to scan component: ${errorMessage}`,
           });
-          console.log(
-            `   ✗ ${componentDir.category}: Scan failed - ${errorMessage}`
-          );
         }
       }
     } catch (error) {
@@ -123,7 +114,6 @@ export async function scanProjectFiles(
         projectNumber,
         message: `Failed to scan project: ${errorMessage}`,
       });
-      console.log(`   ✗ Project scan failed: ${errorMessage}`);
     }
   }
 
@@ -529,7 +519,7 @@ function logComponentSummary(componentFiles: ComponentFiles): void {
   const parts = [mediaStr];
   if (assetsStr) parts.push(assetsStr);
 
-  console.log(`   ├─ ${label}: ${parts.join(", ")}`);
+  // Component summary - logs disabled
 }
 
 /**
@@ -561,42 +551,16 @@ function logFinalSummary(
 
   // Print errors if any
   if (errors.length > 0) {
-    console.log(`\n⚠️  Errors found:`);
-    for (const error of errors) {
-      const projectInfo = error.projectNumber
-        ? `Project ${error.projectNumber}`
-        : "";
-      const componentInfo = error.component ? `, ${error.component}` : "";
-      const context = projectInfo + componentInfo;
-      console.log(`   ✗ ${context}: ${error.message}`);
-    }
+    // Errors found - logs disabled
   }
 
   // Print warnings if any
   if (warnings.length > 0) {
-    console.log(`\n⚠️  Warnings:`);
-    for (const warning of warnings) {
-      const projectInfo = warning.projectNumber
-        ? `Project ${warning.projectNumber}`
-        : "";
-      const componentInfo = warning.component ? `, ${warning.component}` : "";
-      const context = projectInfo + componentInfo;
-      console.log(`   ⚠️  ${context}: ${warning.message}`);
-    }
+    // Warnings found - logs disabled
   }
 
   // Print summary
-  console.log(`\n📊 Scan Summary:`);
-  console.log(`   • Projects scanned: ${stats.totalProjects}`);
-  console.log(`   • Components found: ${stats.totalComponents}`);
-  console.log(
-    `   • Total media files: ${stats.totalMedia} (${imageCount} images, ${videoCount} videos)`
-  );
-  console.log(`   • Total assets: ${stats.totalAssets}`);
-  console.log(`   • Total size: ${formatBytes(stats.totalSize)}`);
-  console.log(`   • Errors: ${errors.length}`);
-  console.log(`   • Warnings: ${warnings.length}`);
-  console.log(`   ⏱️  Scan time: ${(stats.scanTime / 1000).toFixed(1)}s`);
+  // Summary - logs disabled
 }
 
 // Test harness for quick verification
@@ -607,11 +571,9 @@ if (require.main === module) {
 
   scanProjectFiles(assetsRoot, projectNumbers)
     .then((result) => {
-      console.log("\n✅ Scan complete!");
       process.exit(result.success ? 0 : 1);
     })
     .catch((error) => {
-      console.error("\n❌ Unhandled error:", error);
       process.exit(1);
     });
 }

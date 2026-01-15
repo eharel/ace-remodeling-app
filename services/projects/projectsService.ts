@@ -1,6 +1,7 @@
+import { nanoid } from "nanoid";
 import { db } from "@/shared/config";
-import { Project, ProjectSchema } from "@/shared/types";
-import { collection, getDocs } from "firebase/firestore";
+import { Project, ProjectComponent, ProjectSchema } from "@/shared/types";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 
 const PROJECTS_COLLECTION = "projects";
 
@@ -37,11 +38,55 @@ const PROJECTS_COLLECTION = "projects";
 //   }
 // }, []);
 
+/**
+ * Generate a component ID if missing using nanoid(12)
+ */
+function ensureComponentId(component: ProjectComponent): ProjectComponent {
+  if (!component.id) {
+    return {
+      ...component,
+      id: nanoid(12),
+    };
+  }
+  return component;
+}
+
 export const fetchAllProjects = async (): Promise<Project[]> => {
   const projectsCollection = collection(db, PROJECTS_COLLECTION);
   const querySnapshot = await getDocs(projectsCollection);
 
-  return querySnapshot.docs.map((doc) =>
-    ProjectSchema.parse({ id: doc.id, ...doc.data() })
-  );
+  return querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    const projectId = doc.id;
+
+    // Ensure all components have IDs (generate if missing)
+    const components = (data.components || []).map((component: any) =>
+      ensureComponentId(component)
+    );
+
+    return ProjectSchema.parse({
+      id: projectId,
+      ...data,
+      components,
+    });
+  });
+};
+
+/**
+ * Update a project with partial data
+ * @param projectId - The project document ID
+ * @param updates - Partial project data to update
+ */
+export const updateProject = async (
+  projectId: string,
+  updates: Partial<Project>
+): Promise<void> => {
+  // Remove fields that shouldn't be updated
+  const { id, createdAt, ...safeUpdates } = updates;
+
+  const projectRef = doc(db, PROJECTS_COLLECTION, projectId);
+  await updateDoc(projectRef, {
+    ...safeUpdates,
+    updatedAt: new Date().toISOString(), // Always update timestamp
+  });
 };

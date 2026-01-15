@@ -53,7 +53,6 @@ export function formatISODate(
       ...options,
     });
   } catch (error) {
-    console.warn("Failed to format date:", isoString, error);
     return "Invalid date";
   }
 }
@@ -113,7 +112,6 @@ export function getRelativeTime(isoString: string): string {
 
     return formatISODate(isoString);
   } catch (error) {
-    console.warn("Failed to get relative time:", isoString, error);
     return "Invalid date";
   }
 }

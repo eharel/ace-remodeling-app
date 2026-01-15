@@ -11,6 +11,7 @@ export { LoadingState } from "./LoadingState";
 export { PageHeader } from "./PageHeader";
 export { RefreshableScrollView } from "./RefreshableScrollView";
 export { ThemeToggle } from "./ThemeToggle";
+export { EditButton } from "./EditButton";
 
 // Themed Components
 export { ThemedButton } from "./themed/ThemedButton";

@@ -1,0 +1,42 @@
+feat: add project description editing and refactor project detail page
+
+## Features
+
+### Description Editing
+- Add EditDescriptionModal component for editing project/component descriptions
+- Add EditButton component with permission-based visibility (uses AuthContext)
+- Implement updateProject and updateComponent functions in ProjectsContext
+- Add updateProject service function with optimistic UI updates
+- Support editing both project-level and component-level descriptions
+
+### Component ID Management
+- Auto-generate component IDs using nanoid(12) when missing during fetch
+- Add ensureComponentId helper function in projectsService
+- Ensure backward compatibility with existing projects
+
+## Refactoring
+
+### Project Detail Page
+- Extract styles to separate [id].styles.ts file (465 lines)
+- Extract component selection logic to useProjectComponentSelection hook
+- Extract photo gallery logic to usePhotoGallery hook
+- Extract asset category management to useAssetCategoryManagement hook
+- Reduce main component from 1,296 to 942 lines (27% reduction)
+- Improve code organization and maintainability
+
+### Scripts
+- Add removeProjectIdField.ts migration script to clean up redundant ID fields
+- Update seed scripts with component ID generation support
+- Clean up verbose logging in firestore and storage scripts
+- Improve error handling in data builder and progress tracker
+
+## Other Changes
+- Remove excessive console.log statements from ProjectsContext
+- Clean up unused imports and error logging utilities
+- Update package.json dependencies
+- Export EditButton from shared components
+
+## Impact
+- 19 files modified, 265 insertions(+), 1,044 deletions(-)
+- 5 new files: EditDescriptionModal, EditButton, 3 custom hooks, styles file, migration script
+- Net reduction of 779 lines while adding new functionality

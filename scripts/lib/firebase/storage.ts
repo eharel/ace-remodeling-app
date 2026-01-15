@@ -505,13 +505,6 @@ export async function uploadAllFiles(
   );
   const assetCount = allComponents.reduce((sum, c) => sum + c.assets.length, 0);
 
-  console.log("📤 Starting file upload to Firebase Storage...");
-  console.log(`🌍 Environment: ${options.dryRun ? "DRY RUN" : "LIVE"}`);
-  console.log(
-    `📦 Total files: ${totalFiles} (${imageCount} photos, ${videoCount} videos, ${assetCount} assets)`
-  );
-  console.log(`💾 Total size: ${formatBytes(totalBytes)}\n`);
-
   // Create progress tracker
   const progressTracker = new ProgressTracker(totalFiles, totalBytes);
 
@@ -530,20 +523,7 @@ export async function uploadAllFiles(
 
       // Log component completion
       if (result.successCount > 0) {
-        const mediaCount = result.mediaResults.filter((r) => r.success).length;
-        const assetCount = result.assetResults.filter((r) => r.success).length;
-        const componentLabel = component.subcategory
-          ? `${component.category}/${component.subcategory}`
-          : component.category;
-
-        console.log(`\n✅ Component uploaded: ${component.projectNumber}/${componentLabel}`);
-        if (mediaCount > 0) {
-          console.log(`   📷 Media: ${mediaCount}/${component.media.length} uploaded`);
-        }
-        if (assetCount > 0) {
-          console.log(`   📄 Assets: ${assetCount}/${component.assets.length} uploaded`);
-        }
-        console.log(`   💾 Size: ${formatBytes(result.totalBytes)}`);
+        // Component upload completed - logs disabled
       }
 
       // Collect errors
@@ -578,15 +558,7 @@ export async function uploadAllFiles(
 
   // Print errors if any
   if (errors.length > 0) {
-    console.log("\n⚠️  Upload Failures:");
-    for (const error of errors.slice(0, 10)) {
-      // Show first 10 errors
-      const filename = error.localPath.split("/").pop();
-      console.log(`   ❌ ${error.storagePath}/${filename} - ${error.error}`);
-    }
-    if (errors.length > 10) {
-      console.log(`   ... and ${errors.length - 10} more errors`);
-    }
+    // Errors occurred - logs disabled
   }
 
   // Calculate summary statistics
@@ -649,7 +621,7 @@ if (require.main === module) {
       { dryRun: true }
     );
 
-    console.log("Upload result:", result);
+    // Upload result - logs disabled
   })();
 }
 

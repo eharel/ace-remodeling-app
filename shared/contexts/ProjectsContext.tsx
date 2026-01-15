@@ -1,6 +1,9 @@
-import { Project, MediaAsset } from "@/shared/types";
+import { Project, MediaAsset, ProjectComponent } from "@/shared/types";
 import { CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
-import { fetchAllProjects } from "@/services/projects";
+import {
+  fetchAllProjects,
+  updateProject as updateProjectService,
+} from "@/services/projects";
 import React, {
   createContext,
   ReactNode,
@@ -64,6 +67,12 @@ interface ProjectsContextType {
    * Useful for pull-to-refresh functionality.
    */
   refetchProjects: () => Promise<void>;
+  updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
+  updateComponent: (
+    projectId: string,
+    componentId: string,
+    updates: Partial<ProjectComponent>
+  ) => Promise<void>;
 }
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(
@@ -82,29 +91,17 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const fetchProjects = useCallback(async () => {
-    console.log("[ProjectsContext] fetchProjects: Start fetching projects...");
     try {
       setLoading(true);
       setError(null);
       const projects = await fetchAllProjects();
-      console.log(
-        `[ProjectsContext] fetchProjects: Successfully fetched ${projects.length} projects.`
-      );
       setProjects(projects);
     } catch (error) {
       const errorMsg =
         error instanceof Error ? error.message : "Failed to fetch projects";
-      console.error(
-        "[ProjectsContext] fetchProjects: Error fetching projects:",
-        errorMsg,
-        error
-      );
       setError(errorMsg);
     } finally {
       setLoading(false);
-      console.log(
-        "[ProjectsContext] fetchProjects: Finished fetching projects."
-      );
     }
   }, []);
 
@@ -136,6 +133,112 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
         project.components.some((c) => c.category === CORE_CATEGORIES.KITCHEN)
       ),
     [projects]
+  );
+
+  /**
+   * Updates a project with optimistic UI updates and error handling.
+   *
+   * This function performs an optimistic update pattern:
+   * 1. Immediately updates the local state with the new values
+   * 2. Attempts to persist the changes to the backend
+   * 3. Rolls back and refetches on error
+   *
+   * The optimistic update includes an automatically generated `updatedAt` timestamp
+   * to keep the UI in sync, even if the backend response is delayed.
+   *
+   * @param id - The unique identifier of the project to update
+   * @param updates - Partial project object containing the fields to update.
+   *                 Only the provided fields will be updated; other fields remain unchanged.
+   *
+   * @example
+   * ```tsx
+   * // Update just the description
+   * await updateProject('project-123', { description: 'New description' });
+   *
+   * // Update multiple fields
+   * await updateProject('project-123', {
+   *   description: 'New description',
+   *   status: 'completed'
+   * });
+   * ```
+   *
+   * @throws Sets error state and refetches projects if the update fails.
+   *         The error message is available via the context's error state.
+   */
+  const updateProject = useCallback(
+    async (id: string, updates: Partial<Project>) => {
+      try {
+        // Optimistic update with best-guess timestamp
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === id
+              ? { ...p, ...updates, updatedAt: new Date().toISOString() }
+              : p
+          )
+        );
+
+        await updateProjectService(id, updates);
+      } catch (error) {
+        // Rollback on error
+        setError(
+          error instanceof Error ? error.message : "Failed to update project"
+        );
+        await fetchProjects();
+      }
+    },
+    [fetchProjects]
+  );
+
+  const updateComponent = useCallback(
+    async (
+      projectId: string,
+      componentId: string,
+      updates: Partial<ProjectComponent>
+    ) => {
+      try {
+        const now = new Date().toISOString();
+
+        // 1. Optimistic update with best-guess timestamp
+        setProjects((prev) =>
+          prev.map((p) => {
+            if (p.id === projectId) {
+              return {
+                ...p,
+                components: p.components.map((c) =>
+                  c.id === componentId
+                    ? { ...c, ...updates, updatedAt: now }
+                    : c
+                ),
+                updatedAt: now,
+              };
+            }
+            return p;
+          })
+        );
+
+        // 2. Find project to get current components
+        const project = projects.find((p) => p.id === projectId);
+        if (!project) {
+          throw new Error("Project not found");
+        }
+
+        // 3. Update Firestore with modified components array
+        const updatedComponents = project.components.map((c) =>
+          c.id === componentId ? { ...c, ...updates, updatedAt: now } : c
+        );
+
+        await updateProjectService(projectId, {
+          components: updatedComponents,
+        });
+      } catch (error) {
+        // Rollback on error
+        setError(
+          error instanceof Error ? error.message : "Failed to update component"
+        );
+        await fetchProjects();
+      }
+    },
+    [projects, fetchProjects]
   );
 
   /**
@@ -207,6 +310,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       featuredKitchenProjects,
       featuredGeneralProjects,
       refetchProjects,
+      updateProject,
+      updateComponent,
     }),
     [
       projects,
@@ -219,6 +324,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       featuredKitchenProjects,
       featuredGeneralProjects,
       refetchProjects,
+      updateProject,
+      updateComponent,
     ]
   );
 

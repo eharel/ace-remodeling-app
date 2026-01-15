@@ -65,12 +65,6 @@ export function buildProjectDocument(sources: ProjectDataSources): BuildResult {
   const warnings: string[] = [];
 
   try {
-    console.log(`\n🔨 Building Project ${csvData.number}...`);
-    console.log(`   • CSV data: ✅`);
-    console.log(`   • Scanner data: ✅ (${componentFiles.length} components)`);
-    console.log(`   • Upload results: ✅ (${uploadResults.length} components)`);
-    console.log(`   • Merging...`);
-
     // Start with CSV data (has most metadata)
     const project: Project = {
       ...csvData,
@@ -104,11 +98,6 @@ export function buildProjectDocument(sources: ProjectDataSources): BuildResult {
       (sum, c) => sum + (c.documents?.length || 0),
       0
     );
-
-    console.log(`   ✅ Project ${csvData.number} built successfully`);
-    console.log(`      Components: ${project.components.length}`);
-    console.log(`      Media: ${totalMedia}`);
-    console.log(`      Assets: ${totalAssets}`);
 
     return {
       success: true,
