@@ -15,6 +15,7 @@ import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import type { MediaAsset } from "@/shared/types";
 import { commonStyles } from "@/shared/utils";
+import { PhotoGridModal } from "./PhotoGridModal";
 
 interface ProjectPhotoGalleryProps {
   photos: MediaAsset[];
@@ -30,6 +31,7 @@ export function ProjectPhotoGallery({
   canEdit = false,
 }: ProjectPhotoGalleryProps) {
   const { theme } = useTheme();
+  const [showPhotoGrid, setShowPhotoGrid] = useState(false);
 
   // Photo gallery state
   const [galleryVisible, setGalleryVisible] = useState(false);
@@ -76,8 +78,9 @@ export function ProjectPhotoGallery({
   };
 
   const handleMoreImagesPress = () => {
-    setSelectedImageIndex(0); // Start from first photo in filtered set
-    setGalleryVisible(true);
+    // setSelectedImageIndex(0); // Start from first photo in filtered set
+    // setGalleryVisible(true);
+    setShowPhotoGrid(true);
   };
 
   // OPTIMIZATION 3: Gallery image renderer with optimized image props
@@ -233,6 +236,11 @@ export function ProjectPhotoGallery({
           onClose={closeGallery}
         />
       )}
+
+      <PhotoGridModal
+        visible={showPhotoGrid}
+        onClose={() => setShowPhotoGrid(false)}
+      />
     </>
   );
 }

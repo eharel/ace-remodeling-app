@@ -19,3 +19,6 @@ export { ThemedIconButton } from "./themed/ThemedIconButton";
 export { ThemedInput } from "./themed/ThemedInput";
 export { ThemedText } from "./themed/ThemedText";
 export { ThemedView } from "./themed/ThemedView";
+
+// Modals
+export { ModalBackdrop } from "./modals/ModalBackdrop";
