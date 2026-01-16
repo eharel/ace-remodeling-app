@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import React, { useMemo, useState } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { usePhotoGallery } from "@/app/project/hooks/usePhotoGallery";
 import {
@@ -9,7 +9,7 @@ import {
   MorePhotosCard,
   type PhotoTabValue,
 } from "@/features/gallery";
-import { ThemedText, ThemedView } from "@/shared/components";
+import { EditButton, ThemedText, ThemedView } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
@@ -116,11 +116,16 @@ export function ProjectPhotoGallery({
     <>
       {/* Pictures Section */}
       <ThemedView style={styles.section}>
-        <ThemedText
-          style={[styles.sectionTitle, { color: theme.colors.text.primary }]}
-        >
-          {title} ({photos.length})
-        </ThemedText>
+        {/* Header Row - Title + Edit Button */}
+        <View style={styles.sectionHeader}>
+          <ThemedText
+            style={[styles.sectionTitle, { color: theme.colors.text.primary }]}
+          >
+            {title} ({photos.length})
+          </ThemedText>
+          {/* Add the edit button if canEdit is true */}
+          <EditButton onPress={() => {}} />
+        </View>
         <ThemedText
           style={[
             styles.sectionSubtitle,
@@ -129,7 +134,6 @@ export function ProjectPhotoGallery({
         >
           {subtitle}
         </ThemedText>
-
         {photos.length > 0 ? (
           <>
             {/* Photo Category Tabs */}
@@ -248,9 +252,15 @@ const createProjectPhotoGalleryStyles = (theme: any) =>
       borderColor: theme.colors.border.primary,
       ...DesignTokens.shadows.md,
     },
+    sectionHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: DesignTokens.spacing[2], // Space before subtitle
+    },
     sectionTitle: {
       ...commonStyles.text.sectionTitle,
-      marginBottom: DesignTokens.spacing[2],
+      marginBottom: 0, // ← Remove bottom margin (row handles spacing now)
     },
     sectionSubtitle: {
       ...commonStyles.text.smallText,
