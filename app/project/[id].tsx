@@ -9,8 +9,7 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import {
   AssetThumbnail,
   ImageGalleryModal,
-  MorePhotosCard,
-  type PhotoTabValue,
+  type AssetCategoryValue,
 } from "@/features/gallery";
 import {
   LoadingState,
@@ -24,6 +23,7 @@ import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { EditDescriptionModal } from "@/features/projects/components/EditDescriptionModal";
+import { ProjectPhotoGallery } from "@/features/projects/components/ProjectPhotoGallery";
 import { DesignTokens } from "@/shared/themes";
 import {
   getCategoryLabel,
@@ -34,7 +34,6 @@ import {
 import { getProjectDuration } from "@/shared/utils";
 import { createProjectDetailStyles } from "./[id].styles";
 import { useAssetCategoryManagement } from "./hooks/useAssetCategoryManagement";
-import { usePhotoGallery } from "./hooks/usePhotoGallery";
 import { useProjectComponentSelection } from "./hooks/useProjectComponentSelection";
 
 export default function ProjectDetailScreen() {
@@ -59,28 +58,6 @@ export default function ProjectDetailScreen() {
     currentMedia,
     currentDocuments,
   } = useProjectComponentSelection(id, componentId, projects);
-
-  // Photo gallery state
-  const [galleryVisible, setGalleryVisible] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [pressedImageIndex, setPressedImageIndex] = useState<number | null>(
-    null
-  );
-  const [activePhotoTab, setActivePhotoTab] = useState<PhotoTabValue>("after");
-  const previewCount = 3;
-
-  // Photo gallery logic
-  const {
-    photoCounts,
-    previewPhotos,
-    hasMorePhotos,
-    remainingCount,
-    galleryImages,
-  } = usePhotoGallery({
-    media: currentMedia,
-    activePhotoTab,
-    previewCount,
-  });
 
   // Asset category management
   const {
@@ -191,12 +168,6 @@ export default function ProjectDetailScreen() {
     return getProjectThumbnail(project, selectedComponent || undefined);
   }, [project, selectedComponent]);
 
-  // Legacy: Keep aggregatedPictures for backward compatibility during transition
-  // This will be replaced with currentMedia in next steps
-  const aggregatedPictures = useMemo(() => {
-    return currentMedia;
-  }, [currentMedia]);
-
   // Debug logging for asset filtering (current issue)
   useEffect(() => {
     if (!project) return;
@@ -208,10 +179,6 @@ export default function ProjectDetailScreen() {
     currentDocuments,
     filteredDocuments,
   ]);
-
-  const closeGallery = () => {
-    setGalleryVisible(false);
-  };
 
   const handleUpdateDescription = async (description: string) => {
     if (!project) throw new Error("Project not found");
@@ -234,27 +201,6 @@ export default function ProjectDetailScreen() {
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleImagePress = (index: number) => {
-    // Ensure index is within bounds before opening gallery
-    if (galleryImages.length === 0) {
-      return;
-    }
-
-    const safeIndex = Math.max(0, Math.min(index, galleryImages.length - 1));
-
-    if (safeIndex < 0 || safeIndex >= galleryImages.length) {
-      return;
-    }
-
-    setSelectedImageIndex(safeIndex);
-    setGalleryVisible(true);
-  };
-
-  const handleMoreImagesPress = () => {
-    setSelectedImageIndex(2); // Start from 3rd image (index 2)
-    setGalleryVisible(true);
   };
 
   const getStatusBadgeStyle = (status: string) => {
@@ -372,45 +318,6 @@ export default function ProjectDetailScreen() {
       </>
     );
   }
-
-  // OPTIMIZATION 3: Gallery image renderer with optimized image props
-  const renderGridImage = (
-    item: any,
-    index: number,
-    isMoreCell: boolean = false
-  ) => {
-    const isPressed = pressedImageIndex === index;
-
-    return (
-      <ThemedView key={`grid-image-${index}`} style={styles.gridImageContainer}>
-        <Pressable
-          onPress={() =>
-            isMoreCell ? handleMoreImagesPress() : handleImagePress(index)
-          }
-          onPressIn={() => setPressedImageIndex(index)}
-          onPressOut={() => setPressedImageIndex(null)}
-          style={isPressed ? styles.gridImageContainerPressed : undefined}
-        >
-          <Image
-            source={{ uri: item.url }}
-            style={styles.gridImage}
-            contentFit="cover"
-            transition={150}
-            cachePolicy="memory-disk"
-            priority="normal"
-            recyclingKey={item.url}
-          />
-          {isMoreCell && (
-            <ThemedView style={styles.moreImagesOverlay}>
-              <ThemedText style={styles.moreImagesText}>
-                +{aggregatedPictures.length - 2} more photos
-              </ThemedText>
-            </ThemedView>
-          )}
-        </Pressable>
-      </ThemedView>
-    );
-  };
 
   const renderDocumentPreview = (item: any, index: number) => (
     <Pressable
@@ -628,116 +535,7 @@ export default function ProjectDetailScreen() {
             </ThemedView>
           </ThemedView>
 
-          {/* Pictures Section */}
-          <ThemedView style={styles.section}>
-            <ThemedText
-              style={[
-                styles.sectionTitle,
-                { color: theme.colors.text.primary },
-              ]}
-            >
-              Project Photos ({currentMedia.length})
-            </ThemedText>
-            <ThemedText
-              style={[
-                styles.sectionSubtitle,
-                { color: theme.colors.text.secondary },
-              ]}
-            >
-              Tap any photo to view gallery
-            </ThemedText>
-
-            {aggregatedPictures.length > 0 ? (
-              <>
-                {/* Photo Category Tabs */}
-                <SegmentedControl
-                  variant="tabs"
-                  options={["after", "before", "progress", "all"] as const}
-                  selected={activePhotoTab}
-                  onSelect={setActivePhotoTab}
-                  showCounts={true}
-                  getCounts={(tab) => photoCounts[tab as PhotoTabValue]}
-                  getLabel={(tab) => {
-                    const labels: Record<PhotoTabValue, string> = {
-                      after: "After",
-                      before: "Before",
-                      progress: "In Progress",
-                      all: "All Photos",
-                    };
-                    return labels[tab as PhotoTabValue] || tab;
-                  }}
-                  ariaLabel="Filter photos by stage"
-                />
-
-                {/* Photo Grid */}
-                {previewPhotos.length > 0 ? (
-                  <ThemedView variant="ghost" style={styles.picturesGrid}>
-                    {previewPhotos.map((item, previewIndex) => {
-                      // Find the index in the filtered gallery images for correct navigation
-                      const galleryIndex = galleryImages.findIndex(
-                        (p: { id?: string }) => p.id === item.id
-                      );
-                      // If not found, use previewIndex as fallback (but ensure it's in bounds)
-                      const safeIndex =
-                        galleryIndex >= 0
-                          ? galleryIndex
-                          : Math.min(previewIndex, galleryImages.length - 1);
-
-                      return renderGridImage(item, safeIndex);
-                    })}
-                    {/* "+X more" card */}
-                    {hasMorePhotos && (
-                      <MorePhotosCard
-                        count={remainingCount}
-                        backgroundPhoto={
-                          galleryImages[previewPhotos.length] ||
-                          galleryImages[0]
-                        }
-                        onPress={() => {
-                          // Open gallery starting from first photo in filtered set
-                          setSelectedImageIndex(0);
-                          setGalleryVisible(true);
-                        }}
-                      />
-                    )}
-                  </ThemedView>
-                ) : (
-                  <ThemedView style={styles.emptyState}>
-                    <MaterialIcons
-                      name="photo-library"
-                      size={48}
-                      color={theme.colors.text.tertiary}
-                    />
-                    <ThemedText
-                      style={[
-                        styles.emptyStateText,
-                        { color: theme.colors.text.secondary },
-                      ]}
-                    >
-                      No {activePhotoTab === "all" ? "" : activePhotoTab} photos
-                      available
-                    </ThemedText>
-                  </ThemedView>
-                )}
-              </>
-            ) : (
-              <ThemedView style={styles.emptyState}>
-                <MaterialIcons
-                  name="photo-library"
-                  size={48}
-                  color={theme.colors.text.tertiary}
-                />
-                <ThemedText
-                  style={[
-                    styles.emptyStateText,
-                    { color: theme.colors.text.secondary },
-                  ]}
-                >
-                  No pictures available
-                </ThemedText>
-              </ThemedView>
-            )}
-          </ThemedView>
+          <ProjectPhotoGallery photos={currentMedia} />
 
           {/* Assets Section */}
           {currentDocuments && currentDocuments.length > 0 && (
@@ -924,19 +722,6 @@ export default function ProjectDetailScreen() {
           )}
         </RefreshableScrollView>
       </ThemedView>
-
-      {/* Image Gallery Modal */}
-      {galleryImages.length > 0 && (
-        <ImageGalleryModal
-          visible={galleryVisible}
-          images={galleryImages}
-          initialIndex={Math.max(
-            0,
-            Math.min(selectedImageIndex, galleryImages.length - 1)
-          )}
-          onClose={closeGallery}
-        />
-      )}
 
       {/* Asset Image Gallery - with safety check */}
       {assetGalleryVisible && assetGalleryImages.length > 0 && (
