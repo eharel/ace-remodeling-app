@@ -4,6 +4,7 @@ import {
   StyleSheet,
   FlatList,
   useWindowDimensions,
+  Pressable,
 } from "react-native";
 import {
   ModalBackdrop,
@@ -53,7 +54,13 @@ export function PhotoGridModal({
           height: modalHeight,
           borderRadius: DesignTokens.borderRadius.xl,
           borderWidth: 1,
-          overflow: "hidden",
+          backgroundColor: theme.colors.background.card, // Move this here
+          // overflow: "hidden", <--- REMOVE THIS temporarily to see if it's clipping
+        },
+        // Ensure the list is allowed to expand
+        content: {
+          padding: DesignTokens.spacing[4],
+          flexGrow: 1, // Crucial for FlatList scrollability
         },
         header: {
           flexDirection: "row",
@@ -66,9 +73,6 @@ export function PhotoGridModal({
         title: {
           fontSize: DesignTokens.typography.fontSize["2xl"],
           fontWeight: DesignTokens.typography.fontWeight.semibold,
-        },
-        content: {
-          padding: DesignTokens.spacing[4],
         },
         gridItem: {
           flex: 1,
@@ -95,14 +99,17 @@ export function PhotoGridModal({
 
   const renderPhoto = useCallback(
     ({ item }: { item: MediaAsset }) => (
-      <View style={styles.gridItem}>
+      <Pressable
+        style={styles.gridItem}
+        onPress={() => console.log("Photo pressed:", item.id)}
+      >
         <Image
           source={{ uri: item.url }}
           style={styles.gridImage}
           contentFit="cover"
           transition={200} // Smooth fade-in
         />
-      </View>
+      </Pressable>
     ),
     [styles],
   );
