@@ -23,7 +23,7 @@ import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { EditDescriptionModal } from "@/features/projects/components/EditDescriptionModal";
-import { PhotoGallery } from "@/features/gallery";
+import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreviewSection";
 import { DesignTokens } from "@/shared/themes";
 import {
   getCategoryLabel,
@@ -535,7 +535,17 @@ export default function ProjectDetailScreen() {
             </ThemedView>
           </ThemedView>
 
-          <PhotoGallery photos={currentMedia} title="Project Photos" />
+          <PhotoPreviewSection
+            photos={currentMedia}
+            title="Project Photos"
+            onOpenGrid={() =>
+              project?.id && router.push(`/project/${project.id}/photos`)
+            }
+            onOpenImage={(index) =>
+              project?.id &&
+              router.push(`/project/${project.id}/photos/${index}`)
+            }
+          />
 
           {/* Assets Section */}
           {currentDocuments && currentDocuments.length > 0 && (

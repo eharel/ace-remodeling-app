@@ -4,46 +4,38 @@ import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { usePhotoGallery } from "@/features/gallery/hooks/usePhotoGallery";
-import {
-  ImageGalleryModal,
-  MorePhotosCard,
-  PhotoGridModal,
-  type PhotoTabValue,
-} from "@/features/gallery";
+import { MorePhotosCard, type PhotoTabValue } from "@/features/gallery";
 import { EditButton, ThemedText, ThemedView } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import type { MediaAsset } from "@/shared/types";
 import { commonStyles } from "@/shared/utils";
-import { useRouter } from "expo-router";
 
-interface PhotoGalleryProps {
+interface PhotoPreviewSectionProps {
   photos: MediaAsset[];
   title?: string;
   subtitle?: string;
   canEdit?: boolean;
+  onOpenGrid: () => void;
+  onOpenImage: (index: number) => void;
 }
 
-export function PhotoGallery({
+export function PhotoPreviewSection({
   photos,
   title = "Photos",
   subtitle = "Tap any photo to view gallery",
   canEdit = false,
-}: PhotoGalleryProps) {
+  onOpenGrid = () => {},
+  onOpenImage = (index: number) => {},
+}: PhotoPreviewSectionProps) {
   const { theme } = useTheme();
-  // const [showPhotoGrid, setShowPhotoGrid] = useState(false);
 
-  // Photo gallery state
-  const [galleryVisible, setGalleryVisible] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [pressedImageIndex, setPressedImageIndex] = useState<number | null>(
     null,
   );
   const [activePhotoTab, setActivePhotoTab] = useState<PhotoTabValue>("after");
   const previewCount = 3;
-
-  const router = useRouter();
 
   // Photo gallery logic
   const {
@@ -61,29 +53,11 @@ export function PhotoGallery({
   const styles = useMemo(() => createPhotoGalleryStyles(theme), [theme]);
 
   const handleImagePress = (index: number) => {
-    console.log("1. Grid Item Pressed, Index:", index);
-
-    // Ensure index is within bounds before opening gallery
-    if (galleryImages.length === 0) {
-      return;
-    }
-
-    const safeIndex = Math.max(0, Math.min(index, galleryImages.length - 1));
-
-    if (safeIndex < 0 || safeIndex >= galleryImages.length) {
-      return;
-    }
-
-    setSelectedImageIndex(safeIndex);
-
-    // setShowPhotoGrid(false);
-    setGalleryVisible(true);
-
-    console.log("2. setGalleryVisible(true) called");
+    onOpenImage(index);
   };
 
   const showPhotoGrid = (editMode: boolean = false) => {
-    router.push(`/project/${123}/photos`);
+    onOpenGrid();
   };
 
   // OPTIMIZATION 3: Gallery image renderer with optimized image props
