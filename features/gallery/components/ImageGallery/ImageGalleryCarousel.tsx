@@ -16,12 +16,12 @@ import {
 import { DesignTokens } from "@/shared/themes";
 import { Picture } from "@/shared/types";
 import { Image } from "expo-image";
-import { accessibilityStrings } from "../constants/accessibilityStrings";
-import { useImageLoading } from "../hooks/useImageLoading";
-import { useImagePreloading } from "../hooks/useImagePreloading";
-import { useLazyLoading } from "../hooks/useLazyLoading";
-import { ImageGalleryCarouselProps } from "../types/gallery.types";
-import { ImageErrorState } from "./ImageErrorState";
+import { accessibilityStrings } from "../../constants/accessibilityStrings";
+import { useImageLoading } from "../../hooks/useImageLoading";
+import { useImagePreloading } from "../../hooks/useImagePreloading";
+import { useLazyLoading } from "../../hooks/useLazyLoading";
+import { ImageGalleryCarouselProps } from "../../types/gallery.types";
+import { ImageErrorState } from "../ImageErrorState";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 

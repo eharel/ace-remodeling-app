@@ -6,12 +6,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DesignTokens } from "@/shared/themes";
 import { ThemedText } from "@/shared/components";
 
-import { accessibilityStrings } from "../constants/accessibilityStrings";
-import { MAX_PAGINATION_DOTS } from "../constants/gestureConstants";
+import { accessibilityStrings } from "../../constants/accessibilityStrings";
+import { MAX_PAGINATION_DOTS } from "../../constants/gestureConstants";
 import {
   ImageGalleryFooterProps,
   ThumbnailProps,
-} from "../types/gallery.types";
+} from "../../types/gallery.types";
 
 /**
  * Constants for ImageGalleryFooter component

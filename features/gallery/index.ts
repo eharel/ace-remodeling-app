@@ -5,10 +5,13 @@
 
 // Components
 export { ImageErrorState } from "./components/ImageErrorState";
-export { ImageGalleryCarousel } from "./components/ImageGalleryCarousel";
-export { ImageGalleryFooter } from "./components/ImageGalleryFooter";
-export { ImageGalleryHeader } from "./components/ImageGalleryHeader";
-export { ImageGalleryModal } from "./components/ImageGalleryModal";
+export {
+  ImageGalleryModal,
+  ImageGalleryCarousel,
+  ImageGalleryHeader,
+  ImageGalleryFooter,
+  type ImageGalleryCarouselRef,
+} from "./components/ImageGallery";
 export { ImageLoadingSkeleton } from "./components/ImageLoadingSkeleton";
 export { MorePhotosCard } from "./components/MorePhotosCard";
 export { PhotoTabs } from "./components/PhotoTabs";

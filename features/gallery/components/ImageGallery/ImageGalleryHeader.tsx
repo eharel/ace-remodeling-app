@@ -5,8 +5,8 @@ import { DesignTokens } from "@/shared/themes";
 import { ThemedIconButton, ThemedText } from "@/shared/components";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { accessibilityStrings } from "../constants/accessibilityStrings";
-import { ImageGalleryHeaderProps } from "../types/gallery.types";
+import { accessibilityStrings } from "../../constants/accessibilityStrings";
+import { ImageGalleryHeaderProps } from "../../types/gallery.types";
 
 /**
  * ImageGalleryHeader - Header component for the image gallery modal

@@ -3,10 +3,10 @@ import { Modal, StyleSheet, View } from "react-native";
 
 import { useTheme } from "@/shared/contexts";
 
-import { accessibilityStrings } from "../constants/accessibilityStrings";
-import { useAccessibilityAnnouncements } from "../hooks/useAccessibilityAnnouncements";
-import { useImageGallery } from "../hooks/useImageGallery";
-import { GalleryStyles, ImageGalleryModalProps } from "../types/gallery.types";
+import { accessibilityStrings } from "../../constants/accessibilityStrings";
+import { useAccessibilityAnnouncements } from "../../hooks/useAccessibilityAnnouncements";
+import { useImageGallery } from "../../hooks/useImageGallery";
+import { GalleryStyles, ImageGalleryModalProps } from "../../types/gallery.types";
 import {
   ImageGalleryCarousel,
   ImageGalleryCarouselRef,
