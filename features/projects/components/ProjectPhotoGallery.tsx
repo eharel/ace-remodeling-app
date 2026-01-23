@@ -126,8 +126,10 @@ export function ProjectPhotoGallery({
           >
             {title} ({photos.length})
           </ThemedText>
-          {/* Add the edit button if canEdit is true */}
-          <EditButton onPress={() => {}} />
+          <EditButton onPress={() => {
+            setShowPhotoGrid(true);
+          }}
+        />
         </View>
         <ThemedText
           style={[
@@ -239,6 +241,7 @@ export function ProjectPhotoGallery({
 
       <PhotoGridModal
         visible={showPhotoGrid}
+        photos={photos}
         onClose={() => setShowPhotoGrid(false)}
       />
     </>

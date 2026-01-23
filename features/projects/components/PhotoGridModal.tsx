@@ -1,22 +1,40 @@
-import { Modal, View, StyleSheet } from "react-native";
+import { Modal, View, StyleSheet, FlatList, useWindowDimensions } from "react-native";
 import { ModalBackdrop, ThemedIconButton, ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import { useMemo } from "react";
+import { MediaAsset } from "@/shared/types";
+import { Image } from "expo-image";
+
+const MODAL_WIDTH_PERCENT = 0.9;
+const MODAL_HEIGHT_PERCENT = 0.8;
+const MIN_PHOTO_SIZE = 150
+const MIN_COLUMNS = 1;
 
 interface PhotoGridModalProps {
   visible: boolean;
   onClose: () => void;
+  photos: MediaAsset[];
 }
 
-export function PhotoGridModal({ visible, onClose }: PhotoGridModalProps) {
-    const { theme } = useTheme();
-    
+export function PhotoGridModal({ visible, onClose, photos }: PhotoGridModalProps) {
+  const { theme } = useTheme();
+  const { width, height } = useWindowDimensions();
+
+  // Calculate how wide modal content will be
+  const modalWidth = width * MODAL_WIDTH_PERCENT;
+  const modalHeight = height * MODAL_HEIGHT_PERCENT;
+  const contentWidth = modalWidth - (DesignTokens.spacing[4] * 2);
+
+  // Calculate columns based on minimum photo size
+  const calculatedColumns = Math.floor(contentWidth / MIN_PHOTO_SIZE);
+
+  const numColumns = Math.max(MIN_COLUMNS, calculatedColumns);
+
 const styles = useMemo(() => StyleSheet.create({
   modalContent: {
-    width: "90%",  // Takes up most of screen width
-    maxWidth: 800,  // But not too wide on large iPads
-    maxHeight: "80%",  // Leaves space at top/bottom
+    width: modalWidth,
+    height: modalHeight,
     borderRadius: DesignTokens.borderRadius.xl,
     borderWidth: 1,
     overflow: "hidden",
@@ -34,10 +52,21 @@ const styles = useMemo(() => StyleSheet.create({
     fontWeight: DesignTokens.typography.fontWeight.semibold,
   },
   content: {
-    flex: 1,
     padding: DesignTokens.spacing[4],
   },
-}), [theme]);
+  gridItem: {
+    flex: 1,
+    aspectRatio: 1,
+    margin: DesignTokens.spacing[1],
+    borderRadius: DesignTokens.borderRadius.md,
+    overflow: "hidden",
+    backgroundColor: theme.colors.background.secondary,
+  },
+  gridImage: {
+    width: "100%",
+    height: "100%",
+  },
+}), [theme, modalWidth, modalHeight]);
 
   return (
     <Modal visible={visible} transparent={true} animationType="slide" onRequestClose={onClose}>
@@ -50,13 +79,11 @@ const styles = useMemo(() => StyleSheet.create({
                           borderColor: theme.colors.border.primary,
                       }
                   ]
-                      
-                      
               }
-              >
+        >
                             {/* Header */}
           <View style={styles.header}>
-            <ThemedText style={styles.title}>All Photos</ThemedText>
+            <ThemedText style={styles.title}>All Photos ({photos.length})</ThemedText>
             <ThemedIconButton
               icon="close"
               onPress={onClose}
@@ -66,9 +93,22 @@ const styles = useMemo(() => StyleSheet.create({
           </View>
 
                     {/* Content - Grid will go here */}
-          <View style={styles.content}>
-            <ThemedText>Photo grid will go here!</ThemedText>
-          </View>
+            <FlatList
+              data={photos}
+              numColumns={numColumns}
+            keyExtractor={(item, index) => item.id || `photo-${index}`}
+            renderItem={({ item }) => (
+                <View style={styles.gridItem}>
+                <Image
+                  source={{ uri: item.url }}
+                    style={styles.gridImage}
+                    contentFit="cover"
+                />
+                </View>
+              )}
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.content}
+            />
         </View>
       </ModalBackdrop>
     </Modal>

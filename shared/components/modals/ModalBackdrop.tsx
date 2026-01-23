@@ -18,7 +18,6 @@ export function ModalBackdrop({ onPress, children }: ModalBackdropProps) {
     backgroundColor: theme.colors.background.overlay,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: DesignTokens.spacing[4],
   },
     }), [theme]);
     
