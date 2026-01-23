@@ -1,24 +1,24 @@
 import {
-  Modal,
-  View,
-  StyleSheet,
-  FlatList,
-  useWindowDimensions,
-  Pressable,
-} from "react-native";
-import {
   ModalBackdrop,
   ThemedIconButton,
   ThemedText,
 } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
-import { useCallback, useMemo } from "react";
 import { MediaAsset } from "@/shared/types";
 import { Image } from "expo-image";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  FlatList,
+  Modal,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 const MODAL_WIDTH_PERCENT = 0.9;
-const MODAL_HEIGHT_PERCENT = 0.8;
+const MODAL_HEIGHT_PERCENT = 0.84;
 const MIN_PHOTO_SIZE = 150;
 const MIN_COLUMNS = 1;
 
@@ -46,6 +46,14 @@ export function PhotoGridModal({
 
   const numColumns = Math.max(MIN_COLUMNS, calculatedColumns);
 
+  const listRef = useRef<FlatList<MediaAsset>>(null);
+
+  useEffect(() => {
+    if (visible) {
+      listRef.current?.flashScrollIndicators();
+    }
+  }, [visible]);
+
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -54,13 +62,15 @@ export function PhotoGridModal({
           height: modalHeight,
           borderRadius: DesignTokens.borderRadius.xl,
           borderWidth: 1,
-          backgroundColor: theme.colors.background.card, // Move this here
-          // overflow: "hidden", <--- REMOVE THIS temporarily to see if it's clipping
+          backgroundColor: theme.colors.background.card,
+          justifyContent: "flex-start", // Force everything to start at the top
+          overflow: "hidden",
         },
         // Ensure the list is allowed to expand
         content: {
           padding: DesignTokens.spacing[4],
-          flexGrow: 1, // Crucial for FlatList scrollability
+          paddingBottom: DesignTokens.spacing[12], // This creates the "intentional gap" at the end
+          // flexGrow: 1, <--- REMOVE THIS if it's there; it can cause the "scrolling into space" issue
         },
         header: {
           flexDirection: "row",
@@ -148,12 +158,14 @@ export function PhotoGridModal({
           <FlatList
             key={numColumns} // Crucial for layout changes
             data={photos}
+            ref={listRef}
             numColumns={numColumns}
             keyExtractor={(item, index) => item.id || `photo-${index}`}
             renderItem={renderPhoto}
             initialNumToRender={12} // Optimization for perceived speed
             maxToRenderPerBatch={10}
             windowSize={5}
+            style={{ flex: 1 }}
             contentContainerStyle={styles.content}
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
