@@ -23,7 +23,7 @@ import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
 import { EditDescriptionModal } from "@/features/projects/components/EditDescriptionModal";
-import { ProjectPhotoGallery } from "@/features/projects/components/ProjectPhotoGallery";
+import { PhotoGallery } from "@/features/gallery";
 import { DesignTokens } from "@/shared/themes";
 import {
   getCategoryLabel,
@@ -107,7 +107,7 @@ export default function ProjectDetailScreen() {
           (c.media || [])
             .slice(0, 6)
             .map((m) => m.url)
-            .filter(Boolean)
+            .filter(Boolean),
         ) as string[];
 
         // Preload thumbnails
@@ -196,7 +196,7 @@ export default function ProjectDetailScreen() {
       setShowEditDescriptionModal(false);
     } catch (error) {
       setSaveError(
-        error instanceof Error ? error.message : "Failed to update description"
+        error instanceof Error ? error.message : "Failed to update description",
       );
     } finally {
       setIsSaving(false);
@@ -420,7 +420,7 @@ export default function ProjectDetailScreen() {
               onSelect={setSelectedComponent}
               getLabel={(componentId) => {
                 const component = sortedComponents.find(
-                  (c) => c.id === componentId
+                  (c) => c.id === componentId,
                 );
                 return component ? getComponentLabel(component) : componentId;
               }}
@@ -535,7 +535,7 @@ export default function ProjectDetailScreen() {
             </ThemedView>
           </ThemedView>
 
-          <ProjectPhotoGallery photos={currentMedia} />
+          <PhotoGallery photos={currentMedia} title="Project Photos" />
 
           {/* Assets Section */}
           {currentDocuments && currentDocuments.length > 0 && (
@@ -674,8 +674,8 @@ export default function ProjectDetailScreen() {
                   renderLog(
                     item,
                     index,
-                    index === (project.sharedLogs?.length ?? 0) - 1
-                  )
+                    index === (project.sharedLogs?.length ?? 0) - 1,
+                  ),
                 )}
               </ThemedView>
             </ThemedView>
@@ -730,7 +730,7 @@ export default function ProjectDetailScreen() {
           images={assetGalleryImages}
           initialIndex={Math.max(
             0,
-            Math.min(selectedAssetIndex, assetGalleryImages.length - 1)
+            Math.min(selectedAssetIndex, assetGalleryImages.length - 1),
           )}
           onClose={() => {
             setAssetGalleryVisible(false);

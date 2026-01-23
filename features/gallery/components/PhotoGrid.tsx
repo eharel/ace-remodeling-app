@@ -2,6 +2,7 @@ import {
   ModalBackdrop,
   ThemedIconButton,
   ThemedText,
+  ThemedView,
 } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
@@ -26,12 +27,14 @@ interface PhotoGridModalProps {
   visible: boolean;
   onClose: () => void;
   photos: MediaAsset[];
+  onImagePress: (index: number) => void;
 }
 
 export function PhotoGridModal({
   visible,
   onClose,
   photos,
+  onImagePress,
 }: PhotoGridModalProps) {
   const { theme } = useTheme();
   const { width, height } = useWindowDimensions();
@@ -108,10 +111,13 @@ export function PhotoGridModal({
   );
 
   const renderPhoto = useCallback(
-    ({ item }: { item: MediaAsset }) => (
+    ({ item, index }: { item: MediaAsset; index: number }) => (
       <Pressable
         style={styles.gridItem}
-        onPress={() => console.log("Photo pressed:", item.id)}
+        onPress={() => {
+          console.log("Photo pressed:", item.id);
+          onImagePress(index);
+        }}
       >
         <Image
           source={{ uri: item.url }}
@@ -121,62 +127,48 @@ export function PhotoGridModal({
         />
       </Pressable>
     ),
-    [styles],
+    [styles, onImagePress],
   );
 
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <ModalBackdrop onPress={onClose}>
-        <View
-          style={[
-            styles.modalContent,
-            {
-              backgroundColor: theme.colors.background.card,
-              borderColor: theme.colors.border.primary,
-            },
-          ]}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <ThemedText style={styles.title}>
-              All Photos ({photos.length})
-            </ThemedText>
-            <ThemedIconButton
-              icon="close"
-              onPress={onClose}
-              variant="ghost"
-              size="small"
-            />
-          </View>
-
-          {/* Content - Grid will go here */}
-          <FlatList
-            key={numColumns} // Crucial for layout changes
-            data={photos}
-            ref={listRef}
-            numColumns={numColumns}
-            keyExtractor={(item, index) => item.id || `photo-${index}`}
-            renderItem={renderPhoto}
-            initialNumToRender={12} // Optimization for perceived speed
-            maxToRenderPerBatch={10}
-            windowSize={5}
-            style={{ flex: 1 }}
-            contentContainerStyle={styles.content}
-            ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                <ThemedText style={{ color: theme.colors.text.secondary }}>
-                  No photos found in this gallery.
-                </ThemedText>
-              </View>
-            }
+    <ThemedView style={{ flex: 1 }}>
+      {/* We use a View here only to group the Header and List */}
+      <View style={{ flex: 1 }}>
+        {/* Header */}
+        <View style={styles.header}>
+          <ThemedText style={styles.title}>
+            All Photos ({photos.length})
+          </ThemedText>
+          <ThemedIconButton
+            icon="close"
+            onPress={onClose}
+            variant="ghost"
+            size="small"
           />
         </View>
-      </ModalBackdrop>
-    </Modal>
+
+        {/* Content - Grid will go here */}
+        <FlatList
+          key={numColumns} // Crucial for layout changes
+          data={photos}
+          ref={listRef}
+          numColumns={numColumns}
+          keyExtractor={(item, index) => item.id || `photo-${index}`}
+          renderItem={renderPhoto}
+          initialNumToRender={12} // Optimization for perceived speed
+          maxToRenderPerBatch={10}
+          windowSize={5}
+          style={{ flex: 1 }}
+          contentContainerStyle={styles.content}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <ThemedText style={{ color: theme.colors.text.secondary }}>
+                No photos found in this gallery.
+              </ThemedText>
+            </View>
+          }
+        />
+      </View>
+    </ThemedView>
   );
 }

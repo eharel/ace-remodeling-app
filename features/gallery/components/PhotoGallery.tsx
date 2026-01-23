@@ -3,10 +3,11 @@ import { Image } from "expo-image";
 import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { usePhotoGallery } from "@/app/project/hooks/usePhotoGallery";
+import { usePhotoGallery } from "@/features/gallery/hooks/usePhotoGallery";
 import {
   ImageGalleryModal,
   MorePhotosCard,
+  PhotoGridModal,
   type PhotoTabValue,
 } from "@/features/gallery";
 import { EditButton, ThemedText, ThemedView } from "@/shared/components";
@@ -15,32 +16,34 @@ import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import type { MediaAsset } from "@/shared/types";
 import { commonStyles } from "@/shared/utils";
-import { PhotoGridModal } from "./PhotoGridModal";
+import { useRouter } from "expo-router";
 
-interface ProjectPhotoGalleryProps {
+interface PhotoGalleryProps {
   photos: MediaAsset[];
   title?: string;
   subtitle?: string;
   canEdit?: boolean;
 }
 
-export function ProjectPhotoGallery({
+export function PhotoGallery({
   photos,
-  title = "Project Photos",
+  title = "Photos",
   subtitle = "Tap any photo to view gallery",
   canEdit = false,
-}: ProjectPhotoGalleryProps) {
+}: PhotoGalleryProps) {
   const { theme } = useTheme();
-  const [showPhotoGrid, setShowPhotoGrid] = useState(false);
+  // const [showPhotoGrid, setShowPhotoGrid] = useState(false);
 
   // Photo gallery state
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [pressedImageIndex, setPressedImageIndex] = useState<number | null>(
-    null
+    null,
   );
   const [activePhotoTab, setActivePhotoTab] = useState<PhotoTabValue>("after");
   const previewCount = 3;
+
+  const router = useRouter();
 
   // Photo gallery logic
   const {
@@ -55,13 +58,11 @@ export function ProjectPhotoGallery({
     previewCount,
   });
 
-  const styles = useMemo(() => createProjectPhotoGalleryStyles(theme), [theme]);
-
-  const closeGallery = () => {
-    setGalleryVisible(false);
-  };
+  const styles = useMemo(() => createPhotoGalleryStyles(theme), [theme]);
 
   const handleImagePress = (index: number) => {
+    console.log("1. Grid Item Pressed, Index:", index);
+
     // Ensure index is within bounds before opening gallery
     if (galleryImages.length === 0) {
       return;
@@ -74,20 +75,22 @@ export function ProjectPhotoGallery({
     }
 
     setSelectedImageIndex(safeIndex);
+
+    // setShowPhotoGrid(false);
     setGalleryVisible(true);
+
+    console.log("2. setGalleryVisible(true) called");
   };
 
-  const handleMoreImagesPress = () => {
-    // setSelectedImageIndex(0); // Start from first photo in filtered set
-    // setGalleryVisible(true);
-    setShowPhotoGrid(true);
+  const showPhotoGrid = (editMode: boolean = false) => {
+    router.push(`/project/${123}/photos`);
   };
 
   // OPTIMIZATION 3: Gallery image renderer with optimized image props
   const renderGridImage = (
     item: MediaAsset,
     index: number,
-    isMoreCell: boolean = false
+    isMoreCell: boolean = false,
   ) => {
     const isPressed = pressedImageIndex === index;
 
@@ -95,7 +98,7 @@ export function ProjectPhotoGallery({
       <ThemedView key={`grid-image-${index}`} style={styles.gridImageContainer}>
         <Pressable
           onPress={() =>
-            isMoreCell ? handleMoreImagesPress() : handleImagePress(index)
+            isMoreCell ? showPhotoGrid(false) : handleImagePress(index)
           }
           onPressIn={() => setPressedImageIndex(index)}
           onPressOut={() => setPressedImageIndex(null)}
@@ -126,10 +129,11 @@ export function ProjectPhotoGallery({
           >
             {title} ({photos.length})
           </ThemedText>
-          <EditButton onPress={() => {
-            setShowPhotoGrid(true);
-          }}
-        />
+          <EditButton
+            onPress={() => {
+              showPhotoGrid(true);
+            }}
+          />
         </View>
         <ThemedText
           style={[
@@ -167,7 +171,7 @@ export function ProjectPhotoGallery({
                 {previewPhotos.map((item, previewIndex) => {
                   // Find the index in the filtered gallery images for correct navigation
                   const galleryIndex = galleryImages.findIndex(
-                    (p: { id?: string }) => p.id === item.id
+                    (p: { id?: string }) => p.id === item.id,
                   );
                   // If not found, use previewIndex as fallback (but ensure it's in bounds)
                   const safeIndex =
@@ -184,7 +188,7 @@ export function ProjectPhotoGallery({
                     backgroundPhoto={
                       galleryImages[previewPhotos.length] || galleryImages[0]
                     }
-                    onPress={handleMoreImagesPress}
+                    onPress={() => showPhotoGrid(false)}
                   />
                 )}
               </ThemedView>
@@ -225,33 +229,14 @@ export function ProjectPhotoGallery({
           </ThemedView>
         )}
       </ThemedView>
-
-      {/* Image Gallery Modal */}
-      {galleryImages.length > 0 && (
-        <ImageGalleryModal
-          visible={galleryVisible}
-          images={galleryImages}
-          initialIndex={Math.max(
-            0,
-            Math.min(selectedImageIndex, galleryImages.length - 1)
-          )}
-          onClose={closeGallery}
-        />
-      )}
-
-      <PhotoGridModal
-        visible={showPhotoGrid}
-        photos={photos}
-        onClose={() => setShowPhotoGrid(false)}
-      />
     </>
   );
 }
 
 /**
- * Creates styles for the ProjectPhotoGallery component
+ * Creates styles for the PhotoGallery component
  */
-const createProjectPhotoGalleryStyles = (theme: any) =>
+const createPhotoGalleryStyles = (theme: any) =>
   StyleSheet.create({
     section: {
       backgroundColor: theme.colors.background.card,

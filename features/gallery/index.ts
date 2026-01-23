@@ -17,9 +17,14 @@ export { MorePhotosCard } from "./components/MorePhotosCard";
 export { PhotoTabs } from "./components/PhotoTabs";
 export type { PhotoTabValue, PhotoCounts } from "./components/PhotoTabs";
 export { AssetCategoryTabs } from "./components/AssetCategoryTabs";
-export type { AssetCategoryValue, AssetCounts } from "./components/AssetCategoryTabs";
+export type {
+  AssetCategoryValue,
+  AssetCounts,
+} from "./components/AssetCategoryTabs";
 export { AssetThumbnail } from "./components/AssetThumbnail";
 export type { AssetThumbnailProps } from "./components/AssetThumbnail";
+export { PhotoGridModal } from "./components/PhotoGrid";
+export { PhotoGallery } from "./components/PhotoGallery";
 
 // Constants
 export * from "./constants/accessibilityStrings";
@@ -34,6 +39,7 @@ export { useImagePreloading } from "./hooks/useImagePreloading";
 export { useLazyLoading } from "./hooks/useLazyLoading";
 export { useMemoryManagement } from "./hooks/useMemoryManagement";
 export { usePerformanceMonitoring } from "./hooks/usePerformanceMonitoring";
+export { usePhotoGallery } from "./hooks/usePhotoGallery";
 
 // Types
 export * from "./types/gallery.types";
