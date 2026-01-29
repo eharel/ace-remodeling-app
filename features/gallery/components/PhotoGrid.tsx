@@ -40,11 +40,15 @@ export default function PhotoGrid({
 
   const { theme } = useTheme();
   const { width, height } = useWindowDimensions();
-  const { id: projectId } = useLocalSearchParams<{ id?: string }>();
+  const { id: projectId, componentId } = useLocalSearchParams<{
+    id?: string;
+    componentId?: string;
+  }>();
 
   const { project, isLoading, error } = useProject(projectId);
 
-  const photos = project?.sharedMedia || [];
+  const photos =
+    project?.components.find((c) => c.id === componentId)?.media || [];
 
   // Calculate how wide modal content will be
   const modalWidth = width * MODAL_WIDTH_PERCENT;

@@ -82,7 +82,7 @@ export default function ProjectDetailScreen() {
           (c.media || [])
             .slice(0, 6)
             .map((m) => m.url)
-            .filter(Boolean)
+            .filter(Boolean),
         ) as string[];
 
         await Promise.all(allThumbnails.map((url) => Image.prefetch(url)));
@@ -144,7 +144,7 @@ export default function ProjectDetailScreen() {
       setShowEditDescriptionModal(false);
     } catch (error) {
       setSaveError(
-        error instanceof Error ? error.message : "Failed to update description"
+        error instanceof Error ? error.message : "Failed to update description",
       );
     } finally {
       setIsSaving(false);
@@ -217,7 +217,7 @@ export default function ProjectDetailScreen() {
               onSelect={setSelectedComponent}
               getLabel={(componentId) => {
                 const component = sortedComponents.find(
-                  (c) => c.id === componentId
+                  (c) => c.id === componentId,
                 );
                 return component ? getComponentLabel(component) : componentId;
               }}
@@ -263,11 +263,25 @@ export default function ProjectDetailScreen() {
             photos={currentMedia}
             title="Project Photos"
             onOpenGrid={() =>
-              project?.id && router.push(`/project/${project.id}/photos`)
+              project?.id &&
+              router.push({
+                pathname: "/project/[id]/photos",
+                params: {
+                  id: project.id,
+                  componentId: selectedComponent?.id,
+                },
+              })
             }
             onOpenImage={(index) =>
               project?.id &&
-              router.push(`/project/${project.id}/photos/${index}`)
+              router.push({
+                pathname: "/project/[id]/photos/viewer",
+                params: {
+                  id: project.id,
+                  initialIndex: index,
+                  componentId: selectedComponent?.id,
+                },
+              })
             }
           />
 
