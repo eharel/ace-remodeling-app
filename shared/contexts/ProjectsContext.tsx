@@ -37,7 +37,7 @@ export function getProjectMedia(project: Project): MediaAsset[] {
 // Context state interface
 interface ProjectsContextType {
   projects: Project[];
-  loading: boolean;
+  isLoading: boolean;
   error: string | null;
   bathroomProjects: Project[];
   kitchenProjects: Project[];
@@ -87,12 +87,12 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   children,
 }) => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProjects = useCallback(async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
       const projects = await fetchAllProjects();
       setProjects(projects);
@@ -101,7 +101,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
         error instanceof Error ? error.message : "Failed to fetch projects";
       setError(errorMsg);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -304,7 +304,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   const value: ProjectsContextType = useMemo(
     () => ({
       projects,
-      loading,
+      isLoading,
       error,
       bathroomProjects,
       kitchenProjects,
@@ -318,7 +318,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
     }),
     [
       projects,
-      loading,
+      isLoading,
       error,
       bathroomProjects,
       kitchenProjects,

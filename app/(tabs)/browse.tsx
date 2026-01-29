@@ -29,7 +29,7 @@ interface CategoryItem {
 
 export default function ProjectsScreen() {
   const { theme } = useTheme();
-  const { projects, loading, error } = useProjects();
+  const { projects, isLoading, error } = useProjects();
 
   // Get categories with projects, sorted by display order
   const categories = useMemo(() => {
@@ -179,7 +179,7 @@ export default function ProjectsScreen() {
     [theme]
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <ThemedView style={styles.container}>
         <LoadingState />

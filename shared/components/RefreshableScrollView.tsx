@@ -36,13 +36,13 @@ export function RefreshableScrollView({
   ...scrollViewProps
 }: ScrollViewProps) {
   const { theme } = useTheme();
-  const { refetchProjects, loading } = useProjects();
+  const { refetchProjects, isLoading } = useProjects();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshStartTime = useRef<number | null>(null);
 
   // Handle smooth refresh animation
   useEffect(() => {
-    if (loading) {
+    if (isLoading) {
       // Refresh started - record start time
       if (!refreshStartTime.current) {
         refreshStartTime.current = Date.now();
@@ -62,7 +62,7 @@ export function RefreshableScrollView({
         return () => clearTimeout(timeoutId);
       }
     }
-  }, [loading]);
+  }, [isLoading]);
 
   const handleRefresh = async () => {
     refreshStartTime.current = Date.now();

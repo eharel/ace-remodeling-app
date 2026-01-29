@@ -20,7 +20,7 @@ import {
   ThemeProvider,
   useTheme,
 } from "@/shared/contexts";
-LogBox.ignoreAllLogs(true);
+// LogBox.ignoreAllLogs(true);
 
 // Disable error overlay in development
 if (__DEV__) {

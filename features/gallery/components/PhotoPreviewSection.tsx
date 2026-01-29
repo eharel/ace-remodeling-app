@@ -4,7 +4,8 @@ import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { usePhotoGallery } from "@/features/gallery/hooks/usePhotoGallery";
-import { MorePhotosCard, type PhotoTabValue } from "@/features/gallery";
+import { MorePhotosCard } from "@/features/gallery/components/MorePhotosCard";
+import type { PhotoTabValue } from "@/features/gallery/components/PhotoTabs";
 import { EditButton, ThemedText, ThemedView } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useTheme } from "@/shared/contexts";

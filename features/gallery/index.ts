@@ -23,8 +23,8 @@ export type {
 } from "./components/AssetCategoryTabs";
 export { AssetThumbnail } from "./components/AssetThumbnail";
 export type { AssetThumbnailProps } from "./components/AssetThumbnail";
-export { PhotoGridModal } from "./components/PhotoGrid";
-export { PhotoGallery } from "./components/PhotoPreviewSection";
+export { default as PhotoGrid } from "./components/PhotoGrid";
+export { PhotoPreviewSection as PhotoGallery } from "./components/PhotoPreviewSection";
 
 // Constants
 export * from "./constants/accessibilityStrings";

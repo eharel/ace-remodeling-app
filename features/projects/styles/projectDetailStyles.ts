@@ -1,7 +1,7 @@
-import { StyleSheet } from "react-native";
 import { DesignTokens } from "@/shared/themes";
-import { commonStyles } from "@/shared/utils";
 import type { Theme } from "@/shared/themes/base/types";
+import { commonStyles } from "@/shared/utils";
+import { StyleSheet } from "react-native";
 
 /**
  * Creates styles for the ProjectDetailScreen component

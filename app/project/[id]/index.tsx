@@ -1,7 +1,7 @@
 import { EditButton } from "@/shared/components/EditButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { router, Stack, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
@@ -22,8 +22,11 @@ import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
 // Comment out mock data for now (keeping for fallback)
 // import { mockProjects } from "@/data/mockProjects";
-import { EditDescriptionModal } from "@/features/projects/components/EditDescriptionModal";
 import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreviewSection";
+import { EditDescriptionModal } from "@/features/projects/components/EditDescriptionModal";
+import { useAssetCategoryManagement } from "@/features/projects/hooks/useAssetCategoryManagement";
+import { useProjectComponentSelection } from "@/features/projects/hooks/useProjectComponentSelection";
+import { createProjectDetailStyles } from "@/features/projects/styles/projectDetailStyles";
 import { DesignTokens } from "@/shared/themes";
 import {
   getCategoryLabel,
@@ -32,9 +35,6 @@ import {
   ProjectComponent,
 } from "@/shared/types";
 import { getProjectDuration } from "@/shared/utils";
-import { createProjectDetailStyles } from "./[id].styles";
-import { useAssetCategoryManagement } from "./hooks/useAssetCategoryManagement";
-import { useProjectComponentSelection } from "./hooks/useProjectComponentSelection";
 
 export default function ProjectDetailScreen() {
   const { id, componentId } = useLocalSearchParams<{
@@ -43,7 +43,7 @@ export default function ProjectDetailScreen() {
   }>();
   const {
     projects,
-    loading,
+    isLoading,
     updateProject: updateProjectContext,
     updateComponent,
   } = useProjects();
@@ -276,46 +276,24 @@ export default function ProjectDetailScreen() {
 
   // Show loading state only on initial load (when no project found yet)
   // During refresh, keep content visible and just show refresh spinner
-  if (loading && !project) {
+  if (isLoading && !project) {
     return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: false, // Hide React Navigation's header
-          }}
-        />
-        <ThemedView style={styles.container}>
-          <PageHeader
-            title="Project Details"
-            showBack={true}
-            backLabel="Back"
-          />
-          <LoadingState message="Loading project..." />
-        </ThemedView>
-      </>
+      <ThemedView style={styles.container}>
+        <PageHeader title="Project Details" showBack={true} backLabel="Back" />
+        <LoadingState message="Loading project..." />
+      </ThemedView>
     );
   }
 
   // Show error state only after loading is complete and project is still not found
   if (!project) {
     return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: false, // Hide React Navigation's header
-          }}
-        />
-        <ThemedView style={styles.container}>
-          <PageHeader
-            title="Project Details"
-            showBack={true}
-            backLabel="Back"
-          />
-          <ThemedView style={styles.errorState}>
-            <ThemedText style={styles.errorText}>Project not found</ThemedText>
-          </ThemedView>
+      <ThemedView style={styles.container}>
+        <PageHeader title="Project Details" showBack={true} backLabel="Back" />
+        <ThemedView style={styles.errorState}>
+          <ThemedText style={styles.errorText}>Project not found</ThemedText>
         </ThemedView>
-      </>
+      </ThemedView>
     );
   }
 
@@ -375,11 +353,6 @@ export default function ProjectDetailScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          headerShown: false, // Hide React Navigation's header
-        }}
-      />
       <ThemedView style={styles.container}>
         <PageHeader
           title={project.name}

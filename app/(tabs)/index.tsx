@@ -33,7 +33,7 @@ import { CATEGORY_DISPLAY_ORDER } from "@/shared/utils";
 export default function ShowcaseScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const { featuredProjects, loading } = useProjects();
+  const { featuredProjects, isLoading } = useProjects();
 
   /**
    * Group featured projects by category dynamically
@@ -180,7 +180,7 @@ export default function ShowcaseScreen() {
         contentContainerStyle={styles.content}
       >
         {/* Loading State - Only show on initial load, not during refresh */}
-        {loading && featuredProjects.length === 0 ? (
+        {isLoading && featuredProjects.length === 0 ? (
           <LoadingState message="Loading showcase..." />
         ) : (
           <>

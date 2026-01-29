@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   },
   controlBarTitle: {
     flex: 1,
-    alignItems: "flex-end", // Align to right side
-    paddingLeft: DesignTokens.spacing[4], // 16px space from back button
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

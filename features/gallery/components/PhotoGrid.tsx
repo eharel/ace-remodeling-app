@@ -1,3 +1,4 @@
+import { useProject } from "@/features/projects/hooks/useProject";
 import {
   ModalBackdrop,
   ThemedIconButton,
@@ -8,36 +9,42 @@ import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import { MediaAsset } from "@/shared/types";
 import { Image } from "expo-image";
+import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   FlatList,
-  Modal,
   Pressable,
   StyleSheet,
   useWindowDimensions,
   View,
 } from "react-native";
+import PhotoGridList from "./ImageGallery/PhotoGridList";
 
 const MODAL_WIDTH_PERCENT = 0.9;
 const MODAL_HEIGHT_PERCENT = 0.84;
 const MIN_PHOTO_SIZE = 150;
 const MIN_COLUMNS = 1;
 
-interface PhotoGridModalProps {
+interface PhotoGridProps {
   visible: boolean;
   onClose: () => void;
-  photos: MediaAsset[];
   onImagePress: (index: number) => void;
 }
 
-export function PhotoGridModal({
+export default function PhotoGrid({
   visible,
   onClose,
-  photos,
   onImagePress,
-}: PhotoGridModalProps) {
+}: PhotoGridProps) {
+  console.log("In PhotoGrid, visible:", visible);
+
   const { theme } = useTheme();
   const { width, height } = useWindowDimensions();
+  const { id: projectId } = useLocalSearchParams<{ id?: string }>();
+
+  const { project, isLoading, error } = useProject(projectId);
+
+  const photos = project?.sharedMedia || [];
 
   // Calculate how wide modal content will be
   const modalWidth = width * MODAL_WIDTH_PERCENT;
@@ -110,26 +117,6 @@ export function PhotoGridModal({
     [theme, modalWidth, modalHeight],
   );
 
-  const renderPhoto = useCallback(
-    ({ item, index }: { item: MediaAsset; index: number }) => (
-      <Pressable
-        style={styles.gridItem}
-        onPress={() => {
-          console.log("Photo pressed:", item.id);
-          onImagePress(index);
-        }}
-      >
-        <Image
-          source={{ uri: item.url }}
-          style={styles.gridImage}
-          contentFit="cover"
-          transition={200} // Smooth fade-in
-        />
-      </Pressable>
-    ),
-    [styles, onImagePress],
-  );
-
   return (
     <ThemedView style={{ flex: 1 }}>
       {/* We use a View here only to group the Header and List */}
@@ -147,8 +134,10 @@ export function PhotoGridModal({
           />
         </View>
 
+        <PhotoGridList photos={photos} />
+
         {/* Content - Grid will go here */}
-        <FlatList
+        {/* <FlatList
           key={numColumns} // Crucial for layout changes
           data={photos}
           ref={listRef}
@@ -167,7 +156,7 @@ export function PhotoGridModal({
               </ThemedText>
             </View>
           }
-        />
+        /> */}
       </View>
     </ThemedView>
   );

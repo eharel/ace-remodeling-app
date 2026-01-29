@@ -29,7 +29,7 @@ interface DocumentsPageProps {}
 export default function DocumentsPage({}: DocumentsPageProps) {
   const { theme } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { projects, loading } = useProjects();
+  const { projects, isLoading } = useProjects();
 
   // Find the project by ID using Firebase data
   const project = projects.find((p) => p.id === id);
@@ -209,7 +209,7 @@ export default function DocumentsPage({}: DocumentsPageProps) {
   });
 
   // Show loading state while projects are being fetched
-  if (loading) {
+  if (isLoading) {
     return (
       <>
         <Stack.Screen

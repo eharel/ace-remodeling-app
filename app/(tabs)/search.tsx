@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
 
 export default function SearchScreen() {
   const { theme } = useTheme();
-  const { projects, loading: projectsLoading } = useProjects();
+  const { projects, isLoading: projectsIsLoading } = useProjects();
   const [searchQuery, setSearchQuery] = useState("");
 
   // SearchResult represents a matched component from a project
@@ -349,12 +349,12 @@ export default function SearchScreen() {
     if (
       debouncedSearchQuery.trim() !== "" &&
       !isSearching &&
-      !projectsLoading
+      !projectsIsLoading
     ) {
       // This would typically use AccessibilityInfo.announceForAccessibility
       // but for now we'll rely on the existing accessibility labels
     }
-  }, [searchResults, debouncedSearchQuery, isSearching, projectsLoading]);
+  }, [searchResults, debouncedSearchQuery, isSearching, projectsIsLoading]);
 
   const handleProjectPress = (result: SearchResult) => {
     try {
@@ -372,7 +372,7 @@ export default function SearchScreen() {
     }
   };
 
-  const isLoading = isSearching || projectsLoading;
+  const isLoading = isSearching || projectsIsLoading;
 
   // Determine if we should show results (either has text query or active filters)
   const shouldShowResults =

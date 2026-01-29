@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { convertMediaToPictures } from "@/features/gallery";
+import { convertMediaToPictures } from "@/features/gallery/utils/assetViewer";
 import { getPhotoCounts, getPreviewPhotos, samplePreviewPhotos } from "@/shared/utils";
-import type { PhotoTabValue } from "@/features/gallery";
+import type { PhotoTabValue } from "@/features/gallery/components/PhotoTabs";
 import type { MediaAsset } from "@/shared/types";
 
 interface UsePhotoGalleryParams {

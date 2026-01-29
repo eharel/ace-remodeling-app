@@ -31,7 +31,7 @@ import {
 
 export default function CategoryScreen() {
   const { theme } = useTheme();
-  const { projects, loading, error } = useProjects();
+  const { projects, isLoading, error } = useProjects();
   const { category } = useLocalSearchParams<{ category: string }>();
 
   // State for selected subcategory
@@ -168,7 +168,7 @@ export default function CategoryScreen() {
 
   // Show loading state only on initial load (when no projects exist yet)
   // During refresh, keep content visible and just show refresh spinner
-  if (loading && projects.length === 0) {
+  if (isLoading && projects.length === 0) {
     return (
       <ThemedView style={styles.container}>
         <Stack.Screen

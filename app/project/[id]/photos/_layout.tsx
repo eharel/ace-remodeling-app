@@ -1,5 +1,10 @@
 import { Stack } from "expo-router";
 
+/**
+ * Layout for photos routes under /project/[id]/photos/
+ * - index.tsx -> Photo grid view
+ * - viewer.tsx -> Full carousel view
+ */
 export default function PhotosLayout() {
   return (
     <Stack
@@ -11,12 +16,11 @@ export default function PhotosLayout() {
     >
       <Stack.Screen
         name="index"
-        options={{
-          presentation: "modal",
-        }}
-      />{" "}
-      {/* The Grid */}
-      <Stack.Screen name="viewer" /> {/* The Full Carousel */}
+        // options={{
+        //   presentation: "modal",
+        // }}
+      />
+      <Stack.Screen name="viewer" />
     </Stack>
   );
 }
