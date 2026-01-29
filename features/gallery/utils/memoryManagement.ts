@@ -5,26 +5,18 @@
  * and providing memory management recommendations.
  */
 
-/**
- * Configuration constants for memory management
- */
-export const MEMORY_CONSTANTS = {
-  /** Memory check interval (ms) */
-  MEMORY_CHECK_INTERVAL: 10000,
-  /** Minimum time between memory checks (ms) */
-  MIN_CHECK_INTERVAL: 5000,
-  /** Default memory limit (bytes) */
-  DEFAULT_MEMORY_LIMIT: 100 * 1024 * 1024, // 100MB
-  /** High memory pressure threshold (%) */
-  HIGH_MEMORY_THRESHOLD: 80,
-  /** Medium memory pressure threshold (%) */
-  MEDIUM_MEMORY_THRESHOLD: 60,
-} as const;
+import {
+  MEMORY,
+  MemoryPressure,
+} from "../constants/performanceConstants";
 
 /**
- * Memory pressure levels
+ * @deprecated Use MEMORY from constants/performanceConstants instead
  */
-export type MemoryPressure = "low" | "medium" | "high";
+export const MEMORY_CONSTANTS = MEMORY;
+
+// Re-export MemoryPressure type for backward compatibility
+export type { MemoryPressure } from "../constants/performanceConstants";
 
 /**
  * Memory statistics interface
@@ -49,9 +41,9 @@ export interface MemoryStats {
  * ```
  */
 export function calculateMemoryPressure(usagePercent: number): MemoryPressure {
-  if (usagePercent > MEMORY_CONSTANTS.HIGH_MEMORY_THRESHOLD) {
+  if (usagePercent > MEMORY.HIGH_PRESSURE_THRESHOLD) {
     return "high";
-  } else if (usagePercent > MEMORY_CONSTANTS.MEDIUM_MEMORY_THRESHOLD) {
+  } else if (usagePercent > MEMORY.MEDIUM_PRESSURE_THRESHOLD) {
     return "medium";
   } else {
     return "low";
@@ -107,8 +99,7 @@ export function getEstimatedMemoryUsage(): {
     const perfMemory = (performance as any).memory;
     const estimatedMemoryUsage = perfMemory?.usedJSHeapSize || 0;
     const estimatedMemoryLimit =
-      perfMemory?.totalJSHeapSize ||
-      MEMORY_CONSTANTS.DEFAULT_MEMORY_LIMIT;
+      perfMemory?.totalJSHeapSize || MEMORY.DEFAULT_MEMORY_LIMIT;
 
     return {
       usedMemory: estimatedMemoryUsage,
@@ -117,7 +108,7 @@ export function getEstimatedMemoryUsage(): {
   } catch (error) {
     return {
       usedMemory: 0,
-      memoryLimit: MEMORY_CONSTANTS.DEFAULT_MEMORY_LIMIT,
+      memoryLimit: MEMORY.DEFAULT_MEMORY_LIMIT,
     };
   }
 }
@@ -138,7 +129,7 @@ export function shouldCheckMemory(
   lastCheckTime: number,
   currentTime: number
 ): boolean {
-  return currentTime - lastCheckTime >= MEMORY_CONSTANTS.MIN_CHECK_INTERVAL;
+  return currentTime - lastCheckTime >= MEMORY.MIN_CHECK_INTERVAL;
 }
 
 /**
@@ -149,8 +140,8 @@ export function shouldCheckMemory(
 export function createDefaultMemoryStats(): MemoryStats {
   return {
     usedMemory: 0,
-    freeMemory: MEMORY_CONSTANTS.DEFAULT_MEMORY_LIMIT,
-    totalMemory: MEMORY_CONSTANTS.DEFAULT_MEMORY_LIMIT,
+    freeMemory: MEMORY.DEFAULT_MEMORY_LIMIT,
+    totalMemory: MEMORY.DEFAULT_MEMORY_LIMIT,
     memoryPressure: "low",
   };
 }

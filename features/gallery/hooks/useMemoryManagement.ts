@@ -123,7 +123,7 @@ export const useMemoryManagement = ({
         if (!memoryCheckInterval.current) {
           memoryCheckInterval.current = setInterval(
             checkMemoryUsage,
-            MEMORY_CONSTANTS.MEMORY_CHECK_INTERVAL
+            MEMORY_CONSTANTS.CHECK_INTERVAL
           ) as unknown as number;
         }
       }
@@ -136,7 +136,7 @@ export const useMemoryManagement = ({
     // Start monitoring when component mounts
     memoryCheckInterval.current = setInterval(
       checkMemoryUsage,
-      MEMORY_CONSTANTS.MEMORY_CHECK_INTERVAL
+      MEMORY_CONSTANTS.CHECK_INTERVAL
     );
 
     // Listen to app state changes

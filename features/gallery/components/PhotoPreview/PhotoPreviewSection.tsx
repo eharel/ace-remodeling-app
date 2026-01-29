@@ -4,14 +4,15 @@ import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { usePhotoGallery } from "@/features/gallery/hooks/usePhotoGallery";
-import { MorePhotosCard } from "@/features/gallery/components/MorePhotosCard";
-import type { PhotoTabValue } from "@/features/gallery/components/PhotoTabs";
 import { EditButton, ThemedText, ThemedView } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import type { MediaAsset } from "@/shared/types";
 import { commonStyles } from "@/shared/utils";
+
+import { MorePhotosCard } from "./MorePhotosCard";
+import type { PhotoTabValue } from "./PhotoTabs";
 
 interface PhotoPreviewSectionProps {
   photos: MediaAsset[];
@@ -33,7 +34,7 @@ export function PhotoPreviewSection({
   const { theme } = useTheme();
 
   const [pressedImageIndex, setPressedImageIndex] = useState<number | null>(
-    null,
+    null
   );
   const [activePhotoTab, setActivePhotoTab] = useState<PhotoTabValue>("after");
   const previewCount = 3;
@@ -61,11 +62,11 @@ export function PhotoPreviewSection({
     onOpenGrid();
   };
 
-  // OPTIMIZATION 3: Gallery image renderer with optimized image props
+  // Gallery image renderer with optimized image props
   const renderGridImage = (
     item: MediaAsset,
     index: number,
-    isMoreCell: boolean = false,
+    isMoreCell: boolean = false
   ) => {
     const isPressed = pressedImageIndex === index;
 
@@ -146,7 +147,7 @@ export function PhotoPreviewSection({
                 {previewPhotos.map((item, previewIndex) => {
                   // Find the index in the filtered gallery images for correct navigation
                   const galleryIndex = galleryImages.findIndex(
-                    (p: { id?: string }) => p.id === item.id,
+                    (p: { id?: string }) => p.id === item.id
                   );
                   // If not found, use previewIndex as fallback (but ensure it's in bounds)
                   const safeIndex =
@@ -231,7 +232,7 @@ const createPhotoGalleryStyles = (theme: any) =>
     },
     sectionTitle: {
       ...commonStyles.text.sectionTitle,
-      marginBottom: 0, // ← Remove bottom margin (row handles spacing now)
+      marginBottom: 0, // Remove bottom margin (row handles spacing now)
     },
     sectionSubtitle: {
       ...commonStyles.text.smallText,

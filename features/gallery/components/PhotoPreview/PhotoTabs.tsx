@@ -178,10 +178,14 @@ export const PhotoTabs: React.FC<PhotoTabsProps> = ({
         }}
       >
         <View style={styles.tabContent}>
-          <ThemedText style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
+          <ThemedText
+            style={[styles.tabLabel, isActive && styles.tabLabelActive]}
+          >
             {tab.label}
           </ThemedText>
-          <ThemedText style={[styles.tabCount, isActive && styles.tabCountActive]}>
+          <ThemedText
+            style={[styles.tabCount, isActive && styles.tabCountActive]}
+          >
             ({count})
           </ThemedText>
         </View>
@@ -202,4 +206,3 @@ export const PhotoTabs: React.FC<PhotoTabsProps> = ({
     </View>
   );
 };
-

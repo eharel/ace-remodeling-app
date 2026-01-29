@@ -21,7 +21,7 @@ import { useImageLoading } from "../../hooks/useImageLoading";
 import { useImagePreloading } from "../../hooks/useImagePreloading";
 import { useLazyLoading } from "../../hooks/useLazyLoading";
 import { ImageGalleryCarouselProps } from "../../types/gallery.types";
-import { ImageErrorState } from "../ImageErrorState";
+import { ImageErrorState } from "./ImageErrorState";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 

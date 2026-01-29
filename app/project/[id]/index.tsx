@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreviewSection";
+import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreview";
 import {
   AssetsSection,
   EditDescriptionModal,
