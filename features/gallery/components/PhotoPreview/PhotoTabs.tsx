@@ -4,11 +4,10 @@ import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { DesignTokens } from "@/shared/themes";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
-
-/**
- * Photo tab type definition
- */
-export type PhotoTabValue = "all" | "before" | "progress" | "after";
+import {
+  type PhotoTabValue,
+  PHOTO_TAB_LABELS,
+} from "@/shared/constants";
 
 /**
  * Photo counts for each category
@@ -77,23 +76,23 @@ export const PhotoTabs: React.FC<PhotoTabsProps> = ({
     () => [
       {
         value: "after" as const,
-        label: "After",
-        accessibilityLabel: `After photos, ${photoCounts.after} photos`,
+        label: PHOTO_TAB_LABELS.after,
+        accessibilityLabel: `${PHOTO_TAB_LABELS.after} photos, ${photoCounts.after} photos`,
       },
       {
         value: "before" as const,
-        label: "Before",
-        accessibilityLabel: `Before photos, ${photoCounts.before} photos`,
+        label: PHOTO_TAB_LABELS.before,
+        accessibilityLabel: `${PHOTO_TAB_LABELS.before} photos, ${photoCounts.before} photos`,
       },
       {
         value: "progress" as const,
-        label: "In Progress",
-        accessibilityLabel: `In Progress photos, ${photoCounts.progress} photos`,
+        label: PHOTO_TAB_LABELS.progress,
+        accessibilityLabel: `${PHOTO_TAB_LABELS.progress} photos, ${photoCounts.progress} photos`,
       },
       {
         value: "all" as const,
-        label: "All Photos",
-        accessibilityLabel: `All Photos, ${photoCounts.all} total`,
+        label: PHOTO_TAB_LABELS.all,
+        accessibilityLabel: `${PHOTO_TAB_LABELS.all}, ${photoCounts.all} total`,
       },
     ],
     [photoCounts]

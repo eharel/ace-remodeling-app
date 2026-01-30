@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { convertMediaToPictures } from "@/features/gallery/utils/assetTypeConversion";
 import { getPhotoCounts, getPreviewPhotos, samplePreviewPhotos } from "@/shared/utils";
-import type { PhotoTabValue } from "@/features/gallery/components/PhotoPreview";
+import type { PhotoTabValue } from "@/shared/constants";
+import { getStageFromPhotoTab, matchesPhotoTab } from "@/shared/constants";
 import type { MediaAsset } from "@/shared/types";
 
 interface UsePhotoGalleryParams {
@@ -33,15 +34,8 @@ export function usePhotoGallery({
       return samplePreviewPhotos(media, previewCount);
     } else {
       // Filter by specific stage and take first N
-      // Map tab values to MediaAsset stages
-      const stageMap: Record<string, string> = {
-        before: "before",
-        after: "after",
-        progress: "in-progress",
-      };
-      const targetStage = stageMap[activePhotoTab] || activePhotoTab;
-      const filtered = media.filter(
-        (m) => m.mediaType === "image" && m.stage === targetStage
+      const filtered = media.filter((m) =>
+        matchesPhotoTab(m, activePhotoTab)
       );
       return getPreviewPhotos(filtered, previewCount);
     }
@@ -66,18 +60,9 @@ export function usePhotoGallery({
 
     let filteredMedia: typeof media;
     if (activePhotoTab === "all") {
-      filteredMedia = media;
+      filteredMedia = media.filter((m) => m.mediaType === "image");
     } else {
-      // Map tab value to MediaAsset stage
-      const stageMap: Record<string, string> = {
-        before: "before",
-        after: "after",
-        progress: "in-progress",
-      };
-      const targetStage = stageMap[activePhotoTab] || activePhotoTab;
-      filteredMedia = media.filter(
-        (m) => m.mediaType === "image" && m.stage === targetStage
-      );
+      filteredMedia = media.filter((m) => matchesPhotoTab(m, activePhotoTab));
     }
 
     // Convert MediaAsset to Picture format

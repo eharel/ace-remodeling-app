@@ -10,9 +10,9 @@ import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import type { MediaAsset } from "@/shared/types";
 import { commonStyles } from "@/shared/utils";
+import { PHOTO_TAB_LABELS, type PhotoTabValue } from "@/shared/constants";
 
 import { MorePhotosCard } from "./MorePhotosCard";
-import type { PhotoTabValue } from "./PhotoTabs";
 
 interface PhotoPreviewSectionProps {
   photos: MediaAsset[];
@@ -130,13 +130,7 @@ export function PhotoPreviewSection({
               showCounts={true}
               getCounts={(tab) => photoCounts[tab as PhotoTabValue]}
               getLabel={(tab) => {
-                const labels: Record<PhotoTabValue, string> = {
-                  after: "After",
-                  before: "Before",
-                  progress: "In Progress",
-                  all: "All Photos",
-                };
-                return labels[tab as PhotoTabValue] || tab;
+                return PHOTO_TAB_LABELS[tab as PhotoTabValue] || tab;
               }}
               ariaLabel="Filter photos by stage"
             />

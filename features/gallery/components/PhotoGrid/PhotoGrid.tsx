@@ -1,12 +1,16 @@
 import { useProject } from "@/features/projects/hooks/useProject";
 import { usePhotoGallery } from "@/features/gallery/hooks/usePhotoGallery";
-import type { PhotoTabValue } from "@/features/gallery/components/PhotoPreview";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import { useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
+import {
+  type PhotoTabValue,
+  PHOTO_TAB_LABELS,
+  matchesPhotoTab,
+} from "@/shared/constants";
 import { PhotoGridList } from "./PhotoGridList";
 
 interface PhotoGridProps {
@@ -37,30 +41,14 @@ export function PhotoGrid({
 
   // Filter MediaAsset[] based on active tab (same logic as usePhotoGallery)
   const filteredPhotos = useMemo(() => {
-    if (activeTab === "all") {
-      return allPhotos.filter((m) => m.mediaType === "image");
-    }
-    const stageMap: Record<string, string> = {
-      before: "before",
-      after: "after",
-      progress: "in-progress",
-    };
-    const targetStage = stageMap[activeTab] || activeTab;
-    return allPhotos.filter(
-      (m) => m.mediaType === "image" && m.stage === targetStage
-    );
+    return allPhotos.filter((m) => matchesPhotoTab(m, activeTab));
   }, [allPhotos, activeTab]);
 
   // Get display title based on active tab
   const getTitle = () => {
     const count = photoCounts[activeTab];
-    const tabLabels: Record<PhotoTabValue, string> = {
-      all: "All Photos",
-      after: "After Photos",
-      before: "Before Photos",
-      progress: "In Progress Photos",
-    };
-    return `${tabLabels[activeTab]} (${count})`;
+    const label = PHOTO_TAB_LABELS[activeTab];
+    return `${label} (${count})`;
   };
 
   const styles = useMemo(

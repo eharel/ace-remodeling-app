@@ -1,9 +1,9 @@
 import { PhotoGrid } from "@/features/gallery";
-import type { PhotoTabValue } from "@/features/gallery/components/PhotoPreview";
 import { useProject } from "@/features/projects/hooks/useProject";
 import { PageHeader, ThemedText } from "@/shared/components";
 import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { type PhotoTabValue } from "@/shared/constants";
 
 export default function PhotoGridScreen() {
   const { id: projectId, componentId, activeTab } = useLocalSearchParams<{
