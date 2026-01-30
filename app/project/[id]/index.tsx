@@ -262,13 +262,14 @@ export default function ProjectDetailScreen() {
           <PhotoPreviewSection
             photos={currentMedia}
             title="Project Photos"
-            onOpenGrid={() =>
+            onOpenGrid={(activeTab) =>
               project?.id &&
               router.push({
                 pathname: "/project/[id]/photos",
                 params: {
                   id: project.id,
                   componentId: selectedComponent?.id,
+                  activeTab: activeTab || "all",
                 },
               })
             }

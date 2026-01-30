@@ -1,4 +1,6 @@
 import { useProject } from "@/features/projects/hooks/useProject";
+import { usePhotoGallery } from "@/features/gallery/hooks/usePhotoGallery";
+import type { PhotoTabValue } from "@/features/gallery/components/PhotoPreview";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
@@ -9,9 +11,13 @@ import { PhotoGridList } from "./PhotoGridList";
 
 interface PhotoGridProps {
   onImagePress: (index: number) => void;
+  activeTab?: PhotoTabValue;
 }
 
-export function PhotoGrid({ onImagePress }: PhotoGridProps) {
+export function PhotoGrid({
+  onImagePress,
+  activeTab = "all",
+}: PhotoGridProps) {
   const { theme } = useTheme();
   const { id: projectId, componentId } = useLocalSearchParams<{
     id?: string;
@@ -20,8 +26,42 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
 
   const { project } = useProject(projectId);
 
-  const photos =
+  const allPhotos =
     project?.components.find((c) => c.id === componentId)?.media || [];
+
+  // Filter photos based on active tab using the same logic as PhotoPreviewSection
+  const { photoCounts } = usePhotoGallery({
+    media: allPhotos,
+    activePhotoTab: activeTab,
+  });
+
+  // Filter MediaAsset[] based on active tab (same logic as usePhotoGallery)
+  const filteredPhotos = useMemo(() => {
+    if (activeTab === "all") {
+      return allPhotos.filter((m) => m.mediaType === "image");
+    }
+    const stageMap: Record<string, string> = {
+      before: "before",
+      after: "after",
+      progress: "in-progress",
+    };
+    const targetStage = stageMap[activeTab] || activeTab;
+    return allPhotos.filter(
+      (m) => m.mediaType === "image" && m.stage === targetStage
+    );
+  }, [allPhotos, activeTab]);
+
+  // Get display title based on active tab
+  const getTitle = () => {
+    const count = photoCounts[activeTab];
+    const tabLabels: Record<PhotoTabValue, string> = {
+      all: "All Photos",
+      after: "After Photos",
+      before: "Before Photos",
+      progress: "In Progress Photos",
+    };
+    return `${tabLabels[activeTab]} (${count})`;
+  };
 
   const styles = useMemo(
     () =>
@@ -47,12 +87,10 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
       <View style={{ flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
-          <ThemedText style={styles.title}>
-            All Photos ({photos.length})
-          </ThemedText>
+          <ThemedText style={styles.title}>{getTitle()}</ThemedText>
         </View>
 
-        <PhotoGridList photos={photos} onImagePress={onImagePress} />
+        <PhotoGridList photos={filteredPhotos} onImagePress={onImagePress} />
       </View>
     </ThemedView>
   );

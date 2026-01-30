@@ -19,7 +19,7 @@ interface PhotoPreviewSectionProps {
   title?: string;
   subtitle?: string;
   canEdit?: boolean;
-  onOpenGrid: () => void;
+  onOpenGrid: (activeTab?: PhotoTabValue) => void;
   onOpenImage: (index: number) => void;
 }
 
@@ -59,7 +59,7 @@ export function PhotoPreviewSection({
   };
 
   const showPhotoGrid = (editMode: boolean = false) => {
-    onOpenGrid();
+    onOpenGrid(activePhotoTab);
   };
 
   // Gallery image renderer with optimized image props
