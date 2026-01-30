@@ -7,15 +7,15 @@ import { useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import {
-  type PhotoTabValue,
-  PHOTO_TAB_LABELS,
-  matchesPhotoTab,
+  type PhotoCategory,
+  PHOTO_CATEGORY_LABELS,
+  matchesPhotoCategory,
 } from "@/shared/constants";
 import { PhotoGridList } from "./PhotoGridList";
 
 interface PhotoGridProps {
   onImagePress: (index: number) => void;
-  activeTab?: PhotoTabValue;
+  activeTab?: PhotoCategory;
 }
 
 export function PhotoGrid({
@@ -39,15 +39,15 @@ export function PhotoGrid({
     activePhotoTab: activeTab,
   });
 
-  // Filter MediaAsset[] based on active tab (same logic as usePhotoGallery)
+  // Filter MediaAsset[] based on active category (same logic as usePhotoGallery)
   const filteredPhotos = useMemo(() => {
-    return allPhotos.filter((m) => matchesPhotoTab(m, activeTab));
+    return allPhotos.filter((m) => matchesPhotoCategory(m, activeTab));
   }, [allPhotos, activeTab]);
 
-  // Get display title based on active tab
+  // Get display title based on active category
   const getTitle = () => {
     const count = photoCounts[activeTab];
-    const label = PHOTO_TAB_LABELS[activeTab];
+    const label = PHOTO_CATEGORY_LABELS[activeTab];
     return `${label} (${count})`;
   };
 

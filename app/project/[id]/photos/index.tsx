@@ -3,7 +3,7 @@ import { useProject } from "@/features/projects/hooks/useProject";
 import { PageHeader, ThemedText } from "@/shared/components";
 import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { type PhotoTabValue } from "@/shared/constants";
+import { type PhotoCategory } from "@/shared/constants";
 
 export default function PhotoGridScreen() {
   const { id: projectId, componentId, activeTab } = useLocalSearchParams<{
@@ -22,9 +22,9 @@ export default function PhotoGridScreen() {
     selectedComponent?.name ?? project?.name ?? "Project Photos";
 
   // Parse and validate activeTab from route params
-  const photoTab: PhotoTabValue =
+  const photoCategory: PhotoCategory =
     activeTab && ["all", "before", "progress", "after"].includes(activeTab)
-      ? (activeTab as PhotoTabValue)
+      ? (activeTab as PhotoCategory)
       : "all";
 
   const handleImagePress = (index: number) => {
@@ -34,7 +34,7 @@ export default function PhotoGridScreen() {
         id: projectId,
         initialIndex: index,
         componentId: componentId,
-        activeTab: photoTab, // Pass tab to viewer for consistency
+        activeTab: photoCategory, // Pass category to viewer for consistency
       },
     });
   };
@@ -42,7 +42,7 @@ export default function PhotoGridScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
       <PageHeader title={headerTitle} showBack={true} layoutMode="inline" />
-      <PhotoGrid onImagePress={handleImagePress} activeTab={photoTab} />
+      <PhotoGrid onImagePress={handleImagePress} activeTab={photoCategory} />
     </SafeAreaView>
   );
 }

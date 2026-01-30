@@ -1,31 +1,31 @@
 import { MEDIA_STAGES } from "../types/MediaAsset";
 
 /**
- * Photo tab categories for UI filtering
+ * Photo category constants for filtering photos by stage
  *
- * These are the filter options shown in the photo gallery UI.
+ * These represent the filter categories for photos in the gallery.
  * Maps to MEDIA_STAGES in the data model with some UI-friendly naming.
  *
- * IMPORTANT: This is the single source of truth for photo tab values.
- * All components should import PhotoTabValue from here, not define their own.
+ * IMPORTANT: This is the single source of truth for photo category values.
+ * All components should import PhotoCategory from here, not define their own.
  */
-export const PHOTO_TABS = {
+export const PHOTO_CATEGORIES = {
   ALL: "all",
   BEFORE: "before",
   PROGRESS: "progress", // UI-friendly name (maps to "in-progress" in data model)
   AFTER: "after",
 } as const;
 
-export type PhotoTabValue = (typeof PHOTO_TABS)[keyof typeof PHOTO_TABS];
+export type PhotoCategory = (typeof PHOTO_CATEGORIES)[keyof typeof PHOTO_CATEGORIES];
 
 /**
- * Maps PhotoTabValue to MediaStage
+ * Maps PhotoCategory to MediaStage
  *
- * Handles the conversion between UI tab values and data model stage values.
- * "progress" tab maps to "in-progress" stage.
+ * Handles the conversion between photo category filter values and data model stage values.
+ * "progress" category maps to "in-progress" stage.
  * "all" returns null to indicate "all stages".
  */
-export const PHOTO_TAB_TO_STAGE: Record<PhotoTabValue, string | null> = {
+export const PHOTO_CATEGORY_TO_STAGE: Record<PhotoCategory, string | null> = {
   all: null, // null means "all stages"
   before: MEDIA_STAGES.BEFORE,
   progress: MEDIA_STAGES.IN_PROGRESS,
@@ -33,9 +33,9 @@ export const PHOTO_TAB_TO_STAGE: Record<PhotoTabValue, string | null> = {
 } as const;
 
 /**
- * Photo tab display labels for UI
+ * Photo category display labels for UI
  */
-export const PHOTO_TAB_LABELS: Record<PhotoTabValue, string> = {
+export const PHOTO_CATEGORY_LABELS: Record<PhotoCategory, string> = {
   all: "All Photos",
   before: "Before",
   progress: "In Progress",
@@ -43,30 +43,30 @@ export const PHOTO_TAB_LABELS: Record<PhotoTabValue, string> = {
 } as const;
 
 /**
- * Convert PhotoTabValue to MediaStage for filtering
+ * Convert PhotoCategory to MediaStage for filtering
  *
- * @param tab - Photo tab value from UI
+ * @param category - Photo category filter value
  * @returns MediaStage string or null for "all"
  */
-export function getStageFromPhotoTab(tab: PhotoTabValue): string | null {
-  return PHOTO_TAB_TO_STAGE[tab];
+export function getStageFromPhotoCategory(category: PhotoCategory): string | null {
+  return PHOTO_CATEGORY_TO_STAGE[category];
 }
 
 /**
- * Check if a MediaAsset matches the given photo tab filter
+ * Check if a MediaAsset matches the given photo category filter
  *
  * @param asset - MediaAsset to check
- * @param tab - Photo tab filter value
+ * @param category - Photo category filter value
  * @returns true if asset matches the filter
  */
-export function matchesPhotoTab(
+export function matchesPhotoCategory(
   asset: { mediaType: string; stage?: string },
-  tab: PhotoTabValue
+  category: PhotoCategory
 ): boolean {
-  if (tab === "all") {
+  if (category === "all") {
     return asset.mediaType === "image";
   }
-  const targetStage = getStageFromPhotoTab(tab);
+  const targetStage = getStageFromPhotoCategory(category);
   return (
     asset.mediaType === "image" &&
     targetStage !== null &&

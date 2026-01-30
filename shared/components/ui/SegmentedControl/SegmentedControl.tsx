@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import { DesignTokens } from "@/shared/themes";
 import { useTheme } from "@/shared/contexts";
@@ -10,21 +10,21 @@ import TabOption from "./TabOption";
 
 /**
  * SegmentedControl - Unified selection component with multiple visual variants
- * 
+ *
  * Core Responsibilities:
  * - Manage option rendering logic (NOT styling)
  * - Handle label formatting and count display
  * - Delegate to variant-specific components for visual presentation
  * - Provide a clean, composable API
- * 
+ *
  * Architecture:
  * - Uses Strategy Pattern: core logic here, visual variants in separate components
  * - Type-safe with TypeScript generics
  * - Pure functions for label formatting and rendering
  * - Static styles for performance
- * 
+ *
  * @template T - The type of option values (must extend string)
- * 
+ *
  * @example
  * ```tsx
  * <SegmentedControl
@@ -52,7 +52,7 @@ export function SegmentedControl<T extends string>({
 
   /**
    * Pure function: format display text for an option
-   * 
+   *
    * Handles:
    * - Custom label formatting via getLabel prop
    * - Default formatting via formatLabel utility
@@ -84,16 +84,17 @@ export function SegmentedControl<T extends string>({
           },
       { backgroundColor: "transparent" },
     ],
-    [variant, theme]
+    [variant, theme],
   );
 
   const scrollContentStyle = useMemo(
     () => ({
       paddingHorizontal: DesignTokens.spacing[4],
-      gap: variant === "tabs" ? DesignTokens.spacing[6] : DesignTokens.spacing[3],
+      gap:
+        variant === "tabs" ? DesignTokens.spacing[6] : DesignTokens.spacing[3],
       flexDirection: "row" as const,
     }),
-    [variant]
+    [variant],
   );
 
   return (
@@ -108,7 +109,9 @@ export function SegmentedControl<T extends string>({
         {options.map((option) => {
           const isSelected = selected === option;
           const displayText = getDisplayText(option);
-          const accessibilityLabel = `${displayText}${isSelected ? ", selected" : ""}`;
+          const accessibilityLabel = `${displayText}${
+            isSelected ? ", selected" : ""
+          }`;
 
           // Strategy pattern: delegate rendering to variant component
           if (variant === "pills") {
@@ -140,4 +143,3 @@ export function SegmentedControl<T extends string>({
     </View>
   );
 }
-

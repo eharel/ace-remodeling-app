@@ -30,7 +30,7 @@ export {
   MorePhotosCard,
 } from "./components/PhotoPreview";
 export type {
-  PhotoTabValue,
+  PhotoCategory,
   PhotoCounts,
   MorePhotosCardProps,
 } from "./components/PhotoPreview";

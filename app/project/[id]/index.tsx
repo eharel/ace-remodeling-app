@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-
+import { type PhotoCategory } from "@/shared/constants";
 import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreview";
 import {
   AssetsSection,
@@ -33,9 +33,14 @@ import {
 } from "@/shared/types";
 
 export default function ProjectDetailScreen() {
-  const { id, componentId } = useLocalSearchParams<{
+  const {
+    id,
+    componentId,
+    activePhotoCategory = "all",
+  } = useLocalSearchParams<{
     id: string;
     componentId?: string;
+    activePhotoCategory?: PhotoCategory;
   }>();
   const {
     projects,
@@ -104,25 +109,16 @@ export default function ProjectDetailScreen() {
     return getCategoryLabel(component.category);
   };
 
-  /**
-   * Display description - component description with fallback to project description
-   */
   const displayDescription = useMemo(() => {
     if (!project) return "";
     return selectedComponent?.description ?? project.description ?? "";
   }, [selectedComponent, project]);
 
-  /**
-   * Display timeline - component timeline with fallback to project timeline
-   */
   const displayTimeline = useMemo(() => {
     if (!project) return null;
     return selectedComponent?.timeline || project.timeline || null;
   }, [project, selectedComponent]);
 
-  /**
-   * Hero image URL - component-specific thumbnail with fallback
-   */
   const heroImageUrl = useMemo(() => {
     if (!project) return "";
     return getProjectThumbnail(project, selectedComponent || undefined);
@@ -153,7 +149,6 @@ export default function ProjectDetailScreen() {
 
   const styles = useMemo(() => createProjectDetailStyles(theme), [theme]);
 
-  // Loading state
   if (isLoading && !project) {
     return (
       <ThemedView style={styles.container}>
@@ -163,7 +158,6 @@ export default function ProjectDetailScreen() {
     );
   }
 
-  // Error state
   if (!project) {
     return (
       <ThemedView style={styles.container}>
@@ -262,14 +256,18 @@ export default function ProjectDetailScreen() {
           <PhotoPreviewSection
             photos={currentMedia}
             title="Project Photos"
-            onOpenGrid={(activeTab) =>
+            activePhotoCategory={activePhotoCategory}
+            onPhotoCategoryChange={(newPhotoCategory) =>
+              router.setParams({ activePhotoCategory: newPhotoCategory })
+            }
+            onOpenGrid={(activePhotoCategory) =>
               project?.id &&
               router.push({
                 pathname: "/project/[id]/photos",
                 params: {
                   id: project.id,
                   componentId: selectedComponent?.id,
-                  activeTab: activeTab || "all",
+                  activePhotoCategory: activePhotoCategory || "all",
                 },
               })
             }
@@ -281,6 +279,7 @@ export default function ProjectDetailScreen() {
                   id: project.id,
                   initialIndex: index,
                   componentId: selectedComponent?.id,
+                  activePhotoCategory: activePhotoCategory || "all",
                 },
               })
             }

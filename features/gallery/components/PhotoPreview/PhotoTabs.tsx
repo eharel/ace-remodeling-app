@@ -5,8 +5,8 @@ import { DesignTokens } from "@/shared/themes";
 import { ThemedText } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import {
-  type PhotoTabValue,
-  PHOTO_TAB_LABELS,
+  type PhotoCategory,
+  PHOTO_CATEGORY_LABELS,
 } from "@/shared/constants";
 
 /**
@@ -23,10 +23,10 @@ export interface PhotoCounts {
  * PhotoTabs component props
  */
 export interface PhotoTabsProps {
-  /** Currently active tab */
-  activeTab: PhotoTabValue;
-  /** Callback when tab is changed */
-  onTabChange: (tab: PhotoTabValue) => void;
+  /** Currently active category */
+  activeTab: PhotoCategory;
+  /** Callback when category is changed */
+  onTabChange: (category: PhotoCategory) => void;
   /** Photo counts for each category */
   photoCounts: PhotoCounts;
   /** Optional test ID */
@@ -37,7 +37,7 @@ export interface PhotoTabsProps {
  * Tab configuration for rendering
  */
 interface TabConfig {
-  value: PhotoTabValue;
+  value: PhotoCategory;
   label: string;
   accessibilityLabel: string;
 }
@@ -76,23 +76,23 @@ export const PhotoTabs: React.FC<PhotoTabsProps> = ({
     () => [
       {
         value: "after" as const,
-        label: PHOTO_TAB_LABELS.after,
-        accessibilityLabel: `${PHOTO_TAB_LABELS.after} photos, ${photoCounts.after} photos`,
+        label: PHOTO_CATEGORY_LABELS.after,
+        accessibilityLabel: `${PHOTO_CATEGORY_LABELS.after} photos, ${photoCounts.after} photos`,
       },
       {
         value: "before" as const,
-        label: PHOTO_TAB_LABELS.before,
-        accessibilityLabel: `${PHOTO_TAB_LABELS.before} photos, ${photoCounts.before} photos`,
+        label: PHOTO_CATEGORY_LABELS.before,
+        accessibilityLabel: `${PHOTO_CATEGORY_LABELS.before} photos, ${photoCounts.before} photos`,
       },
       {
         value: "progress" as const,
-        label: PHOTO_TAB_LABELS.progress,
-        accessibilityLabel: `${PHOTO_TAB_LABELS.progress} photos, ${photoCounts.progress} photos`,
+        label: PHOTO_CATEGORY_LABELS.progress,
+        accessibilityLabel: `${PHOTO_CATEGORY_LABELS.progress} photos, ${photoCounts.progress} photos`,
       },
       {
         value: "all" as const,
-        label: PHOTO_TAB_LABELS.all,
-        accessibilityLabel: `${PHOTO_TAB_LABELS.all}, ${photoCounts.all} total`,
+        label: PHOTO_CATEGORY_LABELS.all,
+        accessibilityLabel: `${PHOTO_CATEGORY_LABELS.all}, ${photoCounts.all} total`,
       },
     ],
     [photoCounts]

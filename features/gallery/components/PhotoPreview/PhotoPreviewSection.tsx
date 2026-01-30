@@ -10,7 +10,11 @@ import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import type { MediaAsset } from "@/shared/types";
 import { commonStyles } from "@/shared/utils";
-import { PHOTO_TAB_LABELS, type PhotoTabValue } from "@/shared/constants";
+import {
+  PHOTO_CATEGORIES,
+  PHOTO_CATEGORY_LABELS,
+  type PhotoCategory,
+} from "@/shared/constants";
 
 import { MorePhotosCard } from "./MorePhotosCard";
 
@@ -19,7 +23,11 @@ interface PhotoPreviewSectionProps {
   title?: string;
   subtitle?: string;
   canEdit?: boolean;
-  onOpenGrid: (activeTab?: PhotoTabValue) => void;
+
+  activePhotoCategory: PhotoCategory;
+  onPhotoCategoryChange: (activeCategory: PhotoCategory) => void;
+
+  onOpenGrid: (activeCategory?: PhotoCategory) => void;
   onOpenImage: (index: number) => void;
 }
 
@@ -28,15 +36,16 @@ export function PhotoPreviewSection({
   title = "Photos",
   subtitle = "Tap any photo to view gallery",
   canEdit = false,
+  activePhotoCategory,
+  onPhotoCategoryChange,
   onOpenGrid = () => {},
   onOpenImage = (index: number) => {},
 }: PhotoPreviewSectionProps) {
   const { theme } = useTheme();
 
   const [pressedImageIndex, setPressedImageIndex] = useState<number | null>(
-    null
+    null,
   );
-  const [activePhotoTab, setActivePhotoTab] = useState<PhotoTabValue>("after");
   const previewCount = 3;
 
   // Photo gallery logic
@@ -48,7 +57,7 @@ export function PhotoPreviewSection({
     galleryImages,
   } = usePhotoGallery({
     media: photos,
-    activePhotoTab,
+    activePhotoTab: activePhotoCategory,
     previewCount,
   });
 
@@ -59,14 +68,14 @@ export function PhotoPreviewSection({
   };
 
   const showPhotoGrid = (editMode: boolean = false) => {
-    onOpenGrid(activePhotoTab);
+    onOpenGrid(activePhotoCategory);
   };
 
   // Gallery image renderer with optimized image props
   const renderGridImage = (
     item: MediaAsset,
     index: number,
-    isMoreCell: boolean = false
+    isMoreCell: boolean = false,
   ) => {
     const isPressed = pressedImageIndex === index;
 
@@ -124,13 +133,13 @@ export function PhotoPreviewSection({
             {/* Photo Category Tabs */}
             <SegmentedControl
               variant="tabs"
-              options={["after", "before", "progress", "all"] as const}
-              selected={activePhotoTab}
-              onSelect={setActivePhotoTab}
+              options={Object.values(PHOTO_CATEGORIES) as PhotoCategory[]}
+              selected={activePhotoCategory}
+              onSelect={onPhotoCategoryChange}
               showCounts={true}
-              getCounts={(tab) => photoCounts[tab as PhotoTabValue]}
+              getCounts={(tab) => photoCounts[tab as PhotoCategory]}
               getLabel={(tab) => {
-                return PHOTO_TAB_LABELS[tab as PhotoTabValue] || tab;
+                return PHOTO_CATEGORY_LABELS[tab as PhotoCategory] || tab;
               }}
               ariaLabel="Filter photos by stage"
             />
@@ -141,7 +150,7 @@ export function PhotoPreviewSection({
                 {previewPhotos.map((item, previewIndex) => {
                   // Find the index in the filtered gallery images for correct navigation
                   const galleryIndex = galleryImages.findIndex(
-                    (p: { id?: string }) => p.id === item.id
+                    (p: { id?: string }) => p.id === item.id,
                   );
                   // If not found, use previewIndex as fallback (but ensure it's in bounds)
                   const safeIndex =
@@ -175,8 +184,8 @@ export function PhotoPreviewSection({
                     { color: theme.colors.text.secondary },
                   ]}
                 >
-                  No {activePhotoTab === "all" ? "" : activePhotoTab} photos
-                  available
+                  No {activePhotoCategory === "all" ? "" : activePhotoCategory}{" "}
+                  photos available
                 </ThemedText>
               </ThemedView>
             )}

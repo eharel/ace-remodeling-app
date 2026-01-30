@@ -1,13 +1,13 @@
 import { useMemo } from "react";
 import { convertMediaToPictures } from "@/features/gallery/utils/assetTypeConversion";
 import { getPhotoCounts, getPreviewPhotos, samplePreviewPhotos } from "@/shared/utils";
-import type { PhotoTabValue } from "@/shared/constants";
-import { getStageFromPhotoTab, matchesPhotoTab } from "@/shared/constants";
+import type { PhotoCategory } from "@/shared/constants";
+import { getStageFromPhotoCategory, matchesPhotoCategory } from "@/shared/constants";
 import type { MediaAsset } from "@/shared/types";
 
 interface UsePhotoGalleryParams {
   media: MediaAsset[];
-  activePhotoTab: PhotoTabValue;
+  activePhotoTab: PhotoCategory;
   previewCount?: number;
 }
 
@@ -35,7 +35,7 @@ export function usePhotoGallery({
     } else {
       // Filter by specific stage and take first N
       const filtered = media.filter((m) =>
-        matchesPhotoTab(m, activePhotoTab)
+        matchesPhotoCategory(m, activePhotoTab)
       );
       return getPreviewPhotos(filtered, previewCount);
     }
@@ -62,7 +62,7 @@ export function usePhotoGallery({
     if (activePhotoTab === "all") {
       filteredMedia = media.filter((m) => m.mediaType === "image");
     } else {
-      filteredMedia = media.filter((m) => matchesPhotoTab(m, activePhotoTab));
+      filteredMedia = media.filter((m) => matchesPhotoCategory(m, activePhotoTab));
     }
 
     // Convert MediaAsset to Picture format
