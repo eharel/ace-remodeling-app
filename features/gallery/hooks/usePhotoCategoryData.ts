@@ -56,30 +56,32 @@ export function usePhotoCategoryData({
     return photoCounts[activePhotoCategory] - previewPhotos.length;
   }, [photoCounts, activePhotoCategory, previewPhotos.length]);
 
-  // Get filtered images for gallery based on active category
-  const galleryImages = useMemo(() => {
+  // Get filtered photos (MediaAsset[]) based on active category
+  const filteredPhotos = useMemo(() => {
     if (media.length === 0) {
       return [];
     }
 
-    let filteredMedia: typeof media;
     if (activePhotoCategory === "all") {
-      filteredMedia = media.filter((m) => m.mediaType === "image");
+      return media.filter((m) => m.mediaType === "image");
     } else {
-      filteredMedia = media.filter((m) =>
+      return media.filter((m) =>
         matchesPhotoCategory(m, activePhotoCategory),
       );
     }
-
-    // Convert MediaAsset to Picture format
-    return convertMediaToPictures(filteredMedia);
   }, [media, activePhotoCategory]);
+
+  // Get filtered images for gallery (converted to Picture format)
+  const galleryImages = useMemo(() => {
+    return convertMediaToPictures(filteredPhotos);
+  }, [filteredPhotos]);
 
   return {
     photoCounts,
     previewPhotos,
     hasMorePhotos,
     remainingCount,
+    filteredPhotos,
     galleryImages,
   };
 }

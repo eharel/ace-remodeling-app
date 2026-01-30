@@ -9,7 +9,6 @@ import { StyleSheet, View } from "react-native";
 import {
   type PhotoCategory,
   PHOTO_CATEGORY_LABELS,
-  matchesPhotoCategory,
 } from "@/shared/constants";
 import { PhotoGridList } from "./PhotoGridList";
 
@@ -31,20 +30,14 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
 
   const { project } = useProject(projectId);
 
-  const allPhotos =
-    project?.components.find((c) => c.id === componentId)?.media || [];
+  const allPhotos = useMemo(() => {
+    return project?.components.find((c) => c.id === componentId)?.media || [];
+  }, [project, componentId]);
 
-  const { photoCounts } = usePhotoCategoryData({
+  const { photoCounts, filteredPhotos } = usePhotoCategoryData({
     media: allPhotos,
     activePhotoCategory: activePhotoCategory || "all",
   });
-
-  // Filter MediaAsset[] based on active category (same logic as usePhotoCategoryData)
-  const filteredPhotos = useMemo(() => {
-    return allPhotos.filter((m) =>
-      matchesPhotoCategory(m, activePhotoCategory),
-    );
-  }, [allPhotos, activePhotoCategory]);
 
   // Get display title based on active category
   const getTitle = () => {
