@@ -1,7 +1,5 @@
-import { ImageGallery, PhotoCategory } from "@/features/gallery";
-import { convertMediaToPictures } from "@/features/gallery/utils/assetTypeConversion";
+import { ImageGallery, PhotoCategory, usePhotoCategoryData } from "@/features/gallery";
 import { useProject } from "@/features/projects/hooks/useProject";
-import { matchesPhotoCategory } from "@/shared/constants";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 
@@ -26,18 +24,11 @@ export default function PhotoViewer() {
     return project.components.find((c) => c.id === componentId)?.media || [];
   }, [project, componentId]);
 
-  // Filter photos based on active category
-  const filteredPhotos = useMemo(() => {
-    return photos.filter((m) =>
-      matchesPhotoCategory(m, activePhotoCategory || "all"),
-    );
-  }, [photos, activePhotoCategory]);
-
-  // Convert MediaAsset[] to Picture[] format for ImageGalleryModal
-  const pictures = useMemo(
-    () => convertMediaToPictures(filteredPhotos),
-    [filteredPhotos],
-  );
+  // Use hook to filter by category and convert to Picture format
+  const { galleryImages: pictures } = usePhotoCategoryData({
+    media: photos,
+    activePhotoCategory: activePhotoCategory || "all",
+  });
 
   // Parse initialIndex from route params (defaults to 0)
   const initialImageIndex = useMemo(() => {

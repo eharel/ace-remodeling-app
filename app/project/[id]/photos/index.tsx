@@ -6,10 +6,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { type PhotoCategory } from "@/shared/constants";
 
 export default function PhotoGridScreen() {
-  const { id: projectId, componentId, activeTab } = useLocalSearchParams<{
+  const {
+    id: projectId,
+    componentId,
+    activeTab,
+    activePhotoCategory,
+  } = useLocalSearchParams<{
     id: string;
     componentId: string;
     activeTab?: string;
+    activePhotoCategory?: PhotoCategory;
   }>();
 
   const { project, isLoading, error } = useProject(projectId);
@@ -21,12 +27,6 @@ export default function PhotoGridScreen() {
   const headerTitle =
     selectedComponent?.name ?? project?.name ?? "Project Photos";
 
-  // Parse and validate activeTab from route params
-  const photoCategory: PhotoCategory =
-    activeTab && ["all", "before", "progress", "after"].includes(activeTab)
-      ? (activeTab as PhotoCategory)
-      : "all";
-
   const handleImagePress = (index: number) => {
     router.navigate({
       pathname: "/project/[id]/photos/viewer",
@@ -34,7 +34,7 @@ export default function PhotoGridScreen() {
         id: projectId,
         initialIndex: index,
         componentId: componentId,
-        activeTab: photoCategory, // Pass category to viewer for consistency
+        activePhotoCategory: activePhotoCategory,
       },
     });
   };
@@ -42,7 +42,10 @@ export default function PhotoGridScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
       <PageHeader title={headerTitle} showBack={true} layoutMode="inline" />
-      <PhotoGrid onImagePress={handleImagePress} activeTab={photoCategory} />
+      <PhotoGrid
+        onImagePress={handleImagePress}
+        activeTab={activePhotoCategory}
+      />
     </SafeAreaView>
   );
 }

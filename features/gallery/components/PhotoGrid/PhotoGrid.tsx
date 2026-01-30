@@ -1,5 +1,5 @@
 import { useProject } from "@/features/projects/hooks/useProject";
-import { usePhotoGallery } from "@/features/gallery/hooks/usePhotoGallery";
+import { usePhotoCategoryData } from "@/features/gallery/hooks/usePhotoCategoryData";
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
@@ -15,17 +15,18 @@ import { PhotoGridList } from "./PhotoGridList";
 
 interface PhotoGridProps {
   onImagePress: (index: number) => void;
-  activeTab?: PhotoCategory;
 }
 
-export function PhotoGrid({
-  onImagePress,
-  activeTab = "all",
-}: PhotoGridProps) {
+export function PhotoGrid({ onImagePress }: PhotoGridProps) {
   const { theme } = useTheme();
-  const { id: projectId, componentId } = useLocalSearchParams<{
+  const {
+    id: projectId,
+    componentId,
+    activePhotoCategory = "all",
+  } = useLocalSearchParams<{
     id?: string;
     componentId?: string;
+    activePhotoCategory?: PhotoCategory;
   }>();
 
   const { project } = useProject(projectId);
@@ -33,21 +34,22 @@ export function PhotoGrid({
   const allPhotos =
     project?.components.find((c) => c.id === componentId)?.media || [];
 
-  // Filter photos based on active tab using the same logic as PhotoPreviewSection
-  const { photoCounts } = usePhotoGallery({
+  const { photoCounts } = usePhotoCategoryData({
     media: allPhotos,
-    activePhotoTab: activeTab,
+    activePhotoCategory: activePhotoCategory || "all",
   });
 
-  // Filter MediaAsset[] based on active category (same logic as usePhotoGallery)
+  // Filter MediaAsset[] based on active category (same logic as usePhotoCategoryData)
   const filteredPhotos = useMemo(() => {
-    return allPhotos.filter((m) => matchesPhotoCategory(m, activeTab));
-  }, [allPhotos, activeTab]);
+    return allPhotos.filter((m) =>
+      matchesPhotoCategory(m, activePhotoCategory),
+    );
+  }, [allPhotos, activePhotoCategory]);
 
   // Get display title based on active category
   const getTitle = () => {
-    const count = photoCounts[activeTab];
-    const label = PHOTO_CATEGORY_LABELS[activeTab];
+    const count = photoCounts[activePhotoCategory];
+    const label = PHOTO_CATEGORY_LABELS[activePhotoCategory];
     return `${label} (${count})`;
   };
 

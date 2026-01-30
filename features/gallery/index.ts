@@ -50,7 +50,7 @@ export type {
 // Core gallery hooks
 export { useImageGallery } from "./hooks/useImageGallery";
 export { useImageNavigation } from "./hooks/useImageNavigation";
-export { usePhotoGallery } from "./hooks/usePhotoGallery";
+export { usePhotoCategoryData } from "./hooks/usePhotoCategoryData";
 
 // Image loading hooks
 export { useImageLoading } from "./hooks/useImageLoading";

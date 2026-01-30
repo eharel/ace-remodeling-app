@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { usePhotoGallery } from "@/features/gallery/hooks/usePhotoGallery";
+import { usePhotoCategoryData } from "@/features/gallery/hooks/usePhotoCategoryData";
 import { EditButton, ThemedText, ThemedView } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useTheme } from "@/shared/contexts";
@@ -55,9 +55,9 @@ export function PhotoPreviewSection({
     hasMorePhotos,
     remainingCount,
     galleryImages,
-  } = usePhotoGallery({
+  } = usePhotoCategoryData({
     media: photos,
-    activePhotoTab: activePhotoCategory,
+    activePhotoCategory: activePhotoCategory,
     previewCount,
   });
 

@@ -1,73 +1,79 @@
 import { useMemo } from "react";
 import { convertMediaToPictures } from "@/features/gallery/utils/assetTypeConversion";
-import { getPhotoCounts, getPreviewPhotos, samplePreviewPhotos } from "@/shared/utils";
+import {
+  getPhotoCounts,
+  getPreviewPhotos,
+  samplePreviewPhotos,
+} from "@/shared/utils";
 import type { PhotoCategory } from "@/shared/constants";
-import { getStageFromPhotoCategory, matchesPhotoCategory } from "@/shared/constants";
+import { matchesPhotoCategory } from "@/shared/constants";
 import type { MediaAsset } from "@/shared/types";
 
-interface UsePhotoGalleryParams {
+interface UsePhotoCategoryDataParams {
   media: MediaAsset[];
-  activePhotoTab: PhotoCategory;
+  activePhotoCategory: PhotoCategory;
   previewCount?: number;
 }
 
 /**
- * Hook for managing photo gallery filtering, counting, and preview logic
- * Handles tab-based filtering, photo counts, and preview generation
+ * Hook for managing photo category filtering, counting, and preview logic
+ * Handles category-based filtering, photo counts, and preview generation
  */
-export function usePhotoGallery({
+export function usePhotoCategoryData({
   media,
-  activePhotoTab,
+  activePhotoCategory,
   previewCount = 3,
-}: UsePhotoGalleryParams) {
+}: UsePhotoCategoryDataParams) {
   // Calculate photo counts for each category
   const photoCounts = useMemo(() => {
     return getPhotoCounts(media);
   }, [media]);
 
-  // Get preview photos based on active tab
+  // Get preview photos based on active category
   const previewPhotos = useMemo(() => {
     if (media.length === 0) return [];
 
-    if (activePhotoTab === "all") {
-      // Use intelligent sampling for "All Photos" tab
+    if (activePhotoCategory === "all") {
+      // Use intelligent sampling for "All Photos" category
       return samplePreviewPhotos(media, previewCount);
     } else {
       // Filter by specific stage and take first N
       const filtered = media.filter((m) =>
-        matchesPhotoCategory(m, activePhotoTab)
+        matchesPhotoCategory(m, activePhotoCategory),
       );
       return getPreviewPhotos(filtered, previewCount);
     }
-  }, [media, activePhotoTab, previewCount]);
+  }, [media, activePhotoCategory, previewCount]);
 
   // Check if there are more photos beyond the preview
   const hasMorePhotos = useMemo(() => {
-    const totalCount = photoCounts[activePhotoTab];
+    const totalCount = photoCounts[activePhotoCategory];
     return totalCount > previewPhotos.length;
-  }, [photoCounts, activePhotoTab, previewPhotos.length]);
+  }, [photoCounts, activePhotoCategory, previewPhotos.length]);
 
   // Calculate remaining photo count
   const remainingCount = useMemo(() => {
-    return photoCounts[activePhotoTab] - previewPhotos.length;
-  }, [photoCounts, activePhotoTab, previewPhotos.length]);
+    return photoCounts[activePhotoCategory] - previewPhotos.length;
+  }, [photoCounts, activePhotoCategory, previewPhotos.length]);
 
-  // Get filtered images for gallery based on active tab
+  // Get filtered images for gallery based on active category
   const galleryImages = useMemo(() => {
     if (media.length === 0) {
       return [];
     }
 
     let filteredMedia: typeof media;
-    if (activePhotoTab === "all") {
+    if (activePhotoCategory === "all") {
       filteredMedia = media.filter((m) => m.mediaType === "image");
     } else {
-      filteredMedia = media.filter((m) => matchesPhotoCategory(m, activePhotoTab));
+      filteredMedia = media.filter((m) =>
+        matchesPhotoCategory(m, activePhotoCategory),
+      );
     }
 
     // Convert MediaAsset to Picture format
     return convertMediaToPictures(filteredMedia);
-  }, [media, activePhotoTab]);
+  }, [media, activePhotoCategory]);
 
   return {
     photoCounts,
