@@ -1,29 +1,15 @@
-import React, { useMemo, useRef } from "react";
-import { Modal, StyleSheet, View } from "react-native";
-
-import { useTheme } from "@/shared/contexts";
+import React from "react";
+import { Modal, StyleSheet } from "react-native";
 
 import { accessibilityStrings } from "../../constants/accessibilityStrings";
-import { useAccessibilityAnnouncements } from "../../hooks/useAccessibilityAnnouncements";
-import { useImageGallery } from "../../hooks/useImageGallery";
-import { GalleryStyles, ImageGalleryModalProps } from "../../types/gallery.types";
-import {
-  ImageGalleryCarousel,
-  ImageGalleryCarouselRef,
-} from "./ImageGalleryCarousel";
-import { ImageGalleryFooter } from "./ImageGalleryFooter";
-import { ImageGalleryHeader } from "./ImageGalleryHeader";
+import { ImageGalleryModalProps } from "../../types/gallery.types";
+import { ImageGallery } from "./ImageGallery";
 
 /**
- * ImageGalleryModal - A full-screen modal for viewing and navigating through images
+ * ImageGalleryModal - Modal wrapper for ImageGallery component
  *
- * Features:
- * - Full-screen image viewing with swipe navigation
- * - Thumbnail navigation in footer
- * - Accessibility support with screen reader announcements
- * - Smooth gesture-based navigation
- * - Performance optimizations with lazy loading and preloading
- * - Loading states and error handling
+ * This component wraps ImageGallery with a Modal for use as an overlay.
+ * For screen routes, use ImageGallery directly instead.
  *
  * @component
  * @param {ImageGalleryModalProps} props - The component props
@@ -45,67 +31,9 @@ import { ImageGalleryHeader } from "./ImageGalleryHeader";
  * @returns {JSX.Element | null} The modal component or null if not visible
  */
 export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
-  ({ visible, images, initialIndex, onClose }) => {
-    const { theme } = useTheme();
-
-    // Ensure initialIndex is within bounds before passing to hook
-    const safeInitialIndex =
-      images.length > 0
-        ? Math.max(0, Math.min(initialIndex || 0, images.length - 1))
-        : 0;
-
-    const { currentIndex, updateCurrentIndex, modalRef } = useImageGallery({
-      visible,
-      images,
-      initialIndex: safeInitialIndex,
-    });
-
-    // Safety check: ensure currentIndex is valid before accessing array
-    const safeCurrentIndex =
-      images.length > 0
-        ? Math.max(0, Math.min(currentIndex, images.length - 1))
-        : 0;
-    const currentImage =
-      images.length > 0 ? images[safeCurrentIndex] : undefined;
-
-    // Ref for programmatic carousel navigation (e.g., thumbnail taps)
-    const carouselRef = useRef<ImageGalleryCarouselRef>(null);
-
-    useAccessibilityAnnouncements({
-      visible,
-      currentIndex: safeCurrentIndex,
-      images,
-      currentImage,
-      modalRef,
-    });
-
-    // Handle thumbnail navigation
-    const handleThumbnailPress = React.useCallback(
-      (index: number) => {
-        carouselRef.current?.scrollToIndex(index);
-        updateCurrentIndex(index);
-      },
-      [updateCurrentIndex]
-    );
-
-    const styles = useMemo(
-      (): GalleryStyles =>
-        StyleSheet.create({
-          modal: {
-            flex: 1,
-            backgroundColor: theme.colors.background.overlay,
-          },
-          container: {
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          },
-        }),
-      [theme]
-    );
-
-    // Safety checks: don't render if not visible, no images, or invalid index
-    if (!visible || images.length === 0 || !currentImage) {
+  function ImageGalleryModal({ visible, images, initialIndex, onClose }) {
+    // Safety checks: don't render if not visible or no images
+    if (!visible || images.length === 0) {
       return null;
     }
 
@@ -121,38 +49,11 @@ export const ImageGalleryModal = React.memo<ImageGalleryModalProps>(
         accessibilityHint={accessibilityStrings.modal.hint}
         statusBarTranslucent={true}
       >
-        <View
-          style={styles.modal}
-          ref={modalRef}
-          accessible={true}
-          accessibilityRole="none"
-          accessibilityLabel={accessibilityStrings.modal.label}
-        >
-          <ImageGalleryHeader
-            currentIndex={safeCurrentIndex}
-            totalImages={images.length}
-            onClose={onClose}
-            theme={theme}
-          />
-
-          <View style={styles.container}>
-            <ImageGalleryCarousel
-              ref={carouselRef}
-              images={images}
-              currentIndex={safeCurrentIndex}
-              onIndexChange={updateCurrentIndex}
-              theme={theme}
-            />
-          </View>
-
-          <ImageGalleryFooter
-            currentImage={currentImage}
-            images={images}
-            currentIndex={safeCurrentIndex}
-            onImageSelect={handleThumbnailPress}
-            theme={theme}
-          />
-        </View>
+        <ImageGallery
+          images={images}
+          initialIndex={initialIndex}
+          onClose={onClose}
+        />
       </Modal>
     );
   },

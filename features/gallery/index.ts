@@ -7,8 +7,9 @@
 // COMPONENTS
 // ============================================================================
 
-// ImageGallery - Full-screen modal gallery viewer
+// ImageGallery - Full-screen gallery viewer
 export {
+  ImageGallery,
   ImageGalleryModal,
   ImageGalleryCarousel,
   ImageGalleryHeader,

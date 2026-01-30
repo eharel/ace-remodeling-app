@@ -1,9 +1,10 @@
 /**
  * ImageGallery Composite Component
  *
- * A full-screen modal gallery for viewing and navigating through images.
+ * A full-screen gallery for viewing and navigating through images.
  * Composed of:
- * - ImageGalleryModal: Main container/wrapper
+ * - ImageGallery: Base gallery component (for screen routes)
+ * - ImageGalleryModal: Modal wrapper for ImageGallery (for overlays)
  * - ImageGalleryCarousel: Scrollable image viewer
  * - ImageGalleryHeader: Top header with close button and counter
  * - ImageGalleryFooter: Bottom footer with info, pagination, and thumbnails
@@ -12,6 +13,7 @@
  */
 
 // Main components
+export { ImageGallery } from "./ImageGallery";
 export { ImageGalleryModal } from "./ImageGalleryModal";
 export { ImageGalleryCarousel } from "./ImageGalleryCarousel";
 export type { ImageGalleryCarouselRef } from "./ImageGalleryCarousel";

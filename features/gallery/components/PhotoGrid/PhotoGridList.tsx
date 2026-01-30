@@ -35,7 +35,6 @@ export function PhotoGridList({ photos, onImagePress }: PhotoGridListProps) {
 
   return (
     <>
-      <Text>Photo Grid List</Text>
       <FlatList
         numColumns={columns}
         data={photos}

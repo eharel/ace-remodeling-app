@@ -64,19 +64,27 @@ export interface BaseGalleryProps {
 }
 
 /**
- * Props for the main image gallery modal component
+ * Props for the base image gallery component (non-modal)
+ *
+ * @interface ImageGalleryProps
+ */
+export interface ImageGalleryProps {
+  /** Array of images to display in the gallery */
+  images: Picture[];
+  /** Initial image index to display when gallery opens */
+  initialIndex: number;
+  /** Callback function called when gallery should be closed */
+  onClose: () => void;
+}
+
+/**
+ * Props for the image gallery modal component
  *
  * @interface ImageGalleryModalProps
  */
-export interface ImageGalleryModalProps {
+export interface ImageGalleryModalProps extends ImageGalleryProps {
   /** Whether the modal is currently visible */
   visible: boolean;
-  /** Array of images to display in the gallery */
-  images: Picture[];
-  /** Initial image index to display when modal opens */
-  initialIndex: number;
-  /** Callback function called when modal should be closed */
-  onClose: () => void;
 }
 
 /**

@@ -1,27 +1,18 @@
 import { useProject } from "@/features/projects/hooks/useProject";
-import { ThemedIconButton, ThemedText, ThemedView } from "@/shared/components";
+import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
-import { MediaAsset } from "@/shared/types";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useRef } from "react";
-import { FlatList, StyleSheet, useWindowDimensions, View } from "react-native";
+import { useMemo } from "react";
+import { StyleSheet, View } from "react-native";
 import { PhotoGridList } from "./PhotoGridList";
 
-const MODAL_WIDTH_PERCENT = 0.9;
-const MODAL_HEIGHT_PERCENT = 0.84;
-const MIN_PHOTO_SIZE = 150;
-const MIN_COLUMNS = 1;
-
 interface PhotoGridProps {
-  visible: boolean;
-  onClose: () => void;
   onImagePress: (index: number) => void;
 }
 
-export function PhotoGrid({ visible, onClose, onImagePress }: PhotoGridProps) {
+export function PhotoGrid({ onImagePress }: PhotoGridProps) {
   const { theme } = useTheme();
-  const { width, height } = useWindowDimensions();
   const { id: projectId, componentId } = useLocalSearchParams<{
     id?: string;
     componentId?: string;
@@ -31,14 +22,6 @@ export function PhotoGrid({ visible, onClose, onImagePress }: PhotoGridProps) {
 
   const photos =
     project?.components.find((c) => c.id === componentId)?.media || [];
-
-  const listRef = useRef<FlatList<MediaAsset>>(null);
-
-  useEffect(() => {
-    if (visible) {
-      listRef.current?.flashScrollIndicators();
-    }
-  }, [visible]);
 
   const styles = useMemo(
     () =>
@@ -67,12 +50,6 @@ export function PhotoGrid({ visible, onClose, onImagePress }: PhotoGridProps) {
           <ThemedText style={styles.title}>
             All Photos ({photos.length})
           </ThemedText>
-          <ThemedIconButton
-            icon="close"
-            onPress={onClose}
-            variant="ghost"
-            size="small"
-          />
         </View>
 
         <PhotoGridList photos={photos} onImagePress={onImagePress} />
