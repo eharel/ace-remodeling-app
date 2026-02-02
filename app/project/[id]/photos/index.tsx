@@ -9,7 +9,6 @@ export default function PhotoGridScreen() {
   const {
     id: projectId,
     componentId,
-    activeTab,
     activePhotoCategory,
   } = useLocalSearchParams<{
     id: string;
@@ -22,7 +21,7 @@ export default function PhotoGridScreen() {
 
   // Get component name or fallback to project name
   const selectedComponent = project?.components.find(
-    (c) => c.id === componentId,
+    (c) => c.id === componentId
   );
   const headerTitle =
     selectedComponent?.name ?? project?.name ?? "Project Photos";
@@ -42,10 +41,7 @@ export default function PhotoGridScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
       <PageHeader title={headerTitle} showBack={true} layoutMode="inline" />
-      <PhotoGrid
-        onImagePress={handleImagePress}
-        activeTab={activePhotoCategory}
-      />
+      <PhotoGrid onImagePress={handleImagePress} />
     </SafeAreaView>
   );
 }
