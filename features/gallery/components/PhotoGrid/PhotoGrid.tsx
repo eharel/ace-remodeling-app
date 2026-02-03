@@ -47,9 +47,11 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
 
   // Handle edit button press
   const handleEditPress = () => {
+    const exitingEditMode = isEditing;
     setIsEditing(!isEditing);
-    // Clear selection when exiting edit mode
-    if (isEditing) {
+    // Reset all edit-related state when exiting edit mode
+    if (exitingEditMode) {
+      setIsSelectingPhotos(false);
       setSelectedPhotoIds(new Set());
     }
   };
