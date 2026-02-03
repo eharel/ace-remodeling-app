@@ -48,18 +48,12 @@ export function ThemedSegmentedControl<T extends string>({
           flex: 1,
         },
         segment: {
-          flex: 1,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
-          paddingVertical: isSmall
-            ? DesignTokens.spacing[2]
-            : DesignTokens.spacing[3],
-          paddingHorizontal: isSmall
-            ? DesignTokens.spacing[2]
-            : DesignTokens.spacing[3],
+          paddingVertical: isSmall ? 8 : 12,
+          paddingHorizontal: isSmall ? 8 : 12,
           borderRadius: DesignTokens.borderRadius.sm,
-          gap: DesignTokens.spacing[1],
         },
         selectedSegment: {
           backgroundColor: theme.colors.background.card,
