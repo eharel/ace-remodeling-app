@@ -17,6 +17,7 @@ import {
 import { useProjectComponentSelection } from "@/features/projects/hooks/useProjectComponentSelection";
 import { createProjectDetailStyles } from "@/features/projects/styles/projectDetailStyles";
 import {
+  Can,
   LoadingState,
   PageHeader,
   RefreshableScrollView,
@@ -273,12 +274,14 @@ export default function ProjectDetailScreen() {
               displayTimeline={displayTimeline}
             />
 
-            <View style={{ marginTop: DesignTokens.spacing[4] }}>
-              <FeaturedToggle
-                isFeatured={isFeatured}
-                onToggle={handleToggleFeatured}
-              />
-            </View>
+            <Can edit>
+              <View style={{ marginTop: DesignTokens.spacing[4] }}>
+                <FeaturedToggle
+                  isFeatured={isFeatured}
+                  onToggle={handleToggleFeatured}
+                />
+              </View>
+            </Can>
           </ThemedView>
 
           <PhotoPreviewSection
