@@ -1,7 +1,14 @@
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
-import { useMemo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  InteractionManager,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 export interface SegmentOption<T extends string> {
   value: T;
@@ -15,6 +22,8 @@ interface ThemedSegmentedControlProps<T extends string> {
   onValueChange: (value: T) => void;
   /** Size variant */
   size?: "small" | "medium";
+  /** Show loading state */
+  loading?: boolean;
 }
 
 /**
@@ -30,10 +39,29 @@ export function ThemedSegmentedControl<T extends string>({
   selectedValue,
   onValueChange,
   size = "medium",
+  loading: externalLoading,
 }: ThemedSegmentedControlProps<T>) {
   const { theme } = useTheme();
+  const [pendingValue, setPendingValue] = useState<T | null>(null);
 
   const isSmall = size === "small";
+  const isLoading = externalLoading || pendingValue !== null;
+
+  const handlePress = useCallback(
+    (value: T) => {
+      if (value === selectedValue || isLoading) return;
+
+      setPendingValue(value);
+
+      // Use InteractionManager to defer the heavy work until after the UI updates
+      InteractionManager.runAfterInteractions(() => {
+        onValueChange(value);
+        // Clear pending state after a short delay to ensure rendering completes
+        setTimeout(() => setPendingValue(null), 50);
+      });
+    },
+    [selectedValue, onValueChange, isLoading]
+  );
 
   const styles = useMemo(
     () =>
@@ -79,39 +107,73 @@ export function ThemedSegmentedControl<T extends string>({
         selectedCount: {
           color: theme.colors.interactive.primary,
         },
+        containerLoading: {
+          opacity: 0.8,
+        },
+        pendingSegment: {
+          backgroundColor: theme.colors.background.card,
+          ...DesignTokens.shadows.base,
+          shadowColor: theme.colors.shadows.base.shadowColor,
+          shadowOpacity: theme.colors.shadows.base.shadowOpacity,
+        },
+        disabledLabel: {
+          opacity: 0.5,
+        },
       }),
     [theme, isSmall]
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isLoading && styles.containerLoading]}>
       {options.map((option) => {
         const isSelected = option.value === selectedValue;
+        const isPending = option.value === pendingValue;
 
         return (
           <Pressable
             key={option.value}
             style={styles.segmentWrapper}
-            onPress={() => onValueChange(option.value)}
+            onPress={() => handlePress(option.value)}
+            disabled={isLoading}
             accessibilityRole="button"
-            accessibilityState={{ selected: isSelected }}
+            accessibilityState={{ selected: isSelected, busy: isPending }}
             accessibilityLabel={`${option.label}${option.count !== undefined ? `, ${option.count} items` : ""}`}
           >
-            <View style={[styles.segment, isSelected && styles.selectedSegment]}>
-              <Text
-                style={[
-                  styles.label,
-                  isSelected && styles.selectedLabel,
-                ]}
-              >
-                {option.label}
-              </Text>
-              {option.count !== undefined && (
-                <Text
-                  style={[styles.count, isSelected && styles.selectedCount]}
-                >
-                  {option.count}
-                </Text>
+            <View
+              style={[
+                styles.segment,
+                isSelected && styles.selectedSegment,
+                isPending && styles.pendingSegment,
+              ]}
+            >
+              {isPending ? (
+                <ActivityIndicator
+                  size="small"
+                  color={theme.colors.interactive.primary}
+                />
+              ) : (
+                <>
+                  <Text
+                    style={[
+                      styles.label,
+                      isSelected && styles.selectedLabel,
+                      isLoading && !isSelected && styles.disabledLabel,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                  {option.count !== undefined && (
+                    <Text
+                      style={[
+                        styles.count,
+                        isSelected && styles.selectedCount,
+                        isLoading && !isSelected && styles.disabledLabel,
+                      ]}
+                    >
+                      {option.count}
+                    </Text>
+                  )}
+                </>
               )}
             </View>
           </Pressable>
