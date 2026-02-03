@@ -1,3 +1,4 @@
+import { useMediaActions } from "@/features/gallery/hooks/useMediaActions";
 import { usePhotoCategoryData } from "@/features/gallery/hooks/usePhotoCategoryData";
 import { useProject } from "@/features/projects/hooks/useProject";
 import {
@@ -13,7 +14,7 @@ import { DesignTokens } from "@/shared/themes";
 import type { SegmentOption } from "@/shared/components/themed/ThemedSegmentedControl";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { EditModeActionBar } from "./EditModeActionBar";
 import { PhotoGridList } from "./PhotoGridList";
 
@@ -69,9 +70,23 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
     });
   }, []);
 
-  const allPhotos = useMemo(() => {
-    return project?.components.find((c) => c.id === componentId)?.media || [];
+  // Get the current component
+  const component = useMemo(() => {
+    return project?.components.find((c) => c.id === componentId);
   }, [project, componentId]);
+
+  const allPhotos = useMemo(() => {
+    return component?.media || [];
+  }, [component]);
+
+  // Media actions hook for CRUD operations
+  const { isLoading, loadingOperation, addPhotos, deletePhotos, setThumbnail } =
+    useMediaActions({
+      projectId: projectId || "",
+      componentId: componentId || "",
+      component,
+      currentCategory: selectedCategory,
+    });
 
   const { photoCounts, filteredPhotos } = usePhotoCategoryData({
     media: allPhotos,
@@ -168,19 +183,39 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
     setIsSelectingPhotos(!isSelectingPhotos);
   };
 
-  // Handle action bar buttons (placeholders for now)
-  const handleAddPhotosPress = () => {
-    console.log("Add photos");
-  };
+  // Handle action bar buttons
+  const handleAddPhotosPress = useCallback(async () => {
+    await addPhotos();
+  }, [addPhotos]);
 
-  const handleDeletePress = () => {
-    console.log("Delete photos:", Array.from(selectedPhotoIds));
-  };
+  const handleDeletePress = useCallback(async () => {
+    const photoIds = Array.from(selectedPhotoIds);
+    if (photoIds.length === 0) return;
 
-  const handleSetThumbnailPress = () => {
+    // Confirm deletion
+    Alert.alert(
+      "Delete Photos",
+      `Are you sure you want to delete ${photoIds.length} photo${photoIds.length > 1 ? "s" : ""}?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await deletePhotos(photoIds);
+            // Clear selection after delete
+            setSelectedPhotoIds(new Set());
+          },
+        },
+      ]
+    );
+  }, [selectedPhotoIds, deletePhotos]);
+
+  const handleSetThumbnailPress = useCallback(async () => {
     const selectedId = Array.from(selectedPhotoIds)[0];
-    console.log("Set thumbnail:", selectedId);
-  };
+    if (!selectedId) return;
+    await setThumbnail(selectedId);
+  }, [selectedPhotoIds, setThumbnail]);
 
   return (
     <ThemedView style={{ flex: 1 }}>
@@ -241,6 +276,8 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
           onAddPhotos={handleAddPhotosPress}
           onDelete={handleDeletePress}
           onSetThumbnail={handleSetThumbnailPress}
+          isLoading={isLoading}
+          loadingOperation={loadingOperation}
         />
       )}
     </ThemedView>

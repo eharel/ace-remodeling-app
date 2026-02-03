@@ -3,7 +3,7 @@ import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useMemo } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 
 interface ActionButtonProps {
   icon: keyof typeof MaterialIcons.glyphMap;
@@ -11,6 +11,7 @@ interface ActionButtonProps {
   onPress: () => void;
   disabled?: boolean;
   variant?: "default" | "danger";
+  isLoading?: boolean;
 }
 
 function ActionButton({
@@ -19,8 +20,11 @@ function ActionButton({
   onPress,
   disabled = false,
   variant = "default",
+  isLoading = false,
 }: ActionButtonProps) {
   const { theme } = useTheme();
+
+  const isDisabled = disabled || isLoading;
 
   const styles = useMemo(
     () =>
@@ -44,21 +48,21 @@ function ActionButton({
   );
 
   const iconColor = useMemo(() => {
-    if (disabled) return theme.colors.text.disabled;
+    if (isDisabled) return theme.colors.text.disabled;
     if (variant === "danger") return theme.colors.status.error;
     return theme.colors.text.primary;
-  }, [disabled, variant, theme]);
+  }, [isDisabled, variant, theme]);
 
   const textColor = useMemo(() => {
-    if (disabled) return theme.colors.text.disabled;
+    if (isDisabled) return theme.colors.text.disabled;
     if (variant === "danger") return theme.colors.status.error;
     return theme.colors.text.secondary;
-  }, [disabled, variant, theme]);
+  }, [isDisabled, variant, theme]);
 
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled}
+      disabled={isDisabled}
       style={({ pressed }) => [
         styles.button,
         {
@@ -70,9 +74,13 @@ function ActionButton({
       ]}
       accessibilityRole="button"
       accessibilityLabel={label}
-      accessibilityState={{ disabled }}
+      accessibilityState={{ disabled: isDisabled }}
     >
-      <MaterialIcons name={icon} size={24} color={iconColor} />
+      {isLoading ? (
+        <ActivityIndicator size={24} color={iconColor} />
+      ) : (
+        <MaterialIcons name={icon} size={24} color={iconColor} />
+      )}
       <ThemedText style={[styles.label, { color: textColor }]}>
         {label}
       </ThemedText>
@@ -85,6 +93,8 @@ interface EditModeActionBarProps {
   onAddPhotos: () => void;
   onDelete: () => void;
   onSetThumbnail: () => void;
+  isLoading?: boolean;
+  loadingOperation?: "add" | "delete" | "thumbnail" | null;
 }
 
 export function EditModeActionBar({
@@ -92,6 +102,8 @@ export function EditModeActionBar({
   onAddPhotos,
   onDelete,
   onSetThumbnail,
+  isLoading = false,
+  loadingOperation = null,
 }: EditModeActionBarProps) {
   const { theme } = useTheme();
 
@@ -129,6 +141,8 @@ export function EditModeActionBar({
         icon="add-photo-alternate"
         label="Add Photos"
         onPress={onAddPhotos}
+        disabled={isLoading}
+        isLoading={loadingOperation === "add"}
       />
 
       <View style={styles.divider} />
@@ -137,8 +151,9 @@ export function EditModeActionBar({
         icon="delete-outline"
         label="Delete"
         onPress={onDelete}
-        disabled={!hasSelection}
+        disabled={!hasSelection || isLoading}
         variant="danger"
+        isLoading={loadingOperation === "delete"}
       />
 
       <View style={styles.divider} />
@@ -147,7 +162,8 @@ export function EditModeActionBar({
         icon="image"
         label="Set Thumbnail"
         onPress={onSetThumbnail}
-        disabled={!hasSingleSelection}
+        disabled={!hasSingleSelection || isLoading}
+        isLoading={loadingOperation === "thumbnail"}
       />
     </ThemedView>
   );
