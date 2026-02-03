@@ -197,11 +197,12 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
           <View style={styles.headerRight}>
             {isEditing && (
               <ThemedButton
-                variant={isSelectingPhotos ? "primary" : "secondary"}
+                variant={isSelectingPhotos ? "ghost" : "secondary"}
                 size="small"
+                icon={isSelectingPhotos ? "close" : "check-box-outline-blank"}
                 onPress={handleSelectPhotosPress}
               >
-                {isSelectingPhotos ? "Done" : "Select"}
+                {isSelectingPhotos ? "Cancel" : "Select"}
               </ThemedButton>
             )}
             <EditButton onPress={handleEditPress} isEditing={isEditing} />
