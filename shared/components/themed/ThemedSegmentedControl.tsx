@@ -58,7 +58,7 @@ export function ThemedSegmentedControl<T extends string>({
       StyleSheet.create({
         container: {
           flexDirection: "row",
-          backgroundColor: theme.colors.background.secondary,
+          backgroundColor: theme.colors.background.accent,
           borderRadius: DesignTokens.borderRadius.base,
           padding: DesignTokens.spacing[1],
         },
@@ -71,8 +71,8 @@ export function ThemedSegmentedControl<T extends string>({
           alignItems: "center",
           justifyContent: "center",
           paddingVertical: isSmall
-            ? DesignTokens.spacing[1]
-            : DesignTokens.spacing[2],
+            ? DesignTokens.spacing[2]
+            : DesignTokens.spacing[3],
           paddingHorizontal: isSmall
             ? DesignTokens.spacing[2]
             : DesignTokens.spacing[3],
@@ -80,10 +80,10 @@ export function ThemedSegmentedControl<T extends string>({
           gap: DesignTokens.spacing[1],
         },
         selectedSegment: {
-          backgroundColor: theme.colors.background.elevated,
-          ...DesignTokens.shadows.sm,
-          shadowColor: theme.colors.shadows.sm.shadowColor,
-          shadowOpacity: theme.colors.shadows.sm.shadowOpacity,
+          backgroundColor: theme.colors.background.card,
+          ...DesignTokens.shadows.base,
+          shadowColor: theme.colors.shadows.base.shadowColor,
+          shadowOpacity: theme.colors.shadows.base.shadowOpacity,
         },
         label: {
           fontSize: isSmall
