@@ -85,6 +85,7 @@ export function PhotoGridList({
 
   return (
     <FlatList
+      key={`grid-${columns}`}
       numColumns={columns}
       data={photos}
       renderItem={renderItem}
@@ -92,6 +93,15 @@ export function PhotoGridList({
       extraData={[selectedIds, isEditing]}
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
+      removeClippedSubviews={true}
+      maxToRenderPerBatch={12}
+      windowSize={5}
+      initialNumToRender={12}
+      getItemLayout={(_, index) => ({
+        length: calculatedItemSize,
+        offset: calculatedItemSize * Math.floor(index / columns),
+        index,
+      })}
     />
   );
 }
