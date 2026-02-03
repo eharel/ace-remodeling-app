@@ -163,10 +163,18 @@ export default function ProjectDetailScreen() {
 
   // Get the current featured status (component level takes precedence)
   const isFeatured = useMemo(() => {
-    if (selectedComponent) {
-      return selectedComponent.isFeatured ?? project?.isFeatured ?? false;
-    }
-    return project?.isFeatured ?? false;
+    const result = selectedComponent
+      ? (selectedComponent.isFeatured ?? project?.isFeatured ?? false)
+      : (project?.isFeatured ?? false);
+
+    console.log("[FeaturedToggle] isFeatured calculation:", {
+      selectedComponentId: selectedComponent?.id,
+      selectedComponentIsFeatured: selectedComponent?.isFeatured,
+      projectIsFeatured: project?.isFeatured,
+      result,
+    });
+
+    return result;
   }, [selectedComponent, project]);
 
   const styles = useMemo(() => createProjectDetailStyles(theme), [theme]);

@@ -44,7 +44,7 @@ export function Can({
   children,
   fallback = null,
 }: CanProps) {
-  const { hasPermission, canEdit } = useAuth();
+  const { hasPermission, canEdit, user } = useAuth();
 
   let isAllowed = false;
 
@@ -55,6 +55,15 @@ export function Can({
     // Use hasPermission for specific permission check
     isAllowed = hasPermission(permission);
   }
+
+  // Debug logging
+  console.log("[Can] Permission check:", {
+    edit,
+    permission,
+    isAllowed,
+    userRole: user?.role,
+    userPermissions: user?.permissions,
+  });
 
   if (isAllowed) {
     return <>{children}</>;
