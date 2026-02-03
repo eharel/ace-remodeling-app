@@ -1,7 +1,8 @@
+import { DesignTokens } from "@/shared/themes";
 import { useResponsiveGrid } from "@/shared/hooks/useResponsiveGrid";
 import { MediaAsset } from "@/shared/types/MediaAsset";
-import { useCallback } from "react";
-import { FlatList } from "react-native";
+import { useCallback, useMemo } from "react";
+import { FlatList, StyleSheet, View } from "react-native";
 import { PhotoThumbnail } from "../PhotoThumbnail";
 
 interface PhotoGridListProps {
@@ -22,6 +23,8 @@ interface PhotoGridListProps {
  * - Image thumbnails with press handlers
  * - Loading states and placeholders
  */
+const GRID_GAP = DesignTokens.spacing[1]; // 4px gap between photos
+
 export function PhotoGridList({
   photos,
   onImagePress,
@@ -30,37 +33,66 @@ export function PhotoGridList({
   selectedIds = new Set(),
   onToggleSelection,
 }: PhotoGridListProps) {
-  const { columns, itemSize } = useResponsiveGrid("photos");
+  const { columns, screenWidth } = useResponsiveGrid("photos");
+
+  // Calculate item size accounting for gaps and padding
+  const calculatedItemSize = useMemo(() => {
+    const totalGaps = (columns - 1) * GRID_GAP;
+    const containerPadding = GRID_GAP * 2; // Padding on both sides
+    return (screenWidth - totalGaps - containerPadding) / columns;
+  }, [columns, screenWidth]);
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          padding: GRID_GAP,
+        },
+        itemContainer: {
+          padding: GRID_GAP / 2,
+        },
+      }),
+    []
+  );
 
   const renderItem = useCallback(
     ({ item, index }: { item: MediaAsset; index: number }) => {
       const isSelected = selectedIds.has(item.id);
 
       return (
-        <PhotoThumbnail
-          photoId={item.id}
-          uri={item.url} // Using the URL from your MediaAssetSchema
-          size={itemSize} // Using the calculated size from our hook
-          inSelectionMode={isSelectingPhotos}
-          isSelected={isSelected}
-          onPress={() => onImagePress?.(index)}
-          onSelect={onToggleSelection}
-        />
+        <View style={styles.itemContainer}>
+          <PhotoThumbnail
+            photoId={item.id}
+            uri={item.url}
+            size={calculatedItemSize - GRID_GAP}
+            inSelectionMode={isSelectingPhotos}
+            isSelected={isSelected}
+            onPress={() => onImagePress?.(index)}
+            onSelect={onToggleSelection}
+          />
+        </View>
       );
     },
-    [itemSize, onImagePress, isSelectingPhotos, selectedIds, onToggleSelection]
+    [
+      calculatedItemSize,
+      onImagePress,
+      isSelectingPhotos,
+      selectedIds,
+      onToggleSelection,
+      styles.itemContainer,
+    ]
   );
 
   return (
-    <>
-      <FlatList
-        numColumns={columns}
-        data={photos}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        extraData={[selectedIds, isEditing]}
-      />
-    </>
+    <FlatList
+      numColumns={columns}
+      data={photos}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      extraData={[selectedIds, isEditing]}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    />
   );
 }
 

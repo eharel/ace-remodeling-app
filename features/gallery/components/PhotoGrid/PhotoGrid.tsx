@@ -12,6 +12,7 @@ import { DesignTokens } from "@/shared/themes";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { EditModeActionBar } from "./EditModeActionBar";
 import { PhotoGridList } from "./PhotoGridList";
 
 interface PhotoGridProps {
@@ -83,13 +84,36 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: DesignTokens.spacing[4],
-          borderBottomWidth: 1,
+          paddingVertical: DesignTokens.spacing[3],
+          paddingHorizontal: DesignTokens.spacing[4],
+          borderBottomWidth: DesignTokens.borderWidth.thin,
           borderBottomColor: theme.colors.border.secondary,
+          backgroundColor: theme.colors.background.elevated,
+        },
+        headerLeft: {
+          flexDirection: "row",
+          alignItems: "center",
+          gap: DesignTokens.spacing[3],
+          flex: 1,
+        },
+        headerRight: {
+          flexDirection: "row",
+          alignItems: "center",
+          gap: DesignTokens.spacing[2],
         },
         title: {
-          fontSize: DesignTokens.typography.fontSize["2xl"],
+          fontSize: DesignTokens.typography.fontSize.xl,
           fontWeight: DesignTokens.typography.fontWeight.semibold,
+          color: theme.colors.text.primary,
+        },
+        selectionCount: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          fontWeight: DesignTokens.typography.fontWeight.medium,
+          color: theme.colors.interactive.primary,
+          backgroundColor: theme.colors.status.infoLight,
+          paddingVertical: DesignTokens.spacing[1],
+          paddingHorizontal: DesignTokens.spacing[2],
+          borderRadius: DesignTokens.borderRadius.sm,
         },
       }),
     [theme]
@@ -103,35 +127,49 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
     setIsSelectingPhotos(!isSelectingPhotos);
   };
 
-  // Handle add photo press
-  const handleAddPhotoPress = () => {
-    console.log("Add photo");
+  // Handle action bar buttons (placeholders for now)
+  const handleAddPhotosPress = () => {
+    console.log("Add photos");
+  };
+
+  const handleDeletePress = () => {
+    console.log("Delete photos:", Array.from(selectedPhotoIds));
+  };
+
+  const handleSetThumbnailPress = () => {
+    const selectedId = Array.from(selectedPhotoIds)[0];
+    console.log("Set thumbnail:", selectedId);
   };
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>
-        {/* Header */}
-        <View style={styles.header}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
           <ThemedText style={styles.title}>{getTitle()}</ThemedText>
+          {isEditing && isSelectingPhotos && selectedPhotoIds.size > 0 && (
+            <ThemedText style={styles.selectionCount}>
+              {selectedPhotoIds.size} selected
+            </ThemedText>
+          )}
+        </View>
+
+        <View style={styles.headerRight}>
           {isEditing && (
-            <>
-              <ThemedText style={styles.title}>
-                {selectedPhotoIds.size > 0
-                  ? `${selectedPhotoIds.size} selected`
-                  : "Editing"}
-              </ThemedText>
-              <ThemedButton onPress={handleSelectPhotosPress}>
-                {isSelectingPhotos ? "Cancel" : "Select"}
-              </ThemedButton>
-              <ThemedButton onPress={handleAddPhotoPress} icon="add">
-                Add Photo
-              </ThemedButton>
-            </>
+            <ThemedButton
+              variant={isSelectingPhotos ? "primary" : "secondary"}
+              size="small"
+              onPress={handleSelectPhotosPress}
+            >
+              {isSelectingPhotos ? "Done" : "Select"}
+            </ThemedButton>
           )}
           <EditButton onPress={handleEditPress} />
         </View>
+      </View>
 
+      {/* Photo Grid */}
+      <View style={{ flex: 1 }}>
         <PhotoGridList
           photos={filteredPhotos}
           onImagePress={onImagePress}
@@ -141,6 +179,16 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
           onToggleSelection={handleToggleSelection}
         />
       </View>
+
+      {/* Bottom Action Bar - only visible in edit mode */}
+      {isEditing && (
+        <EditModeActionBar
+          selectedCount={selectedPhotoIds.size}
+          onAddPhotos={handleAddPhotosPress}
+          onDelete={handleDeletePress}
+          onSetThumbnail={handleSetThumbnailPress}
+        />
+      )}
     </ThemedView>
   );
 }

@@ -1,9 +1,10 @@
 import { useTheme } from "@/shared/contexts";
+import { DesignTokens } from "@/shared/themes";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { Image } from "expo-image"; // Better performance than standard Image
-import React, { memo, useEffect } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Image } from "expo-image";
+import React, { memo, useEffect, useMemo } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -33,142 +34,154 @@ export const PhotoThumbnail = memo(function PhotoThumbnail({
 }: PhotoThumbnailProps) {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
-  const checkmarkOpacity = useSharedValue(0);
-  const overlayOpacity = useSharedValue(0);
+  const checkmarkScale = useSharedValue(0);
+  const borderOpacity = useSharedValue(0);
 
   // Animate selection state changes
   useEffect(() => {
     if (isSelected && inSelectionMode) {
-      scale.value = withSpring(0.92, {
-        damping: 15,
-        stiffness: 150,
+      scale.value = withSpring(0.94, {
+        damping: 18,
+        stiffness: 200,
       });
-      checkmarkOpacity.value = withTiming(1, { duration: 200 });
-      overlayOpacity.value = withTiming(0.2, { duration: 200 });
+      checkmarkScale.value = withSpring(1, {
+        damping: 12,
+        stiffness: 180,
+      });
+      borderOpacity.value = withTiming(1, { duration: 150 });
     } else {
       scale.value = withSpring(1, {
-        damping: 15,
-        stiffness: 150,
+        damping: 18,
+        stiffness: 200,
       });
-      checkmarkOpacity.value = withTiming(0, { duration: 200 });
-      overlayOpacity.value = withTiming(0, { duration: 200 });
+      checkmarkScale.value = withSpring(0, {
+        damping: 12,
+        stiffness: 180,
+      });
+      borderOpacity.value = withTiming(0, { duration: 150 });
     }
-  }, [isSelected, inSelectionMode, scale, checkmarkOpacity, overlayOpacity]);
+  }, [isSelected, inSelectionMode, scale, checkmarkScale, borderOpacity]);
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
   const animatedCheckmarkStyle = useAnimatedStyle(() => ({
-    opacity: checkmarkOpacity.value,
+    transform: [{ scale: checkmarkScale.value }],
+    opacity: checkmarkScale.value,
   }));
 
-  const animatedOverlayStyle = useAnimatedStyle(() => ({
-    opacity: overlayOpacity.value,
+  const animatedBorderStyle = useAnimatedStyle(() => ({
+    opacity: borderOpacity.value,
   }));
 
   const handlePress = () => {
     if (inSelectionMode && onSelect) {
-      // In editing mode, toggle selection
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       onSelect(photoId);
     } else {
-      // Normal mode, open image
       onPress();
     }
   };
 
   const primaryColor = theme.colors.interactive.primary;
 
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        pressable: {
+          width: size,
+          height: size,
+        },
+        container: {
+          width: size,
+          height: size,
+          borderRadius: DesignTokens.borderRadius.base,
+          overflow: "hidden",
+          backgroundColor: theme.colors.background.secondary,
+        },
+        image: {
+          flex: 1,
+          backgroundColor: theme.colors.background.tertiary,
+        },
+        selectionBorder: {
+          ...StyleSheet.absoluteFillObject,
+          borderRadius: DesignTokens.borderRadius.base,
+          borderWidth: DesignTokens.borderWidth.thick,
+          borderColor: primaryColor,
+        },
+        checkmarkContainer: {
+          position: "absolute",
+          top: DesignTokens.spacing[2],
+          right: DesignTokens.spacing[2],
+          width: 26,
+          height: 26,
+          borderRadius: DesignTokens.borderRadius.full,
+          backgroundColor: primaryColor,
+          justifyContent: "center",
+          alignItems: "center",
+          ...DesignTokens.shadows.md,
+          shadowColor: theme.colors.shadows.md.shadowColor,
+          shadowOpacity: theme.colors.shadows.md.shadowOpacity,
+        },
+        unselectedIndicator: {
+          position: "absolute",
+          top: DesignTokens.spacing[2],
+          right: DesignTokens.spacing[2],
+          width: 26,
+          height: 26,
+          borderRadius: DesignTokens.borderRadius.full,
+          backgroundColor: theme.colors.background.overlay,
+          borderWidth: DesignTokens.borderWidth.base,
+          borderColor: theme.colors.text.inverse,
+          justifyContent: "center",
+          alignItems: "center",
+        },
+      }),
+    [size, theme, primaryColor]
+  );
+
   return (
     <Pressable
       onPress={handlePress}
       style={({ pressed }) => [
-        {
-          width: size,
-          height: size,
-          opacity: pressed && !inSelectionMode ? 0.8 : 1,
-        },
+        styles.pressable,
+        { opacity: pressed && !inSelectionMode ? 0.85 : 1 },
       ]}
     >
-      <Animated.View
-        style={[
-          {
-            width: size,
-            height: size,
-            borderRadius: 4,
-            overflow: "hidden",
-            borderWidth: isSelected && inSelectionMode ? 3 : 0,
-            borderColor:
-              isSelected && inSelectionMode ? primaryColor : "transparent",
-          },
-          animatedContainerStyle,
-        ]}
-      >
+      <Animated.View style={[styles.container, animatedContainerStyle]}>
         <Image
           source={{ uri }}
           style={styles.image}
           contentFit="cover"
-          transition={200} // Smooth fade-in
+          transition={200}
           cachePolicy="memory-disk"
         />
 
-        {/* Overlay when selected in editing mode */}
-        {isSelected && inSelectionMode && (
-          <Animated.View
-            style={[
-              styles.overlay,
-              {
-                backgroundColor: primaryColor,
-              },
-              animatedOverlayStyle,
-            ]}
-          />
+        {/* Selection border overlay */}
+        {inSelectionMode && (
+          <Animated.View style={[styles.selectionBorder, animatedBorderStyle]} />
         )}
 
-        {/* Checkmark when selected in editing mode */}
-        {isSelected && inSelectionMode && (
+        {/* Checkmark when selected */}
+        {inSelectionMode && isSelected && (
           <Animated.View
-            style={[
-              styles.checkmarkContainer,
-              {
-                backgroundColor: primaryColor,
-              },
-              animatedCheckmarkStyle,
-            ]}
+            style={[styles.checkmarkContainer, animatedCheckmarkStyle]}
           >
-            <MaterialIcons name="check" size={16} color="#ffffff" />
+            <MaterialIcons
+              name="check"
+              size={18}
+              color={theme.colors.text.inverse}
+            />
           </Animated.View>
+        )}
+
+        {/* Empty circle indicator when in selection mode but not selected */}
+        {inSelectionMode && !isSelected && (
+          <View style={styles.unselectedIndicator} />
         )}
       </Animated.View>
     </Pressable>
   );
 });
 
-const styles = StyleSheet.create({
-  image: {
-    flex: 1,
-    backgroundColor: "#222", // Placeholder color
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  checkmarkContainer: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-});
