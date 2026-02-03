@@ -68,23 +68,22 @@ export function ThemedSegmentedControl<T extends string>({
           shadowOpacity: theme.colors.shadows.base.shadowOpacity,
         },
         label: {
-          fontSize: isSmall
-            ? DesignTokens.typography.fontSize.xs
-            : DesignTokens.typography.fontSize.sm,
-          fontWeight: "500" as const,
-          color: theme.colors.text.secondary,
+          fontSize: 12,
+          fontWeight: "500",
+          color: "#333333",
         },
         selectedLabel: {
-          color: theme.colors.text.primary,
-          fontWeight: "600" as const,
+          color: "#000000",
+          fontWeight: "600",
         },
         count: {
-          fontSize: DesignTokens.typography.fontSize.xs,
-          fontWeight: "500" as const,
-          color: theme.colors.text.secondary,
+          fontSize: 11,
+          fontWeight: "500",
+          color: "#666666",
+          marginLeft: 4,
         },
         selectedCount: {
-          color: theme.colors.interactive.primary,
+          color: "#BB9D67",
         },
       }),
     [theme, isSmall]
