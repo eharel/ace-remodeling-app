@@ -93,12 +93,13 @@ export function useMediaActions({
   const addPhotos = useCallback(async () => {
     try {
       setError(null);
-      setLoadingOperation("add");
-      setIsLoading(true);
 
-      // Request permission
+      // Request permission first (before showing loading state)
+      console.log("[useMediaActions] Requesting media library permissions...");
       const permissionResult =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      console.log("[useMediaActions] Permission result:", permissionResult);
 
       if (!permissionResult.granted) {
         Alert.alert(
@@ -108,7 +109,8 @@ export function useMediaActions({
         return;
       }
 
-      // Launch image picker
+      // Launch image picker (before showing loading state)
+      console.log("[useMediaActions] Launching image picker...");
       const pickerResult = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsMultipleSelection: true,
@@ -116,15 +118,26 @@ export function useMediaActions({
         exif: false,
       });
 
+      console.log("[useMediaActions] Picker result:", {
+        canceled: pickerResult.canceled,
+        assetCount: pickerResult.assets?.length ?? 0,
+      });
+
       if (pickerResult.canceled || pickerResult.assets.length === 0) {
         return;
       }
+
+      // NOW show loading state - user has selected photos
+      setLoadingOperation("add");
+      setIsLoading(true);
 
       // Prepare files for upload
       const files = pickerResult.assets.map((asset) => ({
         uri: asset.uri,
         filename: asset.fileName || getFilenameFromUri(asset.uri),
       }));
+
+      console.log("[useMediaActions] Preparing to upload", files.length, "files");
 
       // Get current media to determine order for new items
       const currentMedia = component?.media || [];
@@ -143,8 +156,15 @@ export function useMediaActions({
         order: maxOrder + 1,
       };
 
+      console.log("[useMediaActions] Upload options:", uploadOptions);
+
       // Upload files
       const results = await uploadMultipleMedia(files, uploadOptions);
+
+      console.log("[useMediaActions] Upload results:", results.map(r => ({
+        success: r.success,
+        error: r.error,
+      })));
 
       // Check for errors
       const successfulAssets = results
