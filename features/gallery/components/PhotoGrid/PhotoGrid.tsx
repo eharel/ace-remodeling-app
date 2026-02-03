@@ -204,7 +204,7 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
                 {isSelectingPhotos ? "Done" : "Select"}
               </ThemedButton>
             )}
-            <EditButton onPress={handleEditPress} />
+            <EditButton onPress={handleEditPress} isEditing={isEditing} />
           </View>
         </View>
 
