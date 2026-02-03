@@ -9,6 +9,7 @@ import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreview"
 import {
   AssetsSection,
   EditDescriptionModal,
+  FeaturedToggle,
   ProjectLogsSection,
   ProjectMetaGrid,
   TestimonialSection,
@@ -147,6 +148,26 @@ export default function ProjectDetailScreen() {
     }
   };
 
+  const handleToggleFeatured = async (value: boolean) => {
+    if (!project) return;
+
+    if (selectedComponent?.id) {
+      await updateComponent(project.id, selectedComponent.id, {
+        isFeatured: value,
+      });
+    } else {
+      await updateProjectContext(project.id, { isFeatured: value });
+    }
+  };
+
+  // Get the current featured status (component level takes precedence)
+  const isFeatured = useMemo(() => {
+    if (selectedComponent) {
+      return selectedComponent.isFeatured ?? project?.isFeatured ?? false;
+    }
+    return project?.isFeatured ?? false;
+  }, [selectedComponent, project]);
+
   const styles = useMemo(() => createProjectDetailStyles(theme), [theme]);
 
   if (isLoading && !project) {
@@ -251,6 +272,13 @@ export default function ProjectDetailScreen() {
               selectedComponent={selectedComponent}
               displayTimeline={displayTimeline}
             />
+
+            <View style={{ marginTop: DesignTokens.spacing[4] }}>
+              <FeaturedToggle
+                isFeatured={isFeatured}
+                onToggle={handleToggleFeatured}
+              />
+            </View>
           </ThemedView>
 
           <PhotoPreviewSection
