@@ -278,6 +278,7 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
           onSetThumbnail={handleSetThumbnailPress}
           isLoading={isLoading}
           loadingOperation={loadingOperation}
+          canAddPhotos={selectedCategory !== "all"}
         />
       )}
     </ThemedView>

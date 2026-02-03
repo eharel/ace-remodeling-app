@@ -95,6 +95,8 @@ interface EditModeActionBarProps {
   onSetThumbnail: () => void;
   isLoading?: boolean;
   loadingOperation?: "add" | "delete" | "thumbnail" | null;
+  /** Whether adding photos is allowed (disabled when viewing "All" category) */
+  canAddPhotos?: boolean;
 }
 
 export function EditModeActionBar({
@@ -104,6 +106,7 @@ export function EditModeActionBar({
   onSetThumbnail,
   isLoading = false,
   loadingOperation = null,
+  canAddPhotos = true,
 }: EditModeActionBarProps) {
   const { theme } = useTheme();
 
@@ -139,9 +142,9 @@ export function EditModeActionBar({
     <ThemedView style={styles.container}>
       <ActionButton
         icon="add-photo-alternate"
-        label="Add Photos"
+        label={canAddPhotos ? "Add Photos" : "Select Category"}
         onPress={onAddPhotos}
-        disabled={isLoading}
+        disabled={!canAddPhotos || isLoading}
         isLoading={loadingOperation === "add"}
       />
 
