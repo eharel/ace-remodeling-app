@@ -161,11 +161,14 @@ export default function ProjectDetailScreen() {
     }
   };
 
-  // Get the current featured status (component level takes precedence)
+  // Get the effective featured status
+  // Matches showcase logic: featured if project.isFeatured OR component.isFeatured
   const isFeatured = useMemo(() => {
-    const result = selectedComponent
-      ? (selectedComponent.isFeatured ?? project?.isFeatured ?? false)
-      : (project?.isFeatured ?? false);
+    const componentFeatured = selectedComponent?.isFeatured ?? false;
+    const projectFeatured = project?.isFeatured ?? false;
+
+    // Use OR logic to match what the showcase displays
+    const result = componentFeatured || projectFeatured;
 
     console.log("[FeaturedToggle] isFeatured calculation:", {
       selectedComponentId: selectedComponent?.id,
