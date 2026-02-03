@@ -1,13 +1,8 @@
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
-import React, { useMemo } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
-import { ThemedText } from "./ThemedText";
+import { useMemo } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 export interface SegmentOption<T extends string> {
   value: T;
@@ -28,7 +23,6 @@ interface ThemedSegmentedControlProps<T extends string> {
  *
  * Features:
  * - Multiple segment options with labels and optional counts
- * - Smooth animated selection indicator
  * - Theme-aware styling
  * - Two size variants (small, medium)
  */
@@ -39,17 +33,6 @@ export function ThemedSegmentedControl<T extends string>({
   size = "medium",
 }: ThemedSegmentedControlProps<T>) {
   const { theme } = useTheme();
-  const selectedIndex = options.findIndex((opt) => opt.value === selectedValue);
-
-  // Animation for the selection indicator
-  const indicatorPosition = useSharedValue(selectedIndex);
-
-  // Update indicator position when selection changes
-  React.useEffect(() => {
-    indicatorPosition.value = withTiming(selectedIndex, {
-      duration: DesignTokens.animations.duration.fast,
-    });
-  }, [selectedIndex, indicatorPosition]);
 
   const isSmall = size === "small";
 
@@ -103,7 +86,7 @@ export function ThemedSegmentedControl<T extends string>({
             ? DesignTokens.typography.fontSize.xs
             : DesignTokens.typography.fontSize.xs,
           fontWeight: DesignTokens.typography.fontWeight.medium,
-          color: theme.colors.text.tertiary,
+          color: theme.colors.text.secondary,
         },
         selectedCount: {
           color: theme.colors.interactive.primary,
@@ -129,20 +112,20 @@ export function ThemedSegmentedControl<T extends string>({
             <Animated.View
               style={[styles.segment, isSelected && styles.selectedSegment]}
             >
-              <ThemedText
+              <Text
                 style={[
                   styles.label,
                   isSelected ? styles.selectedLabel : styles.unselectedLabel,
                 ]}
               >
                 {option.label}
-              </ThemedText>
+              </Text>
               {option.count !== undefined && (
-                <ThemedText
+                <Text
                   style={[styles.count, isSelected && styles.selectedCount]}
                 >
                   {option.count}
-                </ThemedText>
+                </Text>
               )}
             </Animated.View>
           </Pressable>
