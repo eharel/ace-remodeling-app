@@ -2,7 +2,6 @@ import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import { useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
 
 export interface SegmentOption<T extends string> {
   value: T;
@@ -72,20 +71,16 @@ export function ThemedSegmentedControl<T extends string>({
           fontSize: isSmall
             ? DesignTokens.typography.fontSize.xs
             : DesignTokens.typography.fontSize.sm,
-          fontWeight: DesignTokens.typography.fontWeight.medium,
+          fontWeight: "500" as const,
+          color: theme.colors.text.secondary,
         },
         selectedLabel: {
           color: theme.colors.text.primary,
-          fontWeight: DesignTokens.typography.fontWeight.semibold,
-        },
-        unselectedLabel: {
-          color: theme.colors.text.secondary,
+          fontWeight: "600" as const,
         },
         count: {
-          fontSize: isSmall
-            ? DesignTokens.typography.fontSize.xs
-            : DesignTokens.typography.fontSize.xs,
-          fontWeight: DesignTokens.typography.fontWeight.medium,
+          fontSize: DesignTokens.typography.fontSize.xs,
+          fontWeight: "500" as const,
           color: theme.colors.text.secondary,
         },
         selectedCount: {
@@ -97,7 +92,7 @@ export function ThemedSegmentedControl<T extends string>({
 
   return (
     <View style={styles.container}>
-      {options.map((option, index) => {
+      {options.map((option) => {
         const isSelected = option.value === selectedValue;
 
         return (
@@ -109,13 +104,11 @@ export function ThemedSegmentedControl<T extends string>({
             accessibilityState={{ selected: isSelected }}
             accessibilityLabel={`${option.label}${option.count !== undefined ? `, ${option.count} items` : ""}`}
           >
-            <Animated.View
-              style={[styles.segment, isSelected && styles.selectedSegment]}
-            >
+            <View style={[styles.segment, isSelected && styles.selectedSegment]}>
               <Text
                 style={[
                   styles.label,
-                  isSelected ? styles.selectedLabel : styles.unselectedLabel,
+                  isSelected && styles.selectedLabel,
                 ]}
               >
                 {option.label}
@@ -127,7 +120,7 @@ export function ThemedSegmentedControl<T extends string>({
                   {option.count}
                 </Text>
               )}
-            </Animated.View>
+            </View>
           </Pressable>
         );
       })}
