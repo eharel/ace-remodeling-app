@@ -17,6 +17,7 @@ export { EditButton } from "./EditButton";
 export { ThemedButton } from "./themed/ThemedButton";
 export { ThemedIconButton } from "./themed/ThemedIconButton";
 export { ThemedInput } from "./themed/ThemedInput";
+export { ThemedSegmentedControl } from "./themed/ThemedSegmentedControl";
 export { ThemedText } from "./themed/ThemedText";
 export { ThemedView } from "./themed/ThemedView";
 

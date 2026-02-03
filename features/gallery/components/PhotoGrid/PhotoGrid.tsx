@@ -3,12 +3,14 @@ import { useProject } from "@/features/projects/hooks/useProject";
 import {
   EditButton,
   ThemedButton,
+  ThemedSegmentedControl,
   ThemedText,
   ThemedView,
 } from "@/shared/components";
-import { type PhotoCategory, PHOTO_CATEGORY_LABELS } from "@/shared/constants";
+import { type PhotoCategory, PHOTO_CATEGORIES } from "@/shared/constants";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
+import type { SegmentOption } from "@/shared/components/themed/ThemedSegmentedControl";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -33,6 +35,10 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
 
   const { project } = useProject(projectId);
 
+  // Local state for category selection (initialized from URL param if present)
+  const [selectedCategory, setSelectedCategory] = useState<PhotoCategory>(
+    activePhotoCategory || "all"
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [isSelectingPhotos, setIsSelectingPhotos] = useState(false);
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(
@@ -67,28 +73,57 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
 
   const { photoCounts, filteredPhotos } = usePhotoCategoryData({
     media: allPhotos,
-    activePhotoCategory: activePhotoCategory || "all",
+    activePhotoCategory: selectedCategory,
   });
 
-  // Get display title based on active category
-  const getTitle = () => {
-    const count = photoCounts[activePhotoCategory];
-    const label = PHOTO_CATEGORY_LABELS[activePhotoCategory];
-    return `${label} (${count})`;
-  };
+  // Build category options for the segmented control
+  const categoryOptions: SegmentOption<PhotoCategory>[] = useMemo(
+    () => [
+      {
+        value: PHOTO_CATEGORIES.ALL,
+        label: "All",
+        count: photoCounts.all,
+      },
+      {
+        value: PHOTO_CATEGORIES.BEFORE,
+        label: "Before",
+        count: photoCounts.before,
+      },
+      {
+        value: PHOTO_CATEGORIES.PROGRESS,
+        label: "Progress",
+        count: photoCounts.progress,
+      },
+      {
+        value: PHOTO_CATEGORIES.AFTER,
+        label: "After",
+        count: photoCounts.after,
+      },
+    ],
+    [photoCounts]
+  );
+
+  // Handle category change
+  const handleCategoryChange = useCallback((category: PhotoCategory) => {
+    setSelectedCategory(category);
+    // Clear selection when changing categories
+    setSelectedPhotoIds(new Set());
+  }, []);
 
   const styles = useMemo(
     () =>
       StyleSheet.create({
+        headerContainer: {
+          backgroundColor: theme.colors.background.elevated,
+          borderBottomWidth: DesignTokens.borderWidth.thin,
+          borderBottomColor: theme.colors.border.secondary,
+        },
         header: {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
           paddingVertical: DesignTokens.spacing[3],
           paddingHorizontal: DesignTokens.spacing[4],
-          borderBottomWidth: DesignTokens.borderWidth.thin,
-          borderBottomColor: theme.colors.border.secondary,
-          backgroundColor: theme.colors.background.elevated,
         },
         headerLeft: {
           flexDirection: "row",
@@ -114,6 +149,10 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
           paddingVertical: DesignTokens.spacing[1],
           paddingHorizontal: DesignTokens.spacing[2],
           borderRadius: DesignTokens.borderRadius.sm,
+        },
+        categoryFilter: {
+          paddingHorizontal: DesignTokens.spacing[4],
+          paddingBottom: DesignTokens.spacing[3],
         },
       }),
     [theme]
@@ -144,27 +183,39 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
   return (
     <ThemedView style={{ flex: 1 }}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <ThemedText style={styles.title}>{getTitle()}</ThemedText>
-          {isEditing && isSelectingPhotos && selectedPhotoIds.size > 0 && (
-            <ThemedText style={styles.selectionCount}>
-              {selectedPhotoIds.size} selected
-            </ThemedText>
-          )}
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <ThemedText style={styles.title}>Photos</ThemedText>
+            {isEditing && isSelectingPhotos && selectedPhotoIds.size > 0 && (
+              <ThemedText style={styles.selectionCount}>
+                {selectedPhotoIds.size} selected
+              </ThemedText>
+            )}
+          </View>
+
+          <View style={styles.headerRight}>
+            {isEditing && (
+              <ThemedButton
+                variant={isSelectingPhotos ? "primary" : "secondary"}
+                size="small"
+                onPress={handleSelectPhotosPress}
+              >
+                {isSelectingPhotos ? "Done" : "Select"}
+              </ThemedButton>
+            )}
+            <EditButton onPress={handleEditPress} />
+          </View>
         </View>
 
-        <View style={styles.headerRight}>
-          {isEditing && (
-            <ThemedButton
-              variant={isSelectingPhotos ? "primary" : "secondary"}
-              size="small"
-              onPress={handleSelectPhotosPress}
-            >
-              {isSelectingPhotos ? "Done" : "Select"}
-            </ThemedButton>
-          )}
-          <EditButton onPress={handleEditPress} />
+        {/* Category Filter */}
+        <View style={styles.categoryFilter}>
+          <ThemedSegmentedControl
+            options={categoryOptions}
+            selectedValue={selectedCategory}
+            onValueChange={handleCategoryChange}
+            size="small"
+          />
         </View>
       </View>
 
