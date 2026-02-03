@@ -126,8 +126,12 @@ export function ThemedSegmentedControl<T extends string>({
   return (
     <View style={[styles.container, isLoading && styles.containerLoading]}>
       {options.map((option) => {
-        const isSelected = option.value === selectedValue;
+        const isCurrentlySelected = option.value === selectedValue;
         const isPending = option.value === pendingValue;
+        // When something is pending, only show the pending one as "selected"
+        const showAsSelected = pendingValue
+          ? isPending
+          : isCurrentlySelected;
 
         return (
           <Pressable
@@ -136,14 +140,13 @@ export function ThemedSegmentedControl<T extends string>({
             onPress={() => handlePress(option.value)}
             disabled={isLoading}
             accessibilityRole="button"
-            accessibilityState={{ selected: isSelected, busy: isPending }}
+            accessibilityState={{ selected: isCurrentlySelected, busy: isPending }}
             accessibilityLabel={`${option.label}${option.count !== undefined ? `, ${option.count} items` : ""}`}
           >
             <View
               style={[
                 styles.segment,
-                isSelected && styles.selectedSegment,
-                isPending && styles.pendingSegment,
+                showAsSelected && styles.selectedSegment,
               ]}
             >
               {isPending ? (
@@ -156,8 +159,8 @@ export function ThemedSegmentedControl<T extends string>({
                   <Text
                     style={[
                       styles.label,
-                      isSelected && styles.selectedLabel,
-                      isLoading && !isSelected && styles.disabledLabel,
+                      showAsSelected && styles.selectedLabel,
+                      isLoading && !showAsSelected && styles.disabledLabel,
                     ]}
                   >
                     {option.label}
@@ -166,8 +169,8 @@ export function ThemedSegmentedControl<T extends string>({
                     <Text
                       style={[
                         styles.count,
-                        isSelected && styles.selectedCount,
-                        isLoading && !isSelected && styles.disabledLabel,
+                        showAsSelected && styles.selectedCount,
+                        isLoading && !showAsSelected && styles.disabledLabel,
                       ]}
                     >
                       {option.count}
