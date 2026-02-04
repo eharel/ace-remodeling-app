@@ -32,7 +32,9 @@ import {
   getSubcategoryLabel,
   ProjectComponent,
 } from "@/shared/types";
+import { CoreCategory } from "@/shared/types/ComponentCategory";
 import { ProjectStatus } from "@/shared/types/Status";
+import { checkProjectNumberExists } from "@/services/projects/projectsService";
 
 export default function ProjectDetailScreen() {
   const {
@@ -170,6 +172,41 @@ export default function ProjectDetailScreen() {
     await updateProjectContext(project.id, { status });
   };
 
+  // Update component category
+  const handleCategoryChange = async (category: CoreCategory) => {
+    if (!project || !selectedComponent?.id) return;
+    await updateComponent(project.id, selectedComponent.id, { category });
+  };
+
+  // Update project location
+  const handleLocationChange = async (location: { neighborhood?: string; zipCode?: string }) => {
+    if (!project) return;
+    await updateProjectContext(project.id, {
+      location: {
+        ...project.location,
+        ...location,
+      },
+    });
+  };
+
+  // Update project number with validation
+  const handleProjectNumberChange = async (
+    newNumber: string
+  ): Promise<{ valid: boolean; error?: string }> => {
+    if (!project) return { valid: false, error: "Project not found" };
+    if (!newNumber.trim()) return { valid: false, error: "Project number is required" };
+
+    // Check if the number already exists (excluding current project)
+    const exists = await checkProjectNumberExists(newNumber.trim(), project.id);
+    if (exists) {
+      return { valid: false, error: "This project number already exists" };
+    }
+
+    // Update the project
+    await updateProjectContext(project.id, { number: newNumber.trim() });
+    return { valid: true };
+  };
+
   // Get the featured status for the currently viewed component
   // Featuring is now per-component only
   const isFeatured = useMemo(() => {
@@ -211,7 +248,7 @@ export default function ProjectDetailScreen() {
               <ThemedIconButton
                 icon={isEditMode ? "check" : "edit"}
                 onPress={() => setIsEditMode(!isEditMode)}
-                variant={isEditMode ? "primary" : "ghost"}
+                variant={isEditMode ? "success" : "ghost"}
                 size="small"
                 accessibilityLabel={isEditMode ? "Done editing" : "Edit project"}
               />
@@ -315,6 +352,9 @@ export default function ProjectDetailScreen() {
               displayTimeline={displayTimeline}
               isEditMode={isEditMode}
               onStatusChange={handleStatusChange}
+              onCategoryChange={handleCategoryChange}
+              onLocationChange={handleLocationChange}
+              onProjectNumberChange={handleProjectNumberChange}
             />
 
             {/* Featured toggle - only shown in edit mode */}

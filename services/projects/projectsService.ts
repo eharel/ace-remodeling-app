@@ -122,6 +122,29 @@ export const updateProject = async (
 };
 
 /**
+ * Check if a project number already exists in the database
+ * @param projectNumber - The project number to check
+ * @param excludeProjectId - Optional project ID to exclude (for updates)
+ * @returns true if the number exists, false otherwise
+ */
+export const checkProjectNumberExists = async (
+  projectNumber: string,
+  excludeProjectId?: string
+): Promise<boolean> => {
+  const projectsCollection = collection(db, PROJECTS_COLLECTION);
+  const querySnapshot = await getDocs(projectsCollection);
+
+  return querySnapshot.docs.some((doc) => {
+    // Exclude the current project when checking (for updates)
+    if (excludeProjectId && doc.id === excludeProjectId) {
+      return false;
+    }
+    const data = doc.data();
+    return data.number === projectNumber;
+  });
+};
+
+/**
  * Input for creating a new project
  */
 export interface CreateProjectInput {

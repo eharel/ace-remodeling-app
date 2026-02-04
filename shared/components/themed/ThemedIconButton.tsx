@@ -22,6 +22,7 @@ import { useTheme } from "@/shared/contexts";
  * - overlay: Semi-transparent background (good for modals, galleries)
  * - primary: Primary interactive color background
  * - secondary: Secondary interactive color background
+ * - success: Green success color background (good for confirm/done actions)
  * - ghost: No background, just the icon
  *
  * Sizes:
@@ -34,7 +35,7 @@ export interface ThemedIconButtonProps extends Omit<PressableProps, "style"> {
   /** Material icon name */
   icon: keyof typeof MaterialIcons.glyphMap;
   /** Button variant */
-  variant?: "overlay" | "primary" | "secondary" | "ghost";
+  variant?: "overlay" | "primary" | "secondary" | "success" | "ghost";
   /** Button size */
   size?: "small" | "medium" | "large";
   /** Custom icon size (overrides size preset) */
@@ -100,6 +101,13 @@ export function ThemedIconButton({
         case "secondary":
           return {
             backgroundColor: theme.colors.interactive.secondary,
+            iconColor: theme.colors.text.inverse,
+            borderColor: undefined,
+            borderWidth: DesignTokens.borderWidth.none,
+          };
+        case "success":
+          return {
+            backgroundColor: theme.colors.status.success,
             iconColor: theme.colors.text.inverse,
             borderColor: undefined,
             borderWidth: DesignTokens.borderWidth.none,
