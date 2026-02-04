@@ -213,6 +213,12 @@ export default function CreateProjectScreen() {
           backgroundColor: theme.colors.background.elevated,
           borderTopWidth: DesignTokens.borderWidth.thin,
           borderTopColor: theme.colors.border.primary,
+          alignItems: "center",
+        },
+        submitButton: {
+          backgroundColor: theme.colors.status.success,
+          borderRadius: DesignTokens.borderRadius.lg,
+          paddingHorizontal: DesignTokens.spacing[10],
         },
       }),
     [theme]
@@ -384,9 +390,8 @@ export default function CreateProjectScreen() {
             onPress={handleSubmit}
             disabled={!isValid}
             loading={isSubmitting}
-            fullWidth
             size="large"
-            style={{ borderRadius: DesignTokens.borderRadius.lg }}
+            style={styles.submitButton}
           >
             Create Project
           </ThemedButton>
