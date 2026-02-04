@@ -22,6 +22,8 @@ import {
   ThemedIconButton,
   ThemedText,
   ThemedView,
+  Toast,
+  ToastType,
 } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
@@ -70,6 +72,17 @@ export default function ProjectDetailScreen() {
   // Inline description editing state
   const [editedDescription, setEditedDescription] = useState<string>("");
   const [isSavingDescription, setIsSavingDescription] = useState<boolean>(false);
+
+  // Toast state for feedback
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    type: ToastType;
+  }>({ visible: false, message: "", type: "info" });
+
+  const showToast = (message: string, type: ToastType = "info") => {
+    setToast({ visible: true, message, type });
+  };
 
   // Preload all component images when project loads
   useEffect(() => {
@@ -169,24 +182,39 @@ export default function ProjectDetailScreen() {
   // Update project status
   const handleStatusChange = async (status: ProjectStatus) => {
     if (!project) return;
-    await updateProjectContext(project.id, { status });
+    try {
+      await updateProjectContext(project.id, { status });
+      showToast("Status updated", "success");
+    } catch (error) {
+      showToast("Failed to update status", "error");
+    }
   };
 
   // Update component category
   const handleCategoryChange = async (category: CoreCategory) => {
     if (!project || !selectedComponent?.id) return;
-    await updateComponent(project.id, selectedComponent.id, { category });
+    try {
+      await updateComponent(project.id, selectedComponent.id, { category });
+      showToast("Category updated", "success");
+    } catch (error) {
+      showToast("Failed to update category", "error");
+    }
   };
 
   // Update project location
   const handleLocationChange = async (location: { neighborhood?: string; zipCode?: string }) => {
     if (!project) return;
-    await updateProjectContext(project.id, {
-      location: {
-        ...project.location,
-        ...location,
-      },
-    });
+    try {
+      await updateProjectContext(project.id, {
+        location: {
+          ...project.location,
+          ...location,
+        },
+      });
+      showToast("Location updated", "success");
+    } catch (error) {
+      showToast("Failed to update location", "error");
+    }
   };
 
   // Update project number with validation
@@ -194,17 +222,27 @@ export default function ProjectDetailScreen() {
     newNumber: string
   ): Promise<{ valid: boolean; error?: string }> => {
     if (!project) return { valid: false, error: "Project not found" };
-    if (!newNumber.trim()) return { valid: false, error: "Project number is required" };
+    if (!newNumber.trim()) {
+      showToast("Project number is required", "error");
+      return { valid: false, error: "Project number is required" };
+    }
 
     // Check if the number already exists (excluding current project)
     const exists = await checkProjectNumberExists(newNumber.trim(), project.id);
     if (exists) {
+      showToast("This project number already exists", "error");
       return { valid: false, error: "This project number already exists" };
     }
 
     // Update the project
-    await updateProjectContext(project.id, { number: newNumber.trim() });
-    return { valid: true };
+    try {
+      await updateProjectContext(project.id, { number: newNumber.trim() });
+      showToast("Project number updated", "success");
+      return { valid: true };
+    } catch (error) {
+      showToast("Failed to update project number", "error");
+      return { valid: false, error: "Failed to update project number" };
+    }
   };
 
   // Get the featured status for the currently viewed component
@@ -417,6 +455,13 @@ export default function ProjectDetailScreen() {
         </RefreshableScrollView>
       </ThemedView>
 
+      {/* Toast for feedback */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onDismiss={() => setToast({ ...toast, visible: false })}
+      />
     </>
   );
 }

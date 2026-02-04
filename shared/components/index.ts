@@ -23,5 +23,9 @@ export { ThemedSegmentedControl } from "./themed/ThemedSegmentedControl";
 export { ThemedText } from "./themed/ThemedText";
 export { ThemedView } from "./themed/ThemedView";
 
+// UI Components
+export { Toast } from "./ui/Toast";
+export type { ToastType } from "./ui/Toast";
+
 // Modals
 export { ModalBackdrop } from "./modals/ModalBackdrop";
