@@ -45,7 +45,7 @@ export default function PhotoGridScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-      <PageHeader title={headerTitle} showBack={true} layoutMode="inline" />
+      <PageHeader title={headerTitle} showBack={true} layoutMode="inline" variant="compact" />
       <PhotoGrid onImagePress={handleImagePress} initialEditMode={initialEditMode} />
     </SafeAreaView>
   );
