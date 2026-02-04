@@ -161,15 +161,7 @@ export default function ProjectDetailScreen() {
   // Get the featured status for the currently viewed component
   // Featuring is now per-component only
   const isFeatured = useMemo(() => {
-    const result = selectedComponent?.isFeatured ?? false;
-
-    console.log("[FeaturedToggle] isFeatured calculation:", {
-      selectedComponentId: selectedComponent?.id,
-      selectedComponentIsFeatured: selectedComponent?.isFeatured,
-      result,
-    });
-
-    return result;
+    return selectedComponent?.isFeatured ?? false;
   }, [selectedComponent]);
 
   const styles = useMemo(() => createProjectDetailStyles(theme), [theme]);

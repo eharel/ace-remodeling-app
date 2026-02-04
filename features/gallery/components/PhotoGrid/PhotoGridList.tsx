@@ -3,7 +3,7 @@ import { useResponsiveGrid } from "@/shared/hooks/useResponsiveGrid";
 import { MediaAsset } from "@/shared/types/MediaAsset";
 import { useCallback, useMemo } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import { Sortable } from "react-native-sortables";
+import Sortable from "react-native-sortables";
 import { PhotoThumbnail } from "../PhotoThumbnail";
 
 interface PhotoGridListProps {

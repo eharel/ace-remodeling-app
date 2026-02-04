@@ -198,12 +198,6 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       try {
         const now = new Date().toISOString();
 
-        console.log("[updateComponent] Starting update:", {
-          projectId,
-          componentId,
-          updateKeys: Object.keys(updates),
-        });
-
         // 1. Optimistic update with best-guess timestamp
         let updatedProject: Project | undefined;
         setProjects((prev) => {
@@ -236,16 +230,11 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
           c.id === componentId ? { ...c, ...updates, updatedAt: now } : c
         );
 
-        console.log("[updateComponent] Calling Firestore with", updatedComponents.length, "components");
-
         await updateProjectService(projectId, {
           components: updatedComponents,
         });
-
-        console.log("[updateComponent] Firestore update successful");
       } catch (error) {
         // Rollback on error
-        console.error("[updateComponent] Error:", error);
         setError(
           error instanceof Error ? error.message : "Failed to update component"
         );
