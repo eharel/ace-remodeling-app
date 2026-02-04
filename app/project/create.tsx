@@ -115,7 +115,7 @@ export default function CreateProjectScreen() {
           paddingBottom: DesignTokens.spacing[20],
         },
         section: {
-          marginBottom: DesignTokens.spacing[6],
+          marginBottom: DesignTokens.spacing[4],
         },
         sectionTitle: {
           fontSize: DesignTokens.typography.fontSize.sm,
@@ -124,7 +124,13 @@ export default function CreateProjectScreen() {
           color: theme.colors.text.secondary,
           textTransform: "uppercase",
           letterSpacing: 0.5,
-          marginBottom: DesignTokens.spacing[2],
+          marginBottom: DesignTokens.spacing[3],
+        },
+        sectionCard: {
+          backgroundColor: theme.colors.background.card,
+          borderRadius: DesignTokens.borderRadius.lg,
+          padding: DesignTokens.spacing[4],
+          ...DesignTokens.shadows.sm,
         },
         label: {
           fontSize: DesignTokens.typography.fontSize.base,
@@ -137,7 +143,7 @@ export default function CreateProjectScreen() {
           color: theme.colors.status.error,
         },
         input: {
-          backgroundColor: theme.colors.background.elevated,
+          backgroundColor: theme.colors.background.primary,
           borderWidth: DesignTokens.borderWidth.thin,
           borderColor: theme.colors.border.primary,
           borderRadius: DesignTokens.borderRadius.md,
@@ -148,15 +154,22 @@ export default function CreateProjectScreen() {
           color: theme.colors.text.primary,
           marginBottom: DesignTokens.spacing[4],
         },
+        inputLast: {
+          marginBottom: 0,
+        },
         textArea: {
           minHeight: 100,
           textAlignVertical: "top",
         },
+        fieldDivider: {
+          height: 1,
+          backgroundColor: theme.colors.border.primary,
+          marginVertical: DesignTokens.spacing[4],
+        },
         helperText: {
           fontSize: DesignTokens.typography.fontSize.sm,
           color: theme.colors.text.secondary,
-          marginTop: -DesignTokens.spacing[2],
-          marginBottom: DesignTokens.spacing[4],
+          marginTop: DesignTokens.spacing[2],
         },
         categoryGrid: {
           flexDirection: "row",
@@ -227,136 +240,141 @@ export default function CreateProjectScreen() {
           {/* Basic Info Section */}
           <View style={styles.section}>
             <ThemedText style={styles.sectionTitle}>Basic Information</ThemedText>
+            <View style={styles.sectionCard}>
+              <ThemedText style={styles.label}>
+                Project Number <ThemedText style={styles.required}>*</ThemedText>
+              </ThemedText>
+              <TextInput
+                style={styles.input}
+                value={projectNumber}
+                onChangeText={setProjectNumber}
+                placeholder="e.g., 188"
+                placeholderTextColor={theme.colors.text.tertiary}
+                keyboardType="default"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
 
-            <ThemedText style={styles.label}>
-              Project Number <ThemedText style={styles.required}>*</ThemedText>
-            </ThemedText>
-            <TextInput
-              style={styles.input}
-              value={projectNumber}
-              onChangeText={setProjectNumber}
-              placeholder="e.g., 188"
-              placeholderTextColor={theme.colors.text.tertiary}
-              keyboardType="default"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-
-            <ThemedText style={styles.label}>
-              Project Name <ThemedText style={styles.required}>*</ThemedText>
-            </ThemedText>
-            <TextInput
-              style={styles.input}
-              value={projectName}
-              onChangeText={setProjectName}
-              placeholder="e.g., Smith Residence Kitchen Remodel"
-              placeholderTextColor={theme.colors.text.tertiary}
-              autoCapitalize="words"
-            />
+              <ThemedText style={styles.label}>
+                Project Name <ThemedText style={styles.required}>*</ThemedText>
+              </ThemedText>
+              <TextInput
+                style={[styles.input, styles.inputLast]}
+                value={projectName}
+                onChangeText={setProjectName}
+                placeholder="e.g., Smith Residence Kitchen Remodel"
+                placeholderTextColor={theme.colors.text.tertiary}
+                autoCapitalize="words"
+              />
+            </View>
           </View>
 
           {/* Category Section */}
           <View style={styles.section}>
             <ThemedText style={styles.sectionTitle}>Category</ThemedText>
+            <View style={styles.sectionCard}>
+              <ThemedText style={styles.label}>
+                Primary Category <ThemedText style={styles.required}>*</ThemedText>
+              </ThemedText>
 
-            <ThemedText style={styles.label}>
-              Primary Category <ThemedText style={styles.required}>*</ThemedText>
-            </ThemedText>
-
-            {!showCustomCategory && (
-              <View style={styles.categoryGrid}>
-                {CATEGORY_OPTIONS.map((option) => (
-                  <Pressable
-                    key={option.value}
-                    style={[
-                      styles.categoryChip,
-                      category === option.value && styles.categoryChipSelected,
-                    ]}
-                    onPress={() => setCategory(option.value)}
-                  >
-                    <ThemedText
+              {!showCustomCategory && (
+                <View style={styles.categoryGrid}>
+                  {CATEGORY_OPTIONS.map((option) => (
+                    <Pressable
+                      key={option.value}
                       style={[
-                        styles.categoryChipText,
-                        category === option.value && styles.categoryChipTextSelected,
+                        styles.categoryChip,
+                        category === option.value && styles.categoryChipSelected,
                       ]}
+                      onPress={() => setCategory(option.value)}
                     >
-                      {option.label}
-                    </ThemedText>
-                  </Pressable>
-                ))}
-              </View>
-            )}
+                      <ThemedText
+                        style={[
+                          styles.categoryChipText,
+                          category === option.value && styles.categoryChipTextSelected,
+                        ]}
+                      >
+                        {option.label}
+                      </ThemedText>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
 
-            {showCustomCategory && (
+              {showCustomCategory && (
+                <TextInput
+                  style={styles.input}
+                  value={customCategory}
+                  onChangeText={setCustomCategory}
+                  placeholder="e.g., Home Theater"
+                  placeholderTextColor={theme.colors.text.tertiary}
+                  autoCapitalize="words"
+                />
+              )}
+
+              <Pressable
+                style={styles.customCategoryToggle}
+                onPress={() => {
+                  setShowCustomCategory(!showCustomCategory);
+                  if (!showCustomCategory) {
+                    setCategory(null);
+                  } else {
+                    setCustomCategory("");
+                  }
+                }}
+              >
+                <MaterialIcons
+                  name={showCustomCategory ? "list" : "add"}
+                  size={18}
+                  color={theme.colors.interactive.primary}
+                />
+                <ThemedText style={styles.customCategoryToggleText}>
+                  {showCustomCategory ? "Choose from list" : "Use custom category"}
+                </ThemedText>
+              </Pressable>
+
+              <View style={styles.fieldDivider} />
+
+              <ThemedText style={styles.label}>Subcategory</ThemedText>
               <TextInput
-                style={styles.input}
-                value={customCategory}
-                onChangeText={setCustomCategory}
-                placeholder="e.g., Home Theater"
+                style={[styles.input, styles.inputLast]}
+                value={subcategory}
+                onChangeText={setSubcategory}
+                placeholder="e.g., ADU, Pool, Deck, Primary Bath"
                 placeholderTextColor={theme.colors.text.tertiary}
                 autoCapitalize="words"
               />
-            )}
-
-            <Pressable
-              style={styles.customCategoryToggle}
-              onPress={() => {
-                setShowCustomCategory(!showCustomCategory);
-                if (!showCustomCategory) {
-                  setCategory(null);
-                } else {
-                  setCustomCategory("");
-                }
-              }}
-            >
-              <MaterialIcons
-                name={showCustomCategory ? "list" : "add"}
-                size={18}
-                color={theme.colors.interactive.primary}
-              />
-              <ThemedText style={styles.customCategoryToggleText}>
-                {showCustomCategory ? "Choose from list" : "Use custom category"}
+              <ThemedText style={styles.helperText}>
+                Optional. Use for more specific classification.
               </ThemedText>
-            </Pressable>
-
-            <ThemedText style={styles.label}>Subcategory</ThemedText>
-            <TextInput
-              style={styles.input}
-              value={subcategory}
-              onChangeText={setSubcategory}
-              placeholder="e.g., ADU, Pool, Deck, Primary Bath"
-              placeholderTextColor={theme.colors.text.tertiary}
-              autoCapitalize="words"
-            />
-            <ThemedText style={styles.helperText}>
-              Optional. Use for more specific classification.
-            </ThemedText>
+            </View>
           </View>
 
           {/* Details Section */}
           <View style={styles.section}>
             <ThemedText style={styles.sectionTitle}>Details (Optional)</ThemedText>
+            <View style={styles.sectionCard}>
+              <ThemedText style={styles.label}>Description</ThemedText>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Brief description of the project..."
+                placeholderTextColor={theme.colors.text.tertiary}
+                multiline
+                numberOfLines={4}
+              />
 
-            <ThemedText style={styles.label}>Description</ThemedText>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Brief description of the project..."
-              placeholderTextColor={theme.colors.text.tertiary}
-              multiline
-              numberOfLines={4}
-            />
-
-            <ThemedText style={styles.label}>Neighborhood</ThemedText>
-            <TextInput
-              style={styles.input}
-              value={neighborhood}
-              onChangeText={setNeighborhood}
-              placeholder="e.g., Pacific Palisades"
-              placeholderTextColor={theme.colors.text.tertiary}
-              autoCapitalize="words"
-            />
+              <ThemedText style={styles.label}>Neighborhood</ThemedText>
+              <TextInput
+                style={[styles.input, styles.inputLast]}
+                value={neighborhood}
+                onChangeText={setNeighborhood}
+                placeholder="e.g., Pacific Palisades"
+                placeholderTextColor={theme.colors.text.tertiary}
+                autoCapitalize="words"
+              />
+            </View>
           </View>
         </ScrollView>
 
