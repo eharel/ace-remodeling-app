@@ -18,6 +18,10 @@ const MIN_REFRESH_DURATION = 500;
  * Automatically connects to ProjectsContext to refresh project data.
  * Includes smooth animation by ensuring minimum refresh duration.
  *
+ * NOTE: The RefreshControl spinner only shows during user-initiated pull-to-refresh,
+ * not during initial data load. This prevents double spinners when combined with
+ * a LoadingState component.
+ *
  * @component
  * @param {ScrollViewProps} props - All standard ScrollView props are passed through
  *
@@ -39,9 +43,16 @@ export function RefreshableScrollView({
   const { refetchProjects, isLoading } = useProjects();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshStartTime = useRef<number | null>(null);
+  // Track if the user initiated a refresh (vs initial load)
+  const userInitiatedRefresh = useRef(false);
 
-  // Handle smooth refresh animation
+  // Handle smooth refresh animation - only for user-initiated refreshes
   useEffect(() => {
+    // Only manage spinner state if this was a user-initiated refresh
+    if (!userInitiatedRefresh.current) {
+      return;
+    }
+
     if (isLoading) {
       // Refresh started - record start time
       if (!refreshStartTime.current) {
@@ -57,6 +68,7 @@ export function RefreshableScrollView({
         const timeoutId = setTimeout(() => {
           setIsRefreshing(false);
           refreshStartTime.current = null;
+          userInitiatedRefresh.current = false;
         }, remaining);
 
         return () => clearTimeout(timeoutId);
@@ -65,6 +77,7 @@ export function RefreshableScrollView({
   }, [isLoading]);
 
   const handleRefresh = async () => {
+    userInitiatedRefresh.current = true;
     refreshStartTime.current = Date.now();
     setIsRefreshing(true);
     await refetchProjects();

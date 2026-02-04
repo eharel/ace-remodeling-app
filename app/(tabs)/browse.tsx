@@ -2,6 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useMemo } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DesignTokens } from "@/shared/themes";
 import { ComponentCategory, CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
@@ -32,6 +33,7 @@ interface CategoryItem {
 export default function ProjectsScreen() {
   const { theme } = useTheme();
   const { projects, isLoading, error } = useProjects();
+  const insets = useSafeAreaInsets();
 
   // Get categories with projects, sorted by display order
   const categories = useMemo(() => {
@@ -179,7 +181,8 @@ export default function ProjectsScreen() {
         },
         fab: {
           position: "absolute",
-          bottom: DesignTokens.spacing[6],
+          // Account for tab bar height (~49px) plus safe area bottom plus spacing
+          bottom: 49 + insets.bottom + DesignTokens.spacing[4],
           right: DesignTokens.spacing[4],
         },
       }),
