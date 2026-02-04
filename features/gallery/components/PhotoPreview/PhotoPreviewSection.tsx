@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { usePhotoCategoryData } from "@/features/gallery/hooks/usePhotoCategoryData";
-import { EditButton, ThemedText, ThemedView } from "@/shared/components";
+import { Can, ThemedText, ThemedView } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
@@ -23,6 +23,8 @@ interface PhotoPreviewSectionProps {
   title?: string;
   subtitle?: string;
   canEdit?: boolean;
+  /** When true, shows edit affordances (managed by parent's edit mode) */
+  isEditMode?: boolean;
 
   activePhotoCategory: PhotoCategory;
   onPhotoCategoryChange: (activeCategory: PhotoCategory) => void;
@@ -36,6 +38,7 @@ export function PhotoPreviewSection({
   title = "Photos",
   subtitle = "Tap any photo to view gallery",
   canEdit = false,
+  isEditMode = false,
   activePhotoCategory,
   onPhotoCategoryChange,
   onOpenGrid = () => {},
@@ -107,18 +110,30 @@ export function PhotoPreviewSection({
     <>
       {/* Pictures Section */}
       <ThemedView style={styles.section}>
-        {/* Header Row - Title + Edit Button */}
+        {/* Header Row - Title + Edit Button (only in edit mode) */}
         <View style={styles.sectionHeader}>
           <ThemedText
             style={[styles.sectionTitle, { color: theme.colors.text.primary }]}
           >
             {title} ({photos.length})
           </ThemedText>
-          <EditButton
-            onPress={() => {
-              showPhotoGrid(true);
-            }}
-          />
+          {isEditMode && (
+            <Can edit>
+              <Pressable
+                onPress={() => showPhotoGrid(true)}
+                style={styles.editPhotosButton}
+                accessibilityLabel="Edit photos"
+                accessibilityRole="button"
+              >
+                <MaterialIcons
+                  name="edit"
+                  size={16}
+                  color={theme.colors.interactive.primary}
+                />
+                <ThemedText style={styles.editPhotosText}>Edit</ThemedText>
+              </Pressable>
+            </Can>
+          )}
         </View>
         <ThemedText
           style={[
@@ -236,6 +251,18 @@ const createPhotoGalleryStyles = (theme: any) =>
     sectionTitle: {
       ...commonStyles.text.sectionTitle,
       marginBottom: 0, // Remove bottom margin (row handles spacing now)
+    },
+    editPhotosButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: DesignTokens.spacing[1],
+      paddingVertical: DesignTokens.spacing[1],
+      paddingHorizontal: DesignTokens.spacing[2],
+    },
+    editPhotosText: {
+      fontSize: DesignTokens.typography.fontSize.sm,
+      color: theme.colors.interactive.primary,
+      fontWeight: DesignTokens.typography.fontWeight.medium,
     },
     sectionSubtitle: {
       ...commonStyles.text.smallText,

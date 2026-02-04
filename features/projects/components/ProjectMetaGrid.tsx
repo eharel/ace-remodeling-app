@@ -8,7 +8,10 @@ import {
   Project,
   ProjectComponent,
 } from "@/shared/types";
+import { ProjectStatus } from "@/shared/types/Status";
 import { getProjectDuration } from "@/shared/utils";
+
+import { StatusPicker } from "./StatusPicker";
 
 interface Timeline {
   start?: string;
@@ -20,6 +23,8 @@ export interface ProjectMetaGridProps {
   project: Project;
   selectedComponent: ProjectComponent | null;
   displayTimeline: Timeline | null;
+  isEditMode?: boolean;
+  onStatusChange?: (status: ProjectStatus) => void;
 }
 
 /**
@@ -32,6 +37,8 @@ export const ProjectMetaGrid: React.FC<ProjectMetaGridProps> = ({
   project,
   selectedComponent,
   displayTimeline,
+  isEditMode = false,
+  onStatusChange,
 }) => {
   const { theme } = useTheme();
 
@@ -123,26 +130,33 @@ export const ProjectMetaGrid: React.FC<ProjectMetaGridProps> = ({
         >
           Status
         </ThemedText>
-        <ThemedView style={styles.metaValuePill}>
-          <ThemedView
-            style={[
-              styles.statusPill,
-              {
-                backgroundColor: getStatusBadgeStyle(project.status)
-                  .backgroundColor,
-              },
-            ]}
-          >
-            <ThemedText
+        {isEditMode && onStatusChange ? (
+          <StatusPicker
+            currentStatus={project.status as ProjectStatus}
+            onStatusChange={onStatusChange}
+          />
+        ) : (
+          <ThemedView style={styles.metaValuePill}>
+            <ThemedView
               style={[
-                styles.statusPillText,
-                { color: getStatusBadgeStyle(project.status).color },
+                styles.statusPill,
+                {
+                  backgroundColor: getStatusBadgeStyle(project.status)
+                    .backgroundColor,
+                },
               ]}
             >
-              {project.status.replace("-", " ").toUpperCase()}
-            </ThemedText>
+              <ThemedText
+                style={[
+                  styles.statusPillText,
+                  { color: getStatusBadgeStyle(project.status).color },
+                ]}
+              >
+                {project.status.replace("-", " ").toUpperCase()}
+              </ThemedText>
+            </ThemedView>
           </ThemedView>
-        </ThemedView>
+        )}
       </ThemedView>
 
       <ThemedView style={styles.metaItem}>

@@ -1,8 +1,7 @@
-import { EditButton } from "@/shared/components/EditButton";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { type PhotoCategory } from "@/shared/constants";
 import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreview";
@@ -21,6 +20,7 @@ import {
   LoadingState,
   PageHeader,
   RefreshableScrollView,
+  ThemedIconButton,
   ThemedText,
   ThemedView,
 } from "@/shared/components";
@@ -33,6 +33,7 @@ import {
   getSubcategoryLabel,
   ProjectComponent,
 } from "@/shared/types";
+import { ProjectStatus } from "@/shared/types/Status";
 
 export default function ProjectDetailScreen() {
   const {
@@ -61,6 +62,9 @@ export default function ProjectDetailScreen() {
     currentMedia,
     currentDocuments,
   } = useProjectComponentSelection(id, componentId, projects);
+
+  // Edit mode state - unified edit mode for the whole page
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   // Modal state
   const [showEditDescriptionModal, setShowEditDescriptionModal] =
@@ -158,6 +162,12 @@ export default function ProjectDetailScreen() {
     });
   };
 
+  // Update project status
+  const handleStatusChange = async (status: ProjectStatus) => {
+    if (!project) return;
+    await updateProjectContext(project.id, { status });
+  };
+
   // Get the featured status for the currently viewed component
   // Featuring is now per-component only
   const isFeatured = useMemo(() => {
@@ -194,6 +204,17 @@ export default function ProjectDetailScreen() {
           showBack={true}
           backLabel="Back"
           variant="compact"
+          rightAction={
+            <Can edit>
+              <ThemedIconButton
+                icon={isEditMode ? "check" : "edit"}
+                onPress={() => setIsEditMode(!isEditMode)}
+                variant={isEditMode ? "primary" : "ghost"}
+                size="small"
+                accessibilityLabel={isEditMode ? "Done editing" : "Edit project"}
+              />
+            </Can>
+          }
         />
         <RefreshableScrollView
           style={styles.scrollView}
@@ -249,28 +270,50 @@ export default function ProjectDetailScreen() {
                   {selectedComponent.name}
                 </ThemedText>
               )}
-              <View style={styles.editButtonContainer}>
-                <EditButton onPress={() => setShowEditDescriptionModal(true)} />
-              </View>
-              <ThemedText
-                key={`description-${selectedComponent?.id || "default"}`}
-                style={[
-                  styles.projectDescription,
-                  { color: theme.colors.text.secondary },
-                ]}
-              >
-                {displayDescription}
-              </ThemedText>
+              {/* Description - tappable in edit mode */}
+              {isEditMode ? (
+                <Pressable
+                  onPress={() => setShowEditDescriptionModal(true)}
+                  style={[
+                    styles.editableDescription,
+                    { borderColor: theme.colors.border.accent },
+                  ]}
+                  accessibilityLabel="Edit description"
+                  accessibilityRole="button"
+                >
+                  <ThemedText
+                    key={`description-${selectedComponent?.id || "default"}`}
+                    style={[
+                      styles.projectDescription,
+                      { color: theme.colors.text.secondary },
+                    ]}
+                  >
+                    {displayDescription || "Tap to add description..."}
+                  </ThemedText>
+                </Pressable>
+              ) : (
+                <ThemedText
+                  key={`description-${selectedComponent?.id || "default"}`}
+                  style={[
+                    styles.projectDescription,
+                    { color: theme.colors.text.secondary },
+                  ]}
+                >
+                  {displayDescription}
+                </ThemedText>
+              )}
             </ThemedView>
 
             <ProjectMetaGrid
               project={project}
               selectedComponent={selectedComponent}
               displayTimeline={displayTimeline}
+              isEditMode={isEditMode}
+              onStatusChange={handleStatusChange}
             />
 
-            {/* Featured toggle - only shown for components, not project-level */}
-            {selectedComponent && (
+            {/* Featured toggle - only shown in edit mode */}
+            {selectedComponent && isEditMode && (
               <Can edit>
                 <View style={{ marginTop: DesignTokens.spacing[4] }}>
                   <FeaturedToggle
@@ -285,6 +328,7 @@ export default function ProjectDetailScreen() {
           <PhotoPreviewSection
             photos={currentMedia}
             title="Project Photos"
+            isEditMode={isEditMode}
             activePhotoCategory={activePhotoCategory}
             onPhotoCategoryChange={(newPhotoCategory) =>
               router.setParams({ activePhotoCategory: newPhotoCategory })
@@ -319,6 +363,7 @@ export default function ProjectDetailScreen() {
             documents={currentDocuments}
             projectId={project.id}
             selectedComponentId={selectedComponent?.id || null}
+            isEditMode={isEditMode}
           />
 
           <ProjectLogsSection logs={project.sharedLogs} />

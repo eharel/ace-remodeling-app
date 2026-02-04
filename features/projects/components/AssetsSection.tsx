@@ -19,6 +19,7 @@ export interface AssetsSectionProps {
   documents: Document[];
   projectId: string;
   selectedComponentId: string | null;
+  isEditMode?: boolean;
 }
 
 /**
@@ -35,6 +36,7 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
   documents,
   projectId,
   selectedComponentId,
+  isEditMode = false,
 }) => {
   const { theme } = useTheme();
 
@@ -103,6 +105,37 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
         color: theme.colors.text.secondary,
         fontWeight: DesignTokens.typography.fontWeight.medium,
       },
+      emptyState: {
+        padding: DesignTokens.spacing[8],
+        alignItems: "center" as const,
+        justifyContent: "center" as const,
+        backgroundColor: theme.colors.background.secondary,
+        borderRadius: DesignTokens.borderRadius.md,
+        borderWidth: 1,
+        borderColor: theme.colors.border.primary,
+        borderStyle: "dashed" as const,
+      },
+      emptyStateText: {
+        fontSize: DesignTokens.typography.fontSize.base,
+        color: theme.colors.text.secondary,
+        textAlign: "center" as const,
+        marginTop: DesignTokens.spacing[2],
+      },
+      addButton: {
+        flexDirection: "row" as const,
+        alignItems: "center" as const,
+        gap: DesignTokens.spacing[2],
+        marginTop: DesignTokens.spacing[3],
+        paddingHorizontal: DesignTokens.spacing[4],
+        paddingVertical: DesignTokens.spacing[2],
+        backgroundColor: theme.colors.interactive.primary,
+        borderRadius: DesignTokens.borderRadius.md,
+      },
+      addButtonText: {
+        fontSize: DesignTokens.typography.fontSize.sm,
+        fontWeight: DesignTokens.typography.fontWeight.medium,
+        color: theme.colors.text.inverse,
+      },
     }),
     [theme]
   );
@@ -140,8 +173,48 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
     }
   };
 
+  // Show empty state in edit mode, hide completely otherwise
   if (!documents || documents.length === 0) {
-    return null;
+    if (!isEditMode) {
+      return null;
+    }
+
+    // Empty state for edit mode
+    return (
+      <ThemedView style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <ThemedText
+            style={[styles.sectionTitle, { color: theme.colors.text.primary }]}
+          >
+            Assets
+          </ThemedText>
+        </View>
+        <View style={styles.emptyState}>
+          <MaterialIcons
+            name="folder-open"
+            size={48}
+            color={theme.colors.text.tertiary}
+          />
+          <ThemedText style={styles.emptyStateText}>
+            No assets yet
+          </ThemedText>
+          <Pressable
+            style={styles.addButton}
+            onPress={() => router.push(`/project/${projectId}/documents`)}
+            accessible={true}
+            accessibilityLabel="Add assets"
+            accessibilityRole="button"
+          >
+            <MaterialIcons
+              name="add"
+              size={18}
+              color={theme.colors.text.inverse}
+            />
+            <ThemedText style={styles.addButtonText}>Add Assets</ThemedText>
+          </Pressable>
+        </View>
+      </ThemedView>
+    );
   }
 
   return (

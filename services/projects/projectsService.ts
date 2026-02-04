@@ -180,7 +180,7 @@ export const createProject = async (
     thumbnail: "", // Will be set when photos are added
     location: input.neighborhood ? { neighborhood: input.neighborhood } : undefined,
     components: [component],
-    status: "planning",
+    status: "completed",
     tags: [],
     isFeatured: false, // Deprecated, but keeping for schema compatibility
     createdAt: now,

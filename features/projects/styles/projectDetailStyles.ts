@@ -81,6 +81,15 @@ export const createProjectDetailStyles = (theme: Theme) =>
       ...commonStyles.text.description,
       marginBottom: DesignTokens.spacing[6],
     },
+    editableDescription: {
+      paddingVertical: DesignTokens.spacing[3],
+      paddingHorizontal: DesignTokens.spacing[3],
+      marginBottom: DesignTokens.spacing[4],
+      borderWidth: 1,
+      borderStyle: "dashed",
+      borderRadius: DesignTokens.borderRadius.md,
+      backgroundColor: theme.colors.background.secondary,
+    },
     metaGrid: {
       flexDirection: "column",
     },

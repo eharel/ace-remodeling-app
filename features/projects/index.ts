@@ -10,3 +10,4 @@ export { ProjectLogsSection } from "./components/ProjectLogsSection";
 export { ProjectMetaGrid } from "./components/ProjectMetaGrid";
 export { AssetsSection } from "./components/AssetsSection";
 export { FeaturedToggle } from "./components/FeaturedToggle";
+export { StatusPicker } from "./components/StatusPicker";
