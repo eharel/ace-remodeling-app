@@ -7,7 +7,7 @@
  * @module services/media/mediaService
  */
 
-import { nanoid } from "nanoid";
+import { nanoid } from "nanoid/non-secure";
 import {
   deleteObject,
   getDownloadURL,
