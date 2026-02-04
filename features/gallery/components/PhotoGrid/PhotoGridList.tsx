@@ -8,8 +8,8 @@ import { PhotoThumbnail } from "../PhotoThumbnail";
 interface PhotoGridListProps {
   photos: MediaAsset[];
   onImagePress?: (index: number) => void;
+  /** When true, tapping a photo selects it instead of opening it */
   isEditing?: boolean;
-  isSelectingPhotos?: boolean;
   selectedIds: Set<string>;
   onToggleSelection: (photoId: string) => void;
 }
@@ -29,7 +29,6 @@ export function PhotoGridList({
   photos,
   onImagePress,
   isEditing = false,
-  isSelectingPhotos = false,
   selectedIds = new Set(),
   onToggleSelection,
 }: PhotoGridListProps) {
@@ -65,7 +64,7 @@ export function PhotoGridList({
             photoId={item.id}
             uri={item.url}
             size={calculatedItemSize - GRID_GAP}
-            inSelectionMode={isSelectingPhotos}
+            inSelectionMode={isEditing}
             isSelected={isSelected}
             onPress={() => onImagePress?.(index)}
             onSelect={onToggleSelection}
@@ -76,7 +75,7 @@ export function PhotoGridList({
     [
       calculatedItemSize,
       onImagePress,
-      isSelectingPhotos,
+      isEditing,
       selectedIds,
       onToggleSelection,
       styles.itemContainer,

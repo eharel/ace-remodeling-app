@@ -3,7 +3,6 @@ import { usePhotoCategoryData } from "@/features/gallery/hooks/usePhotoCategoryD
 import { useProject } from "@/features/projects/hooks/useProject";
 import {
   EditButton,
-  ThemedButton,
   ThemedSegmentedControl,
   ThemedText,
   ThemedView,
@@ -43,20 +42,17 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
     activePhotoCategory || "all"
   );
   const [isEditing, setIsEditing] = useState(initialEditMode);
-  const [isSelectingPhotos, setIsSelectingPhotos] = useState(false);
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(
     new Set()
   );
 
-  // Handle edit button press
+  // Handle edit button press - edit mode IS select mode
   const handleEditPress = () => {
-    const exitingEditMode = isEditing;
-    setIsEditing(!isEditing);
-    // Reset all edit-related state when exiting edit mode
-    if (exitingEditMode) {
-      setIsSelectingPhotos(false);
+    if (isEditing) {
+      // Exiting edit mode - clear selection
       setSelectedPhotoIds(new Set());
     }
+    setIsEditing(!isEditing);
   };
 
   // Handle photo selection toggle
@@ -177,14 +173,6 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
     [theme]
   );
 
-  // Handle select photos press
-  const handleSelectPhotosPress = () => {
-    if (isSelectingPhotos) {
-      setSelectedPhotoIds(new Set());
-    }
-    setIsSelectingPhotos(!isSelectingPhotos);
-  };
-
   // Handle action bar buttons
   const handleAddPhotosPress = useCallback(async () => {
     await addPhotos();
@@ -226,7 +214,7 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <ThemedText style={styles.title}>Photos</ThemedText>
-            {isEditing && isSelectingPhotos && selectedPhotoIds.size > 0 && (
+            {isEditing && selectedPhotoIds.size > 0 && (
               <ThemedText style={styles.selectionCount}>
                 {selectedPhotoIds.size} selected
               </ThemedText>
@@ -234,16 +222,6 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
           </View>
 
           <View style={styles.headerRight}>
-            {isEditing && (
-              <ThemedButton
-                variant={isSelectingPhotos ? "ghost" : "secondary"}
-                size="small"
-                icon={isSelectingPhotos ? "close" : "check-box-outline-blank"}
-                onPress={handleSelectPhotosPress}
-              >
-                {isSelectingPhotos ? "Cancel" : "Select"}
-              </ThemedButton>
-            )}
             <EditButton onPress={handleEditPress} isEditing={isEditing} />
           </View>
         </View>
@@ -265,7 +243,6 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
           photos={filteredPhotos}
           onImagePress={onImagePress}
           isEditing={isEditing}
-          isSelectingPhotos={isSelectingPhotos}
           selectedIds={selectedPhotoIds}
           onToggleSelection={handleToggleSelection}
         />
