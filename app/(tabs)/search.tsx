@@ -499,26 +499,25 @@ export default function SearchScreen() {
             </ThemedText>
           </ThemedView>
           <ProjectGallery
-            projects={searchResults.map((result) => ({
-              id: `${result.projectId}::${result.componentId}`, // Unique key: project + component (using :: separator to avoid UUID dash conflicts)
-              projectNumber: result.projectNumber,
-              name: `${result.projectName}${
+            cardViews={searchResults.map((result) => ({
+              projectId: result.projectId,
+              componentId: result.componentId,
+              displayName: `${result.projectName}${
                 result.componentName ? ` - ${result.componentName}` : ""
               }`,
+              summary: result.componentSummary || "",
+              thumbnailUrl: result.thumbnail,
               category: result.componentCategory,
-              briefDescription: result.componentSummary || "",
-              thumbnail: result.thumbnail,
               status: result.status,
               isFeatured: result.isFeatured,
               completedAt: result.completedAt,
+              isMultiComponent: false,
+              componentCount: 1,
             }))}
-            onProjectPress={(summary) => {
-              // Find the original result by extracting projectId and componentId from the composite key
-              // Format: "projectId::componentId" (using :: to avoid conflicts with UUID dashes)
-              const [projectId, componentId] = summary.id.split("::", 2);
+            onCardPress={(cardView) => {
               const result = searchResults.find(
                 (r) =>
-                  r.projectId === projectId && r.componentId === componentId
+                  r.projectId === cardView.projectId && r.componentId === cardView.componentId
               );
               if (result) {
                 handleProjectPress(result);
