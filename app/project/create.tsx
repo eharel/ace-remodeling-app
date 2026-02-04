@@ -23,7 +23,7 @@ import {
   getCategoryLabel,
 } from "@/shared/types/ComponentCategory";
 
-// Core categories for the picker
+// Core categories for the picker (excluding MISCELLANEOUS since "Use custom category" serves that purpose)
 const CATEGORY_OPTIONS: { value: ComponentCategory; label: string }[] = [
   { value: CORE_CATEGORIES.BATHROOM, label: CORE_CATEGORY_LABELS[CORE_CATEGORIES.BATHROOM] },
   { value: CORE_CATEGORIES.KITCHEN, label: CORE_CATEGORY_LABELS[CORE_CATEGORIES.KITCHEN] },
@@ -32,7 +32,6 @@ const CATEGORY_OPTIONS: { value: ComponentCategory; label: string }[] = [
   { value: CORE_CATEGORIES.OUTDOOR_LIVING, label: CORE_CATEGORY_LABELS[CORE_CATEGORIES.OUTDOOR_LIVING] },
   { value: CORE_CATEGORIES.NEW_CONSTRUCTION, label: CORE_CATEGORY_LABELS[CORE_CATEGORIES.NEW_CONSTRUCTION] },
   { value: CORE_CATEGORIES.COMMERCIAL, label: CORE_CATEGORY_LABELS[CORE_CATEGORIES.COMMERCIAL] },
-  { value: CORE_CATEGORIES.MISCELLANEOUS, label: CORE_CATEGORY_LABELS[CORE_CATEGORIES.MISCELLANEOUS] },
 ];
 
 export default function CreateProjectScreen() {
@@ -155,7 +154,7 @@ export default function CreateProjectScreen() {
         },
         helperText: {
           fontSize: DesignTokens.typography.fontSize.sm,
-          color: theme.colors.text.tertiary,
+          color: theme.colors.text.secondary,
           marginTop: -DesignTokens.spacing[2],
           marginBottom: DesignTokens.spacing[4],
         },
