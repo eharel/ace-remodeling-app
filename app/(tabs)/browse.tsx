@@ -2,16 +2,15 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useMemo } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DesignTokens } from "@/shared/themes";
 import { ComponentCategory, CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
 import {
   Can,
   EmptyState,
-  FAB,
   LoadingState,
   PageHeader,
+  ThemedIconButton,
   ThemedText,
   ThemedView,
 } from "@/shared/components";
@@ -33,7 +32,6 @@ interface CategoryItem {
 export default function ProjectsScreen() {
   const { theme } = useTheme();
   const { projects, isLoading, error } = useProjects();
-  const insets = useSafeAreaInsets();
 
   // Get categories with projects, sorted by display order
   const categories = useMemo(() => {
@@ -179,12 +177,6 @@ export default function ProjectsScreen() {
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.secondary,
         },
-        fab: {
-          position: "absolute",
-          // Account for tab bar height (~49px) plus safe area bottom plus spacing
-          bottom: 49 + insets.bottom + DesignTokens.spacing[4],
-          right: DesignTokens.spacing[4],
-        },
       }),
     [theme]
   );
@@ -232,6 +224,16 @@ export default function ProjectsScreen() {
       <PageHeader
         title="Projects"
         subtitle="Browse our various projects by category"
+        rightAction={
+          <Can edit>
+            <ThemedIconButton
+              icon="add"
+              onPress={handleCreateProject}
+              accessibilityLabel="Create new project"
+              variant="primary"
+            />
+          </Can>
+        }
       />
 
       <FlatList
@@ -241,19 +243,9 @@ export default function ProjectsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: DesignTokens.spacing[4],
-          paddingBottom: DesignTokens.spacing[20], // Extra padding for FAB
+          paddingBottom: DesignTokens.spacing[8],
         }}
       />
-
-      {/* Floating Action Button - only visible to editors */}
-      <Can edit>
-        <FAB
-          icon="add"
-          onPress={handleCreateProject}
-          accessibilityLabel="Create new project"
-          style={styles.fab}
-        />
-      </Can>
     </ThemedView>
   );
 }

@@ -20,6 +20,8 @@ interface PageHeaderProps {
   onBack?: () => void; // Custom back handler (defaults to router.back())
   // Layout mode
   layoutMode?: "stacked" | "inline"; // Layout pattern (stacked for content, inline for control bars)
+  // Right action (e.g., add button, settings icon)
+  rightAction?: React.ReactNode; // Custom component to render on the right side of the header
 }
 
 /**
@@ -82,6 +84,7 @@ export function PageHeader({
   backLabel,
   onBack,
   layoutMode = "stacked", // Default to stacked for backward compatibility
+  rightAction,
 }: PageHeaderProps) {
   const { theme } = useTheme();
   const router = useRouter();
@@ -182,21 +185,29 @@ export function PageHeader({
         </Pressable>
       )}
 
-      {/* Title - Render customTitle if provided, otherwise use text title */}
-      {customTitle ? (
-        <View style={styles.customTitleContainer}>{customTitle}</View>
-      ) : title ? (
-        <ThemedText variant="title" style={styles.title}>
-          {title}
-        </ThemedText>
-      ) : null}
+      {/* Title Row - with optional right action */}
+      <View style={styles.titleRow}>
+        <View style={styles.titleContainer}>
+          {/* Title - Render customTitle if provided, otherwise use text title */}
+          {customTitle ? (
+            <View style={styles.customTitleContainer}>{customTitle}</View>
+          ) : title ? (
+            <ThemedText variant="title" style={styles.title}>
+              {title}
+            </ThemedText>
+          ) : null}
 
-      {/* Subtitle */}
-      {subtitle && (
-        <ThemedText variant="body" style={styles.subtitle}>
-          {subtitle}
-        </ThemedText>
-      )}
+          {/* Subtitle */}
+          {subtitle && (
+            <ThemedText variant="body" style={styles.subtitle}>
+              {subtitle}
+            </ThemedText>
+          )}
+        </View>
+
+        {/* Right Action */}
+        {rightAction && <View style={styles.rightAction}>{rightAction}</View>}
+      </View>
 
       {/* Custom Children */}
       {children && <View style={styles.children}>{children}</View>}
@@ -226,6 +237,14 @@ const styles = StyleSheet.create({
   backLabel: {
     marginLeft: DesignTokens.spacing[1], // 4px space between icon and label
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+  },
+  titleContainer: {
+    flex: 1,
+  },
   customTitleContainer: {
     // Match the spacing/alignment of text titles
     // No additional styling needed - let custom component control its own appearance
@@ -237,6 +256,10 @@ const styles = StyleSheet.create({
   subtitle: {
     marginTop: DesignTokens.spacing[2], // 8px between title and subtitle
     opacity: 0.7, // Subtle subtitle
+  },
+  rightAction: {
+    marginLeft: DesignTokens.spacing[3], // 12px space from title
+    alignSelf: "center", // Vertically center the action
   },
   children: {
     marginTop: DesignTokens.spacing[4], // 16px between header content and children
