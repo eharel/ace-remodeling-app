@@ -394,30 +394,26 @@ export default function SearchScreen() {
           onRemoveHistory={removeFromHistory}
           onClearHistory={clearHistory}
           onAddToHistory={addToHistory}
-          projects={searchResults.map((result) => ({
-            id: result.projectId,
-            projectNumber: result.projectNumber,
-            name: `${result.projectName}${
+          cardViews={searchResults.map((result) => ({
+            projectId: result.projectId,
+            componentId: result.componentId,
+            displayName: `${result.projectName}${
               result.componentName ? ` - ${result.componentName}` : ""
             }`,
+            summary: result.componentSummary || "",
+            thumbnailUrl: result.thumbnail,
             category: result.componentCategory,
-            briefDescription: result.componentSummary || "",
-            thumbnail: result.thumbnail,
             status: result.status,
             isFeatured: result.isFeatured,
             completedAt: result.completedAt,
+            isMultiComponent: false,
+            componentCount: 1,
           }))}
-          onSelectProject={(id) => {
-            // Find the result and navigate with componentId
-            const result = searchResults.find((r) => r.projectId === id);
-            if (result) {
-              router.push({
-                pathname: `/project/${result.projectId}` as any,
-                params: { componentId: result.componentId },
-              });
-            } else {
-              router.push(`/project/${id}` as any);
-            }
+          onSelectCard={(cardView) => {
+            router.push({
+              pathname: `/project/${cardView.projectId}` as any,
+              params: { componentId: cardView.componentId },
+            });
           }}
         />
       </PageHeader>
