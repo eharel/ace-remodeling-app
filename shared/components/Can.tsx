@@ -56,15 +56,6 @@ export function Can({
     isAllowed = hasPermission(permission);
   }
 
-  // Debug logging
-  console.log("[Can] Permission check:", {
-    edit,
-    permission,
-    isAllowed,
-    userRole: user?.role,
-    userPermissions: user?.permissions,
-  });
-
   if (isAllowed) {
     return <>{children}</>;
   }
