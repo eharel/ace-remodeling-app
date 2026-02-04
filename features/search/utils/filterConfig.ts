@@ -36,7 +36,8 @@ export function createFilterConfig(
   const safeTags = Array.isArray(availableTags) ? availableTags : [];
 
   // Category options - dynamically generated from centralized category constants
-  const categoryOptions: FilterOption<ComponentCategory>[] = getAllCategories().map(
+  const categories = getAllCategories() || [];
+  const categoryOptions: FilterOption<ComponentCategory>[] = categories.map(
     (category) => ({
       value: category,
       label: getCategoryLabel(category),
