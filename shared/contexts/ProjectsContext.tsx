@@ -245,60 +245,64 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   );
 
   /**
-   * All featured projects across all categories.
-   * A project is featured if project.isFeatured is true OR any component.isFeatured is true.
+   * All projects that have at least one featured component.
+   * Featuring is now per-component, not per-project.
    * Memoized to prevent unnecessary recalculations.
    */
   const featuredProjects = useMemo(
     () =>
-      projects.filter(
-        (project) =>
-          project.isFeatured === true ||
-          project.components.some((c) => c.isFeatured === true)
+      projects.filter((project) =>
+        project.components.some((c) => c.isFeatured === true)
       ),
     [projects]
   );
 
   /**
-   * Featured bathroom projects.
+   * Projects with featured bathroom components.
+   * Only includes projects where the bathroom component itself is featured.
    * Memoized to prevent unnecessary recalculations.
    */
   const featuredBathroomProjects = useMemo(
     () =>
-      featuredProjects.filter((project) =>
-        project.components.some((c) => c.category === CORE_CATEGORIES.BATHROOM)
+      projects.filter((project) =>
+        project.components.some(
+          (c) => c.category === CORE_CATEGORIES.BATHROOM && c.isFeatured === true
+        )
       ),
-    [featuredProjects]
+    [projects]
   );
 
   /**
-   * Featured kitchen projects.
+   * Projects with featured kitchen components.
+   * Only includes projects where the kitchen component itself is featured.
    * Memoized to prevent unnecessary recalculations.
    */
   const featuredKitchenProjects = useMemo(
     () =>
-      featuredProjects.filter((project) =>
-        project.components.some((c) => c.category === CORE_CATEGORIES.KITCHEN)
+      projects.filter((project) =>
+        project.components.some(
+          (c) => c.category === CORE_CATEGORIES.KITCHEN && c.isFeatured === true
+        )
       ),
-    [featuredProjects]
+    [projects]
   );
 
   /**
-   * Featured projects from all other categories (excluding bathroom and kitchen).
+   * Projects with featured components from other categories (excluding bathroom and kitchen).
+   * Only includes projects where a non-bathroom/kitchen component is featured.
    * Memoized to prevent unnecessary recalculations.
    */
   const featuredGeneralProjects = useMemo(
     () =>
-      featuredProjects.filter(
-        (project) =>
-          !project.components.some(
-            (c) => c.category === CORE_CATEGORIES.BATHROOM
-          ) &&
-          !project.components.some(
-            (c) => c.category === CORE_CATEGORIES.KITCHEN
-          )
+      projects.filter((project) =>
+        project.components.some(
+          (c) =>
+            c.isFeatured === true &&
+            c.category !== CORE_CATEGORIES.BATHROOM &&
+            c.category !== CORE_CATEGORIES.KITCHEN
+        )
       ),
-    [featuredProjects]
+    [projects]
   );
 
   const value: ProjectsContextType = useMemo(

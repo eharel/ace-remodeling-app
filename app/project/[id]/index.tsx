@@ -149,36 +149,28 @@ export default function ProjectDetailScreen() {
     }
   };
 
+  // Toggle featured status for the selected component
   const handleToggleFeatured = async (value: boolean) => {
-    if (!project) return;
+    if (!project || !selectedComponent?.id) return;
 
-    if (selectedComponent?.id) {
-      await updateComponent(project.id, selectedComponent.id, {
-        isFeatured: value,
-      });
-    } else {
-      await updateProjectContext(project.id, { isFeatured: value });
-    }
+    await updateComponent(project.id, selectedComponent.id, {
+      isFeatured: value,
+    });
   };
 
-  // Get the featured status for the currently viewed item
-  // Component-level isFeatured is independent from project-level
+  // Get the featured status for the currently viewed component
+  // Featuring is now per-component only
   const isFeatured = useMemo(() => {
-    // If viewing a component, use its isFeatured value
-    // Otherwise use the project's isFeatured value
-    const result = selectedComponent
-      ? (selectedComponent.isFeatured ?? false)
-      : (project?.isFeatured ?? false);
+    const result = selectedComponent?.isFeatured ?? false;
 
     console.log("[FeaturedToggle] isFeatured calculation:", {
       selectedComponentId: selectedComponent?.id,
       selectedComponentIsFeatured: selectedComponent?.isFeatured,
-      projectIsFeatured: project?.isFeatured,
       result,
     });
 
     return result;
-  }, [selectedComponent, project]);
+  }, [selectedComponent]);
 
   const styles = useMemo(() => createProjectDetailStyles(theme), [theme]);
 
@@ -285,14 +277,17 @@ export default function ProjectDetailScreen() {
               displayTimeline={displayTimeline}
             />
 
-            <Can edit>
-              <View style={{ marginTop: DesignTokens.spacing[4] }}>
-                <FeaturedToggle
-                  isFeatured={isFeatured}
-                  onToggle={handleToggleFeatured}
-                />
-              </View>
-            </Can>
+            {/* Featured toggle - only shown for components, not project-level */}
+            {selectedComponent && (
+              <Can edit>
+                <View style={{ marginTop: DesignTokens.spacing[4] }}>
+                  <FeaturedToggle
+                    isFeatured={isFeatured}
+                    onToggle={handleToggleFeatured}
+                  />
+                </View>
+              </Can>
+            )}
           </ThemedView>
 
           <PhotoPreviewSection

@@ -29,6 +29,8 @@
     "migrate:remove-id": "tsx scripts/removeProjectIdField.ts",
     "add-featured:dev": "tsx scripts/utilities/addFeaturedField.ts --env=dev",
     "add-featured:prod": "tsx scripts/utilities/addFeaturedField.ts --env=prod",
+    "migrate:featured-to-components:dev": "tsx scripts/migrations/migrateIsFeaturedToComponents.ts --env=dev",
+    "migrate:featured-to-components:prod": "tsx scripts/migrations/migrateIsFeaturedToComponents.ts --env=prod",
     "legacy:upload": "tsx scripts/legacy/uploadPhotos.ts",
     "legacy:upload:prod": "NODE_ENV=production tsx scripts/legacy/uploadPhotos.ts",
     "legacy:seed": "tsx scripts/legacy/seedFirebase.ts",

@@ -44,6 +44,10 @@ export const ProjectSchema = z.object({
   sharedLogs: z.array(LogSchema).optional(),
   status: ProjectStatusSchema,
   tags: z.array(z.string()).optional(),
+  /**
+   * @deprecated Use component.isFeatured instead. Featuring is now per-component.
+   * This field will be removed in a future version.
+   */
   isFeatured: z.boolean().optional().default(false),
   createdAt: z.string(),
   updatedAt: z.string(),
