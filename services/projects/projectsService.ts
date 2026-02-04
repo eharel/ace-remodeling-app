@@ -1,7 +1,8 @@
-import { nanoid } from "nanoid";
+import { nanoid } from "nanoid/non-secure";
 import { db } from "@/shared/config";
 import { Project, ProjectComponent, ProjectSchema } from "@/shared/types";
-import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import type { ComponentCategory } from "@/shared/types/ComponentCategory";
+import { collection, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 
 const PROJECTS_COLLECTION = "projects";
 
@@ -118,4 +119,81 @@ export const updateProject = async (
     ...cleanUpdates,
     updatedAt: new Date().toISOString(), // Always update timestamp
   });
+};
+
+/**
+ * Input for creating a new project
+ */
+export interface CreateProjectInput {
+  /** Project number (e.g., "188") - required, user-provided */
+  number: string;
+  /** Project name (e.g., "Smith Residence Kitchen Remodel") */
+  name: string;
+  /** Primary category for the first component */
+  category: ComponentCategory;
+  /** Optional subcategory (e.g., "adu", "pool", "primary-bath") */
+  subcategory?: string;
+  /** Optional description */
+  description?: string;
+  /** Optional neighborhood */
+  neighborhood?: string;
+}
+
+/**
+ * Create a new project with a single component
+ *
+ * Creates a minimal project with sensible defaults for optional fields.
+ * The project will have one component matching the provided category.
+ *
+ * @param input - The project creation input
+ * @returns The created project
+ */
+export const createProject = async (
+  input: CreateProjectInput
+): Promise<Project> => {
+  const now = new Date().toISOString();
+  const projectId = nanoid(12);
+  const componentId = nanoid(12);
+
+  // Create the first component
+  const component: ProjectComponent = {
+    id: componentId,
+    category: input.category,
+    subcategory: input.subcategory,
+    description: input.description,
+    media: [],
+    documents: [],
+    logs: [],
+    isFeatured: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  // Create the project with required fields and sensible defaults
+  const project: Project = {
+    id: projectId,
+    number: input.number,
+    name: input.name,
+    summary: "", // Can be added later
+    description: input.description || "",
+    scope: "", // Can be added later
+    thumbnail: "", // Will be set when photos are added
+    location: input.neighborhood ? { neighborhood: input.neighborhood } : undefined,
+    components: [component],
+    status: "planning",
+    tags: [],
+    isFeatured: false, // Deprecated, but keeping for schema compatibility
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  // Strip undefined values before saving to Firestore
+  const cleanProject = stripUndefined(project);
+
+  // Save to Firestore
+  const projectRef = doc(db, PROJECTS_COLLECTION, projectId);
+  await setDoc(projectRef, cleanProject);
+
+  // Return the created project (with id included)
+  return ProjectSchema.parse(cleanProject);
 };

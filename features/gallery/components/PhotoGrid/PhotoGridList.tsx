@@ -2,7 +2,7 @@ import { DesignTokens } from "@/shared/themes";
 import { useResponsiveGrid } from "@/shared/hooks/useResponsiveGrid";
 import { MediaAsset } from "@/shared/types/MediaAsset";
 import { useCallback, useMemo } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Sortable from "react-native-sortables";
 import { PhotoThumbnail } from "../PhotoThumbnail";
 
@@ -24,6 +24,10 @@ interface PhotoGridListProps {
  * - Responsive grid layout based on screen size
  * - Selection mode for batch operations
  * - Drag-to-reorder in edit mode (long press to drag)
+ *
+ * Uses Sortable.Grid for both view and edit modes to avoid
+ * the delay from switching between FlatList and Sortable.Grid.
+ * Drag is only enabled in edit mode via sortEnabled prop.
  */
 const GRID_GAP = DesignTokens.spacing[1]; // 4px gap between photos
 
@@ -47,9 +51,6 @@ export function PhotoGridList({
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        container: {
-          padding: GRID_GAP,
-        },
         itemContainer: {
           padding: GRID_GAP / 2,
         },
@@ -71,36 +72,7 @@ export function PhotoGridList({
     [onReorder]
   );
 
-  // Render item for sortable grid
-  const renderSortableItem = useCallback(
-    ({ item, index }: { item: MediaAsset; index: number }) => {
-      const isSelected = selectedIds.has(item.id);
-
-      return (
-        <View style={styles.itemContainer}>
-          <PhotoThumbnail
-            photoId={item.id}
-            uri={item.url}
-            size={calculatedItemSize - GRID_GAP}
-            inSelectionMode={isEditing}
-            isSelected={isSelected}
-            onPress={() => onImagePress?.(index)}
-            onSelect={onToggleSelection}
-          />
-        </View>
-      );
-    },
-    [
-      calculatedItemSize,
-      onImagePress,
-      isEditing,
-      selectedIds,
-      onToggleSelection,
-      styles.itemContainer,
-    ]
-  );
-
-  // Render item for regular FlatList (non-edit mode)
+  // Render item for the grid
   const renderItem = useCallback(
     ({ item, index }: { item: MediaAsset; index: number }) => {
       const isSelected = selectedIds.has(item.id);
@@ -129,44 +101,21 @@ export function PhotoGridList({
     ]
   );
 
-  // In edit mode, use sortable grid for drag-to-reorder
-  if (isEditing && onReorder) {
-    return (
-      <Sortable.Grid
-        data={photos}
-        renderItem={renderSortableItem}
-        keyExtractor={(item) => item.id}
-        columns={columns}
-        rowGap={GRID_GAP}
-        columnGap={GRID_GAP}
-        onDragEnd={handleDragEnd}
-        contentContainerStyle={styles.sortableContainer}
-        showsVerticalScrollIndicator={false}
-        hapticsEnabled={true}
-      />
-    );
-  }
-
-  // In view mode, use regular FlatList (better performance)
+  // Always use Sortable.Grid, but only enable sorting in edit mode
+  // This avoids the delay from switching components
   return (
-    <FlatList
-      key={`grid-${columns}`}
-      numColumns={columns}
+    <Sortable.Grid
       data={photos}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
-      extraData={[selectedIds, isEditing]}
-      contentContainerStyle={styles.container}
+      columns={columns}
+      rowGap={GRID_GAP}
+      columnGap={GRID_GAP}
+      onDragEnd={handleDragEnd}
+      contentContainerStyle={styles.sortableContainer}
       showsVerticalScrollIndicator={false}
-      removeClippedSubviews={true}
-      maxToRenderPerBatch={12}
-      windowSize={5}
-      initialNumToRender={12}
-      getItemLayout={(_, index) => ({
-        length: calculatedItemSize,
-        offset: calculatedItemSize * Math.floor(index / columns),
-        index,
-      })}
+      hapticsEnabled={isEditing}
+      sortEnabled={isEditing}
     />
   );
 }

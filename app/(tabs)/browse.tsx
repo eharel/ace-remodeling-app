@@ -6,7 +6,9 @@ import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { DesignTokens } from "@/shared/themes";
 import { ComponentCategory, CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
 import {
+  Can,
   EmptyState,
+  FAB,
   LoadingState,
   PageHeader,
   ThemedText,
@@ -175,9 +177,18 @@ export default function ProjectsScreen() {
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.secondary,
         },
+        fab: {
+          position: "absolute",
+          bottom: DesignTokens.spacing[6],
+          right: DesignTokens.spacing[4],
+        },
       }),
     [theme]
   );
+
+  const handleCreateProject = () => {
+    router.push("/project/create");
+  };
 
   if (isLoading) {
     return (
@@ -227,9 +238,19 @@ export default function ProjectsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: DesignTokens.spacing[4],
-          paddingBottom: DesignTokens.spacing[8],
+          paddingBottom: DesignTokens.spacing[20], // Extra padding for FAB
         }}
       />
+
+      {/* Floating Action Button - only visible to editors */}
+      <Can edit>
+        <FAB
+          icon="add"
+          onPress={handleCreateProject}
+          accessibilityLabel="Create new project"
+          style={styles.fab}
+        />
+      </Can>
     </ThemedView>
   );
 }

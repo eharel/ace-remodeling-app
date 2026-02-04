@@ -1,4 +1,6 @@
 import {
+  createProject as createProjectService,
+  CreateProjectInput,
   fetchAllProjects,
   updateProject as updateProjectService,
 } from "@/services/projects";
@@ -73,6 +75,11 @@ interface ProjectsContextType {
     componentId: string,
     updates: Partial<ProjectComponent>
   ) => Promise<void>;
+  /**
+   * Create a new project with a single component.
+   * Returns the created project.
+   */
+  createProject: (input: CreateProjectInput) => Promise<Project>;
 }
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(
@@ -245,6 +252,32 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   );
 
   /**
+   * Creates a new project with a single component.
+   *
+   * @param input - The project creation input (number, name, category, etc.)
+   * @returns The created project
+   */
+  const createProject = useCallback(
+    async (input: CreateProjectInput): Promise<Project> => {
+      try {
+        // Create in Firestore first
+        const newProject = await createProjectService(input);
+
+        // Add to local state (optimistic-ish, but after success)
+        setProjects((prev) => [...prev, newProject]);
+
+        return newProject;
+      } catch (error) {
+        const errorMsg =
+          error instanceof Error ? error.message : "Failed to create project";
+        setError(errorMsg);
+        throw error;
+      }
+    },
+    []
+  );
+
+  /**
    * All projects that have at least one featured component.
    * Featuring is now per-component, not per-project.
    * Memoized to prevent unnecessary recalculations.
@@ -319,6 +352,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       refetchProjects,
       updateProject,
       updateComponent,
+      createProject,
     }),
     [
       projects,
@@ -333,6 +367,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       refetchProjects,
       updateProject,
       updateComponent,
+      createProject,
     ]
   );
 

@@ -8,6 +8,7 @@ export { Can } from "./Can";
 export { EmptyState } from "./EmptyState";
 export { ErrorBoundary } from "./ErrorBoundary";
 export { ErrorState } from "./ErrorState";
+export { FAB } from "./FAB";
 export { LoadingState } from "./LoadingState";
 export { PageHeader } from "./PageHeader";
 export { RefreshableScrollView } from "./RefreshableScrollView";
