@@ -27,7 +27,7 @@ interface PhotoPreviewSectionProps {
   activePhotoCategory: PhotoCategory;
   onPhotoCategoryChange: (activeCategory: PhotoCategory) => void;
 
-  onOpenGrid: (activeCategory?: PhotoCategory) => void;
+  onOpenGrid: (activeCategory?: PhotoCategory, editMode?: boolean) => void;
   onOpenImage: (index: number) => void;
 }
 
@@ -68,7 +68,7 @@ export function PhotoPreviewSection({
   };
 
   const showPhotoGrid = (editMode: boolean = false) => {
-    onOpenGrid(activePhotoCategory);
+    onOpenGrid(activePhotoCategory, editMode);
   };
 
   // Gallery image renderer with optimized image props

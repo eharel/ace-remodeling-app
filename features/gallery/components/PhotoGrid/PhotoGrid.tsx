@@ -20,9 +20,11 @@ import { PhotoGridList } from "./PhotoGridList";
 
 interface PhotoGridProps {
   onImagePress: (index: number) => void;
+  /** Whether to start in edit mode (e.g., when navigating from edit button) */
+  initialEditMode?: boolean;
 }
 
-export function PhotoGrid({ onImagePress }: PhotoGridProps) {
+export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridProps) {
   const { theme } = useTheme();
   const {
     id: projectId,
@@ -40,7 +42,7 @@ export function PhotoGrid({ onImagePress }: PhotoGridProps) {
   const [selectedCategory, setSelectedCategory] = useState<PhotoCategory>(
     activePhotoCategory || "all"
   );
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(initialEditMode);
   const [isSelectingPhotos, setIsSelectingPhotos] = useState(false);
   const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(
     new Set()

@@ -297,7 +297,7 @@ export default function ProjectDetailScreen() {
             onPhotoCategoryChange={(newPhotoCategory) =>
               router.setParams({ activePhotoCategory: newPhotoCategory })
             }
-            onOpenGrid={(activePhotoCategory) =>
+            onOpenGrid={(activePhotoCategory, editMode) =>
               project?.id &&
               router.push({
                 pathname: "/project/[id]/photos",
@@ -305,6 +305,7 @@ export default function ProjectDetailScreen() {
                   id: project.id,
                   componentId: selectedComponent?.id,
                   activePhotoCategory: activePhotoCategory || "all",
+                  editMode: editMode ? "true" : undefined,
                 },
               })
             }

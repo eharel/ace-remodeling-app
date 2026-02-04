@@ -10,12 +10,17 @@ export default function PhotoGridScreen() {
     id: projectId,
     componentId,
     activePhotoCategory,
+    editMode,
   } = useLocalSearchParams<{
     id: string;
     componentId: string;
     activeTab?: string;
     activePhotoCategory?: PhotoCategory;
+    editMode?: string;
   }>();
+
+  // Convert editMode string param to boolean
+  const initialEditMode = editMode === "true";
 
   const { project, isLoading, error } = useProject(projectId);
 
@@ -41,7 +46,7 @@ export default function PhotoGridScreen() {
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
       <PageHeader title={headerTitle} showBack={true} layoutMode="inline" />
-      <PhotoGrid onImagePress={handleImagePress} />
+      <PhotoGrid onImagePress={handleImagePress} initialEditMode={initialEditMode} />
     </SafeAreaView>
   );
 }
