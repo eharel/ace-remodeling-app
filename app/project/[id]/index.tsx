@@ -1,13 +1,12 @@
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, View } from "react-native";
+import { TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { type PhotoCategory } from "@/shared/constants";
 import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreview";
 import {
   AssetsSection,
-  EditDescriptionModal,
   FeaturedToggle,
   ProjectLogsSection,
   ProjectMetaGrid,
@@ -66,11 +65,9 @@ export default function ProjectDetailScreen() {
   // Edit mode state - unified edit mode for the whole page
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
-  // Modal state
-  const [showEditDescriptionModal, setShowEditDescriptionModal] =
-    useState<boolean>(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
+  // Inline description editing state
+  const [editedDescription, setEditedDescription] = useState<string>("");
+  const [isSavingDescription, setIsSavingDescription] = useState<boolean>(false);
 
   // Preload all component images when project loads
   useEffect(() => {
@@ -130,26 +127,31 @@ export default function ProjectDetailScreen() {
     return getProjectThumbnail(project, selectedComponent || undefined);
   }, [project, selectedComponent]);
 
-  const handleUpdateDescription = async (description: string) => {
-    if (!project) throw new Error("Project not found");
+  // Initialize edited description when entering edit mode or changing component
+  useEffect(() => {
+    if (isEditMode) {
+      setEditedDescription(displayDescription);
+    }
+  }, [isEditMode, selectedComponent?.id]);
 
-    setIsSaving(true);
-    setSaveError(null);
+  const handleSaveDescription = async () => {
+    if (!project) return;
+    if (editedDescription === displayDescription) return; // No changes
+
+    setIsSavingDescription(true);
     try {
       if (selectedComponent?.id) {
         await updateComponent(project.id, selectedComponent.id, {
-          description,
+          description: editedDescription,
         });
       } else {
-        await updateProjectContext(project.id, { description });
+        await updateProjectContext(project.id, { description: editedDescription });
       }
-      setShowEditDescriptionModal(false);
     } catch (error) {
-      setSaveError(
-        error instanceof Error ? error.message : "Failed to update description",
-      );
+      // Reset to original on error
+      setEditedDescription(displayDescription);
     } finally {
-      setIsSaving(false);
+      setIsSavingDescription(false);
     }
   };
 
@@ -270,17 +272,30 @@ export default function ProjectDetailScreen() {
                   {selectedComponent.name}
                 </ThemedText>
               )}
-              {/* Description - tappable in edit mode */}
+              {/* Description - inline editable in edit mode */}
               {isEditMode ? (
-                <Pressable
-                  onPress={() => setShowEditDescriptionModal(true)}
+                <TextInput
+                  key={`description-input-${selectedComponent?.id || "default"}`}
                   style={[
                     styles.editableDescription,
-                    { borderColor: theme.colors.border.accent },
+                    styles.projectDescription,
+                    {
+                      borderColor: theme.colors.border.accent,
+                      color: theme.colors.text.secondary,
+                    },
                   ]}
+                  value={editedDescription}
+                  onChangeText={setEditedDescription}
+                  onBlur={handleSaveDescription}
+                  placeholder="Add a description..."
+                  placeholderTextColor={theme.colors.text.tertiary}
+                  multiline
+                  textAlignVertical="top"
                   accessibilityLabel="Edit description"
-                  accessibilityRole="button"
-                >
+                  editable={!isSavingDescription}
+                />
+              ) : (
+                displayDescription ? (
                   <ThemedText
                     key={`description-${selectedComponent?.id || "default"}`}
                     style={[
@@ -288,19 +303,9 @@ export default function ProjectDetailScreen() {
                       { color: theme.colors.text.secondary },
                     ]}
                   >
-                    {displayDescription || "Tap to add description..."}
+                    {displayDescription}
                   </ThemedText>
-                </Pressable>
-              ) : (
-                <ThemedText
-                  key={`description-${selectedComponent?.id || "default"}`}
-                  style={[
-                    styles.projectDescription,
-                    { color: theme.colors.text.secondary },
-                  ]}
-                >
-                  {displayDescription}
-                </ThemedText>
+                ) : null
               )}
             </ThemedView>
 
@@ -372,14 +377,6 @@ export default function ProjectDetailScreen() {
         </RefreshableScrollView>
       </ThemedView>
 
-      <EditDescriptionModal
-        visible={showEditDescriptionModal}
-        onClose={() => setShowEditDescriptionModal(false)}
-        onSave={handleUpdateDescription}
-        currentDescription={displayDescription}
-        isSaving={isSaving}
-        error={saveError}
-      />
     </>
   );
 }

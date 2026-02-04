@@ -89,6 +89,7 @@ export const createProjectDetailStyles = (theme: Theme) =>
       borderStyle: "dashed",
       borderRadius: DesignTokens.borderRadius.md,
       backgroundColor: theme.colors.background.secondary,
+      minHeight: 80,
     },
     metaGrid: {
       flexDirection: "column",

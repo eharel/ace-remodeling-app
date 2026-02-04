@@ -1,6 +1,12 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useMemo, useState } from "react";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from "react-native";
 
 import { ThemedText, ThemedView } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
@@ -28,6 +34,7 @@ const STATUS_OPTIONS: { value: ProjectStatus; label: string }[] = [
  * StatusPicker - Dropdown picker for project status
  *
  * Only shown in edit mode. Allows changing project status.
+ * Opens as an anchored dropdown below the trigger button.
  */
 export const StatusPicker: React.FC<StatusPickerProps> = ({
   currentStatus,
@@ -36,6 +43,29 @@ export const StatusPicker: React.FC<StatusPickerProps> = ({
 }) => {
   const { theme } = useTheme();
   const [showPicker, setShowPicker] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<View>(null);
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+
+  const measureAndShowDropdown = useCallback(() => {
+    if (disabled) return;
+
+    buttonRef.current?.measureInWindow((x, y, width, height) => {
+      // Position dropdown below the button
+      const dropdownTop = y + height + 4;
+      const dropdownLeft = x;
+
+      // Ensure dropdown doesn't go off screen
+      const maxLeft = windowWidth - 200; // approximate dropdown width
+      const adjustedLeft = Math.min(dropdownLeft, maxLeft);
+
+      setDropdownPosition({
+        top: dropdownTop,
+        left: Math.max(8, adjustedLeft), // at least 8px from edge
+      });
+      setShowPicker(true);
+    });
+  }, [disabled, windowWidth]);
 
   const styles = useMemo(
     () =>
@@ -63,27 +93,20 @@ export const StatusPicker: React.FC<StatusPickerProps> = ({
           fontWeight: DesignTokens.typography.fontWeight.medium,
           color: theme.colors.text.primary,
         },
-        // Modal styles
+        // Dropdown styles (anchored)
         modalOverlay: {
           flex: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          justifyContent: "center",
-          alignItems: "center",
+          backgroundColor: "transparent",
         },
-        modalContent: {
+        dropdownContainer: {
+          position: "absolute",
           backgroundColor: theme.colors.background.card,
           borderRadius: DesignTokens.borderRadius.lg,
-          padding: DesignTokens.spacing[4],
-          minWidth: 250,
-          maxWidth: "80%",
+          paddingVertical: DesignTokens.spacing[2],
+          minWidth: 180,
+          borderWidth: 1,
+          borderColor: theme.colors.border.primary,
           ...DesignTokens.shadows.lg,
-        },
-        modalTitle: {
-          fontSize: DesignTokens.typography.fontSize.lg,
-          fontWeight: DesignTokens.typography.fontWeight.semibold,
-          color: theme.colors.text.primary,
-          marginBottom: DesignTokens.spacing[4],
-          textAlign: "center",
         },
         optionButton: {
           flexDirection: "row",
@@ -91,28 +114,17 @@ export const StatusPicker: React.FC<StatusPickerProps> = ({
           justifyContent: "space-between",
           paddingVertical: DesignTokens.spacing[3],
           paddingHorizontal: DesignTokens.spacing[4],
-          borderRadius: DesignTokens.borderRadius.md,
-          marginBottom: DesignTokens.spacing[2],
         },
         optionButtonSelected: {
-          backgroundColor: theme.colors.interactive.primary + "20",
+          backgroundColor: theme.colors.interactive.primary + "15",
         },
         optionText: {
-          fontSize: DesignTokens.typography.fontSize.base,
+          fontSize: DesignTokens.typography.fontSize.sm,
           color: theme.colors.text.primary,
         },
         optionTextSelected: {
           fontWeight: DesignTokens.typography.fontWeight.semibold,
           color: theme.colors.interactive.primary,
-        },
-        cancelButton: {
-          marginTop: DesignTokens.spacing[2],
-          paddingVertical: DesignTokens.spacing[3],
-          alignItems: "center",
-        },
-        cancelText: {
-          fontSize: DesignTokens.typography.fontSize.base,
-          color: theme.colors.text.secondary,
         },
       }),
     [theme]
@@ -140,13 +152,13 @@ export const StatusPicker: React.FC<StatusPickerProps> = ({
 
   return (
     <>
-      <View style={styles.container}>
+      <View ref={buttonRef} style={styles.container} collapsable={false}>
         <Pressable
           style={[
             styles.pickerButton,
             disabled && styles.pickerButtonDisabled,
           ]}
-          onPress={() => !disabled && setShowPicker(true)}
+          onPress={measureAndShowDropdown}
           disabled={disabled}
           accessibilityLabel={`Change status, current: ${getStatusDisplayText(currentStatus)}`}
           accessibilityRole="button"
@@ -180,12 +192,15 @@ export const StatusPicker: React.FC<StatusPickerProps> = ({
           style={styles.modalOverlay}
           onPress={() => setShowPicker(false)}
         >
-          <Pressable
-            style={styles.modalContent}
-            onPress={(e) => e.stopPropagation()}
+          <View
+            style={[
+              styles.dropdownContainer,
+              {
+                top: dropdownPosition.top,
+                left: dropdownPosition.left,
+              },
+            ]}
           >
-            <ThemedText style={styles.modalTitle}>Select Status</ThemedText>
-
             {STATUS_OPTIONS.map((option) => (
               <Pressable
                 key={option.value}
@@ -195,7 +210,13 @@ export const StatusPicker: React.FC<StatusPickerProps> = ({
                 ]}
                 onPress={() => handleSelectStatus(option.value)}
               >
-                <View style={{ flexDirection: "row", alignItems: "center", gap: DesignTokens.spacing[3] }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: DesignTokens.spacing[3],
+                  }}
+                >
                   <View
                     style={{
                       width: 10,
@@ -216,20 +237,13 @@ export const StatusPicker: React.FC<StatusPickerProps> = ({
                 {currentStatus === option.value && (
                   <MaterialIcons
                     name="check"
-                    size={20}
+                    size={18}
                     color={theme.colors.interactive.primary}
                   />
                 )}
               </Pressable>
             ))}
-
-            <Pressable
-              style={styles.cancelButton}
-              onPress={() => setShowPicker(false)}
-            >
-              <ThemedText style={styles.cancelText}>Cancel</ThemedText>
-            </Pressable>
-          </Pressable>
+          </View>
         </Pressable>
       </Modal>
     </>
