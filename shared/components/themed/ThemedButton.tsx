@@ -112,8 +112,8 @@ export function ThemedButton({
         backgroundColor:
           variant === "ghost"
             ? "transparent"
-            : theme.colors.background.secondary,
-        textColor: theme.colors.text.tertiary,
+            : theme.colors.interactive.disabled,
+        textColor: theme.colors.interactive.disabledText,
         borderColor:
           variant === "secondary" ? theme.colors.border.primary : undefined,
         borderWidth:
