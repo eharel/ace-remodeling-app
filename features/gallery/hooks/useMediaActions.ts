@@ -35,7 +35,7 @@ interface UseMediaActionsResult {
   /** Whether an operation is in progress */
   isLoading: boolean;
   /** Current operation type for more specific loading states */
-  loadingOperation: "add" | "delete" | "thumbnail" | null;
+  loadingOperation: "add" | "delete" | "thumbnail" | "reorder" | null;
   /** Error message if last operation failed */
   error: string | null;
   /** Add photos - shows action sheet to choose source */
@@ -44,6 +44,8 @@ interface UseMediaActionsResult {
   deletePhotos: (photoIds: string[]) => Promise<void>;
   /** Set a photo as the component thumbnail */
   setThumbnail: (photoId: string) => Promise<void>;
+  /** Reorder photos after drag-and-drop */
+  reorderPhotos: (reorderedPhotos: MediaAsset[]) => Promise<void>;
 }
 
 /**
@@ -97,7 +99,7 @@ export function useMediaActions({
   const { updateComponent } = useProjects();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingOperation, setLoadingOperation] = useState<
-    "add" | "delete" | "thumbnail" | null
+    "add" | "delete" | "thumbnail" | "reorder" | null
   >(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -386,6 +388,39 @@ export function useMediaActions({
     [projectId, componentId, component, updateComponent]
   );
 
+  /**
+   * Reorder photos after drag-and-drop
+   *
+   * Updates the order field on each MediaAsset to reflect the new order.
+   */
+  const reorderPhotos = useCallback(
+    async (reorderedPhotos: MediaAsset[]) => {
+      try {
+        setError(null);
+        // Don't show loading state for reorder - it should feel instant
+        // The optimistic update handles UI, we just persist in background
+
+        // Update order field for each photo based on new position
+        const updatedMedia = reorderedPhotos.map((photo, index) => ({
+          ...photo,
+          order: index,
+        }));
+
+        // Update component with reordered media
+        await updateComponent(projectId, componentId, {
+          media: updatedMedia,
+        });
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Failed to reorder photos";
+        setError(message);
+        // Don't show alert for reorder failures - too disruptive
+        console.error("[useMediaActions] Reorder failed:", message);
+      }
+    },
+    [projectId, componentId, updateComponent]
+  );
+
   return {
     isLoading,
     loadingOperation,
@@ -393,5 +428,6 @@ export function useMediaActions({
     addPhotos,
     deletePhotos,
     setThumbnail,
+    reorderPhotos,
   };
 }

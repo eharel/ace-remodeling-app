@@ -78,7 +78,7 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
   }, [component]);
 
   // Media actions hook for CRUD operations
-  const { isLoading, loadingOperation, addPhotos, deletePhotos, setThumbnail } =
+  const { isLoading, loadingOperation, addPhotos, deletePhotos, setThumbnail, reorderPhotos } =
     useMediaActions({
       projectId: projectId || "",
       componentId: componentId || "",
@@ -245,6 +245,7 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
           isEditing={isEditing}
           selectedIds={selectedPhotoIds}
           onToggleSelection={handleToggleSelection}
+          onReorder={reorderPhotos}
         />
       </View>
 
