@@ -5,6 +5,32 @@ import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 
 const PROJECTS_COLLECTION = "projects";
 
+/**
+ * Recursively removes undefined values from an object.
+ * Firestore doesn't accept undefined values, so we need to strip them out.
+ */
+function stripUndefined<T>(obj: T): T {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(stripUndefined) as T;
+  }
+
+  if (typeof obj === "object") {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        result[key] = stripUndefined(value);
+      }
+    }
+    return result as T;
+  }
+
+  return obj;
+}
+
 // /**
 //  * Fetch projects from Firestore.
 //  * Extracted into a separate function so it can be reused for refetch.
@@ -84,9 +110,12 @@ export const updateProject = async (
   // Remove fields that shouldn't be updated
   const { id, createdAt, ...safeUpdates } = updates;
 
+  // Strip undefined values - Firestore doesn't accept them
+  const cleanUpdates = stripUndefined(safeUpdates);
+
   const projectRef = doc(db, PROJECTS_COLLECTION, projectId);
   await updateDoc(projectRef, {
-    ...safeUpdates,
+    ...cleanUpdates,
     updatedAt: new Date().toISOString(), // Always update timestamp
   });
 };
