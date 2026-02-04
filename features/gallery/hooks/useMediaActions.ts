@@ -10,7 +10,8 @@
 
 import { useCallback, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
-import { Alert } from "react-native";
+import * as DocumentPicker from "expo-document-picker";
+import { ActionSheetIOS, Alert, Platform } from "react-native";
 
 import { useProjects } from "@/shared/contexts";
 import {
@@ -37,7 +38,7 @@ interface UseMediaActionsResult {
   loadingOperation: "add" | "delete" | "thumbnail" | null;
   /** Error message if last operation failed */
   error: string | null;
-  /** Add photos from device gallery */
+  /** Add photos - shows action sheet to choose source */
   addPhotos: () => Promise<void>;
   /** Delete selected photos */
   deletePhotos: (photoIds: string[]) => Promise<void>;
@@ -71,6 +72,22 @@ function getFilenameFromUri(uri: string): string {
   return `${nameWithoutExt}_${Date.now()}.${ext}`;
 }
 
+/**
+ * Check if a file is an image based on MIME type or extension
+ */
+function isImageFile(mimeType?: string, filename?: string): boolean {
+  if (mimeType?.startsWith("image/")) {
+    return true;
+  }
+  if (filename) {
+    const ext = filename.toLowerCase().split(".").pop();
+    return ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif"].includes(
+      ext || ""
+    );
+  }
+  return false;
+}
+
 export function useMediaActions({
   projectId,
   componentId,
@@ -85,16 +102,87 @@ export function useMediaActions({
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Add photos from device gallery
-   *
-   * Opens image picker, uploads selected images to Firebase Storage,
-   * and updates the component's media array.
+   * Upload files and update the component
+   * Shared logic for both photo library and document picker
    */
-  const addPhotos = useCallback(async () => {
+  const uploadFiles = useCallback(
+    async (files: Array<{ uri: string; filename: string }>) => {
+      if (files.length === 0) return;
+
+      setLoadingOperation("add");
+      setIsLoading(true);
+
+      try {
+        // Get current media to determine order for new items
+        const currentMedia = component?.media || [];
+        const maxOrder = currentMedia.reduce(
+          (max, m) => Math.max(max, m.order),
+          -1
+        );
+
+        // Upload options
+        const uploadOptions: UploadMediaOptions = {
+          projectId,
+          componentCategory: component?.category || "unknown",
+          subcategory: component?.subcategory,
+          stage: getUploadStage(currentCategory),
+          mediaType: MEDIA_TYPES.IMAGE,
+          order: maxOrder + 1,
+        };
+
+        // Upload files to Firebase Storage
+        const results = await uploadMultipleMedia(files, uploadOptions);
+
+        // Check for errors
+        const successfulAssets = results
+          .filter((r) => r.success && r.asset)
+          .map((r) => r.asset as MediaAsset);
+
+        const failedCount = results.filter((r) => !r.success).length;
+
+        if (failedCount > 0) {
+          const message =
+            failedCount === results.length
+              ? "Failed to upload photos. Please try again."
+              : `${failedCount} of ${results.length} photos failed to upload.`;
+          setError(message);
+        }
+
+        if (successfulAssets.length > 0) {
+          // Update component with new media
+          const updatedMedia = [...currentMedia, ...successfulAssets];
+          await updateComponent(projectId, componentId, {
+            media: updatedMedia,
+          });
+        }
+
+        if (failedCount > 0 && successfulAssets.length > 0) {
+          Alert.alert(
+            "Partial Success",
+            `${successfulAssets.length} photos added. ${failedCount} failed to upload.`
+          );
+        }
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Failed to add photos";
+        setError(message);
+        Alert.alert("Error", message);
+      } finally {
+        setIsLoading(false);
+        setLoadingOperation(null);
+      }
+    },
+    [projectId, componentId, component, currentCategory, updateComponent]
+  );
+
+  /**
+   * Pick photos from the device photo library
+   */
+  const pickFromPhotoLibrary = useCallback(async () => {
     try {
       setError(null);
 
-      // Request permission first (before showing loading state)
+      // Request permission
       const permissionResult =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -106,7 +194,7 @@ export function useMediaActions({
         return;
       }
 
-      // Launch image picker (before showing loading state)
+      // Launch image picker
       const pickerResult = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsMultipleSelection: true,
@@ -118,81 +206,96 @@ export function useMediaActions({
         return;
       }
 
-      // NOW show loading state - user has selected photos
-      setLoadingOperation("add");
-      setIsLoading(true);
-
       // Prepare files for upload
       const files = pickerResult.assets.map((asset) => ({
         uri: asset.uri,
         filename: asset.fileName || getFilenameFromUri(asset.uri),
       }));
 
-      // Get current media to determine order for new items
-      const currentMedia = component?.media || [];
-      const maxOrder = currentMedia.reduce(
-        (max, m) => Math.max(max, m.order),
-        -1
-      );
-
-      // Upload options
-      const uploadOptions: UploadMediaOptions = {
-        projectId,
-        componentCategory: component?.category || "unknown",
-        subcategory: component?.subcategory,
-        stage: getUploadStage(currentCategory),
-        mediaType: MEDIA_TYPES.IMAGE,
-        order: maxOrder + 1,
-      };
-
-      // Upload files to Firebase Storage
-      const results = await uploadMultipleMedia(files, uploadOptions);
-
-      // Check for errors
-      const successfulAssets = results
-        .filter((r) => r.success && r.asset)
-        .map((r) => r.asset as MediaAsset);
-
-      const failedCount = results.filter((r) => !r.success).length;
-
-      if (failedCount > 0) {
-        const message =
-          failedCount === results.length
-            ? "Failed to upload photos. Please try again."
-            : `${failedCount} of ${results.length} photos failed to upload.`;
-        setError(message);
-      }
-
-      if (successfulAssets.length > 0) {
-        // Update component with new media
-        const updatedMedia = [...currentMedia, ...successfulAssets];
-        await updateComponent(projectId, componentId, {
-          media: updatedMedia,
-        });
-      }
-
-      if (failedCount > 0 && successfulAssets.length > 0) {
-        Alert.alert(
-          "Partial Success",
-          `${successfulAssets.length} photos added. ${failedCount} failed to upload.`
-        );
-      }
+      await uploadFiles(files);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to add photos";
+        err instanceof Error ? err.message : "Failed to pick photos";
       setError(message);
       Alert.alert("Error", message);
-    } finally {
-      setIsLoading(false);
-      setLoadingOperation(null);
     }
-  }, [
-    projectId,
-    componentId,
-    component,
-    currentCategory,
-    updateComponent,
-  ]);
+  }, [uploadFiles]);
+
+  /**
+   * Pick photos from the Files app (for Google Drive, Downloads, etc.)
+   */
+  const pickFromFiles = useCallback(async () => {
+    try {
+      setError(null);
+
+      // Launch document picker for images
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "image/*",
+        multiple: true,
+        copyToCacheDirectory: true, // Ensures we have access to the file
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return;
+      }
+
+      // Filter to only image files and prepare for upload
+      const files = result.assets
+        .filter((asset) => isImageFile(asset.mimeType, asset.name))
+        .map((asset) => ({
+          uri: asset.uri,
+          filename: asset.name || getFilenameFromUri(asset.uri),
+        }));
+
+      if (files.length === 0) {
+        Alert.alert(
+          "No Images Selected",
+          "Please select image files (JPG, PNG, etc.)"
+        );
+        return;
+      }
+
+      await uploadFiles(files);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to pick files";
+      setError(message);
+      Alert.alert("Error", message);
+    }
+  }, [uploadFiles]);
+
+  /**
+   * Add photos - shows action sheet to choose source
+   *
+   * Options:
+   * - Photo Library: Opens device photo gallery
+   * - Files: Opens document picker (for Google Drive, Downloads, etc.)
+   */
+  const addPhotos = useCallback(async () => {
+    if (Platform.OS === "ios") {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ["Cancel", "Photo Library", "Files"],
+          cancelButtonIndex: 0,
+          title: "Add Photos From",
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) {
+            pickFromPhotoLibrary();
+          } else if (buttonIndex === 2) {
+            pickFromFiles();
+          }
+        }
+      );
+    } else {
+      // Android: Use Alert as a simple action sheet
+      Alert.alert("Add Photos From", undefined, [
+        { text: "Cancel", style: "cancel" },
+        { text: "Photo Library", onPress: pickFromPhotoLibrary },
+        { text: "Files", onPress: pickFromFiles },
+      ]);
+    }
+  }, [pickFromPhotoLibrary, pickFromFiles]);
 
   /**
    * Delete selected photos
