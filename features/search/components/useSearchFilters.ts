@@ -51,6 +51,7 @@ export function useSearchFilters(projects: Project[]) {
 
   // Extract unique project managers from all projects
   const availableProjectManagers = useMemo(() => {
+    if (!projects || !Array.isArray(projects)) return [];
     const pmSet = new Set<string>();
     projects.forEach((project) => {
       project.projectManagers?.forEach((pm) => {
@@ -64,6 +65,7 @@ export function useSearchFilters(projects: Project[]) {
 
   // Extract unique tags from all projects
   const availableTags = useMemo(() => {
+    if (!projects || !Array.isArray(projects)) return [];
     const tagSet = new Set<string>();
     projects.forEach((project) => {
       project.tags?.forEach((tag) => {
