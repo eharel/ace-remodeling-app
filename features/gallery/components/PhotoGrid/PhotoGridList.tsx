@@ -73,9 +73,8 @@ export function PhotoGridList({
 
   // Render item for sortable grid
   const renderSortableItem = useCallback(
-    (item: MediaAsset) => {
+    ({ item, index }: { item: MediaAsset; index: number }) => {
       const isSelected = selectedIds.has(item.id);
-      const index = photos.findIndex((p) => p.id === item.id);
 
       return (
         <View style={styles.itemContainer}>
@@ -98,7 +97,6 @@ export function PhotoGridList({
       selectedIds,
       onToggleSelection,
       styles.itemContainer,
-      photos,
     ]
   );
 
