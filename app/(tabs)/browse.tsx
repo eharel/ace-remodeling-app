@@ -230,7 +230,7 @@ export default function ProjectsScreen() {
               icon="add"
               onPress={handleCreateProject}
               accessibilityLabel="Create new project"
-              variant="primary"
+              variant="secondary"
             />
           </Can>
         }
