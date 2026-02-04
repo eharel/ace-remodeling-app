@@ -143,7 +143,7 @@ export default function CreateProjectScreen() {
           color: theme.colors.status.error,
         },
         input: {
-          backgroundColor: theme.colors.background.primary,
+          backgroundColor: theme.colors.background.card,
           borderWidth: DesignTokens.borderWidth.thin,
           borderColor: theme.colors.border.primary,
           borderRadius: DesignTokens.borderRadius.md,
@@ -385,6 +385,8 @@ export default function CreateProjectScreen() {
             disabled={!isValid}
             loading={isSubmitting}
             fullWidth
+            size="large"
+            style={{ borderRadius: DesignTokens.borderRadius.lg }}
           >
             Create Project
           </ThemedButton>
