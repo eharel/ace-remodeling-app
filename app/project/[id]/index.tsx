@@ -465,8 +465,8 @@ export default function ProjectDetailScreen() {
             </Animated.View>
           ) : null}
 
-          {/* Component Selector */}
-          {(project.components.length > 1 || isEditMode) && sortedComponents.length > 0 && (
+          {/* Component Selector - always show to provide context and enable editing */}
+          {sortedComponents.length > 0 && (
             <View style={{
               flexDirection: "row",
               alignItems: "center",
