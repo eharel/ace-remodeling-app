@@ -487,12 +487,12 @@ export default function ProjectDetailScreen() {
                     return component ? getComponentLabel(component) : componentId;
                   }}
                   renderSuffix={isEditMode ? (componentId, isSelected) => {
-                    // Only show edit icon on selected pill
-                    if (!isSelected) return null;
                     return (
                       <Pressable
                         onPress={(e) => {
                           e.stopPropagation();
+                          // Select this component and open edit modal
+                          setSelectedComponent(componentId);
                           setShowEditComponentModal(true);
                         }}
                         hitSlop={8}
@@ -501,7 +501,7 @@ export default function ProjectDetailScreen() {
                         <MaterialIcons
                           name="edit"
                           size={16}
-                          color="#FFFFFF"
+                          color={isSelected ? "#FFFFFF" : theme.colors.interactive.primary}
                         />
                       </Pressable>
                     );
