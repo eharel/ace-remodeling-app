@@ -388,20 +388,20 @@ export default function DocumentsPage() {
         {/* Action Bar */}
         <View style={styles.headerActions}>
           <ThemedButton
-            variant={isEditMode ? "primary" : "secondary"}
-            size="small"
-            icon={isEditMode ? "check" : "edit"}
-            onPress={() => setIsEditMode(!isEditMode)}
-          >
-            {isEditMode ? "Done" : "Edit"}
-          </ThemedButton>
-          <ThemedButton
             variant="primary"
             size="small"
             icon="add"
             onPress={() => setShowAddModal(true)}
           >
             Add Document
+          </ThemedButton>
+          <ThemedButton
+            variant={isEditMode ? "primary" : "secondary"}
+            size="small"
+            icon={isEditMode ? "check" : "edit"}
+            onPress={() => setIsEditMode(!isEditMode)}
+          >
+            {isEditMode ? "Done" : "Edit"}
           </ThemedButton>
         </View>
 
@@ -486,13 +486,6 @@ export default function DocumentsPage() {
               <ThemedText style={styles.emptyStateSubtext}>
                 Add floor plans, contracts, permits, and other project documents
               </ThemedText>
-              <ThemedButton
-                variant="primary"
-                icon="add"
-                onPress={() => setShowAddModal(true)}
-              >
-                Add Document
-              </ThemedButton>
             </View>
           )}
         </ScrollView>
