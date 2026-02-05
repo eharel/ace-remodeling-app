@@ -298,7 +298,7 @@ export function EditComponentModal({
                 editable={!isSaving}
               />
               <ThemedText style={styles.hint}>
-                A custom name helps distinguish similar components
+                Distinguishes multiple components of the same type (e.g., "Master" vs "Guest" for two bathrooms)
               </ThemedText>
             </View>
 

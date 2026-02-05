@@ -403,21 +403,23 @@ export function AddComponentModal({
               </View>
             )}
 
-            {/* Name Input */}
-            <View style={styles.section}>
-              <ThemedText style={styles.label}>Name (optional)</ThemedText>
-              <TextInput
-                style={styles.textInput}
-                value={name}
-                onChangeText={setName}
-                placeholder="e.g., Master Suite, Pool House"
-                placeholderTextColor={theme.colors.text.tertiary}
-                editable={!isAdding}
-              />
-              <ThemedText style={styles.hint}>
-                A display name to distinguish similar components
-              </ThemedText>
-            </View>
+            {/* Name Input - only show for core categories (custom categories are already unique) */}
+            {selectedCategory !== CUSTOM_CATEGORY && (
+              <View style={styles.section}>
+                <ThemedText style={styles.label}>Name (optional)</ThemedText>
+                <TextInput
+                  style={styles.textInput}
+                  value={name}
+                  onChangeText={setName}
+                  placeholder="e.g., Master Bath, Guest Bath"
+                  placeholderTextColor={theme.colors.text.tertiary}
+                  editable={!isAdding}
+                />
+                <ThemedText style={styles.hint}>
+                  Distinguishes multiple components of the same type (e.g., "Master" vs "Guest" for two bathrooms)
+                </ThemedText>
+              </View>
+            )}
           </ScrollView>
 
           {/* Error Message */}
