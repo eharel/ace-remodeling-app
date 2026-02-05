@@ -42,7 +42,7 @@ export interface ThemedButtonProps extends Omit<PressableProps, "style"> {
   /** Button text content */
   children: string;
   /** Button variant */
-  variant?: "primary" | "secondary" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "ghost" | "danger" | "success";
   /** Button size */
   size?: "small" | "medium" | "large";
   /** Optional icon to display (left side) */
@@ -138,6 +138,13 @@ export function ThemedButton({
             borderColor: undefined,
             borderWidth: DesignTokens.borderWidth.none,
           };
+        case "success":
+          return {
+            backgroundColor: theme.colors.status.success,
+            textColor: theme.colors.text.inverse,
+            borderColor: undefined,
+            borderWidth: DesignTokens.borderWidth.none,
+          };
         default:
           return {
             backgroundColor: theme.colors.interactive.primary,
@@ -159,7 +166,7 @@ export function ThemedButton({
             ? "transparent"
             : variantColors.backgroundColor + "80", // 50% opacity via hex alpha
         textColor:
-          variant === "primary" || variant === "danger"
+          variant === "primary" || variant === "danger" || variant === "success"
             ? theme.colors.text.inverse + "B3" // 70% opacity - still readable on colored bg
             : theme.colors.interactive.disabledText,
         borderColor: variantColors.borderColor,

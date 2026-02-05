@@ -16,7 +16,6 @@ import {
   LoadingState,
   PageHeader,
   ThemedButton,
-  ThemedIconButton,
   ThemedText,
 } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
@@ -396,13 +395,14 @@ export default function DocumentsPage() {
           >
             Add Document
           </ThemedButton>
-          <ThemedIconButton
+          <ThemedButton
+            variant={isEditMode ? "success" : "secondary"}
+            size="small"
             icon={isEditMode ? "check" : "edit"}
             onPress={() => setIsEditMode(!isEditMode)}
-            variant={isEditMode ? "success" : "ghost"}
-            size="small"
-            accessibilityLabel={isEditMode ? "Done editing" : "Edit documents"}
-          />
+          >
+            {isEditMode ? "Done" : "Edit"}
+          </ThemedButton>
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
