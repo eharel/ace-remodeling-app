@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useRef } from "react";
 import { Animated, Pressable, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
@@ -30,6 +31,7 @@ export function Toast({
   onDismiss,
 }: ToastProps) {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const translateY = useRef(new Animated.Value(100)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const dismissing = useRef(false);
@@ -116,10 +118,13 @@ export function Toast({
 
   const config = getTypeConfig();
 
+  // Position above tab bar: safe area bottom + tab bar height (~50) + padding
+  const bottomOffset = Math.max(insets.bottom, 0) + 60 + DesignTokens.spacing[4];
+
   const styles = StyleSheet.create({
     container: {
       position: "absolute",
-      bottom: DesignTokens.spacing[20],
+      bottom: bottomOffset,
       left: DesignTokens.spacing[4],
       right: DesignTokens.spacing[4],
       zIndex: 9999,
