@@ -125,8 +125,9 @@ export function Toast({
     container: {
       position: "absolute",
       bottom: bottomOffset,
-      left: DesignTokens.spacing[4],
-      right: DesignTokens.spacing[4],
+      left: 0,
+      right: 0,
+      alignItems: "center",
       zIndex: 9999,
     },
     toast: {
@@ -135,7 +136,8 @@ export function Toast({
       backgroundColor: config.backgroundColor,
       paddingVertical: DesignTokens.spacing[3],
       paddingHorizontal: DesignTokens.spacing[4],
-      borderRadius: DesignTokens.borderRadius.lg,
+      borderRadius: DesignTokens.borderRadius.full,
+      maxWidth: "80%",
       ...DesignTokens.shadows.lg,
     },
     icon: {
