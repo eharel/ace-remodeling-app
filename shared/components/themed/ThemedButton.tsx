@@ -107,65 +107,71 @@ export function ThemedButton({
     borderWidth,
     pressedOpacity,
   } = useMemo(() => {
+    // Get base variant colors first
+    const getVariantColors = () => {
+      switch (variant) {
+        case "primary":
+          return {
+            backgroundColor: theme.colors.interactive.primary,
+            textColor: theme.colors.text.inverse,
+            borderColor: undefined,
+            borderWidth: DesignTokens.borderWidth.none,
+          };
+        case "secondary":
+          return {
+            backgroundColor: theme.colors.background.elevated,
+            textColor: theme.colors.text.primary,
+            borderColor: theme.colors.border.primary,
+            borderWidth: DesignTokens.borderWidth.thin,
+          };
+        case "ghost":
+          return {
+            backgroundColor: "transparent",
+            textColor: theme.colors.text.primary,
+            borderColor: undefined,
+            borderWidth: DesignTokens.borderWidth.none,
+          };
+        case "danger":
+          return {
+            backgroundColor: theme.colors.status.error,
+            textColor: theme.colors.text.inverse,
+            borderColor: undefined,
+            borderWidth: DesignTokens.borderWidth.none,
+          };
+        default:
+          return {
+            backgroundColor: theme.colors.interactive.primary,
+            textColor: theme.colors.text.inverse,
+            borderColor: undefined,
+            borderWidth: DesignTokens.borderWidth.none,
+          };
+      }
+    };
+
+    const variantColors = getVariantColors();
+
     if (disabled || loading) {
+      // For disabled state: keep the variant's background but reduce opacity
+      // and use muted text. This keeps the button recognizable as its variant.
       return {
         backgroundColor:
           variant === "ghost"
             ? "transparent"
-            : theme.colors.interactive.disabled,
-        textColor: theme.colors.interactive.disabledText,
-        borderColor:
-          variant === "secondary" ? theme.colors.border.primary : undefined,
-        borderWidth:
-          variant === "secondary"
-            ? DesignTokens.borderWidth.thin
-            : DesignTokens.borderWidth.none,
+            : variantColors.backgroundColor + "80", // 50% opacity via hex alpha
+        textColor:
+          variant === "primary" || variant === "danger"
+            ? theme.colors.text.inverse + "B3" // 70% opacity - still readable on colored bg
+            : theme.colors.interactive.disabledText,
+        borderColor: variantColors.borderColor,
+        borderWidth: variantColors.borderWidth,
         pressedOpacity: 1, // No press effect when disabled
       };
     }
 
-    switch (variant) {
-      case "primary":
-        return {
-          backgroundColor: theme.colors.interactive.primary,
-          textColor: theme.colors.text.inverse,
-          borderColor: undefined,
-          borderWidth: DesignTokens.borderWidth.none,
-          pressedOpacity: DesignTokens.interactions.activeOpacity,
-        };
-      case "secondary":
-        return {
-          backgroundColor: theme.colors.background.elevated,
-          textColor: theme.colors.text.primary,
-          borderColor: theme.colors.border.primary,
-          borderWidth: DesignTokens.borderWidth.thin,
-          pressedOpacity: DesignTokens.interactions.activeOpacity,
-        };
-      case "ghost":
-        return {
-          backgroundColor: "transparent",
-          textColor: theme.colors.text.primary,
-          borderColor: undefined,
-          borderWidth: DesignTokens.borderWidth.none,
-          pressedOpacity: DesignTokens.interactions.activeOpacity,
-        };
-      case "danger":
-        return {
-          backgroundColor: theme.colors.status.error,
-          textColor: theme.colors.text.inverse,
-          borderColor: undefined,
-          borderWidth: DesignTokens.borderWidth.none,
-          pressedOpacity: DesignTokens.interactions.activeOpacity,
-        };
-      default:
-        return {
-          backgroundColor: theme.colors.interactive.primary,
-          textColor: theme.colors.text.inverse,
-          borderColor: undefined,
-          borderWidth: DesignTokens.borderWidth.none,
-          pressedOpacity: DesignTokens.interactions.activeOpacity,
-        };
-    }
+    return {
+      ...variantColors,
+      pressedOpacity: DesignTokens.interactions.activeOpacity,
+    };
   }, [variant, theme, disabled, loading]);
 
   const styles = useMemo(
