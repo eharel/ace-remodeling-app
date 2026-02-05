@@ -14,6 +14,7 @@ import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import type { Document } from "@/shared/types";
+import { commonStyles } from "@/shared/utils";
 
 export interface AssetsSectionProps {
   documents: Document[];
@@ -58,19 +59,26 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
 
   const styles = useMemo(
     () => ({
+      // Card container - matches PhotoPreviewSection
       section: {
-        paddingHorizontal: DesignTokens.spacing[6],
-        marginTop: DesignTokens.spacing[8],
+        backgroundColor: theme.colors.background.card,
+        marginBottom: DesignTokens.spacing[4],
+        marginHorizontal: DesignTokens.spacing[4],
+        padding: DesignTokens.spacing[6],
+        borderRadius: DesignTokens.borderRadius.xl,
+        borderWidth: 1,
+        borderColor: theme.colors.border.primary,
+        ...DesignTokens.shadows.md,
       },
       sectionHeader: {
         flexDirection: "row" as const,
         justifyContent: "space-between" as const,
         alignItems: "center" as const,
-        marginBottom: DesignTokens.spacing[4],
+        marginBottom: DesignTokens.spacing[2],
       },
       sectionTitle: {
-        fontSize: DesignTokens.typography.fontSize.lg,
-        fontWeight: DesignTokens.typography.fontWeight.semibold,
+        ...commonStyles.text.sectionTitle,
+        marginBottom: 0,
       },
       viewAllButton: {
         flexDirection: "row" as const,
@@ -109,9 +117,6 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
         justifyContent: "center" as const,
         backgroundColor: theme.colors.background.secondary,
         borderRadius: DesignTokens.borderRadius.md,
-        borderWidth: 1,
-        borderColor: theme.colors.border.primary,
-        borderStyle: "dashed" as const,
       },
       emptyStateText: {
         fontSize: DesignTokens.typography.fontSize.base,
