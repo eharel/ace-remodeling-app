@@ -5,6 +5,7 @@ import {
   fetchAllProjects,
   updateProject as updateProjectService,
 } from "@/services/projects";
+import { deleteMultipleMedia } from "@/services/media/mediaService";
 import { MediaAsset, Project, ProjectComponent } from "@/shared/types";
 import { CORE_CATEGORIES, CoreCategory } from "@/shared/types/ComponentCategory";
 import React, {
@@ -367,6 +368,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   /**
    * Deletes a component from a project.
    * Cannot delete the last component - projects must have at least one.
+   * Also deletes all associated media files from Firebase Storage.
    *
    * @param projectId - The project ID
    * @param componentId - The component ID to delete
@@ -386,6 +388,11 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
           throw new Error("Cannot delete the last component");
         }
 
+        // Find the component to get its media for deletion
+        const componentToDelete = project.components.find(
+          (c) => c.id === componentId
+        );
+
         const filteredComponents = project.components.filter(
           (c) => c.id !== componentId
         );
@@ -399,10 +406,31 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
           )
         );
 
-        // Update Firestore
+        // Update Firestore first (critical operation)
         await updateProjectService(projectId, {
           components: filteredComponents,
         });
+
+        // Delete associated media files from Storage (non-critical, fire-and-forget)
+        // We do this after Firestore update succeeds to avoid orphaned DB records
+        if (componentToDelete?.media && componentToDelete.media.length > 0) {
+          const storagePaths = componentToDelete.media
+            .map((m) => m.storagePath)
+            .filter((path): path is string => !!path);
+
+          if (storagePaths.length > 0) {
+            // Fire and forget - don't block on storage deletion
+            // Log errors but don't fail the component deletion
+            deleteMultipleMedia(storagePaths).then((result) => {
+              if (!result.success) {
+                console.warn(
+                  "Some media files could not be deleted:",
+                  result.errors
+                );
+              }
+            });
+          }
+        }
       } catch (error) {
         // Rollback on error
         setError(
