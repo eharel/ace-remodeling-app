@@ -191,6 +191,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
           error instanceof Error ? error.message : "Failed to update project"
         );
         await fetchProjects();
+        // Re-throw so callers know the update failed
+        throw error;
       }
     },
     [fetchProjects]
@@ -246,6 +248,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
           error instanceof Error ? error.message : "Failed to update component"
         );
         await fetchProjects();
+        // Re-throw so callers know the update failed
+        throw error;
       }
     },
     [fetchProjects]

@@ -109,6 +109,7 @@ export function ProjectGallery({
       flex: 1,
     },
     listContent: {
+      flexGrow: 1,
       paddingHorizontal: DesignTokens.spacing[6],
       paddingBottom: DesignTokens.spacing[5],
     },

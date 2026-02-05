@@ -63,13 +63,13 @@ export const ProjectMetaGrid: React.FC<ProjectMetaGridProps> = ({
   const [projectNumberError, setProjectNumberError] = useState<string | null>(null);
   const [isSavingProjectNumber, setIsSavingProjectNumber] = useState(false);
 
-  // Reset local state when project changes
+  // Reset local state when project changes or when project data is updated
   React.useEffect(() => {
     setEditedNeighborhood(project.location?.neighborhood || "");
     setEditedZipCode(project.location?.zipCode || "");
     setEditedProjectNumber(project.number || "");
     setProjectNumberError(null);
-  }, [project.id]);
+  }, [project.id, project.number, project.location?.neighborhood, project.location?.zipCode]);
 
   const styles = useMemo(
     () => ({
