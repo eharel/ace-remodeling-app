@@ -204,19 +204,33 @@ export const ProjectMetaGrid: React.FC<ProjectMetaGridProps> = ({
   };
 
   const handleProjectNumberBlur = async () => {
-    if (!onProjectNumberChange) return;
-    if (editedProjectNumber === project.number) return;
+    console.log("[ProjectMetaGrid] handleProjectNumberBlur called");
+    console.log("[ProjectMetaGrid] onProjectNumberChange exists:", !!onProjectNumberChange);
+    console.log("[ProjectMetaGrid] editedProjectNumber:", editedProjectNumber);
+    console.log("[ProjectMetaGrid] project.number:", project.number);
 
+    if (!onProjectNumberChange) {
+      console.log("[ProjectMetaGrid] Early return: no onProjectNumberChange");
+      return;
+    }
+    if (editedProjectNumber === project.number) {
+      console.log("[ProjectMetaGrid] Early return: number unchanged");
+      return;
+    }
+
+    console.log("[ProjectMetaGrid] Proceeding with update...");
     setIsSavingProjectNumber(true);
     setProjectNumberError(null);
 
     try {
       const result = await onProjectNumberChange(editedProjectNumber);
+      console.log("[ProjectMetaGrid] Result from onProjectNumberChange:", result);
       if (!result.valid) {
         setProjectNumberError(result.error || "Invalid project number");
         setEditedProjectNumber(project.number || ""); // Reset to original
       }
     } catch (error) {
+      console.log("[ProjectMetaGrid] Error:", error);
       setProjectNumberError("Failed to update project number");
       setEditedProjectNumber(project.number || "");
     } finally {
