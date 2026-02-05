@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid/non-secure";
 import {
   createProject as createProjectService,
   CreateProjectInput,
@@ -5,7 +6,7 @@ import {
   updateProject as updateProjectService,
 } from "@/services/projects";
 import { MediaAsset, Project, ProjectComponent } from "@/shared/types";
-import { CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
+import { CORE_CATEGORIES, CoreCategory } from "@/shared/types/ComponentCategory";
 import React, {
   createContext,
   ReactNode,
@@ -75,6 +76,19 @@ interface ProjectsContextType {
     componentId: string,
     updates: Partial<ProjectComponent>
   ) => Promise<void>;
+  /**
+   * Add a new component to an existing project.
+   * Returns the created component.
+   */
+  addComponent: (
+    projectId: string,
+    input: { category: CoreCategory; subcategory?: string; name?: string }
+  ) => Promise<ProjectComponent>;
+  /**
+   * Delete a component from a project.
+   * Cannot delete the last component.
+   */
+  deleteComponent: (projectId: string, componentId: string) => Promise<void>;
   /**
    * Create a new project with a single component.
    * Returns the created project.
@@ -282,6 +296,125 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   );
 
   /**
+   * Adds a new component to an existing project.
+   *
+   * @param projectId - The project to add the component to
+   * @param input - The component details (category, subcategory, name)
+   * @returns The created component
+   */
+  const addComponent = useCallback(
+    async (
+      projectId: string,
+      input: { category: CoreCategory; subcategory?: string; name?: string }
+    ): Promise<ProjectComponent> => {
+      const now = new Date().toISOString();
+      const componentId = nanoid(12);
+
+      const newComponent: ProjectComponent = {
+        id: componentId,
+        category: input.category,
+        subcategory: input.subcategory,
+        name: input.name,
+        description: "",
+        media: [],
+        documents: [],
+        logs: [],
+        isFeatured: false,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      try {
+        // Optimistic update
+        let updatedProject: Project | undefined;
+        setProjects((prev) =>
+          prev.map((p) => {
+            if (p.id === projectId) {
+              updatedProject = {
+                ...p,
+                components: [...p.components, newComponent],
+                updatedAt: now,
+              };
+              return updatedProject;
+            }
+            return p;
+          })
+        );
+
+        if (!updatedProject) {
+          throw new Error("Project not found");
+        }
+
+        // Update Firestore
+        await updateProjectService(projectId, {
+          components: updatedProject.components,
+        });
+
+        return newComponent;
+      } catch (error) {
+        // Rollback on error
+        setError(
+          error instanceof Error ? error.message : "Failed to add component"
+        );
+        await fetchProjects();
+        throw error;
+      }
+    },
+    [fetchProjects]
+  );
+
+  /**
+   * Deletes a component from a project.
+   * Cannot delete the last component - projects must have at least one.
+   *
+   * @param projectId - The project ID
+   * @param componentId - The component ID to delete
+   */
+  const deleteComponent = useCallback(
+    async (projectId: string, componentId: string): Promise<void> => {
+      const now = new Date().toISOString();
+
+      try {
+        // Find the project and validate
+        const project = projects.find((p) => p.id === projectId);
+        if (!project) {
+          throw new Error("Project not found");
+        }
+
+        if (project.components.length <= 1) {
+          throw new Error("Cannot delete the last component");
+        }
+
+        const filteredComponents = project.components.filter(
+          (c) => c.id !== componentId
+        );
+
+        // Optimistic update
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === projectId
+              ? { ...p, components: filteredComponents, updatedAt: now }
+              : p
+          )
+        );
+
+        // Update Firestore
+        await updateProjectService(projectId, {
+          components: filteredComponents,
+        });
+      } catch (error) {
+        // Rollback on error
+        setError(
+          error instanceof Error ? error.message : "Failed to delete component"
+        );
+        await fetchProjects();
+        throw error;
+      }
+    },
+    [projects, fetchProjects]
+  );
+
+  /**
    * All projects that have at least one featured component.
    * Featuring is now per-component, not per-project.
    * Memoized to prevent unnecessary recalculations.
@@ -356,6 +489,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       refetchProjects,
       updateProject,
       updateComponent,
+      addComponent,
+      deleteComponent,
       createProject,
     }),
     [
@@ -371,6 +506,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       refetchProjects,
       updateProject,
       updateComponent,
+      addComponent,
+      deleteComponent,
       createProject,
     ]
   );

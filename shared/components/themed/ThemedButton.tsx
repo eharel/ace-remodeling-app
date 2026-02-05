@@ -42,7 +42,7 @@ export interface ThemedButtonProps extends Omit<PressableProps, "style"> {
   /** Button text content */
   children: string;
   /** Button variant */
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "danger";
   /** Button size */
   size?: "small" | "medium" | "large";
   /** Optional icon to display (left side) */
@@ -145,6 +145,14 @@ export function ThemedButton({
         return {
           backgroundColor: "transparent",
           textColor: theme.colors.text.primary,
+          borderColor: undefined,
+          borderWidth: DesignTokens.borderWidth.none,
+          pressedOpacity: DesignTokens.interactions.activeOpacity,
+        };
+      case "danger":
+        return {
+          backgroundColor: theme.colors.status.error,
+          textColor: theme.colors.text.inverse,
           borderColor: undefined,
           borderWidth: DesignTokens.borderWidth.none,
           pressedOpacity: DesignTokens.interactions.activeOpacity,

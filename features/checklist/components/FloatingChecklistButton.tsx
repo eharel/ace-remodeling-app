@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useCallback, useMemo, useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DesignTokens } from "@/shared/themes";
 import { ThemedText } from "@/shared/components";
@@ -13,6 +14,7 @@ import { ChecklistModal } from "./ChecklistModal";
  */
 function FloatingChecklistButtonInternal() {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
 
   // Use the context for progress tracking
@@ -40,22 +42,28 @@ function FloatingChecklistButtonInternal() {
   const openModal = useCallback(() => setModalVisible(true), []);
   const closeModal = useCallback(() => setModalVisible(false), []);
 
+  // Position above tab bar: safe area bottom + tab bar height (~50) + padding
+  const bottomOffset = Math.max(insets.bottom, 0) + 50 + DesignTokens.spacing[4];
+
   // Dynamic styles based on theme
   const dynamicStyles = useMemo(
     () =>
       StyleSheet.create({
+        fabContainer: {
+          bottom: bottomOffset,
+        },
         fab: {
           backgroundColor: theme.colors.interactive.primary,
           shadowColor: theme.colors.text.primary,
         },
       }),
-    [theme]
+    [theme, bottomOffset]
   );
 
   return (
     <>
       {/* FAB Container with Badge */}
-      <View style={styles.fabContainer}>
+      <View style={[styles.fabContainer, dynamicStyles.fabContainer]}>
         {/* Floating Action Button */}
         <TouchableOpacity
           style={[styles.fab, dynamicStyles.fab]}
@@ -91,7 +99,7 @@ function FloatingChecklistButtonInternal() {
 const styles = StyleSheet.create({
   fabContainer: {
     position: "absolute",
-    bottom: 100, // Position above tab bar
+    // bottom is set dynamically via dynamicStyles to account for safe area
     right: DesignTokens.spacing[5], // 20px from right
     zIndex: 1000,
   },

@@ -6,7 +6,9 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { type PhotoCategory } from "@/shared/constants";
 import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreview";
 import {
+  AddComponentModal,
   AssetsSection,
+  EditComponentModal,
   FeaturedToggle,
   ProjectLogsSection,
   ProjectMetaGrid,
@@ -54,6 +56,8 @@ export default function ProjectDetailScreen() {
     isLoading,
     updateProject: updateProjectContext,
     updateComponent,
+    addComponent,
+    deleteComponent,
   } = useProjects();
   const { theme } = useTheme();
 
@@ -87,6 +91,13 @@ export default function ProjectDetailScreen() {
   const showToast = (message: string, type: ToastType = "info") => {
     setToast({ visible: true, message, type });
   };
+
+  // Component modal states
+  const [showAddComponentModal, setShowAddComponentModal] = useState(false);
+  const [showEditComponentModal, setShowEditComponentModal] = useState(false);
+  const [isAddingComponent, setIsAddingComponent] = useState(false);
+  const [isSavingComponent, setIsSavingComponent] = useState(false);
+  const [componentError, setComponentError] = useState<string | null>(null);
 
   // Handle save - dismiss keyboard to trigger blur saves, then exit edit mode
   const handleSaveAndExit = async () => {
@@ -292,6 +303,82 @@ export default function ProjectDetailScreen() {
     return selectedComponent?.isFeatured ?? false;
   }, [selectedComponent]);
 
+  // Add new component handler
+  const handleAddComponent = async (input: {
+    category: CoreCategory;
+    subcategory?: string;
+    name?: string;
+  }) => {
+    if (!project) return;
+    setIsAddingComponent(true);
+    setComponentError(null);
+    try {
+      const newComponent = await addComponent(project.id, input);
+      setShowAddComponentModal(false);
+      setSelectedComponent(newComponent.id);
+      showToast("Component added", "success");
+    } catch (error) {
+      setComponentError(
+        error instanceof Error ? error.message : "Failed to add component"
+      );
+    } finally {
+      setIsAddingComponent(false);
+    }
+  };
+
+  // Edit component handler (name/subcategory)
+  const handleEditComponent = async (updates: {
+    name?: string;
+    subcategory?: string;
+  }) => {
+    if (!project || !selectedComponent) return;
+    setIsSavingComponent(true);
+    setComponentError(null);
+    try {
+      await updateComponent(project.id, selectedComponent.id, updates);
+      setShowEditComponentModal(false);
+      showToast("Component updated", "success");
+    } catch (error) {
+      setComponentError(
+        error instanceof Error ? error.message : "Failed to update component"
+      );
+    } finally {
+      setIsSavingComponent(false);
+    }
+  };
+
+  // Delete component handler
+  const handleDeleteComponent = async () => {
+    if (!project || !selectedComponent) return;
+    setIsSavingComponent(true);
+    setComponentError(null);
+    try {
+      // Find another component to select after deletion
+      const remainingComponents = project.components.filter(
+        (c) => c.id !== selectedComponent.id
+      );
+      const nextComponent = remainingComponents[0];
+
+      await deleteComponent(project.id, selectedComponent.id);
+      setShowEditComponentModal(false);
+
+      // Select the next available component
+      if (nextComponent) {
+        setSelectedComponent(nextComponent.id);
+      }
+      showToast("Component deleted", "success");
+    } catch (error) {
+      setComponentError(
+        error instanceof Error ? error.message : "Failed to delete component"
+      );
+    } finally {
+      setIsSavingComponent(false);
+    }
+  };
+
+  // Can delete if there's more than one component
+  const canDeleteComponent = (project?.components.length ?? 0) > 1;
+
   const styles = useMemo(() => createProjectDetailStyles(theme), [theme]);
 
   if (isLoading && !project) {
@@ -378,20 +465,51 @@ export default function ProjectDetailScreen() {
           ) : null}
 
           {/* Component Selector */}
-          {project.components.length > 1 && sortedComponents.length > 0 && (
-            <SegmentedControl
-              variant="pills"
-              options={sortedComponents.map((c) => c.id) as readonly string[]}
-              selected={selectedComponent?.id || sortedComponents[0].id}
-              onSelect={setSelectedComponent}
-              getLabel={(componentId) => {
-                const component = sortedComponents.find(
-                  (c) => c.id === componentId,
-                );
-                return component ? getComponentLabel(component) : componentId;
-              }}
-              ariaLabel="Select project component"
-            />
+          {(project.components.length > 1 || isEditMode) && sortedComponents.length > 0 && (
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: DesignTokens.spacing[4],
+              paddingVertical: DesignTokens.spacing[2],
+              gap: DesignTokens.spacing[2],
+            }}>
+              <View style={{ flex: 1 }}>
+                <SegmentedControl
+                  variant="pills"
+                  options={sortedComponents.map((c) => c.id) as readonly string[]}
+                  selected={selectedComponent?.id || sortedComponents[0].id}
+                  onSelect={setSelectedComponent}
+                  getLabel={(componentId) => {
+                    const component = sortedComponents.find(
+                      (c) => c.id === componentId,
+                    );
+                    return component ? getComponentLabel(component) : componentId;
+                  }}
+                  ariaLabel="Select project component"
+                />
+              </View>
+              {/* Edit/Add buttons in edit mode */}
+              {isEditMode && (
+                <Can edit>
+                  <View style={{ flexDirection: "row", gap: DesignTokens.spacing[1] }}>
+                    <ThemedIconButton
+                      icon="edit"
+                      onPress={() => setShowEditComponentModal(true)}
+                      variant="ghost"
+                      size="small"
+                      accessibilityLabel="Edit component"
+                    />
+                    <ThemedIconButton
+                      icon="add"
+                      onPress={() => setShowAddComponentModal(true)}
+                      variant="ghost"
+                      size="small"
+                      accessibilityLabel="Add component"
+                    />
+                  </View>
+                </Can>
+              )}
+            </View>
           )}
 
           {/* Project Header */}
@@ -522,6 +640,33 @@ export default function ProjectDetailScreen() {
         message={toast.message}
         type={toast.type}
         onDismiss={() => setToast({ ...toast, visible: false })}
+      />
+
+      {/* Add Component Modal */}
+      <AddComponentModal
+        visible={showAddComponentModal}
+        onClose={() => {
+          setShowAddComponentModal(false);
+          setComponentError(null);
+        }}
+        onAdd={handleAddComponent}
+        isAdding={isAddingComponent}
+        error={componentError}
+      />
+
+      {/* Edit Component Modal */}
+      <EditComponentModal
+        visible={showEditComponentModal}
+        onClose={() => {
+          setShowEditComponentModal(false);
+          setComponentError(null);
+        }}
+        onSave={handleEditComponent}
+        onDelete={handleDeleteComponent}
+        component={selectedComponent}
+        isSaving={isSavingComponent}
+        canDelete={canDeleteComponent}
+        error={componentError}
       />
     </>
   );
