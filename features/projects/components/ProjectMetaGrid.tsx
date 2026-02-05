@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useMemo, useState } from "react";
 import { TextInput, View } from "react-native";
 
 import { ThemedText, ThemedView } from "@/shared/components";
@@ -33,23 +33,34 @@ export interface ProjectMetaGridProps {
   onProjectNumberChange?: (number: string) => Promise<{ valid: boolean; error?: string }>;
 }
 
+export interface ProjectMetaGridRef {
+  saveAll: () => Promise<void>;
+  resetAll: () => void;
+}
+
 /**
  * ProjectMetaGrid - Displays project metadata in a grid layout
  *
  * Shows Status, Category, Location, and Duration in a consistent grid format.
  * In edit mode, fields become editable with pickers and inputs.
  * Adapts to show component-specific data when a component is selected.
+ *
+ * Exposes saveAll() and resetAll() methods via ref for parent control.
  */
-export const ProjectMetaGrid: React.FC<ProjectMetaGridProps> = ({
-  project,
-  selectedComponent,
-  displayTimeline,
-  isEditMode = false,
-  onStatusChange,
-  onCategoryChange,
-  onLocationChange,
-  onProjectNumberChange,
-}) => {
+export const ProjectMetaGrid = forwardRef<ProjectMetaGridRef, ProjectMetaGridProps>(
+  (
+    {
+      project,
+      selectedComponent,
+      displayTimeline,
+      isEditMode = false,
+      onStatusChange,
+      onCategoryChange,
+      onLocationChange,
+      onProjectNumberChange,
+    },
+    ref
+  ) => {
   const { theme } = useTheme();
 
   // Local state for editable fields
@@ -64,12 +75,40 @@ export const ProjectMetaGrid: React.FC<ProjectMetaGridProps> = ({
   const [isSavingProjectNumber, setIsSavingProjectNumber] = useState(false);
 
   // Reset local state when project changes or when project data is updated
+  // Reset local state when project changes or when project data is updated
   React.useEffect(() => {
     setEditedNeighborhood(project.location?.neighborhood || "");
     setEditedZipCode(project.location?.zipCode || "");
     setEditedProjectNumber(project.number || "");
     setProjectNumberError(null);
   }, [project.id, project.number, project.location?.neighborhood, project.location?.zipCode]);
+
+  // Expose saveAll and resetAll methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    saveAll: async () => {
+      // Save location if changed
+      const hasLocationChanged =
+        editedNeighborhood !== (project.location?.neighborhood || "") ||
+        editedZipCode !== (project.location?.zipCode || "");
+      if (hasLocationChanged && onLocationChange) {
+        onLocationChange({
+          neighborhood: editedNeighborhood || undefined,
+          zipCode: editedZipCode || undefined,
+        });
+      }
+
+      // Save project number if changed
+      if (editedProjectNumber !== project.number && onProjectNumberChange) {
+        await handleProjectNumberSave();
+      }
+    },
+    resetAll: () => {
+      setEditedNeighborhood(project.location?.neighborhood || "");
+      setEditedZipCode(project.location?.zipCode || "");
+      setEditedProjectNumber(project.number || "");
+      setProjectNumberError(null);
+    },
+  }));
 
   const styles = useMemo(
     () => ({
@@ -203,34 +242,20 @@ export const ProjectMetaGrid: React.FC<ProjectMetaGridProps> = ({
     }
   };
 
-  const handleProjectNumberBlur = async () => {
-    console.log("[ProjectMetaGrid] handleProjectNumberBlur called");
-    console.log("[ProjectMetaGrid] onProjectNumberChange exists:", !!onProjectNumberChange);
-    console.log("[ProjectMetaGrid] editedProjectNumber:", editedProjectNumber);
-    console.log("[ProjectMetaGrid] project.number:", project.number);
+  const handleProjectNumberSave = async () => {
+    if (!onProjectNumberChange) return;
+    if (editedProjectNumber === project.number) return;
 
-    if (!onProjectNumberChange) {
-      console.log("[ProjectMetaGrid] Early return: no onProjectNumberChange");
-      return;
-    }
-    if (editedProjectNumber === project.number) {
-      console.log("[ProjectMetaGrid] Early return: number unchanged");
-      return;
-    }
-
-    console.log("[ProjectMetaGrid] Proceeding with update...");
     setIsSavingProjectNumber(true);
     setProjectNumberError(null);
 
     try {
       const result = await onProjectNumberChange(editedProjectNumber);
-      console.log("[ProjectMetaGrid] Result from onProjectNumberChange:", result);
       if (!result.valid) {
         setProjectNumberError(result.error || "Invalid project number");
         setEditedProjectNumber(project.number || ""); // Reset to original
       }
     } catch (error) {
-      console.log("[ProjectMetaGrid] Error:", error);
       setProjectNumberError("Failed to update project number");
       setEditedProjectNumber(project.number || "");
     } finally {
@@ -255,7 +280,7 @@ export const ProjectMetaGrid: React.FC<ProjectMetaGridProps> = ({
             ]}
             value={editedProjectNumber}
             onChangeText={setEditedProjectNumber}
-            onBlur={handleProjectNumberBlur}
+            onBlur={handleProjectNumberSave}
             placeholder="e.g., 2024-001"
             placeholderTextColor={theme.colors.text.tertiary}
             editable={!isSavingProjectNumber}
@@ -377,4 +402,7 @@ export const ProjectMetaGrid: React.FC<ProjectMetaGridProps> = ({
       </View>
     </ThemedView>
   );
-};
+});
+
+// Display name for debugging
+ProjectMetaGrid.displayName = "ProjectMetaGrid";

@@ -131,27 +131,17 @@ export const checkProjectNumberExists = async (
   projectNumber: string,
   excludeProjectId?: string
 ): Promise<boolean> => {
-  console.log("[checkProjectNumberExists] Checking for:", projectNumber, "excluding:", excludeProjectId);
   const projectsCollection = collection(db, PROJECTS_COLLECTION);
   const querySnapshot = await getDocs(projectsCollection);
 
-  console.log("[checkProjectNumberExists] Found", querySnapshot.docs.length, "projects");
-
-  const result = querySnapshot.docs.some((doc) => {
+  return querySnapshot.docs.some((doc) => {
     // Exclude the current project when checking (for updates)
     if (excludeProjectId && doc.id === excludeProjectId) {
       return false;
     }
     const data = doc.data();
-    const matches = data.number === projectNumber;
-    if (matches) {
-      console.log("[checkProjectNumberExists] Found match in doc:", doc.id, "number:", data.number);
-    }
-    return matches;
+    return data.number === projectNumber;
   });
-
-  console.log("[checkProjectNumberExists] Result:", result);
-  return result;
 };
 
 /**

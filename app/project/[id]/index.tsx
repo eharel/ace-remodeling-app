@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
-import { TextInput, View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Keyboard, TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { type PhotoCategory } from "@/shared/constants";
 import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreview";
@@ -10,6 +10,7 @@ import {
   FeaturedToggle,
   ProjectLogsSection,
   ProjectMetaGrid,
+  ProjectMetaGridRef,
   TestimonialSection,
 } from "@/features/projects";
 import { useProjectComponentSelection } from "@/features/projects/hooks/useProjectComponentSelection";
@@ -73,6 +74,9 @@ export default function ProjectDetailScreen() {
   const [editedDescription, setEditedDescription] = useState<string>("");
   const [isSavingDescription, setIsSavingDescription] = useState<boolean>(false);
 
+  // Ref to ProjectMetaGrid for save/cancel operations
+  const metaGridRef = useRef<ProjectMetaGridRef>(null);
+
   // Toast state for feedback
   const [toast, setToast] = useState<{
     visible: boolean;
@@ -82,6 +86,38 @@ export default function ProjectDetailScreen() {
 
   const showToast = (message: string, type: ToastType = "info") => {
     setToast({ visible: true, message, type });
+  };
+
+  // Handle save - dismiss keyboard to trigger blur saves, then exit edit mode
+  const handleSaveAndExit = async () => {
+    // Dismiss keyboard triggers onBlur on any focused input
+    Keyboard.dismiss();
+
+    // Call saveAll on ProjectMetaGrid if available
+    if (metaGridRef.current?.saveAll) {
+      await metaGridRef.current.saveAll();
+    }
+
+    // Save description if changed
+    if (editedDescription !== displayDescription) {
+      await handleSaveDescription();
+    }
+
+    setIsEditMode(false);
+    showToast("Changes saved", "success");
+  };
+
+  // Handle cancel - reset all pending changes and exit edit mode
+  const handleCancelEdit = () => {
+    // Reset description to original
+    setEditedDescription(displayDescription);
+
+    // Reset ProjectMetaGrid fields
+    if (metaGridRef.current?.resetAll) {
+      metaGridRef.current.resetAll();
+    }
+
+    setIsEditMode(false);
   };
 
   // Preload all component images when project loads
@@ -221,7 +257,6 @@ export default function ProjectDetailScreen() {
   const handleProjectNumberChange = async (
     newNumber: string
   ): Promise<{ valid: boolean; error?: string }> => {
-    console.log("[ProjectNumber] handleProjectNumberChange called with:", newNumber);
     if (!project) return { valid: false, error: "Project not found" };
     if (!newNumber.trim()) {
       showToast("Project number is required", "error");
@@ -230,28 +265,22 @@ export default function ProjectDetailScreen() {
 
     // Check if the number already exists (excluding current project)
     try {
-      console.log("[ProjectNumber] Checking if exists, excluding project:", project.id);
       const exists = await checkProjectNumberExists(newNumber.trim(), project.id);
-      console.log("[ProjectNumber] checkProjectNumberExists returned:", exists);
       if (exists) {
-        console.log("[ProjectNumber] Duplicate found! Showing error toast");
         showToast("This project number already exists", "error");
         return { valid: false, error: "This project number already exists" };
       }
     } catch (error) {
-      console.log("[ProjectNumber] Error during validation:", error);
       showToast("Failed to validate project number", "error");
       return { valid: false, error: "Failed to validate project number" };
     }
 
     // Update the project
     try {
-      console.log("[ProjectNumber] No duplicate, updating project");
       await updateProjectContext(project.id, { number: newNumber.trim() });
       showToast("Project number updated", "success");
       return { valid: true };
     } catch (error) {
-      console.log("[ProjectNumber] Error updating project:", error);
       showToast("Failed to update project number", "error");
       return { valid: false, error: "Failed to update project number" };
     }
@@ -295,13 +324,32 @@ export default function ProjectDetailScreen() {
           variant="compact"
           rightAction={
             <Can edit>
-              <ThemedIconButton
-                icon={isEditMode ? "check" : "edit"}
-                onPress={() => setIsEditMode(!isEditMode)}
-                variant={isEditMode ? "success" : "ghost"}
-                size="small"
-                accessibilityLabel={isEditMode ? "Done editing" : "Edit project"}
-              />
+              {isEditMode ? (
+                <View style={{ flexDirection: "row", gap: DesignTokens.spacing[2] }}>
+                  <ThemedIconButton
+                    icon="close"
+                    onPress={handleCancelEdit}
+                    variant="ghost"
+                    size="small"
+                    accessibilityLabel="Cancel editing"
+                  />
+                  <ThemedIconButton
+                    icon="check"
+                    onPress={handleSaveAndExit}
+                    variant="success"
+                    size="small"
+                    accessibilityLabel="Save changes"
+                  />
+                </View>
+              ) : (
+                <ThemedIconButton
+                  icon="edit"
+                  onPress={() => setIsEditMode(true)}
+                  variant="ghost"
+                  size="small"
+                  accessibilityLabel="Edit project"
+                />
+              )}
             </Can>
           }
         />
@@ -397,6 +445,7 @@ export default function ProjectDetailScreen() {
             </ThemedView>
 
             <ProjectMetaGrid
+              ref={metaGridRef}
               project={project}
               selectedComponent={selectedComponent}
               displayTimeline={displayTimeline}
