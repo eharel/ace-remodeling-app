@@ -221,6 +221,7 @@ export default function ProjectDetailScreen() {
   const handleProjectNumberChange = async (
     newNumber: string
   ): Promise<{ valid: boolean; error?: string }> => {
+    console.log("[ProjectNumber] handleProjectNumberChange called with:", newNumber);
     if (!project) return { valid: false, error: "Project not found" };
     if (!newNumber.trim()) {
       showToast("Project number is required", "error");
@@ -229,22 +230,28 @@ export default function ProjectDetailScreen() {
 
     // Check if the number already exists (excluding current project)
     try {
+      console.log("[ProjectNumber] Checking if exists, excluding project:", project.id);
       const exists = await checkProjectNumberExists(newNumber.trim(), project.id);
+      console.log("[ProjectNumber] checkProjectNumberExists returned:", exists);
       if (exists) {
+        console.log("[ProjectNumber] Duplicate found! Showing error toast");
         showToast("This project number already exists", "error");
         return { valid: false, error: "This project number already exists" };
       }
     } catch (error) {
+      console.log("[ProjectNumber] Error during validation:", error);
       showToast("Failed to validate project number", "error");
       return { valid: false, error: "Failed to validate project number" };
     }
 
     // Update the project
     try {
+      console.log("[ProjectNumber] No duplicate, updating project");
       await updateProjectContext(project.id, { number: newNumber.trim() });
       showToast("Project number updated", "success");
       return { valid: true };
     } catch (error) {
+      console.log("[ProjectNumber] Error updating project:", error);
       showToast("Failed to update project number", "error");
       return { valid: false, error: "Failed to update project number" };
     }
