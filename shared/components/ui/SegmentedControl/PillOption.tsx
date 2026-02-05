@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/shared/themes";
 import { ThemedText } from "@/shared/components";
@@ -8,18 +8,19 @@ import { OptionComponentProps } from "./types";
 
 /**
  * PillOption - Visual variant component for pill-style selection
- * 
+ *
  * Responsibilities:
  * - ONLY visual presentation of the pill variant
  * - Uses theme colors and design tokens
  * - No business logic
- * 
+ *
  * Extracted from ComponentSelector styling to be reusable.
  */
 export default function PillOption({
   label,
   isSelected,
   onPress,
+  suffix,
   accessibilityLabel,
   testID,
 }: OptionComponentProps) {
@@ -42,18 +43,21 @@ export default function PillOption({
       accessibilityState={{ selected: isSelected }}
       testID={testID}
     >
-      <ThemedText
-        style={[
-          staticStyles.pillText,
-          {
-            color: isSelected
-              ? "#FFFFFF" // White text on colored background
-              : theme.colors.interactive.primary,
-          },
-        ]}
-      >
-        {label}
-      </ThemedText>
+      <View style={staticStyles.pillContent}>
+        <ThemedText
+          style={[
+            staticStyles.pillText,
+            {
+              color: isSelected
+                ? "#FFFFFF" // White text on colored background
+                : theme.colors.interactive.primary,
+            },
+          ]}
+        >
+          {label}
+        </ThemedText>
+        {suffix}
+      </View>
     </Pressable>
   );
 }
@@ -68,6 +72,11 @@ const staticStyles = StyleSheet.create({
     minHeight: 44, // Minimum touch target for accessibility
     justifyContent: "center",
     alignItems: "center",
+  },
+  pillContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: DesignTokens.spacing[2],
   },
   pillText: {
     fontSize: DesignTokens.typography.fontSize.base,

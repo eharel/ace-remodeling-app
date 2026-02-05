@@ -191,6 +191,9 @@ export const ProjectMetaGrid = forwardRef<ProjectMetaGridRef, ProjectMetaGridPro
       zipCodeInput: {
         width: 80,
       },
+      projectNumberInput: {
+        width: 120,
+      },
     }),
     [theme]
   );
@@ -267,7 +270,7 @@ export const ProjectMetaGrid = forwardRef<ProjectMetaGridRef, ProjectMetaGridPro
     <ThemedView style={styles.metaGrid}>
       {/* Project Number - only in edit mode */}
       {isEditMode && onProjectNumberChange && (
-        <ThemedView style={[styles.metaItem, styles.metaItemFull]}>
+        <ThemedView style={styles.metaItem}>
           <ThemedText
             style={[styles.metaLabel, { color: theme.colors.text.secondary }]}
           >
@@ -276,15 +279,21 @@ export const ProjectMetaGrid = forwardRef<ProjectMetaGridRef, ProjectMetaGridPro
           <TextInput
             style={[
               styles.editableInput,
+              styles.projectNumberInput,
               projectNumberError && styles.editableInputError,
             ]}
             value={editedProjectNumber}
-            onChangeText={setEditedProjectNumber}
+            onChangeText={(text) => {
+              // Allow only alphanumeric characters and common separators (dash, dot)
+              const sanitized = text.replace(/[^a-zA-Z0-9\-\.]/g, "").toUpperCase();
+              setEditedProjectNumber(sanitized);
+            }}
             onBlur={handleProjectNumberSave}
             placeholder="e.g., 2024-001"
             placeholderTextColor={theme.colors.text.tertiary}
             editable={!isSavingProjectNumber}
             autoCapitalize="characters"
+            maxLength={20}
           />
           {projectNumberError && (
             <ThemedText style={styles.errorText}>{projectNumberError}</ThemedText>

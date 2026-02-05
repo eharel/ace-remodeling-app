@@ -45,6 +45,7 @@ export function SegmentedControl<T extends string>({
   showCounts = false,
   getCounts,
   getLabel,
+  renderSuffix,
   ariaLabel,
   testID,
 }: SegmentedControlProps<T>) {
@@ -113,6 +114,9 @@ export function SegmentedControl<T extends string>({
             isSelected ? ", selected" : ""
           }`;
 
+          // Get optional suffix content
+          const suffix = renderSuffix?.(option, isSelected);
+
           // Strategy pattern: delegate rendering to variant component
           if (variant === "pills") {
             return (
@@ -121,6 +125,7 @@ export function SegmentedControl<T extends string>({
                 label={displayText}
                 isSelected={isSelected}
                 onPress={() => onSelect(option)}
+                suffix={suffix}
                 accessibilityLabel={accessibilityLabel}
                 testID={testID ? `${testID}-${option}` : undefined}
               />

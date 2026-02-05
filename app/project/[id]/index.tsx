@@ -1,7 +1,8 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Keyboard, TextInput, View } from "react-native";
+import { Keyboard, Pressable, TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { type PhotoCategory } from "@/shared/constants";
 import { PhotoPreviewSection } from "@/features/gallery/components/PhotoPreview";
@@ -469,7 +470,7 @@ export default function ProjectDetailScreen() {
             <View style={{
               flexDirection: "row",
               alignItems: "center",
-              paddingHorizontal: DesignTokens.spacing[4],
+              paddingRight: DesignTokens.spacing[4],
               paddingVertical: DesignTokens.spacing[2],
               gap: DesignTokens.spacing[2],
             }}>
@@ -485,28 +486,39 @@ export default function ProjectDetailScreen() {
                     );
                     return component ? getComponentLabel(component) : componentId;
                   }}
+                  renderSuffix={isEditMode ? (componentId, isSelected) => {
+                    // Only show edit icon on selected pill
+                    if (!isSelected) return null;
+                    return (
+                      <Pressable
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          setShowEditComponentModal(true);
+                        }}
+                        hitSlop={8}
+                        accessibilityLabel="Edit component"
+                      >
+                        <MaterialIcons
+                          name="edit"
+                          size={16}
+                          color="#FFFFFF"
+                        />
+                      </Pressable>
+                    );
+                  } : undefined}
                   ariaLabel="Select project component"
                 />
               </View>
-              {/* Edit/Add buttons in edit mode */}
+              {/* Add button in edit mode */}
               {isEditMode && (
                 <Can edit>
-                  <View style={{ flexDirection: "row", gap: DesignTokens.spacing[1] }}>
-                    <ThemedIconButton
-                      icon="edit"
-                      onPress={() => setShowEditComponentModal(true)}
-                      variant="ghost"
-                      size="small"
-                      accessibilityLabel="Edit component"
-                    />
-                    <ThemedIconButton
-                      icon="add"
-                      onPress={() => setShowAddComponentModal(true)}
-                      variant="ghost"
-                      size="small"
-                      accessibilityLabel="Add component"
-                    />
-                  </View>
+                  <ThemedIconButton
+                    icon="add"
+                    onPress={() => setShowAddComponentModal(true)}
+                    variant="ghost"
+                    size="small"
+                    accessibilityLabel="Add component"
+                  />
                 </Can>
               )}
             </View>
