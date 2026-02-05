@@ -189,14 +189,9 @@ export function PhotoPreviewSection({
                   size={48}
                   color={theme.colors.text.tertiary}
                 />
-                <ThemedText
-                  style={[
-                    styles.emptyStateText,
-                    { color: theme.colors.text.secondary },
-                  ]}
-                >
+                <ThemedText style={styles.emptyStateText}>
                   No {activePhotoCategory === "all" ? "" : activePhotoCategory}{" "}
-                  photos available
+                  photos yet
                 </ThemedText>
               </ThemedView>
             )}
@@ -208,13 +203,8 @@ export function PhotoPreviewSection({
               size={48}
               color={theme.colors.text.tertiary}
             />
-            <ThemedText
-              style={[
-                styles.emptyStateText,
-                { color: theme.colors.text.secondary },
-              ]}
-            >
-              No pictures available
+            <ThemedText style={styles.emptyStateText}>
+              No photos yet
             </ThemedText>
           </ThemedView>
         )}
@@ -290,7 +280,7 @@ const createPhotoGalleryStyles = (theme: any) =>
     },
     emptyStateText: {
       fontSize: DesignTokens.typography.fontSize.base,
-      opacity: 0.6,
+      color: theme.colors.text.secondary,
       textAlign: "center",
       marginTop: DesignTokens.spacing[2],
     },
