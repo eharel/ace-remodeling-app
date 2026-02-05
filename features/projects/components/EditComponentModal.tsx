@@ -3,6 +3,7 @@ import {
   Alert,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -18,8 +19,10 @@ import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import { ProjectComponent } from "@/shared/types";
 import {
+  COMMON_SUBCATEGORIES,
   getCategoryLabel,
   getSubcategoryLabel,
+  isCoreCategory,
 } from "@/shared/types/ComponentCategory";
 
 interface EditComponentModalProps {
@@ -33,30 +36,17 @@ interface EditComponentModalProps {
   error: string | null;
 }
 
-// Common subcategories by category
-const SUBCATEGORY_OPTIONS: Record<string, { value: string; label: string }[]> = {
-  "adu-addition": [
-    { value: "adu", label: "ADU" },
-    { value: "addition", label: "Addition" },
-  ],
-  "outdoor-living": [
-    { value: "pool", label: "Pool" },
-    { value: "deck", label: "Deck" },
-    { value: "patio", label: "Patio" },
-    { value: "pergola", label: "Pergola" },
-    { value: "outdoor-kitchen", label: "Outdoor Kitchen" },
-  ],
-  bathroom: [
-    { value: "primary-bath", label: "Primary Bath" },
-    { value: "guest-bath", label: "Guest Bath" },
-    { value: "powder-room", label: "Powder Room" },
-  ],
-};
+// Special value for custom subcategory selection
+const CUSTOM_SUBCATEGORY = "__custom__";
 
 /**
  * EditComponentModal - Modal for editing a component's name and subcategory
  *
- * Also allows deleting the component (if not the last one).
+ * Features:
+ * - Edit component name (display name)
+ * - Common subcategories shown as quick-select buttons
+ * - "Custom" option for entering any subcategory
+ * - Delete option (if not the only component)
  */
 export function EditComponentModal({
   visible,
@@ -70,20 +60,55 @@ export function EditComponentModal({
 }: EditComponentModalProps) {
   const { theme } = useTheme();
   const [name, setName] = useState<string>("");
-  const [subcategory, setSubcategory] = useState<string | undefined>(undefined);
+
+  // Subcategory state - either a predefined value, CUSTOM_SUBCATEGORY marker, or undefined
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | undefined>(undefined);
+  const [customSubcategory, setCustomSubcategory] = useState<string>("");
 
   // Reset form when modal opens or component changes
   useEffect(() => {
     if (visible && component) {
       setName(component.name || "");
-      setSubcategory(component.subcategory);
+
+      // Determine if current subcategory is a predefined option or custom
+      const availableSubs = getAvailableSubcategories(component.category);
+      const isPredefined = availableSubs.some(sub => sub.value === component.subcategory);
+
+      if (component.subcategory && !isPredefined) {
+        // Current subcategory is custom
+        setSelectedSubcategory(CUSTOM_SUBCATEGORY);
+        setCustomSubcategory(component.subcategory);
+      } else {
+        setSelectedSubcategory(component.subcategory);
+        setCustomSubcategory("");
+      }
     }
   }, [visible, component]);
+
+  // Get available subcategories for a category
+  const getAvailableSubcategories = (category: string) => {
+    if (isCoreCategory(category)) {
+      return COMMON_SUBCATEGORIES[category] || [];
+    }
+    return [];
+  };
+
+  // Get the actual subcategory value to submit
+  const getEffectiveSubcategory = (): string | undefined => {
+    if (!selectedSubcategory) return undefined;
+    if (selectedSubcategory === CUSTOM_SUBCATEGORY) {
+      const trimmed = customSubcategory.trim();
+      if (!trimmed) return undefined;
+      // Convert to kebab-case for consistency
+      return trimmed.toLowerCase().replace(/\s+/g, "-");
+    }
+    return selectedSubcategory;
+  };
 
   const handleSave = async () => {
     await onSave({
       name: name.trim() || undefined,
-      subcategory: subcategory || undefined,
+      subcategory: getEffectiveSubcategory(),
     });
   };
 
@@ -108,7 +133,7 @@ export function EditComponentModal({
 
   if (!component) return null;
 
-  const availableSubcategories = SUBCATEGORY_OPTIONS[component.category] || [];
+  const availableSubcategories = getAvailableSubcategories(component.category);
   const componentLabel = component.subcategory
     ? getSubcategoryLabel(component.subcategory)
     : getCategoryLabel(component.category);
@@ -124,6 +149,7 @@ export function EditComponentModal({
     modalContent: {
       width: "100%",
       maxWidth: 500,
+      maxHeight: "90%",
       borderRadius: DesignTokens.borderRadius.md,
       borderWidth: 1,
       borderColor: theme.colors.border.primary,
@@ -181,6 +207,9 @@ export function EditComponentModal({
     optionTextSelected: {
       color: theme.colors.interactive.primary,
       fontWeight: DesignTokens.typography.fontWeight.semibold,
+    },
+    customInputContainer: {
+      marginTop: DesignTokens.spacing[2],
     },
     textInput: {
       borderWidth: 1,
@@ -256,37 +285,37 @@ export function EditComponentModal({
             />
           </View>
 
-          {/* Name Input */}
-          <View style={styles.section}>
-            <ThemedText style={styles.label}>Name</ThemedText>
-            <TextInput
-              style={styles.textInput}
-              value={name}
-              onChangeText={setName}
-              placeholder="e.g., Master Bathroom, Pool House"
-              placeholderTextColor={theme.colors.text.tertiary}
-              editable={!isSaving}
-            />
-            <ThemedText style={styles.hint}>
-              A custom name helps distinguish similar components
-            </ThemedText>
-          </View>
-
-          {/* Subcategory Selection (if available) */}
-          {availableSubcategories.length > 0 && (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Name Input */}
             <View style={styles.section}>
-              <ThemedText style={styles.label}>Subcategory</ThemedText>
+              <ThemedText style={styles.label}>Name</ThemedText>
+              <TextInput
+                style={styles.textInput}
+                value={name}
+                onChangeText={setName}
+                placeholder="e.g., Master Suite, Pool House"
+                placeholderTextColor={theme.colors.text.tertiary}
+                editable={!isSaving}
+              />
+              <ThemedText style={styles.hint}>
+                A custom name helps distinguish similar components
+              </ThemedText>
+            </View>
+
+            {/* Subcategory Selection (show common options + custom) */}
+            <View style={styles.section}>
+              <ThemedText style={styles.label}>Subcategory (optional)</ThemedText>
               <View style={styles.optionsGrid}>
                 {availableSubcategories.map((option) => (
                   <Pressable
                     key={option.value}
                     style={[
                       styles.optionButton,
-                      subcategory === option.value && styles.optionButtonSelected,
+                      selectedSubcategory === option.value && styles.optionButtonSelected,
                     ]}
                     onPress={() =>
-                      setSubcategory(
-                        subcategory === option.value ? undefined : option.value
+                      setSelectedSubcategory(
+                        selectedSubcategory === option.value ? undefined : option.value
                       )
                     }
                     disabled={isSaving}
@@ -294,16 +323,52 @@ export function EditComponentModal({
                     <ThemedText
                       style={[
                         styles.optionText,
-                        subcategory === option.value && styles.optionTextSelected,
+                        selectedSubcategory === option.value && styles.optionTextSelected,
                       ]}
                     >
                       {option.label}
                     </ThemedText>
                   </Pressable>
                 ))}
+                {/* Custom subcategory option */}
+                <Pressable
+                  style={[
+                    styles.optionButton,
+                    selectedSubcategory === CUSTOM_SUBCATEGORY && styles.optionButtonSelected,
+                  ]}
+                  onPress={() =>
+                    setSelectedSubcategory(
+                      selectedSubcategory === CUSTOM_SUBCATEGORY ? undefined : CUSTOM_SUBCATEGORY
+                    )
+                  }
+                  disabled={isSaving}
+                >
+                  <ThemedText
+                    style={[
+                      styles.optionText,
+                      selectedSubcategory === CUSTOM_SUBCATEGORY && styles.optionTextSelected,
+                    ]}
+                  >
+                    Custom...
+                  </ThemedText>
+                </Pressable>
               </View>
+              {/* Custom subcategory input */}
+              {selectedSubcategory === CUSTOM_SUBCATEGORY && (
+                <View style={styles.customInputContainer}>
+                  <TextInput
+                    style={styles.textInput}
+                    value={customSubcategory}
+                    onChangeText={setCustomSubcategory}
+                    placeholder="e.g., primary-bath, guest-suite"
+                    placeholderTextColor={theme.colors.text.tertiary}
+                    editable={!isSaving}
+                    autoFocus
+                  />
+                </View>
+              )}
             </View>
-          )}
+          </ScrollView>
 
           {/* Error Message */}
           {error && <ThemedText style={styles.errorText}>{error}</ThemedText>}

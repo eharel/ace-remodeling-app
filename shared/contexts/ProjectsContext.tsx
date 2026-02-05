@@ -82,7 +82,7 @@ interface ProjectsContextType {
    */
   addComponent: (
     projectId: string,
-    input: { category: CoreCategory; subcategory?: string; name?: string }
+    input: { category: string; subcategory?: string; name?: string }
   ) => Promise<ProjectComponent>;
   /**
    * Delete a component from a project.
@@ -300,12 +300,13 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
    *
    * @param projectId - The project to add the component to
    * @param input - The component details (category, subcategory, name)
+   *               Category can be a CoreCategory or a custom string (e.g., "home-theater")
    * @returns The created component
    */
   const addComponent = useCallback(
     async (
       projectId: string,
-      input: { category: CoreCategory; subcategory?: string; name?: string }
+      input: { category: string; subcategory?: string; name?: string }
     ): Promise<ProjectComponent> => {
       const now = new Date().toISOString();
       const componentId = nanoid(12);

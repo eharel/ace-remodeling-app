@@ -37,14 +37,33 @@ export const CoreCategorySchema = z.enum(
 export type ComponentCategory = CoreCategory | string;
 
 /**
- * Common subcategory values for reference
+ * Common subcategories by category
  *
- * Note: ComponentSubcategory type accepts any string, not just these values.
- * This constant documents commonly-used subcategories but is not exhaustive.
+ * These are displayed as quick-select buttons in the UI.
+ * Users can also enter custom subcategories via text input.
  *
- * USAGE:
- * - ADU/Addition projects: "adu" or "addition"
- * - Outdoor projects: "pool", "deck", "patio", "bbq-island", etc.
+ * Only categories with meaningful, commonly-used subcategories are included.
+ * Categories not in this map simply won't show predefined subcategory options.
+ */
+export const COMMON_SUBCATEGORIES: Partial<
+  Record<CoreCategory, { value: string; label: string }[]>
+> = {
+  [CORE_CATEGORIES.ADU_ADDITION]: [
+    { value: "adu", label: "ADU" },
+    { value: "addition", label: "Addition" },
+  ],
+  [CORE_CATEGORIES.OUTDOOR_LIVING]: [
+    { value: "pool", label: "Pool" },
+    { value: "deck", label: "Deck" },
+    { value: "patio", label: "Patio" },
+    { value: "pergola", label: "Pergola" },
+    { value: "outdoor-kitchen", label: "Outdoor Kitchen" },
+  ],
+};
+
+/**
+ * @deprecated Use COMMON_SUBCATEGORIES instead.
+ * Kept for backwards compatibility.
  */
 export const COMPONENT_SUBCATEGORIES = {
   ADU: "adu",

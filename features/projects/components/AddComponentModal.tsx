@@ -17,15 +17,18 @@ import {
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import {
+  COMMON_SUBCATEGORIES,
   CORE_CATEGORIES,
+  CORE_CATEGORY_LABELS,
   CoreCategory,
+  isCoreCategory,
 } from "@/shared/types/ComponentCategory";
 
 interface AddComponentModalProps {
   visible: boolean;
   onClose: () => void;
   onAdd: (input: {
-    category: CoreCategory;
+    category: string; // Can be CoreCategory or custom string
     subcategory?: string;
     name?: string;
   }) => Promise<void>;
@@ -33,6 +36,7 @@ interface AddComponentModalProps {
   error: string | null;
 }
 
+// Core categories to show as buttons (excluding MISCELLANEOUS)
 const CATEGORY_OPTIONS: { value: CoreCategory; label: string }[] = [
   { value: CORE_CATEGORIES.BATHROOM, label: "Bathroom" },
   { value: CORE_CATEGORIES.KITCHEN, label: "Kitchen" },
@@ -41,33 +45,20 @@ const CATEGORY_OPTIONS: { value: CoreCategory; label: string }[] = [
   { value: CORE_CATEGORIES.OUTDOOR_LIVING, label: "Outdoor Living" },
   { value: CORE_CATEGORIES.NEW_CONSTRUCTION, label: "New Construction" },
   { value: CORE_CATEGORIES.COMMERCIAL, label: "Commercial" },
-  { value: CORE_CATEGORIES.MISCELLANEOUS, label: "Other" },
 ];
 
-// Common subcategories by category
-const SUBCATEGORY_OPTIONS: Record<string, { value: string; label: string }[]> = {
-  [CORE_CATEGORIES.ADU_ADDITION]: [
-    { value: "adu", label: "ADU" },
-    { value: "addition", label: "Addition" },
-  ],
-  [CORE_CATEGORIES.OUTDOOR_LIVING]: [
-    { value: "pool", label: "Pool" },
-    { value: "deck", label: "Deck" },
-    { value: "patio", label: "Patio" },
-    { value: "pergola", label: "Pergola" },
-    { value: "outdoor-kitchen", label: "Outdoor Kitchen" },
-  ],
-  [CORE_CATEGORIES.BATHROOM]: [
-    { value: "primary-bath", label: "Primary Bath" },
-    { value: "guest-bath", label: "Guest Bath" },
-    { value: "powder-room", label: "Powder Room" },
-  ],
-};
+// Special value for custom category selection
+const CUSTOM_CATEGORY = "__custom__";
 
 /**
  * AddComponentModal - Modal for adding a new component to a project
  *
- * Allows selecting a category, optional subcategory, and optional name.
+ * Features:
+ * - Core categories as quick-select buttons
+ * - "Custom" option for entering any category
+ * - Common subcategories shown for applicable categories
+ * - "Custom" option for entering any subcategory
+ * - Optional name field for additional distinction
  */
 export function AddComponentModal({
   visible,
@@ -77,28 +68,70 @@ export function AddComponentModal({
   error,
 }: AddComponentModalProps) {
   const { theme } = useTheme();
-  const [category, setCategory] = useState<CoreCategory>(CORE_CATEGORIES.BATHROOM);
-  const [subcategory, setSubcategory] = useState<string | undefined>(undefined);
+
+  // Category state - either a CoreCategory or CUSTOM_CATEGORY marker
+  const [selectedCategory, setSelectedCategory] = useState<string>(CORE_CATEGORIES.BATHROOM);
+  const [customCategory, setCustomCategory] = useState<string>("");
+
+  // Subcategory state - either a predefined value, CUSTOM_CATEGORY marker, or undefined
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | undefined>(undefined);
+  const [customSubcategory, setCustomSubcategory] = useState<string>("");
+
+  // Optional name
   const [name, setName] = useState<string>("");
 
   // Reset form when modal opens
   useEffect(() => {
     if (visible) {
-      setCategory(CORE_CATEGORIES.BATHROOM);
-      setSubcategory(undefined);
+      setSelectedCategory(CORE_CATEGORIES.BATHROOM);
+      setCustomCategory("");
+      setSelectedSubcategory(undefined);
+      setCustomSubcategory("");
       setName("");
     }
   }, [visible]);
 
   // Reset subcategory when category changes
   useEffect(() => {
-    setSubcategory(undefined);
-  }, [category]);
+    setSelectedSubcategory(undefined);
+    setCustomSubcategory("");
+  }, [selectedCategory]);
+
+  // Get the actual category value to submit
+  const getEffectiveCategory = (): string => {
+    if (selectedCategory === CUSTOM_CATEGORY) {
+      // Convert to kebab-case for consistency
+      return customCategory.trim().toLowerCase().replace(/\s+/g, "-");
+    }
+    return selectedCategory;
+  };
+
+  // Get the actual subcategory value to submit
+  const getEffectiveSubcategory = (): string | undefined => {
+    if (!selectedSubcategory) return undefined;
+    if (selectedSubcategory === CUSTOM_CATEGORY) {
+      const trimmed = customSubcategory.trim();
+      if (!trimmed) return undefined;
+      // Convert to kebab-case for consistency
+      return trimmed.toLowerCase().replace(/\s+/g, "-");
+    }
+    return selectedSubcategory;
+  };
+
+  // Check if form is valid
+  const isFormValid = (): boolean => {
+    if (selectedCategory === CUSTOM_CATEGORY) {
+      return customCategory.trim().length > 0;
+    }
+    return true;
+  };
 
   const handleAdd = async () => {
+    if (!isFormValid()) return;
+
     await onAdd({
-      category,
-      subcategory: subcategory || undefined,
+      category: getEffectiveCategory(),
+      subcategory: getEffectiveSubcategory(),
       name: name.trim() || undefined,
     });
   };
@@ -107,7 +140,10 @@ export function AddComponentModal({
     onClose();
   };
 
-  const availableSubcategories = SUBCATEGORY_OPTIONS[category] || [];
+  // Get available subcategories for current category
+  const availableSubcategories = isCoreCategory(selectedCategory)
+    ? COMMON_SUBCATEGORIES[selectedCategory] || []
+    : [];
 
   const styles = StyleSheet.create({
     overlay: {
@@ -120,6 +156,7 @@ export function AddComponentModal({
     modalContent: {
       width: "100%",
       maxWidth: 500,
+      maxHeight: "90%",
       borderRadius: DesignTokens.borderRadius.md,
       borderWidth: 1,
       borderColor: theme.colors.border.primary,
@@ -172,6 +209,9 @@ export function AddComponentModal({
     optionTextSelected: {
       color: theme.colors.interactive.primary,
       fontWeight: DesignTokens.typography.fontWeight.semibold,
+    },
+    customInputContainer: {
+      marginTop: DesignTokens.spacing[2],
     },
     textInput: {
       borderWidth: 1,
@@ -245,52 +285,121 @@ export function AddComponentModal({
                     key={option.value}
                     style={[
                       styles.optionButton,
-                      category === option.value && styles.optionButtonSelected,
+                      selectedCategory === option.value && styles.optionButtonSelected,
                     ]}
-                    onPress={() => setCategory(option.value)}
+                    onPress={() => setSelectedCategory(option.value)}
                   >
                     <ThemedText
                       style={[
                         styles.optionText,
-                        category === option.value && styles.optionTextSelected,
+                        selectedCategory === option.value && styles.optionTextSelected,
                       ]}
                     >
                       {option.label}
                     </ThemedText>
                   </Pressable>
                 ))}
+                {/* Custom category option */}
+                <Pressable
+                  style={[
+                    styles.optionButton,
+                    selectedCategory === CUSTOM_CATEGORY && styles.optionButtonSelected,
+                  ]}
+                  onPress={() => setSelectedCategory(CUSTOM_CATEGORY)}
+                >
+                  <ThemedText
+                    style={[
+                      styles.optionText,
+                      selectedCategory === CUSTOM_CATEGORY && styles.optionTextSelected,
+                    ]}
+                  >
+                    Custom...
+                  </ThemedText>
+                </Pressable>
               </View>
+              {/* Custom category input */}
+              {selectedCategory === CUSTOM_CATEGORY && (
+                <View style={styles.customInputContainer}>
+                  <TextInput
+                    style={styles.textInput}
+                    value={customCategory}
+                    onChangeText={setCustomCategory}
+                    placeholder="e.g., Home Theater, Wine Cellar"
+                    placeholderTextColor={theme.colors.text.tertiary}
+                    editable={!isAdding}
+                    autoFocus
+                  />
+                  <ThemedText style={styles.hint}>
+                    Enter a custom category name
+                  </ThemedText>
+                </View>
+              )}
             </View>
 
-            {/* Subcategory Selection (if available) */}
-            {availableSubcategories.length > 0 && (
+            {/* Subcategory Selection */}
+            {(availableSubcategories.length > 0 || selectedCategory !== CUSTOM_CATEGORY) && (
               <View style={styles.section}>
-                <ThemedText style={styles.label}>Subcategory</ThemedText>
+                <ThemedText style={styles.label}>Subcategory (optional)</ThemedText>
                 <View style={styles.optionsGrid}>
                   {availableSubcategories.map((option) => (
                     <Pressable
                       key={option.value}
                       style={[
                         styles.optionButton,
-                        subcategory === option.value && styles.optionButtonSelected,
+                        selectedSubcategory === option.value && styles.optionButtonSelected,
                       ]}
                       onPress={() =>
-                        setSubcategory(
-                          subcategory === option.value ? undefined : option.value
+                        setSelectedSubcategory(
+                          selectedSubcategory === option.value ? undefined : option.value
                         )
                       }
                     >
                       <ThemedText
                         style={[
                           styles.optionText,
-                          subcategory === option.value && styles.optionTextSelected,
+                          selectedSubcategory === option.value && styles.optionTextSelected,
                         ]}
                       >
                         {option.label}
                       </ThemedText>
                     </Pressable>
                   ))}
+                  {/* Custom subcategory option */}
+                  <Pressable
+                    style={[
+                      styles.optionButton,
+                      selectedSubcategory === CUSTOM_CATEGORY && styles.optionButtonSelected,
+                    ]}
+                    onPress={() =>
+                      setSelectedSubcategory(
+                        selectedSubcategory === CUSTOM_CATEGORY ? undefined : CUSTOM_CATEGORY
+                      )
+                    }
+                  >
+                    <ThemedText
+                      style={[
+                        styles.optionText,
+                        selectedSubcategory === CUSTOM_CATEGORY && styles.optionTextSelected,
+                      ]}
+                    >
+                      Custom...
+                    </ThemedText>
+                  </Pressable>
                 </View>
+                {/* Custom subcategory input */}
+                {selectedSubcategory === CUSTOM_CATEGORY && (
+                  <View style={styles.customInputContainer}>
+                    <TextInput
+                      style={styles.textInput}
+                      value={customSubcategory}
+                      onChangeText={setCustomSubcategory}
+                      placeholder="e.g., primary-bath, guest-suite"
+                      placeholderTextColor={theme.colors.text.tertiary}
+                      editable={!isAdding}
+                      autoFocus
+                    />
+                  </View>
+                )}
               </View>
             )}
 
@@ -301,12 +410,12 @@ export function AddComponentModal({
                 style={styles.textInput}
                 value={name}
                 onChangeText={setName}
-                placeholder="e.g., Master Bathroom, Pool House"
+                placeholder="e.g., Master Suite, Pool House"
                 placeholderTextColor={theme.colors.text.tertiary}
                 editable={!isAdding}
               />
               <ThemedText style={styles.hint}>
-                A custom name helps distinguish similar components
+                A display name to distinguish similar components
               </ThemedText>
             </View>
           </ScrollView>
@@ -327,7 +436,7 @@ export function AddComponentModal({
             <ThemedButton
               onPress={handleAdd}
               variant="primary"
-              disabled={isAdding}
+              disabled={isAdding || !isFormValid()}
               loading={isAdding}
               style={styles.button}
             >
