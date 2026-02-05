@@ -1,7 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import React from "react";
+import React, { useState, useMemo } from "react";
 import {
+  Alert,
   Dimensions,
   Pressable,
   ScrollView,
@@ -10,14 +11,23 @@ import {
 } from "react-native";
 
 import { DesignTokens } from "@/shared/themes";
-import { Document } from "@/shared/types";
-import { LoadingState, PageHeader, ThemedText } from "@/shared/components";
+import { Document, DocumentType } from "@/shared/types";
+import {
+  LoadingState,
+  PageHeader,
+  ThemedButton,
+  ThemedText,
+} from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
 import { commonStyles } from "@/shared/utils";
+import { uploadDocument } from "@/services/documents/documentService";
+import { AddDocumentModal } from "@/features/projects/components/AddDocumentModal";
 
 const { width: screenWidth } = Dimensions.get("window");
 
-interface DocumentsPageProps {}
+interface DocumentWithContext extends Document {
+  componentId: string;
+}
 
 /**
  * DocumentsPage - Professional document browser for project files
@@ -25,29 +35,44 @@ interface DocumentsPageProps {}
  * This page provides a file-like system interface for viewing and managing
  * project documents. It displays documents in a grid layout with proper
  * file type icons and metadata.
+ *
+ * Features:
+ * - View all documents from all components
+ * - Upload new documents
+ * - Delete documents (with confirmation)
+ * - Edit mode toggle
  */
-export default function DocumentsPage({}: DocumentsPageProps) {
+export default function DocumentsPage() {
   const { theme } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { projects, isLoading } = useProjects();
+  const { projects, isLoading, addDocument, deleteDocument } = useProjects();
+
+  // Local state
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
 
   // Find the project by ID using Firebase data
   const project = projects.find((p) => p.id === id);
 
-  // Collect all documents from all components plus shared documents
-  const documents: Document[] = [];
-  if (project) {
-    // Add shared documents
-    if (project.sharedDocuments) {
-      documents.push(...project.sharedDocuments);
-    }
-    // Add documents from all components
+  // Collect all documents from all components with their component context
+  const documentsWithContext: DocumentWithContext[] = useMemo(() => {
+    if (!project) return [];
+
+    const docs: DocumentWithContext[] = [];
     project.components.forEach((component) => {
       if (component.documents) {
-        documents.push(...component.documents);
+        component.documents.forEach((doc) => {
+          docs.push({ ...doc, componentId: component.id });
+        });
       }
     });
-  }
+    return docs;
+  }, [project]);
+
+  // Get first component ID for uploads (default target)
+  const defaultComponentId = project?.components[0]?.id;
 
   // Calculate grid layout
   const numColumns = 2;
@@ -64,16 +89,12 @@ export default function DocumentsPage({}: DocumentsPageProps) {
         return "receipt";
       case "permit":
         return "verified-user";
-      case "specification":
-        return "engineering";
-      case "warranty":
-        return "security";
-      case "manual":
-        return "book";
-      case "photo":
-        return "photo";
-      case "plan":
+      case "floor plan":
         return "architecture";
+      case "3d rendering":
+        return "view-in-ar";
+      case "materials":
+        return "palette";
       default:
         return "insert-drive-file";
     }
@@ -88,18 +109,20 @@ export default function DocumentsPage({}: DocumentsPageProps) {
         return theme.colors.status.success;
       case "permit":
         return theme.colors.status.warning;
-      case "specification":
+      case "floor plan":
         return theme.colors.status.info;
-      case "warranty":
-        return theme.colors.status.info;
-      case "manual":
-        return theme.colors.status.error;
+      case "3d rendering":
+        return "#9333ea"; // Purple
+      case "materials":
+        return "#f59e0b"; // Amber
       default:
         return theme.colors.text.secondary;
     }
   };
 
   const handleDocumentPress = (document: Document) => {
+    if (isEditMode) return; // Don't navigate in edit mode
+
     // Navigate to PDF viewer with document details
     router.push({
       pathname: "/pdf-viewer",
@@ -111,6 +134,74 @@ export default function DocumentsPage({}: DocumentsPageProps) {
     });
   };
 
+  const handleAddDocument = async (input: {
+    fileUri: string;
+    filename: string;
+    name: string;
+    type: DocumentType;
+    description?: string;
+  }) => {
+    if (!project || !defaultComponentId) return;
+
+    setIsAdding(true);
+    setAddError(null);
+
+    try {
+      // Upload to Firebase Storage
+      const result = await uploadDocument(input.fileUri, input.filename, {
+        projectId: project.id,
+        name: input.name,
+        type: input.type,
+        description: input.description,
+        // Map document type to category for filtering
+        category: input.type.toLowerCase().replace(/\s+/g, "-"),
+      });
+
+      if (!result.success || !result.document) {
+        throw new Error(result.error || "Upload failed");
+      }
+
+      // Add to component in Firestore
+      await addDocument(project.id, defaultComponentId, result.document);
+
+      setShowAddModal(false);
+    } catch (error) {
+      setAddError(
+        error instanceof Error ? error.message : "Failed to upload document"
+      );
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleDeleteDocument = (doc: DocumentWithContext) => {
+    if (!project) return;
+
+    Alert.alert(
+      "Delete Document",
+      `Are you sure you want to delete "${doc.name}"? This action cannot be undone.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteDocument(project.id, doc.componentId, doc.id);
+            } catch (error) {
+              Alert.alert(
+                "Error",
+                error instanceof Error
+                  ? error.message
+                  : "Failed to delete document"
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -120,6 +211,14 @@ export default function DocumentsPage({}: DocumentsPageProps) {
       flex: 1,
       paddingHorizontal: DesignTokens.spacing[6],
       paddingBottom: DesignTokens.spacing[6],
+    },
+    headerActions: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: DesignTokens.spacing[6],
+      paddingVertical: DesignTokens.spacing[3],
+      gap: DesignTokens.spacing[3],
     },
     documentsGrid: {
       flexDirection: "row",
@@ -140,6 +239,15 @@ export default function DocumentsPage({}: DocumentsPageProps) {
       transform: [{ scale: 0.95 }],
       ...DesignTokens.shadows.md,
     },
+    documentCardEditMode: {
+      borderColor: theme.colors.border.primary,
+    },
+    documentHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      marginBottom: DesignTokens.spacing[3],
+    },
     documentIcon: {
       width: 48,
       height: 48,
@@ -147,7 +255,9 @@ export default function DocumentsPage({}: DocumentsPageProps) {
       backgroundColor: theme.colors.background.secondary,
       justifyContent: "center",
       alignItems: "center",
-      marginBottom: DesignTokens.spacing[3],
+    },
+    deleteButton: {
+      padding: DesignTokens.spacing[1],
     },
     documentName: {
       fontSize: DesignTokens.typography.fontSize.base,
@@ -160,7 +270,7 @@ export default function DocumentsPage({}: DocumentsPageProps) {
     },
     documentType: {
       ...commonStyles.text.badge,
-      fontWeight: DesignTokens.typography.fontWeight.medium, // Override to medium weight
+      fontWeight: DesignTokens.typography.fontWeight.medium,
       color: theme.colors.text.secondary,
       marginBottom: DesignTokens.spacing[2],
     },
@@ -205,6 +315,7 @@ export default function DocumentsPage({}: DocumentsPageProps) {
       fontSize: DesignTokens.typography.fontSize.sm,
       color: theme.colors.text.tertiary,
       textAlign: "center",
+      marginBottom: DesignTokens.spacing[4],
     },
   });
 
@@ -273,28 +384,66 @@ export default function DocumentsPage({}: DocumentsPageProps) {
           backLabel={project?.name}
           variant="compact"
         />
+
+        {/* Action Bar */}
+        <View style={styles.headerActions}>
+          <ThemedButton
+            variant={isEditMode ? "primary" : "secondary"}
+            size="small"
+            icon={isEditMode ? "check" : "edit"}
+            onPress={() => setIsEditMode(!isEditMode)}
+          >
+            {isEditMode ? "Done" : "Edit"}
+          </ThemedButton>
+          <ThemedButton
+            variant="primary"
+            size="small"
+            icon="add"
+            onPress={() => setShowAddModal(true)}
+          >
+            Add Document
+          </ThemedButton>
+        </View>
+
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {documents.length > 0 ? (
+          {documentsWithContext.length > 0 ? (
             <View style={styles.documentsGrid}>
-              {documents.map((document) => (
+              {documentsWithContext.map((document) => (
                 <Pressable
                   key={document.id}
                   style={({ pressed }) => [
                     styles.documentCard,
-                    pressed && styles.documentCardPressed,
+                    pressed && !isEditMode && styles.documentCardPressed,
+                    isEditMode && styles.documentCardEditMode,
                   ]}
                   onPress={() => handleDocumentPress(document)}
                   accessible={true}
-                  accessibilityLabel={`Open ${document.name}, ${document.type} document`}
-                  accessibilityHint={`Double tap to open ${document.name}`}
+                  accessibilityLabel={`${isEditMode ? "Delete" : "Open"} ${document.name}, ${document.type} document`}
                   accessibilityRole="button"
                 >
-                  <View style={styles.documentIcon}>
-                    <MaterialIcons
-                      name={getDocumentIcon(document.type) as any}
-                      size={24}
-                      color={getDocumentTypeColor(document.type)}
-                    />
+                  <View style={styles.documentHeader}>
+                    <View style={styles.documentIcon}>
+                      <MaterialIcons
+                        name={getDocumentIcon(document.type) as any}
+                        size={24}
+                        color={getDocumentTypeColor(document.type)}
+                      />
+                    </View>
+                    {isEditMode && (
+                      <Pressable
+                        style={styles.deleteButton}
+                        onPress={() => handleDeleteDocument(document)}
+                        hitSlop={8}
+                        accessibilityLabel={`Delete ${document.name}`}
+                        accessibilityRole="button"
+                      >
+                        <MaterialIcons
+                          name="delete"
+                          size={24}
+                          color={theme.colors.status.error}
+                        />
+                      </Pressable>
+                    )}
                   </View>
                   <ThemedText style={styles.documentName} numberOfLines={2}>
                     {document.name}
@@ -332,15 +481,34 @@ export default function DocumentsPage({}: DocumentsPageProps) {
                 style={styles.emptyStateIcon}
               />
               <ThemedText style={styles.emptyStateText}>
-                No documents available
+                No documents yet
               </ThemedText>
               <ThemedText style={styles.emptyStateSubtext}>
-                Documents will appear here when they are uploaded
+                Add floor plans, contracts, permits, and other project documents
               </ThemedText>
+              <ThemedButton
+                variant="primary"
+                icon="add"
+                onPress={() => setShowAddModal(true)}
+              >
+                Add Document
+              </ThemedButton>
             </View>
           )}
         </ScrollView>
       </View>
+
+      {/* Add Document Modal */}
+      <AddDocumentModal
+        visible={showAddModal}
+        onClose={() => {
+          setShowAddModal(false);
+          setAddError(null);
+        }}
+        onAdd={handleAddDocument}
+        isAdding={isAdding}
+        error={addError}
+      />
     </>
   );
 }

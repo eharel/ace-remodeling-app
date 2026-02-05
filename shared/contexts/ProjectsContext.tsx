@@ -6,7 +6,8 @@ import {
   updateProject as updateProjectService,
 } from "@/services/projects";
 import { deleteMultipleMedia } from "@/services/media/mediaService";
-import { MediaAsset, Project, ProjectComponent } from "@/shared/types";
+import { deleteMultipleDocuments } from "@/services/documents/documentService";
+import { Document, MediaAsset, Project, ProjectComponent } from "@/shared/types";
 import { CORE_CATEGORIES, CoreCategory } from "@/shared/types/ComponentCategory";
 import React, {
   createContext,
@@ -95,6 +96,24 @@ interface ProjectsContextType {
    * Returns the created project.
    */
   createProject: (input: CreateProjectInput) => Promise<Project>;
+  /**
+   * Add a document to a component.
+   * Returns the updated component.
+   */
+  addDocument: (
+    projectId: string,
+    componentId: string,
+    document: Document
+  ) => Promise<void>;
+  /**
+   * Delete a document from a component.
+   * Also deletes the file from Firebase Storage.
+   */
+  deleteDocument: (
+    projectId: string,
+    componentId: string,
+    documentId: string
+  ) => Promise<void>;
 }
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(
@@ -444,6 +463,166 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   );
 
   /**
+   * Adds a document to a component.
+   *
+   * @param projectId - The project ID
+   * @param componentId - The component ID to add the document to
+   * @param document - The document to add (already uploaded to Storage)
+   */
+  const addDocument = useCallback(
+    async (
+      projectId: string,
+      componentId: string,
+      document: Document
+    ): Promise<void> => {
+      const now = new Date().toISOString();
+
+      try {
+        // Find the project and component
+        const project = projects.find((p) => p.id === projectId);
+        if (!project) {
+          throw new Error("Project not found");
+        }
+
+        const component = project.components.find((c) => c.id === componentId);
+        if (!component) {
+          throw new Error("Component not found");
+        }
+
+        // Add document to component's documents array
+        const updatedDocuments = [...(component.documents || []), document];
+
+        // Optimistic update
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === projectId
+              ? {
+                  ...p,
+                  components: p.components.map((c) =>
+                    c.id === componentId
+                      ? { ...c, documents: updatedDocuments, updatedAt: now }
+                      : c
+                  ),
+                  updatedAt: now,
+                }
+              : p
+          )
+        );
+
+        // Update Firestore
+        const updatedComponents = project.components.map((c) =>
+          c.id === componentId
+            ? { ...c, documents: updatedDocuments, updatedAt: now }
+            : c
+        );
+
+        await updateProjectService(projectId, {
+          components: updatedComponents,
+        });
+      } catch (error) {
+        // Rollback on error
+        setError(
+          error instanceof Error ? error.message : "Failed to add document"
+        );
+        await fetchProjects();
+        throw error;
+      }
+    },
+    [projects, fetchProjects]
+  );
+
+  /**
+   * Deletes a document from a component.
+   * Also deletes the file from Firebase Storage.
+   *
+   * @param projectId - The project ID
+   * @param componentId - The component ID
+   * @param documentId - The document ID to delete
+   */
+  const deleteDocument = useCallback(
+    async (
+      projectId: string,
+      componentId: string,
+      documentId: string
+    ): Promise<void> => {
+      const now = new Date().toISOString();
+
+      try {
+        // Find the project and component
+        const project = projects.find((p) => p.id === projectId);
+        if (!project) {
+          throw new Error("Project not found");
+        }
+
+        const component = project.components.find((c) => c.id === componentId);
+        if (!component) {
+          throw new Error("Component not found");
+        }
+
+        // Find the document to get its storage path
+        const documentToDelete = component.documents?.find(
+          (d) => d.id === documentId
+        );
+
+        // Filter out the document
+        const updatedDocuments = (component.documents || []).filter(
+          (d) => d.id !== documentId
+        );
+
+        // Optimistic update
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === projectId
+              ? {
+                  ...p,
+                  components: p.components.map((c) =>
+                    c.id === componentId
+                      ? { ...c, documents: updatedDocuments, updatedAt: now }
+                      : c
+                  ),
+                  updatedAt: now,
+                }
+              : p
+          )
+        );
+
+        // Update Firestore first (critical operation)
+        const updatedComponents = project.components.map((c) =>
+          c.id === componentId
+            ? { ...c, documents: updatedDocuments, updatedAt: now }
+            : c
+        );
+
+        await updateProjectService(projectId, {
+          components: updatedComponents,
+        });
+
+        // Delete file from Storage (non-critical, fire-and-forget)
+        if (documentToDelete?.storagePath) {
+          deleteMultipleDocuments([documentToDelete.storagePath]).then(
+            (result) => {
+              if (!result.success) {
+                console.warn(
+                  "Document file could not be deleted:",
+                  result.errors
+                );
+              }
+            }
+          );
+        }
+      } catch (error) {
+        // Rollback on error
+        setError(
+          error instanceof Error ? error.message : "Failed to delete document"
+        );
+        await fetchProjects();
+        throw error;
+      }
+    },
+    [projects, fetchProjects]
+  );
+
+  /**
    * All projects that have at least one featured component.
    * Featuring is now per-component, not per-project.
    * Memoized to prevent unnecessary recalculations.
@@ -521,6 +700,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       addComponent,
       deleteComponent,
       createProject,
+      addDocument,
+      deleteDocument,
     }),
     [
       projects,
@@ -538,6 +719,8 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       addComponent,
       deleteComponent,
       createProject,
+      addDocument,
+      deleteDocument,
     ]
   );
 
