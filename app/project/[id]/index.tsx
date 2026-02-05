@@ -228,10 +228,15 @@ export default function ProjectDetailScreen() {
     }
 
     // Check if the number already exists (excluding current project)
-    const exists = await checkProjectNumberExists(newNumber.trim(), project.id);
-    if (exists) {
-      showToast("This project number already exists", "error");
-      return { valid: false, error: "This project number already exists" };
+    try {
+      const exists = await checkProjectNumberExists(newNumber.trim(), project.id);
+      if (exists) {
+        showToast("This project number already exists", "error");
+        return { valid: false, error: "This project number already exists" };
+      }
+    } catch (error) {
+      showToast("Failed to validate project number", "error");
+      return { valid: false, error: "Failed to validate project number" };
     }
 
     // Update the project

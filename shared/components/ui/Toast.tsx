@@ -32,9 +32,15 @@ export function Toast({
   const { theme } = useTheme();
   const translateY = useRef(new Animated.Value(100)).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const dismissing = useRef(false);
 
   useEffect(() => {
     if (visible) {
+      dismissing.current = false;
+      // Reset animation values before animating in (important for rapid toast changes)
+      translateY.setValue(100);
+      opacity.setValue(0);
+
       // Animate in
       Animated.parallel([
         Animated.timing(translateY, {
@@ -51,14 +57,19 @@ export function Toast({
 
       // Auto dismiss
       const timer = setTimeout(() => {
-        handleDismiss();
+        if (!dismissing.current) {
+          handleDismiss();
+        }
       }, duration);
 
       return () => clearTimeout(timer);
     }
-  }, [visible, duration]);
+  }, [visible, message, duration]); // Added message to deps to re-trigger for new toasts
 
   const handleDismiss = () => {
+    if (dismissing.current) return;
+    dismissing.current = true;
+
     Animated.parallel([
       Animated.timing(translateY, {
         toValue: 100,
