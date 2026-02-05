@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { usePhotoCategoryData } from "@/features/gallery/hooks/usePhotoCategoryData";
-import { Can, ThemedText, ThemedView } from "@/shared/components";
+import { ThemedText, ThemedView } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
@@ -110,30 +110,26 @@ export function PhotoPreviewSection({
     <>
       {/* Pictures Section */}
       <ThemedView style={styles.section}>
-        {/* Header Row - Title + Edit Button (only in edit mode) */}
+        {/* Header Row - Title + View All link */}
         <View style={styles.sectionHeader}>
           <ThemedText
             style={[styles.sectionTitle, { color: theme.colors.text.primary }]}
           >
             {title} ({photos.length})
           </ThemedText>
-          {isEditMode && (
-            <Can edit>
-              <Pressable
-                onPress={() => showPhotoGrid(true)}
-                style={styles.editPhotosButton}
-                accessibilityLabel="Edit photos"
-                accessibilityRole="button"
-              >
-                <MaterialIcons
-                  name="edit"
-                  size={16}
-                  color={theme.colors.interactive.primary}
-                />
-                <ThemedText style={styles.editPhotosText}>Edit</ThemedText>
-              </Pressable>
-            </Can>
-          )}
+          <Pressable
+            onPress={() => showPhotoGrid(false)}
+            style={styles.viewAllButton}
+            accessibilityLabel="View all photos"
+            accessibilityRole="button"
+          >
+            <ThemedText style={styles.viewAllButtonText}>View All</ThemedText>
+            <MaterialIcons
+              name="chevron-right"
+              size={16}
+              color={theme.colors.interactive.primary}
+            />
+          </Pressable>
         </View>
         <ThemedText
           style={[
@@ -252,14 +248,12 @@ const createPhotoGalleryStyles = (theme: any) =>
       ...commonStyles.text.sectionTitle,
       marginBottom: 0, // Remove bottom margin (row handles spacing now)
     },
-    editPhotosButton: {
+    viewAllButton: {
       flexDirection: "row",
       alignItems: "center",
-      gap: DesignTokens.spacing[1],
-      paddingVertical: DesignTokens.spacing[1],
-      paddingHorizontal: DesignTokens.spacing[2],
+      paddingVertical: DesignTokens.spacing[2],
     },
-    editPhotosText: {
+    viewAllButtonText: {
       fontSize: DesignTokens.typography.fontSize.sm,
       color: theme.colors.interactive.primary,
       fontWeight: DesignTokens.typography.fontWeight.medium,

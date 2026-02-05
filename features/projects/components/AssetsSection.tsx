@@ -19,7 +19,6 @@ export interface AssetsSectionProps {
   documents: Document[];
   projectId: string;
   selectedComponentId: string | null;
-  isEditMode?: boolean;
 }
 
 /**
@@ -36,7 +35,6 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
   documents,
   projectId,
   selectedComponentId,
-  isEditMode = false,
 }) => {
   const { theme } = useTheme();
 
@@ -121,21 +119,6 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
         textAlign: "center" as const,
         marginTop: DesignTokens.spacing[2],
       },
-      addButton: {
-        flexDirection: "row" as const,
-        alignItems: "center" as const,
-        gap: DesignTokens.spacing[2],
-        marginTop: DesignTokens.spacing[3],
-        paddingHorizontal: DesignTokens.spacing[4],
-        paddingVertical: DesignTokens.spacing[2],
-        backgroundColor: theme.colors.interactive.primary,
-        borderRadius: DesignTokens.borderRadius.md,
-      },
-      addButtonText: {
-        fontSize: DesignTokens.typography.fontSize.sm,
-        fontWeight: DesignTokens.typography.fontWeight.medium,
-        color: theme.colors.text.inverse,
-      },
     }),
     [theme]
   );
@@ -173,13 +156,8 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
     }
   };
 
-  // Show empty state in edit mode, hide completely otherwise
+  // Always show empty state (consistent with Photos section)
   if (!documents || documents.length === 0) {
-    if (!isEditMode) {
-      return null;
-    }
-
-    // Empty state for edit mode
     return (
       <ThemedView style={styles.section}>
         <View style={styles.sectionHeader}>
@@ -188,6 +166,20 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
           >
             Assets
           </ThemedText>
+          <Pressable
+            style={styles.viewAllButton}
+            onPress={() => router.push(`/project/${projectId}/documents`)}
+            accessible={true}
+            accessibilityLabel="View all assets"
+            accessibilityRole="button"
+          >
+            <ThemedText style={styles.viewAllButtonText}>View All</ThemedText>
+            <MaterialIcons
+              name="chevron-right"
+              size={16}
+              color={theme.colors.interactive.primary}
+            />
+          </Pressable>
         </View>
         <View style={styles.emptyState}>
           <MaterialIcons
@@ -198,20 +190,6 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
           <ThemedText style={styles.emptyStateText}>
             No assets yet
           </ThemedText>
-          <Pressable
-            style={styles.addButton}
-            onPress={() => router.push(`/project/${projectId}/documents`)}
-            accessible={true}
-            accessibilityLabel="Add assets"
-            accessibilityRole="button"
-          >
-            <MaterialIcons
-              name="add"
-              size={18}
-              color={theme.colors.text.inverse}
-            />
-            <ThemedText style={styles.addButtonText}>Add Assets</ThemedText>
-          </Pressable>
         </View>
       </ThemedView>
     );

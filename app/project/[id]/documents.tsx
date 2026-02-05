@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   Alert,
   Dimensions,
@@ -9,13 +10,15 @@ import {
   StyleSheet,
   View,
 } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import { DesignTokens } from "@/shared/themes";
 import { Document, DocumentType } from "@/shared/types";
 import {
+  EditButton,
   LoadingState,
   PageHeader,
-  ThemedButton,
+  SelectionActionBar,
   ThemedText,
 } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
@@ -39,19 +42,25 @@ interface DocumentWithContext extends Document {
  * Features:
  * - View all documents from all components
  * - Upload new documents
- * - Delete documents (with confirmation)
- * - Edit mode toggle
+ * - Batch selection and delete (iOS-style)
+ * - Bottom action bar in edit mode
  */
 export default function DocumentsPage() {
   const { theme } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { projects, isLoading, addDocument, deleteDocument } = useProjects();
 
-  // Local state
+  // Edit mode and selection state
   const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Add document modal state
   const [showAddModal, setShowAddModal] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
+
+  // Loading state for delete operation
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Find the project by ID using Firebase data
   const project = projects.find((p) => p.id === id);
@@ -79,6 +88,29 @@ export default function DocumentsPage() {
   const itemWidth =
     (screenWidth - DesignTokens.spacing[6] * 2 - DesignTokens.spacing[4]) /
     numColumns;
+
+  // Selection handlers
+  const handleToggleSelection = useCallback((docId: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(docId)) {
+        next.delete(docId);
+      } else {
+        next.add(docId);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleExitEditMode = useCallback(() => {
+    setIsEditMode(false);
+    setSelectedIds(new Set());
+  }, []);
+
+  const handleEnterEditMode = useCallback(() => {
+    setIsEditMode(true);
+  }, []);
 
   const getDocumentIcon = (type: string) => {
     const typeLower = type.toLowerCase();
@@ -120,8 +152,12 @@ export default function DocumentsPage() {
     }
   };
 
-  const handleDocumentPress = (document: Document) => {
-    if (isEditMode) return; // Don't navigate in edit mode
+  const handleDocumentPress = (document: DocumentWithContext) => {
+    if (isEditMode) {
+      // In edit mode, toggle selection
+      handleToggleSelection(document.id);
+      return;
+    }
 
     // Navigate to PDF viewer with document details
     router.push({
@@ -174,33 +210,75 @@ export default function DocumentsPage() {
     }
   };
 
-  const handleDeleteDocument = (doc: DocumentWithContext) => {
-    if (!project) return;
+  const handleDeleteSelected = useCallback(() => {
+    if (!project || selectedIds.size === 0) return;
+
+    const count = selectedIds.size;
+    const message = count === 1
+      ? "Are you sure you want to delete this document?"
+      : `Are you sure you want to delete ${count} documents?`;
 
     Alert.alert(
-      "Delete Document",
-      `Are you sure you want to delete "${doc.name}"? This action cannot be undone.`,
+      "Delete Documents",
+      `${message} This action cannot be undone.`,
       [
         { text: "Cancel", style: "cancel" },
         {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
+            setIsDeleting(true);
             try {
-              await deleteDocument(project.id, doc.componentId, doc.id);
+              // Delete each selected document
+              const docsToDelete = documentsWithContext.filter((doc) =>
+                selectedIds.has(doc.id)
+              );
+
+              for (const doc of docsToDelete) {
+                await deleteDocument(project.id, doc.componentId, doc.id);
+              }
+
+              // Clear selection after successful delete
+              setSelectedIds(new Set());
             } catch (error) {
               Alert.alert(
                 "Error",
                 error instanceof Error
                   ? error.message
-                  : "Failed to delete document"
+                  : "Failed to delete documents"
               );
+            } finally {
+              setIsDeleting(false);
             }
           },
         },
       ]
     );
-  };
+  }, [project, selectedIds, documentsWithContext, deleteDocument]);
+
+  const handleAddPress = useCallback(() => {
+    setShowAddModal(true);
+  }, []);
+
+  // Action bar configuration
+  const actions = useMemo(() => [
+    {
+      id: "add",
+      icon: "note-add" as const,
+      label: "Add",
+      onPress: handleAddPress,
+      disabled: !defaultComponentId,
+    },
+    {
+      id: "delete",
+      icon: "delete-outline" as const,
+      label: "Delete",
+      onPress: handleDeleteSelected,
+      disabled: selectedIds.size === 0,
+      variant: "danger" as const,
+      isLoading: isDeleting,
+    },
+  ], [handleAddPress, handleDeleteSelected, selectedIds.size, isDeleting, defaultComponentId]);
 
   const styles = StyleSheet.create({
     container: {
@@ -212,13 +290,15 @@ export default function DocumentsPage() {
       paddingHorizontal: DesignTokens.spacing[6],
       paddingBottom: DesignTokens.spacing[6],
     },
-    headerActions: {
+    selectionHeader: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      paddingHorizontal: DesignTokens.spacing[6],
-      paddingVertical: DesignTokens.spacing[3],
-      gap: DesignTokens.spacing[3],
+      gap: DesignTokens.spacing[2],
+    },
+    selectionCount: {
+      fontSize: DesignTokens.typography.fontSize.sm,
+      color: theme.colors.interactive.primary,
+      fontWeight: DesignTokens.typography.fontWeight.medium,
     },
     documentsGrid: {
       flexDirection: "row",
@@ -239,6 +319,10 @@ export default function DocumentsPage() {
       transform: [{ scale: 0.95 }],
       ...DesignTokens.shadows.md,
     },
+    documentCardSelected: {
+      borderColor: theme.colors.interactive.primary,
+      borderWidth: 2,
+    },
     documentCardEditMode: {
       borderColor: theme.colors.border.primary,
     },
@@ -256,8 +340,18 @@ export default function DocumentsPage() {
       justifyContent: "center",
       alignItems: "center",
     },
-    deleteButton: {
-      padding: DesignTokens.spacing[1],
+    selectionIndicator: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: theme.colors.border.primary,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    selectionIndicatorSelected: {
+      backgroundColor: theme.colors.interactive.primary,
+      borderColor: theme.colors.interactive.primary,
     },
     documentName: {
       fontSize: DesignTokens.typography.fontSize.base,
@@ -383,94 +477,92 @@ export default function DocumentsPage() {
           showBack
           backLabel={project?.name}
           variant="compact"
+          rightAction={
+            <View style={styles.selectionHeader}>
+              {isEditMode && selectedIds.size > 0 && (
+                <ThemedText style={styles.selectionCount}>
+                  {selectedIds.size} selected
+                </ThemedText>
+              )}
+              <EditButton
+                onPress={isEditMode ? handleExitEditMode : handleEnterEditMode}
+                isEditing={isEditMode}
+              />
+            </View>
+          }
         />
-
-        {/* Action Bar */}
-        <View style={styles.headerActions}>
-          <ThemedButton
-            variant="primary"
-            size="small"
-            icon="add"
-            onPress={() => setShowAddModal(true)}
-          >
-            Add Document
-          </ThemedButton>
-          <ThemedButton
-            variant={isEditMode ? "success" : "secondary"}
-            size="small"
-            icon={isEditMode ? "check" : "edit"}
-            onPress={() => setIsEditMode(!isEditMode)}
-          >
-            {isEditMode ? "Done" : "Edit"}
-          </ThemedButton>
-        </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {documentsWithContext.length > 0 ? (
             <View style={styles.documentsGrid}>
-              {documentsWithContext.map((document) => (
-                <Pressable
-                  key={document.id}
-                  style={({ pressed }) => [
-                    styles.documentCard,
-                    pressed && !isEditMode && styles.documentCardPressed,
-                    isEditMode && styles.documentCardEditMode,
-                  ]}
-                  onPress={() => handleDocumentPress(document)}
-                  accessible={true}
-                  accessibilityLabel={`${isEditMode ? "Delete" : "Open"} ${document.name}, ${document.type} document`}
-                  accessibilityRole="button"
-                >
-                  <View style={styles.documentHeader}>
-                    <View style={styles.documentIcon}>
-                      <MaterialIcons
-                        name={getDocumentIcon(document.type) as any}
-                        size={24}
-                        color={getDocumentTypeColor(document.type)}
-                      />
-                    </View>
-                    {isEditMode && (
-                      <Pressable
-                        style={styles.deleteButton}
-                        onPress={() => handleDeleteDocument(document)}
-                        hitSlop={8}
-                        accessibilityLabel={`Delete ${document.name}`}
-                        accessibilityRole="button"
-                      >
+              {documentsWithContext.map((document) => {
+                const isSelected = selectedIds.has(document.id);
+                return (
+                  <Pressable
+                    key={document.id}
+                    style={({ pressed }) => [
+                      styles.documentCard,
+                      pressed && !isEditMode && styles.documentCardPressed,
+                      isEditMode && styles.documentCardEditMode,
+                      isSelected && styles.documentCardSelected,
+                    ]}
+                    onPress={() => handleDocumentPress(document)}
+                    accessible={true}
+                    accessibilityLabel={`${isEditMode ? (isSelected ? "Deselect" : "Select") : "Open"} ${document.name}, ${document.type} document`}
+                    accessibilityRole="button"
+                  >
+                    <View style={styles.documentHeader}>
+                      <View style={styles.documentIcon}>
                         <MaterialIcons
-                          name="delete"
+                          name={getDocumentIcon(document.type) as any}
                           size={24}
-                          color={theme.colors.status.error}
+                          color={getDocumentTypeColor(document.type)}
                         />
-                      </Pressable>
+                      </View>
+                      {isEditMode && (
+                        <View
+                          style={[
+                            styles.selectionIndicator,
+                            isSelected && styles.selectionIndicatorSelected,
+                          ]}
+                        >
+                          {isSelected && (
+                            <MaterialIcons
+                              name="check"
+                              size={16}
+                              color={theme.colors.text.inverse}
+                            />
+                          )}
+                        </View>
+                      )}
+                    </View>
+                    <ThemedText style={styles.documentName} numberOfLines={2}>
+                      {document.name}
+                    </ThemedText>
+                    <ThemedText style={styles.documentType}>
+                      {document.type}
+                    </ThemedText>
+                    {document.description && (
+                      <ThemedText
+                        style={styles.documentDescription}
+                        numberOfLines={3}
+                      >
+                        {document.description}
+                      </ThemedText>
                     )}
-                  </View>
-                  <ThemedText style={styles.documentName} numberOfLines={2}>
-                    {document.name}
-                  </ThemedText>
-                  <ThemedText style={styles.documentType}>
-                    {document.type}
-                  </ThemedText>
-                  {document.description && (
-                    <ThemedText
-                      style={styles.documentDescription}
-                      numberOfLines={3}
-                    >
-                      {document.description}
-                    </ThemedText>
-                  )}
-                  <View style={styles.documentMeta}>
-                    <ThemedText style={styles.documentDate}>
-                      {document.uploadedAt
-                        ? new Date(document.uploadedAt).toLocaleDateString()
-                        : "Unknown date"}
-                    </ThemedText>
-                    <ThemedText style={styles.documentSize}>
-                      {document.fileType}
-                    </ThemedText>
-                  </View>
-                </Pressable>
-              ))}
+                    <View style={styles.documentMeta}>
+                      <ThemedText style={styles.documentDate}>
+                        {document.uploadedAt
+                          ? new Date(document.uploadedAt).toLocaleDateString()
+                          : "Unknown date"}
+                      </ThemedText>
+                      <ThemedText style={styles.documentSize}>
+                        {document.fileType}
+                      </ThemedText>
+                    </View>
+                  </Pressable>
+                );
+              })}
             </View>
           ) : (
             <View style={styles.emptyState}>
@@ -489,6 +581,17 @@ export default function DocumentsPage() {
             </View>
           )}
         </ScrollView>
+
+        {/* Bottom Action Bar - Only visible in edit mode */}
+        {isEditMode && (
+          <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(200)}>
+            <SelectionActionBar
+              actions={actions}
+              selectedCount={selectedIds.size}
+              showSelectionCount={false}
+            />
+          </Animated.View>
+        )}
       </View>
 
       {/* Add Document Modal */}

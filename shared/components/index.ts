@@ -14,6 +14,8 @@ export { PageHeader } from "./PageHeader";
 export { RefreshableScrollView } from "./RefreshableScrollView";
 export { ThemeToggle } from "./ThemeToggle";
 export { EditButton } from "./EditButton";
+export { SelectionActionBar } from "./SelectionActionBar";
+export type { SelectionAction } from "./SelectionActionBar";
 
 // Themed Components
 export { ThemedButton } from "./themed/ThemedButton";

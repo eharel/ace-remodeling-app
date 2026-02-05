@@ -1,22 +1,29 @@
 import { useAuth } from "@/shared/contexts/AuthContext";
-import {
-  ThemedIconButton,
-  ThemedIconButtonProps,
-} from "./themed/ThemedIconButton";
+import { ThemedButton } from "./themed/ThemedButton";
 
 interface EditButtonProps {
   onPress: () => void;
-  label?: string;
-  icon?: ThemedIconButtonProps["icon"];
-  /** When true, shows a checkmark icon to indicate "done" state */
+  /** When true, shows "Done" state with success styling */
   isEditing?: boolean;
   resourceOwnerId?: string; // For future ownership-based permissions
 }
 
+/**
+ * EditButton - A reusable edit/done toggle button
+ *
+ * Follows iOS conventions with text labels ("Edit" / "Done").
+ * Automatically hides if user doesn't have edit permissions.
+ *
+ * Usage:
+ * ```tsx
+ * <EditButton
+ *   onPress={() => setIsEditing(!isEditing)}
+ *   isEditing={isEditing}
+ * />
+ * ```
+ */
 export function EditButton({
   onPress,
-  label = "Edit",
-  icon = "edit",
   isEditing = false,
   resourceOwnerId,
 }: EditButtonProps) {
@@ -27,16 +34,15 @@ export function EditButton({
     return null;
   }
 
-  const activeIcon = isEditing ? "check" : icon;
-  const activeLabel = isEditing ? "Done editing" : `${label} section`;
-
   return (
-    <ThemedIconButton
-      icon={activeIcon}
+    <ThemedButton
       onPress={onPress}
-      variant={isEditing ? "primary" : "ghost"}
+      variant={isEditing ? "success" : "secondary"}
       size="small"
-      accessibilityLabel={activeLabel}
-    />
+      icon={isEditing ? "check" : "edit"}
+      accessibilityLabel={isEditing ? "Done editing" : "Enter edit mode"}
+    >
+      {isEditing ? "Done" : "Edit"}
+    </ThemedButton>
   );
 }
