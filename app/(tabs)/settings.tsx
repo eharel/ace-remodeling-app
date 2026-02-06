@@ -27,7 +27,8 @@ import { useVersionCheck } from "@/shared/hooks";
 export default function SettingsScreen() {
   const { theme } = useTheme();
   const router = useRouter();
-  const { updateRequired } = useVersionCheck();
+  const { updateRequired, isLoading, currentBuild, minimumBuild } =
+    useVersionCheck();
 
   const { isAuthenticated, signIn, signOut } = useAuth();
   const [pinInput, setPinInput] = useState("");
@@ -467,6 +468,11 @@ export default function SettingsScreen() {
             <ThemedText variant="caption" style={styles.versionInfo}>
               Built for ACE Remodeling TX • Transforming Austin Homes
             </ThemedText>
+            {!isLoading && (currentBuild !== null || minimumBuild !== null) && (
+              <ThemedText variant="caption" style={styles.versionInfo}>
+                Build {currentBuild ?? "?"} • Min {minimumBuild ?? "?"}
+              </ThemedText>
+            )}
           </ThemedView>
         </View>
 
