@@ -315,6 +315,7 @@ export default function DocumentsPage() {
       await addDocument(project.id, defaultComponentId, result.document);
 
       setShowAddModal(false);
+      showToast("Document uploaded", "success");
     } catch (error) {
       setAddError(
         error instanceof Error ? error.message : "Failed to upload document"
@@ -354,6 +355,12 @@ export default function DocumentsPage() {
 
               // Clear selection after successful delete
               setSelectedIds(new Set());
+
+              // Show success toast
+              const deleteMessage = count === 1
+                ? "Document deleted"
+                : `${count} documents deleted`;
+              showToast(deleteMessage, "success");
             } catch (error) {
               Alert.alert(
                 "Error",
@@ -368,7 +375,7 @@ export default function DocumentsPage() {
         },
       ]
     );
-  }, [project, selectedIds, documentsWithContext, deleteDocument]);
+  }, [project, selectedIds, documentsWithContext, deleteDocument, showToast]);
 
   const handleAddPress = useCallback(() => {
     setShowAddModal(true);
@@ -409,8 +416,8 @@ export default function DocumentsPage() {
     }
   }, [project, editingDocument, updateDocument, showToast]);
 
-  // Handle edit button click from action bar (single selection only)
-  const handleEditFromActionBar = useCallback(() => {
+  // Handle rename button click from action bar (single selection only)
+  const handleRenameFromActionBar = useCallback(() => {
     if (selectedIds.size !== 1) return;
     const docId = Array.from(selectedIds)[0];
     const doc = documentsWithContext.find((d) => d.id === docId);
@@ -429,10 +436,10 @@ export default function DocumentsPage() {
       disabled: !defaultComponentId,
     },
     {
-      id: "edit",
-      icon: "edit" as const,
-      label: "Edit",
-      onPress: handleEditFromActionBar,
+      id: "rename",
+      icon: "drive-file-rename-outline" as const,
+      label: "Rename",
+      onPress: handleRenameFromActionBar,
       disabled: selectedIds.size !== 1,
     },
     {
@@ -444,7 +451,7 @@ export default function DocumentsPage() {
       variant: "danger" as const,
       isLoading: isDeleting,
     },
-  ], [handleAddPress, handleEditFromActionBar, handleDeleteSelected, selectedIds.size, isDeleting, defaultComponentId]);
+  ], [handleAddPress, handleRenameFromActionBar, handleDeleteSelected, selectedIds.size, isDeleting, defaultComponentId]);
 
   const styles = StyleSheet.create({
     container: {
