@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.1.0] - TBD
+## [3.0.0] - TBD
 
 **⚠️ BREAKING CHANGES:** This release includes database migrations that must be run before deployment. See RELEASE_NOTES.md for migration scripts and instructions.
 

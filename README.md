@@ -164,9 +164,9 @@ See `scripts/README.md` for full upload pipeline documentation.
 ### Version Management
 
 ```bash
-npm run version:patch    # 2.1.0 → 2.1.1
-npm run version:minor    # 2.1.0 → 2.2.0
-npm run version:major    # 2.1.0 → 3.0.0
+npm run version:patch    # 3.0.0 → 3.0.1
+npm run version:minor    # 3.0.0 → 3.1.0
+npm run version:major    # 3.0.0 → 4.0.0
 npm run version:info     # Show current version
 ```
 
@@ -285,5 +285,5 @@ npm run build:status
 
 ---
 
-**Version**: 2.1.0  
+**Version**: 3.0.0  
 **Last Updated**: 2026-02-06

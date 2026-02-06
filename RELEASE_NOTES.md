@@ -45,7 +45,7 @@ This file tracks pending migrations and deployment steps for upcoming releases.
 
 ## Version History
 
-### v2.2.0 (Upcoming)
+### v3.0.0 (Upcoming)
 **Changes:**
 - Featured toggle for components in project detail view
 - Per-component featuring (breaking change from project-level)

@@ -177,7 +177,7 @@ npm run build:status
 
 **Example progression:**
 - v2.1.0 (buildNumber: 11)
-- v2.2.0 (buildNumber: 12) ← Next build
+- v3.0.0 (buildNumber: 12) ← Next build
 - v2.2.1 (buildNumber: 13)
 - v2.3.0 (buildNumber: 14)
 
@@ -256,7 +256,7 @@ npm run build:status
 
 ## Current Status
 
-**Current Version:** 2.1.0 (check package.json)
+**Current Version:** 3.0.0 (check package.json)
 
 **Pending Migrations:** See RELEASE_NOTES.md
 
