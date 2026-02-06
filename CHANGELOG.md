@@ -9,11 +9,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.3.0] - TDB
+## [2.1.0] - TBD
+
+**⚠️ BREAKING CHANGES:** This release includes database migrations that must be run before deployment. See RELEASE_NOTES.md for migration scripts and instructions.
 
 ### Added
 
+#### Project Management
+- Create new projects with form-based input
+- Comprehensive edit mode for project metadata (name, number, description, location)
+- Project number validation with duplicate checking
+- Inline editing for project fields with dropdown selectors
+
+#### Component Management
+- Add, edit, and delete project components
+- Component selector with improved UX
+- Component name editing and category/subcategory selection
+- Custom category and subcategory options
+- Delete associated media files when deleting components
+- Component pills with edit indicators
+
+#### Photo Management (CRUD)
+- Upload photos from device library or Files app
+- Delete photos with confirmation
+- Set thumbnail/hero image for components
+- Drag-to-reorder photos in edit mode
+- Photo category filtering (Before, During, After, Renderings)
+- Responsive photo grid with optimized performance
+- Photo selection mode for bulk operations
+- Edit mode for photo gallery with visual improvements
+
+#### Document Management (CRUD)
+- Upload documents (PDFs, images) to project components
+- Edit/rename document names
+- Delete documents (also removes files from Firebase Storage)
+- Document category tabs and filtering
+- Document preview for images
+- Category consolidation (type → category field)
+
+#### Authentication & Permissions
+- PIN-based authentication system
+- Permission-based UI rendering with `<Can>` component
+- Edit mode protection requiring authentication
+- Permission utilities for role-based access
+
+#### Featured Projects
+- Per-component featuring (moved from project-level)
+- Featured toggle in project detail view
+- Component-level featured status for showcase
+
+#### UI/UX Improvements
+- Toast notifications for user feedback
+- Improved edit mode UX with Save/Cancel buttons
+- Visual improvements for headers, separators, and card spacing
+- Consistent empty states across Photos and Assets sections
+- Success variant for ThemedButton
+- Improved disabled button visibility
+- Loading states for segmented controls
+- Auto-width, centered toast positioning above tab bar
+- Improved navbar inactive tab color contrast
+
+#### Performance & Architecture
+- Optimized FlatList rendering for photo galleries
+- Refactored gallery components for better organization
+- ProjectCardView DTO for consistent data transformation
+- Service layer for Firestore operations
+- Zod validation for data integrity
+- Optimistic updates in ProjectsContext
+
 ### Changed
+
+- Featuring system changed from project-level to component-level (breaking change)
+- Document fields consolidated from `type` to `category` field
+- Project data model restructured to use components array
+- Gallery refactored to decouple photos from projects
+- Core directory merged into shared directory
+- Edit mode unified across project detail page
+
+### Fixed
+
+- Firestore undefined value errors in project updates
+- Search suggestions crash with undefined cardViews
+- Search filters crash when projects array is undefined
+- Photo upload nanoid crypto error in React Native
+- Showcase now only shows projects under featured component categories
+- Project number validation duplicate checking
+- Project update error handling and state sync
+- Document category filtering fallback to doc.type
+- Component name display and category tab visibility
+- Photo grid modal scroll conflicts
+- Screen rotation crash in photo grid
 
 ---
 
