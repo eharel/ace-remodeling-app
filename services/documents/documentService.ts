@@ -18,7 +18,11 @@ import {
   uploadBytes,
 } from "firebase/storage";
 import { storage } from "@/shared/config";
-import { Document, DocumentType, DOCUMENT_TYPES } from "@/shared/types";
+import {
+  Document,
+  DocumentCategory,
+  DOCUMENT_CATEGORIES,
+} from "@/shared/types";
 
 /**
  * Options for uploading a document
@@ -26,14 +30,12 @@ import { Document, DocumentType, DOCUMENT_TYPES } from "@/shared/types";
 export interface UploadDocumentOptions {
   /** Project ID for storage path */
   projectId: string;
-  /** Document type (Floor Plan, Contract, etc.) */
-  type: DocumentType;
+  /** Document category (Floor Plan, Contract, etc.) */
+  category: DocumentCategory;
   /** Display name for the document */
   name: string;
   /** Optional description */
   description?: string;
-  /** Optional category for filtering (e.g., "floor-plan", "materials") */
-  category?: string;
   /** Order in the document list */
   order?: number;
 }
@@ -90,18 +92,21 @@ function getFileTypeLabel(mimeType: string): string {
 /**
  * Build storage path for a document file
  *
- * Path format: projects/{projectId}/documents/{type-slug}/{filename}
+ * Path format: projects/{projectId}/documents/{category-slug}/{filename}
  */
 function buildStoragePath(
   filename: string,
   options: UploadDocumentOptions
 ): string {
-  const { projectId, type } = options;
+  const { projectId, category } = options;
 
-  // Convert type to URL-friendly slug
-  const typeSlug = type.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+  // Convert category to URL-friendly slug
+  const categorySlug = category
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
 
-  return `projects/${projectId}/documents/${typeSlug}/${filename}`;
+  return `projects/${projectId}/documents/${categorySlug}/${filename}`;
 }
 
 /**
@@ -158,9 +163,8 @@ export async function uploadDocument(
       url: downloadURL,
       storagePath,
       name: options.name,
-      type: options.type,
-      fileType: getFileTypeLabel(contentType),
       category: options.category,
+      fileType: getFileTypeLabel(contentType),
       description: options.description,
       order: options.order ?? 0,
       uploadedAt: new Date().toISOString(),
@@ -186,9 +190,8 @@ export async function uploadMultipleDocuments(
     uri: string;
     filename: string;
     name: string;
-    type: DocumentType;
+    category: DocumentCategory;
     description?: string;
-    category?: string;
   }[],
   baseOptions: { projectId: string }
 ): Promise<UploadDocumentResult[]> {
@@ -199,9 +202,8 @@ export async function uploadMultipleDocuments(
     const result = await uploadDocument(file.uri, file.filename, {
       projectId: baseOptions.projectId,
       name: file.name,
-      type: file.type,
-      description: file.description,
       category: file.category,
+      description: file.description,
       order: i,
     });
     results.push(result);
@@ -261,15 +263,23 @@ export async function deleteMultipleDocuments(
 }
 
 /**
- * Document type options for UI selection
- * Includes all predefined types from DOCUMENT_TYPES
+ * Document category options for UI selection
+ * Includes all predefined categories from DOCUMENT_CATEGORIES
  */
-export const DOCUMENT_TYPE_OPTIONS: { value: DocumentType; label: string }[] = [
-  { value: DOCUMENT_TYPES.FLOOR_PLAN, label: "Floor Plan" },
-  { value: DOCUMENT_TYPES.RENDERING_3D, label: "3D Rendering" },
-  { value: DOCUMENT_TYPES.MATERIALS, label: "Materials" },
-  { value: DOCUMENT_TYPES.PERMIT, label: "Permit" },
-  { value: DOCUMENT_TYPES.CONTRACT, label: "Contract" },
-  { value: DOCUMENT_TYPES.INVOICE, label: "Invoice" },
-  { value: DOCUMENT_TYPES.OTHER, label: "Other" },
+export const DOCUMENT_CATEGORY_OPTIONS: {
+  value: DocumentCategory;
+  label: string;
+}[] = [
+  { value: DOCUMENT_CATEGORIES.FLOOR_PLAN, label: "Floor Plan" },
+  { value: DOCUMENT_CATEGORIES.RENDERING_3D, label: "3D Rendering" },
+  { value: DOCUMENT_CATEGORIES.MATERIALS, label: "Materials" },
+  { value: DOCUMENT_CATEGORIES.PERMIT, label: "Permit" },
+  { value: DOCUMENT_CATEGORIES.CONTRACT, label: "Contract" },
+  { value: DOCUMENT_CATEGORIES.INVOICE, label: "Invoice" },
+  { value: DOCUMENT_CATEGORIES.OTHER, label: "Other" },
 ];
+
+/**
+ * @deprecated Use DOCUMENT_CATEGORY_OPTIONS instead
+ */
+export const DOCUMENT_TYPE_OPTIONS = DOCUMENT_CATEGORY_OPTIONS;

@@ -59,7 +59,7 @@ export function convertDocumentsToPictures(documents: Document[]): Picture[] {
     .map((d) => ({
       uri: d.url,
       id: d.id,
-      type: d.category || d.type || "Other",
+      type: d.category || "Other",
       description: d.name || d.filename || undefined,
       thumbnailUrl: d.thumbnailUrl,
     }))

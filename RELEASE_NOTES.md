@@ -32,6 +32,15 @@ This file tracks pending migrations and deployment steps for upcoming releases.
 - [ ] Run on prod: `npm run migrate:featured-to-components:prod`
 - [ ] Verify showcase displays correctly
 
+### 4. Consolidate Document Fields (type → category)
+**Script:** `npx tsx scripts/migrations/syncDocumentTypeWithCategory.ts`
+**Reason:** Documents had both `type` and `category` fields with inconsistent data. Consolidated to use only `category` with proper display format values (e.g., "Floor Plan", "Contract").
+
+- [x] Run on dev (completed)
+- [ ] Verify dev works correctly
+- [ ] Run on prod: `npx tsx scripts/migrations/syncDocumentTypeWithCategory.ts`
+- [ ] Verify documents display correctly in Assets section
+
 ---
 
 ## Version History

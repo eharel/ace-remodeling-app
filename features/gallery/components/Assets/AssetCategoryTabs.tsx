@@ -45,7 +45,7 @@ interface TabConfig {
   value: AssetCategoryValue;
   label: string;
   accessibilityLabel: string;
-  documentType?: Document["type"];
+  documentCategory?: Document["category"];
 }
 
 /**

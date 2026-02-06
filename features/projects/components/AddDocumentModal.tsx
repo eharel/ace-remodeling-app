@@ -18,8 +18,8 @@ import {
 } from "@/shared/components";
 import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
-import { DocumentType, DOCUMENT_TYPES } from "@/shared/types";
-import { DOCUMENT_TYPE_OPTIONS } from "@/services/documents/documentService";
+import { DocumentCategory, DOCUMENT_CATEGORIES } from "@/shared/types";
+import { DOCUMENT_CATEGORY_OPTIONS } from "@/services/documents/documentService";
 
 interface AddDocumentModalProps {
   visible: boolean;
@@ -28,7 +28,7 @@ interface AddDocumentModalProps {
     fileUri: string;
     filename: string;
     name: string;
-    type: DocumentType;
+    type: DocumentCategory; // Still named 'type' in the callback interface for compatibility
     description?: string;
   }) => Promise<void>;
   isAdding: boolean;
@@ -64,7 +64,9 @@ export function AddDocumentModal({
 
   // Document metadata state
   const [documentName, setDocumentName] = useState<string>("");
-  const [selectedType, setSelectedType] = useState<DocumentType>(DOCUMENT_TYPES.OTHER);
+  const [selectedCategory, setSelectedCategory] = useState<DocumentCategory>(
+    DOCUMENT_CATEGORIES.OTHER
+  );
   const [description, setDescription] = useState<string>("");
 
   // Reset form when modal opens
@@ -72,7 +74,7 @@ export function AddDocumentModal({
     if (visible) {
       setSelectedFile(null);
       setDocumentName("");
-      setSelectedType(DOCUMENT_TYPES.OTHER);
+      setSelectedCategory(DOCUMENT_CATEGORIES.OTHER);
       setDescription("");
     }
   }, [visible]);
@@ -127,7 +129,7 @@ export function AddDocumentModal({
       fileUri: selectedFile.uri,
       filename: selectedFile.name,
       name: documentName.trim(),
-      type: selectedType,
+      type: selectedCategory, // Pass category as 'type' for callback compatibility
       description: description.trim() || undefined,
     });
   };
@@ -357,24 +359,26 @@ export function AddDocumentModal({
               )}
             </View>
 
-            {/* Document Type Selection */}
+            {/* Document Category Selection */}
             <View style={styles.section}>
-              <ThemedText style={styles.label}>Type *</ThemedText>
+              <ThemedText style={styles.label}>Category *</ThemedText>
               <View style={styles.optionsGrid}>
-                {DOCUMENT_TYPE_OPTIONS.map((option) => (
+                {DOCUMENT_CATEGORY_OPTIONS.map((option) => (
                   <Pressable
                     key={option.value}
                     style={[
                       styles.optionButton,
-                      selectedType === option.value && styles.optionButtonSelected,
+                      selectedCategory === option.value &&
+                        styles.optionButtonSelected,
                     ]}
-                    onPress={() => setSelectedType(option.value)}
+                    onPress={() => setSelectedCategory(option.value)}
                     disabled={isAdding}
                   >
                     <ThemedText
                       style={[
                         styles.optionText,
-                        selectedType === option.value && styles.optionTextSelected,
+                        selectedCategory === option.value &&
+                          styles.optionTextSelected,
                       ]}
                     >
                       {option.label}

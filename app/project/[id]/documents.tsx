@@ -13,7 +13,7 @@ import {
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import { DesignTokens } from "@/shared/themes";
-import { Document, DocumentType } from "@/shared/types";
+import { Document, DocumentCategory } from "@/shared/types";
 import {
   EditButton,
   LoadingState,
@@ -174,7 +174,7 @@ export default function DocumentsPage() {
     fileUri: string;
     filename: string;
     name: string;
-    type: DocumentType;
+    type: DocumentCategory;
     description?: string;
   }) => {
     if (!project || !defaultComponentId) return;
@@ -187,10 +187,8 @@ export default function DocumentsPage() {
       const result = await uploadDocument(input.fileUri, input.filename, {
         projectId: project.id,
         name: input.name,
-        type: input.type,
+        category: input.type, // category is now the primary field
         description: input.description,
-        // Map document type to category for filtering
-        category: input.type.toLowerCase().replace(/\s+/g, "-"),
       });
 
       if (!result.success || !result.document) {
@@ -508,15 +506,15 @@ export default function DocumentsPage() {
                     ]}
                     onPress={() => handleDocumentPress(document)}
                     accessible={true}
-                    accessibilityLabel={`${isEditMode ? (isSelected ? "Deselect" : "Select") : "Open"} ${document.name}, ${document.type} document`}
+                    accessibilityLabel={`${isEditMode ? (isSelected ? "Deselect" : "Select") : "Open"} ${document.name}, ${document.category} document`}
                     accessibilityRole="button"
                   >
                     <View style={styles.documentHeader}>
                       <View style={styles.documentIcon}>
                         <MaterialIcons
-                          name={getDocumentIcon(document.type) as any}
+                          name={getDocumentIcon(document.category) as any}
                           size={24}
-                          color={getDocumentTypeColor(document.type)}
+                          color={getDocumentTypeColor(document.category)}
                         />
                       </View>
                       {isEditMode && (
@@ -540,7 +538,7 @@ export default function DocumentsPage() {
                       {document.name}
                     </ThemedText>
                     <ThemedText style={styles.documentType}>
-                      {document.type}
+                      {document.category}
                     </ThemedText>
                     {document.description && (
                       <ThemedText
