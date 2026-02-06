@@ -23,6 +23,7 @@ import {
   LoadingState,
   PageHeader,
   RefreshableScrollView,
+  ThemedButton,
   ThemedIconButton,
   ThemedText,
   ThemedView,
@@ -423,29 +424,34 @@ export default function ProjectDetailScreen() {
             <Can edit>
               {isEditMode ? (
                 <View style={{ flexDirection: "row", gap: DesignTokens.spacing[2] }}>
-                  <ThemedIconButton
-                    icon="close"
+                  <ThemedButton
                     onPress={handleCancelEdit}
-                    variant="ghost"
+                    variant="secondary"
                     size="small"
                     accessibilityLabel="Cancel editing"
-                  />
-                  <ThemedIconButton
-                    icon="check"
+                  >
+                    Cancel
+                  </ThemedButton>
+                  <ThemedButton
                     onPress={handleSaveAndExit}
                     variant="success"
                     size="small"
+                    icon="check"
                     accessibilityLabel="Save changes"
-                  />
+                  >
+                    Done
+                  </ThemedButton>
                 </View>
               ) : (
-                <ThemedIconButton
-                  icon="edit"
+                <ThemedButton
                   onPress={() => setIsEditMode(true)}
-                  variant="ghost"
+                  variant="secondary"
                   size="small"
+                  icon="edit"
                   accessibilityLabel="Edit project"
-                />
+                >
+                  Edit
+                </ThemedButton>
               )}
             </Can>
           }
