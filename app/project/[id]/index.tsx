@@ -420,6 +420,7 @@ export default function ProjectDetailScreen() {
           showBack={true}
           backLabel="Back"
           variant="compact"
+          showBorder={true}
           rightAction={
             <Can edit>
               {isEditMode ? (

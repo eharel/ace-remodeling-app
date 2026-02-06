@@ -22,6 +22,8 @@ interface PageHeaderProps {
   layoutMode?: "stacked" | "inline"; // Layout pattern (stacked for content, inline for control bars)
   // Right action (e.g., add button, settings icon)
   rightAction?: React.ReactNode; // Custom component to render on the right side of the header
+  // Visual separator
+  showBorder?: boolean; // Show a bottom border for visual separation when content scrolls under
 }
 
 /**
@@ -48,6 +50,9 @@ interface PageHeaderProps {
  * Variants:
  * - default: 64px top spacing (for pages without nav bars)
  * - compact: 32px top spacing (for pages with nav bars)
+ *
+ * Visual Options:
+ * - showBorder: Adds a subtle bottom border for visual separation when content scrolls under the header
  *
  * Usage Examples:
  *
@@ -85,6 +90,7 @@ export function PageHeader({
   onBack,
   layoutMode = "stacked", // Default to stacked for backward compatibility
   rightAction,
+  showBorder = false,
 }: PageHeaderProps) {
   const { theme } = useTheme();
   const router = useRouter();
@@ -97,6 +103,16 @@ export function PageHeader({
     }
   };
 
+  // Border style when showBorder is true
+  const borderStyle = showBorder
+    ? {
+        borderBottomWidth: 1,
+        borderBottomColor: theme.colors.border.primary,
+        paddingBottom: DesignTokens.spacing[4],
+        marginBottom: DesignTokens.spacing[4],
+      }
+    : {};
+
   // Render inline layout (control bar pattern)
   if (layoutMode === "inline") {
     return (
@@ -104,6 +120,7 @@ export function PageHeader({
         style={[
           styles.container,
           variant === "compact" && styles.containerCompact,
+          borderStyle,
         ]}
       >
         {/* Control Bar: Back button and title on same line */}
@@ -162,6 +179,7 @@ export function PageHeader({
       style={[
         styles.container,
         variant === "compact" && styles.containerCompact,
+        borderStyle,
       ]}
     >
       {/* Back Button (on its own line above title) */}
