@@ -114,6 +114,16 @@ interface ProjectsContextType {
     componentId: string,
     documentId: string
   ) => Promise<void>;
+  /**
+   * Update a document's metadata (name, category, description).
+   * Does not modify the actual file in Storage.
+   */
+  updateDocument: (
+    projectId: string,
+    componentId: string,
+    documentId: string,
+    updates: Partial<Pick<Document, "name" | "category" | "description">>
+  ) => Promise<void>;
 }
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(
@@ -623,6 +633,88 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
   );
 
   /**
+   * Updates a document's metadata (name, category, description).
+   * Does not modify the actual file in Firebase Storage.
+   *
+   * @param projectId - The project ID
+   * @param componentId - The component ID
+   * @param documentId - The document ID to update
+   * @param updates - Partial document object with fields to update
+   */
+  const updateDocument = useCallback(
+    async (
+      projectId: string,
+      componentId: string,
+      documentId: string,
+      updates: Partial<Pick<Document, "name" | "category" | "description">>
+    ): Promise<void> => {
+      const now = new Date().toISOString();
+
+      try {
+        // Find the project and component
+        const project = projects.find((p) => p.id === projectId);
+        if (!project) {
+          throw new Error("Project not found");
+        }
+
+        const component = project.components.find((c) => c.id === componentId);
+        if (!component) {
+          throw new Error("Component not found");
+        }
+
+        // Find the document
+        const documentIndex = component.documents?.findIndex(
+          (d) => d.id === documentId
+        );
+        if (documentIndex === undefined || documentIndex === -1) {
+          throw new Error("Document not found");
+        }
+
+        // Update the document
+        const updatedDocuments = (component.documents || []).map((d) =>
+          d.id === documentId ? { ...d, ...updates } : d
+        );
+
+        // Optimistic update
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === projectId
+              ? {
+                  ...p,
+                  components: p.components.map((c) =>
+                    c.id === componentId
+                      ? { ...c, documents: updatedDocuments, updatedAt: now }
+                      : c
+                  ),
+                  updatedAt: now,
+                }
+              : p
+          )
+        );
+
+        // Update Firestore
+        const updatedComponents = project.components.map((c) =>
+          c.id === componentId
+            ? { ...c, documents: updatedDocuments, updatedAt: now }
+            : c
+        );
+
+        await updateProjectService(projectId, {
+          components: updatedComponents,
+        });
+      } catch (error) {
+        // Rollback on error
+        setError(
+          error instanceof Error ? error.message : "Failed to update document"
+        );
+        await fetchProjects();
+        throw error;
+      }
+    },
+    [projects, fetchProjects]
+  );
+
+  /**
    * All projects that have at least one featured component.
    * Featuring is now per-component, not per-project.
    * Memoized to prevent unnecessary recalculations.
@@ -702,6 +794,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       createProject,
       addDocument,
       deleteDocument,
+      updateDocument,
     }),
     [
       projects,
@@ -721,6 +814,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({
       createProject,
       addDocument,
       deleteDocument,
+      updateDocument,
     ]
   );
 

@@ -27,6 +27,7 @@ import { commonStyles } from "@/shared/utils";
 import { getCategoryDisplayName } from "@/shared/utils/categoryUtils";
 import { uploadDocument } from "@/services/documents/documentService";
 import { AddDocumentModal } from "@/features/projects/components/AddDocumentModal";
+import { EditDocumentModal } from "@/features/projects/components/EditDocumentModal";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -95,7 +96,7 @@ interface DocumentWithContext extends Document {
 export default function DocumentsPage() {
   const { theme } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { projects, isLoading, addDocument, deleteDocument } = useProjects();
+  const { projects, isLoading, addDocument, deleteDocument, updateDocument } = useProjects();
 
   // Edit mode and selection state
   const [isEditMode, setIsEditMode] = useState(false);
@@ -108,6 +109,12 @@ export default function DocumentsPage() {
 
   // Loading state for delete operation
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Edit document modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingDocument, setEditingDocument] = useState<DocumentWithContext | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   // Find the project by ID using Firebase data
   const project = projects.find((p) => p.id === id);
@@ -354,6 +361,50 @@ export default function DocumentsPage() {
     setShowAddModal(true);
   }, []);
 
+  const handleEditDocument = useCallback((doc: DocumentWithContext) => {
+    setEditingDocument(doc);
+    setEditError(null);
+    setShowEditModal(true);
+  }, []);
+
+  const handleSaveEdit = useCallback(async (updates: {
+    name: string;
+    category: DocumentCategory;
+    description?: string;
+  }) => {
+    if (!project || !editingDocument) return;
+
+    setIsSaving(true);
+    setEditError(null);
+
+    try {
+      await updateDocument(
+        project.id,
+        editingDocument.componentId,
+        editingDocument.id,
+        updates
+      );
+      setShowEditModal(false);
+      setEditingDocument(null);
+    } catch (error) {
+      setEditError(
+        error instanceof Error ? error.message : "Failed to save changes"
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  }, [project, editingDocument, updateDocument]);
+
+  // Handle edit button click from action bar (single selection only)
+  const handleEditFromActionBar = useCallback(() => {
+    if (selectedIds.size !== 1) return;
+    const docId = Array.from(selectedIds)[0];
+    const doc = documentsWithContext.find((d) => d.id === docId);
+    if (doc) {
+      handleEditDocument(doc);
+    }
+  }, [selectedIds, documentsWithContext, handleEditDocument]);
+
   // Action bar configuration
   const actions = useMemo(() => [
     {
@@ -364,6 +415,13 @@ export default function DocumentsPage() {
       disabled: !defaultComponentId,
     },
     {
+      id: "edit",
+      icon: "edit" as const,
+      label: "Edit",
+      onPress: handleEditFromActionBar,
+      disabled: selectedIds.size !== 1,
+    },
+    {
       id: "delete",
       icon: "delete-outline" as const,
       label: "Delete",
@@ -372,7 +430,7 @@ export default function DocumentsPage() {
       variant: "danger" as const,
       isLoading: isDeleting,
     },
-  ], [handleAddPress, handleDeleteSelected, selectedIds.size, isDeleting, defaultComponentId]);
+  ], [handleAddPress, handleEditFromActionBar, handleDeleteSelected, selectedIds.size, isDeleting, defaultComponentId]);
 
   const styles = StyleSheet.create({
     container: {
@@ -625,8 +683,14 @@ export default function DocumentsPage() {
                       isSelected && styles.documentCardSelected,
                     ]}
                     onPress={() => handleDocumentPress(document)}
+                    onLongPress={() => {
+                      if (!isEditMode) {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        handleEditDocument(document);
+                      }
+                    }}
                     accessible={true}
-                    accessibilityLabel={`${isEditMode ? (isSelected ? "Deselect" : "Select") : "Open"} ${document.name}, ${document.category} document`}
+                    accessibilityLabel={`${isEditMode ? (isSelected ? "Deselect" : "Select") : "Open"} ${document.name}, ${document.category} document. Long press to edit.`}
                     accessibilityRole="button"
                   >
                     <View style={styles.documentHeader}>
@@ -725,6 +789,20 @@ export default function DocumentsPage() {
         onAdd={handleAddDocument}
         isAdding={isAdding}
         error={addError}
+      />
+
+      {/* Edit Document Modal */}
+      <EditDocumentModal
+        visible={showEditModal}
+        document={editingDocument}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingDocument(null);
+          setEditError(null);
+        }}
+        onSave={handleSaveEdit}
+        isSaving={isSaving}
+        error={editError}
       />
     </>
   );

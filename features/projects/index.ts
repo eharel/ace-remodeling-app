@@ -15,3 +15,4 @@ export { AssetsSection } from "./components/AssetsSection";
 export { FeaturedToggle } from "./components/FeaturedToggle";
 export { StatusPicker } from "./components/StatusPicker";
 export { CategoryPicker } from "./components/CategoryPicker";
+export { EditDocumentModal } from "./components/EditDocumentModal";
