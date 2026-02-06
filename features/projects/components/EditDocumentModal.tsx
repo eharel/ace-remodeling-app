@@ -329,7 +329,7 @@ export function EditDocumentModal({
             </ThemedButton>
             <ThemedButton
               onPress={handleSave}
-              variant="primary"
+              variant="success"
               disabled={isSaving || !isFormValid() || !hasChanges()}
               loading={isSaving}
               style={styles.button}

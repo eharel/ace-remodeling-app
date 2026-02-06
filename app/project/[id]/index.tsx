@@ -105,18 +105,27 @@ export default function ProjectDetailScreen() {
     // Dismiss keyboard triggers onBlur on any focused input
     Keyboard.dismiss();
 
+    let changesMade = false;
+
     // Call saveAll on ProjectMetaGrid if available
     if (metaGridRef.current?.saveAll) {
       await metaGridRef.current.saveAll();
+      // Note: ProjectMetaGrid handles its own saves with individual toasts
     }
 
     // Save description if changed
     if (editedDescription !== displayDescription) {
       await handleSaveDescription();
+      changesMade = true;
     }
 
     setIsEditMode(false);
-    showToast("Changes saved", "success");
+
+    // Only show toast if description was changed
+    // (ProjectMetaGrid fields show their own toasts when saved)
+    if (changesMade) {
+      showToast("Changes saved", "success");
+    }
   };
 
   // Handle cancel - reset all pending changes and exit edit mode

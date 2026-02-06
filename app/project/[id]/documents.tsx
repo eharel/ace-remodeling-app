@@ -20,6 +20,8 @@ import {
   PageHeader,
   SelectionActionBar,
   ThemedText,
+  Toast,
+  ToastType,
 } from "@/shared/components";
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
@@ -115,6 +117,17 @@ export default function DocumentsPage() {
   const [editingDocument, setEditingDocument] = useState<DocumentWithContext | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
+
+  // Toast state for feedback
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    type: ToastType;
+  }>({ visible: false, message: "", type: "info" });
+
+  const showToast = useCallback((message: string, type: ToastType = "info") => {
+    setToast({ visible: true, message, type });
+  }, []);
 
   // Find the project by ID using Firebase data
   const project = projects.find((p) => p.id === id);
@@ -386,6 +399,7 @@ export default function DocumentsPage() {
       );
       setShowEditModal(false);
       setEditingDocument(null);
+      showToast("Document updated", "success");
     } catch (error) {
       setEditError(
         error instanceof Error ? error.message : "Failed to save changes"
@@ -393,7 +407,7 @@ export default function DocumentsPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [project, editingDocument, updateDocument]);
+  }, [project, editingDocument, updateDocument, showToast]);
 
   // Handle edit button click from action bar (single selection only)
   const handleEditFromActionBar = useCallback(() => {
@@ -803,6 +817,14 @@ export default function DocumentsPage() {
         onSave={handleSaveEdit}
         isSaving={isSaving}
         error={editError}
+      />
+
+      {/* Toast for feedback */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onDismiss={() => setToast({ ...toast, visible: false })}
       />
     </>
   );
