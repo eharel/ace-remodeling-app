@@ -6,6 +6,8 @@ import {
   ThemedSegmentedControl,
   ThemedText,
   ThemedView,
+  Toast,
+  ToastType,
 } from "@/shared/components";
 import { type PhotoCategory, PHOTO_CATEGORIES } from "@/shared/constants";
 import { useTheme } from "@/shared/contexts";
@@ -46,6 +48,17 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
     new Set()
   );
 
+  // Toast state for feedback
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    type: ToastType;
+  }>({ visible: false, message: "", type: "info" });
+
+  const showToast = useCallback((message: string, type: ToastType = "info") => {
+    setToast({ visible: true, message, type });
+  }, []);
+
   // Handle edit button press - edit mode IS select mode
   const handleEditPress = () => {
     if (isEditing) {
@@ -77,6 +90,14 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
     return component?.media || [];
   }, [component]);
 
+  // Handle upload success callback
+  const handleUploadSuccess = useCallback((count: number) => {
+    const message = count === 1
+      ? "Photo uploaded"
+      : `${count} photos uploaded`;
+    showToast(message, "success");
+  }, [showToast]);
+
   // Media actions hook for CRUD operations
   const { isLoading, loadingOperation, addPhotos, deletePhotos, setThumbnail, reorderPhotos } =
     useMediaActions({
@@ -84,6 +105,7 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
       componentId: componentId || "",
       component,
       currentCategory: selectedCategory,
+      onUploadSuccess: handleUploadSuccess,
     });
 
   const { photoCounts, filteredPhotos } = usePhotoCategoryData({
@@ -182,10 +204,12 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
     const photoIds = Array.from(selectedPhotoIds);
     if (photoIds.length === 0) return;
 
+    const count = photoIds.length;
+
     // Confirm deletion
     Alert.alert(
       "Delete Photos",
-      `Are you sure you want to delete ${photoIds.length} photo${photoIds.length > 1 ? "s" : ""}?`,
+      `Are you sure you want to delete ${count} photo${count > 1 ? "s" : ""}?`,
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -195,11 +219,16 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
             await deletePhotos(photoIds);
             // Clear selection after delete
             setSelectedPhotoIds(new Set());
+            // Show success toast
+            const message = count === 1
+              ? "Photo deleted"
+              : `${count} photos deleted`;
+            showToast(message, "success");
           },
         },
       ]
     );
-  }, [selectedPhotoIds, deletePhotos]);
+  }, [selectedPhotoIds, deletePhotos, showToast]);
 
   const handleSetThumbnailPress = useCallback(async () => {
     const selectedId = Array.from(selectedPhotoIds)[0];
@@ -261,6 +290,14 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
           canAddPhotos={selectedCategory !== "all"}
         />
       )}
+
+      {/* Toast for feedback */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onDismiss={() => setToast({ ...toast, visible: false })}
+      />
     </ThemedView>
   );
 }

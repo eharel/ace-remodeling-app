@@ -1,5 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useState, useMemo, useCallback } from "react";
 import {
@@ -19,6 +20,7 @@ import {
   LoadingState,
   PageHeader,
   SelectionActionBar,
+  ThemedButton,
   ThemedText,
   Toast,
   ToastType,
@@ -81,6 +83,14 @@ interface DocumentWithContext extends Document {
   componentId: string;
   componentName: string;
 }
+
+/**
+ * Check if a document is an image type that can show a thumbnail
+ */
+const isImageDocument = (fileType: string): boolean => {
+  const imageTypes = ["Image", "image", "PNG", "JPG", "JPEG", "GIF", "WEBP", "HEIC"];
+  return imageTypes.some((type) => fileType.toLowerCase().includes(type.toLowerCase()));
+};
 
 /**
  * DocumentsPage - Professional document browser for project files
@@ -199,6 +209,16 @@ export default function DocumentsPage() {
   // Get first component ID for uploads (default target)
   const defaultComponentId = project?.components[0]?.id;
 
+  // Create component options for the modal
+  const componentOptions = useMemo(() => {
+    if (!project) return [];
+    return project.components.map((comp) => ({
+      id: comp.id,
+      name: comp.name || "",
+      category: comp.category,
+    }));
+  }, [project]);
+
   // Calculate grid layout
   const numColumns = 2;
   const itemWidth =
@@ -292,8 +312,9 @@ export default function DocumentsPage() {
     name: string;
     type: DocumentCategory;
     description?: string;
+    componentId: string;
   }) => {
-    if (!project || !defaultComponentId) return;
+    if (!project || !input.componentId) return;
 
     setIsAdding(true);
     setAddError(null);
@@ -311,8 +332,8 @@ export default function DocumentsPage() {
         throw new Error(result.error || "Upload failed");
       }
 
-      // Add to component in Firestore
-      await addDocument(project.id, defaultComponentId, result.document);
+      // Add to selected component in Firestore
+      await addDocument(project.id, input.componentId, result.document);
 
       setShowAddModal(false);
       showToast("Document uploaded", "success");
@@ -512,6 +533,12 @@ export default function DocumentsPage() {
       backgroundColor: theme.colors.background.secondary,
       justifyContent: "center",
       alignItems: "center",
+      overflow: "hidden",
+    },
+    documentThumbnail: {
+      width: 48,
+      height: 48,
+      borderRadius: DesignTokens.borderRadius.md,
     },
     selectionIndicator: {
       width: 24,
@@ -591,6 +618,9 @@ export default function DocumentsPage() {
       color: theme.colors.text.tertiary,
       textAlign: "center",
       marginBottom: DesignTokens.spacing[4],
+    },
+    emptyStateButton: {
+      marginTop: DesignTokens.spacing[2],
     },
   });
 
@@ -716,11 +746,20 @@ export default function DocumentsPage() {
                   >
                     <View style={styles.documentHeader}>
                       <View style={styles.documentIcon}>
-                        <MaterialIcons
-                          name={getDocumentIcon(document.category) as any}
-                          size={24}
-                          color={getDocumentTypeColor(document.category)}
-                        />
+                        {isImageDocument(document.fileType) ? (
+                          <Image
+                            source={{ uri: document.url }}
+                            style={styles.documentThumbnail}
+                            contentFit="cover"
+                            transition={200}
+                          />
+                        ) : (
+                          <MaterialIcons
+                            name={getDocumentIcon(document.category) as any}
+                            size={24}
+                            color={getDocumentTypeColor(document.category)}
+                          />
+                        )}
                       </View>
                       {isEditMode && (
                         <View
@@ -784,6 +823,14 @@ export default function DocumentsPage() {
               <ThemedText style={styles.emptyStateSubtext}>
                 Add floor plans, contracts, permits, and other project assets
               </ThemedText>
+              <ThemedButton
+                onPress={handleAddPress}
+                variant="primary"
+                icon="note-add"
+                style={styles.emptyStateButton}
+              >
+                Add Document
+              </ThemedButton>
             </View>
           )}
         </ScrollView>
@@ -810,6 +857,8 @@ export default function DocumentsPage() {
         onAdd={handleAddDocument}
         isAdding={isAdding}
         error={addError}
+        components={componentOptions}
+        defaultComponentId={defaultComponentId}
       />
 
       {/* Edit Document Modal */}

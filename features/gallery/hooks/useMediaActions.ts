@@ -29,6 +29,8 @@ interface UseMediaActionsParams {
   componentId: string;
   component?: ProjectComponent;
   currentCategory: PhotoCategory;
+  /** Callback when photos are successfully uploaded */
+  onUploadSuccess?: (count: number) => void;
 }
 
 interface UseMediaActionsResult {
@@ -95,6 +97,7 @@ export function useMediaActions({
   componentId,
   component,
   currentCategory,
+  onUploadSuccess,
 }: UseMediaActionsParams): UseMediaActionsResult {
   const { updateComponent } = useProjects();
   const [isLoading, setIsLoading] = useState(false);
@@ -156,6 +159,9 @@ export function useMediaActions({
           await updateComponent(projectId, componentId, {
             media: updatedMedia,
           });
+
+          // Call success callback if provided
+          onUploadSuccess?.(successfulAssets.length);
         }
 
         if (failedCount > 0 && successfulAssets.length > 0) {
@@ -174,7 +180,7 @@ export function useMediaActions({
         setLoadingOperation(null);
       }
     },
-    [projectId, componentId, component, currentCategory, updateComponent]
+    [projectId, componentId, component, currentCategory, updateComponent, onUploadSuccess]
   );
 
   /**

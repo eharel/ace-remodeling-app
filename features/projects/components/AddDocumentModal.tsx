@@ -20,6 +20,13 @@ import { useTheme } from "@/shared/contexts";
 import { DesignTokens } from "@/shared/themes";
 import { DocumentCategory, DOCUMENT_CATEGORIES } from "@/shared/types";
 import { DOCUMENT_CATEGORY_OPTIONS } from "@/services/documents/documentService";
+import { getCategoryDisplayName } from "@/shared/utils/categoryUtils";
+
+interface ComponentOption {
+  id: string;
+  name: string;
+  category: string;
+}
 
 interface AddDocumentModalProps {
   visible: boolean;
@@ -30,9 +37,14 @@ interface AddDocumentModalProps {
     name: string;
     type: DocumentCategory; // Still named 'type' in the callback interface for compatibility
     description?: string;
+    componentId: string;
   }) => Promise<void>;
   isAdding: boolean;
   error: string | null;
+  /** Available components to upload to */
+  components: ComponentOption[];
+  /** Default component ID to select */
+  defaultComponentId?: string;
 }
 
 
@@ -52,6 +64,8 @@ export function AddDocumentModal({
   onAdd,
   isAdding,
   error,
+  components,
+  defaultComponentId,
 }: AddDocumentModalProps) {
   const { theme } = useTheme();
 
@@ -67,6 +81,9 @@ export function AddDocumentModal({
   const [selectedCategory, setSelectedCategory] = useState<DocumentCategory>(
     DOCUMENT_CATEGORIES.OTHER
   );
+  const [selectedComponentId, setSelectedComponentId] = useState<string>(
+    defaultComponentId || ""
+  );
   const [description, setDescription] = useState<string>("");
 
   // Reset form when modal opens
@@ -76,8 +93,9 @@ export function AddDocumentModal({
       setDocumentName("");
       setSelectedCategory(DOCUMENT_CATEGORIES.OTHER);
       setDescription("");
+      setSelectedComponentId(defaultComponentId || components[0]?.id || "");
     }
-  }, [visible]);
+  }, [visible, defaultComponentId, components]);
 
   // Auto-fill name from filename when file is selected
   useEffect(() => {
@@ -123,7 +141,7 @@ export function AddDocumentModal({
   };
 
   const handleAdd = async () => {
-    if (!selectedFile || !documentName.trim()) return;
+    if (!selectedFile || !documentName.trim() || !selectedComponentId) return;
 
     await onAdd({
       fileUri: selectedFile.uri,
@@ -131,6 +149,7 @@ export function AddDocumentModal({
       name: documentName.trim(),
       type: selectedCategory, // Pass category as 'type' for callback compatibility
       description: description.trim() || undefined,
+      componentId: selectedComponentId,
     });
   };
 
@@ -140,7 +159,7 @@ export function AddDocumentModal({
 
   // Check if form is valid
   const isFormValid = (): boolean => {
-    return !!selectedFile && documentName.trim().length > 0;
+    return !!selectedFile && documentName.trim().length > 0 && !!selectedComponentId;
   };
 
   const styles = StyleSheet.create({
@@ -358,6 +377,37 @@ export function AddDocumentModal({
                 </View>
               )}
             </View>
+
+            {/* Component Selection (only show if multiple components) */}
+            {components.length > 1 && (
+              <View style={styles.section}>
+                <ThemedText style={styles.label}>Add to Component *</ThemedText>
+                <View style={styles.optionsGrid}>
+                  {components.map((comp) => (
+                    <Pressable
+                      key={comp.id}
+                      style={[
+                        styles.optionButton,
+                        selectedComponentId === comp.id &&
+                          styles.optionButtonSelected,
+                      ]}
+                      onPress={() => setSelectedComponentId(comp.id)}
+                      disabled={isAdding}
+                    >
+                      <ThemedText
+                        style={[
+                          styles.optionText,
+                          selectedComponentId === comp.id &&
+                            styles.optionTextSelected,
+                        ]}
+                      >
+                        {comp.name || getCategoryDisplayName(comp.category)}
+                      </ThemedText>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+            )}
 
             {/* Document Category Selection */}
             <View style={styles.section}>
