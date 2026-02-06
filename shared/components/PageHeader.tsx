@@ -104,12 +104,13 @@ export function PageHeader({
   };
 
   // Border style when showBorder is true
+  // When border is shown, content should start right at the border (no gap)
   const borderStyle = showBorder
     ? {
         borderBottomWidth: 1,
         borderBottomColor: theme.colors.border.primary,
         paddingBottom: DesignTokens.spacing[4],
-        marginBottom: DesignTokens.spacing[4],
+        marginBottom: 0, // Override default margin - content starts at border
       }
     : {};
 
