@@ -24,6 +24,7 @@ import {
 import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
 import { commonStyles } from "@/shared/utils";
+import { getCategoryDisplayName } from "@/shared/utils/categoryUtils";
 import { uploadDocument } from "@/services/documents/documentService";
 import { AddDocumentModal } from "@/features/projects/components/AddDocumentModal";
 
@@ -126,7 +127,8 @@ export default function DocumentsPage() {
           docs.push({
             ...doc,
             componentId: component.id,
-            componentName: component.name || component.category || "Unknown",
+            componentName:
+              component.name || getCategoryDisplayName(component.category),
           });
         });
       }
@@ -594,7 +596,7 @@ export default function DocumentsPage() {
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {/* Category Tabs */}
-          {availableCategories.length > 1 && (
+          {availableCategories.length > 0 && (
             <View style={styles.tabsContainer}>
               <SegmentedControl<AssetCategoryValue>
                 variant="tabs"
