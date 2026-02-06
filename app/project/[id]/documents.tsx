@@ -21,6 +21,7 @@ import {
   SelectionActionBar,
   ThemedText,
 } from "@/shared/components";
+import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
 import { commonStyles } from "@/shared/utils";
 import { uploadDocument } from "@/services/documents/documentService";
@@ -28,8 +29,53 @@ import { AddDocumentModal } from "@/features/projects/components/AddDocumentModa
 
 const { width: screenWidth } = Dimensions.get("window");
 
+/**
+ * Asset category tab values (kebab-case for internal use)
+ */
+type AssetCategoryValue =
+  | "floor-plan"
+  | "materials"
+  | "rendering-3d"
+  | "contract"
+  | "permit"
+  | "invoice"
+  | "other";
+
+/**
+ * Map display category to tab value
+ */
+const categoryToTabValue = (category: DocumentCategory): AssetCategoryValue => {
+  const mapping: Record<DocumentCategory, AssetCategoryValue> = {
+    "Floor Plan": "floor-plan",
+    Materials: "materials",
+    "3D Rendering": "rendering-3d",
+    Contract: "contract",
+    Permit: "permit",
+    Invoice: "invoice",
+    Other: "other",
+  };
+  return mapping[category] || "other";
+};
+
+/**
+ * Get display label for tab value
+ */
+const getTabLabel = (tabValue: AssetCategoryValue): string => {
+  const labels: Record<AssetCategoryValue, string> = {
+    "floor-plan": "Plans",
+    materials: "Materials",
+    "rendering-3d": "Renderings",
+    contract: "Contracts",
+    permit: "Permits",
+    invoice: "Invoices",
+    other: "Other",
+  };
+  return labels[tabValue] || tabValue;
+};
+
 interface DocumentWithContext extends Document {
   componentId: string;
+  componentName: string;
 }
 
 /**
@@ -65,6 +111,10 @@ export default function DocumentsPage() {
   // Find the project by ID using Firebase data
   const project = projects.find((p) => p.id === id);
 
+  // Category filter state
+  const [selectedCategory, setSelectedCategory] =
+    useState<AssetCategoryValue | null>(null);
+
   // Collect all documents from all components with their component context
   const documentsWithContext: DocumentWithContext[] = useMemo(() => {
     if (!project) return [];
@@ -73,12 +123,56 @@ export default function DocumentsPage() {
     project.components.forEach((component) => {
       if (component.documents) {
         component.documents.forEach((doc) => {
-          docs.push({ ...doc, componentId: component.id });
+          docs.push({
+            ...doc,
+            componentId: component.id,
+            componentName: component.name || component.category || "Unknown",
+          });
         });
       }
     });
     return docs;
   }, [project]);
+
+  // Calculate category counts and available categories
+  const { categoryCounts, availableCategories } = useMemo(() => {
+    const counts: Record<AssetCategoryValue, number> = {
+      "floor-plan": 0,
+      materials: 0,
+      "rendering-3d": 0,
+      contract: 0,
+      permit: 0,
+      invoice: 0,
+      other: 0,
+    };
+
+    documentsWithContext.forEach((doc) => {
+      const tabValue = categoryToTabValue(doc.category);
+      counts[tabValue]++;
+    });
+
+    // Only include categories that have documents
+    const available = (
+      Object.keys(counts) as AssetCategoryValue[]
+    ).filter((cat) => counts[cat] > 0);
+
+    return { categoryCounts: counts, availableCategories: available };
+  }, [documentsWithContext]);
+
+  // Filter documents by selected category
+  const filteredDocuments = useMemo(() => {
+    if (!selectedCategory) return documentsWithContext;
+    return documentsWithContext.filter(
+      (doc) => categoryToTabValue(doc.category) === selectedCategory
+    );
+  }, [documentsWithContext, selectedCategory]);
+
+  // Auto-select first category when documents load
+  useMemo(() => {
+    if (availableCategories.length > 0 && selectedCategory === null) {
+      setSelectedCategory(availableCategories[0]);
+    }
+  }, [availableCategories, selectedCategory]);
 
   // Get first component ID for uploads (default target)
   const defaultComponentId = project?.components[0]?.id;
@@ -364,7 +458,15 @@ export default function DocumentsPage() {
       ...commonStyles.text.badge,
       fontWeight: DesignTokens.typography.fontWeight.medium,
       color: theme.colors.text.secondary,
+      marginBottom: DesignTokens.spacing[1],
+    },
+    componentName: {
+      fontSize: DesignTokens.typography.fontSize.xs,
+      color: theme.colors.text.tertiary,
       marginBottom: DesignTokens.spacing[2],
+    },
+    tabsContainer: {
+      marginBottom: DesignTokens.spacing[4],
     },
     documentDescription: {
       fontSize: DesignTokens.typography.fontSize.sm,
@@ -422,8 +524,8 @@ export default function DocumentsPage() {
           }}
         />
         <View style={styles.container}>
-          <PageHeader title="Documents" showBack variant="compact" />
-          <LoadingState message="Loading documents..." />
+          <PageHeader title="All Project Assets" showBack variant="compact" />
+          <LoadingState message="Loading assets..." />
         </View>
       </>
     );
@@ -440,7 +542,7 @@ export default function DocumentsPage() {
           }}
         />
         <View style={styles.container}>
-          <PageHeader title="Documents" showBack variant="compact" />
+          <PageHeader title="All Project Assets" showBack variant="compact" />
           <View style={styles.emptyState}>
             <MaterialIcons
               name="error-outline"
@@ -471,7 +573,7 @@ export default function DocumentsPage() {
       />
       <View style={styles.container}>
         <PageHeader
-          title="Documents"
+          title="All Project Assets"
           showBack
           backLabel={project?.name}
           variant="compact"
@@ -491,9 +593,25 @@ export default function DocumentsPage() {
         />
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {documentsWithContext.length > 0 ? (
+          {/* Category Tabs */}
+          {availableCategories.length > 1 && (
+            <View style={styles.tabsContainer}>
+              <SegmentedControl<AssetCategoryValue>
+                variant="tabs"
+                options={availableCategories}
+                selected={selectedCategory || availableCategories[0]}
+                onSelect={setSelectedCategory}
+                showCounts={true}
+                getCounts={(category) => categoryCounts[category]}
+                getLabel={getTabLabel}
+                ariaLabel="Filter assets by category"
+              />
+            </View>
+          )}
+
+          {filteredDocuments.length > 0 ? (
             <View style={styles.documentsGrid}>
-              {documentsWithContext.map((document) => {
+              {filteredDocuments.map((document) => {
                 const isSelected = selectedIds.has(document.id);
                 return (
                   <Pressable
@@ -540,6 +658,9 @@ export default function DocumentsPage() {
                     <ThemedText style={styles.documentType}>
                       {document.category}
                     </ThemedText>
+                    <ThemedText style={styles.componentName}>
+                      {document.componentName}
+                    </ThemedText>
                     {document.description && (
                       <ThemedText
                         style={styles.documentDescription}
@@ -571,10 +692,10 @@ export default function DocumentsPage() {
                 style={styles.emptyStateIcon}
               />
               <ThemedText style={styles.emptyStateText}>
-                No documents yet
+                No assets yet
               </ThemedText>
               <ThemedText style={styles.emptyStateSubtext}>
-                Add floor plans, contracts, permits, and other project documents
+                Add floor plans, contracts, permits, and other project assets
               </ThemedText>
             </View>
           )}
