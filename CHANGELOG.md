@@ -9,11 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.3.0] - TDB
+## [3.1.0] - 2026-02-24
 
 ### Added
 
+- Photo upload from "All Photos" tab: phase picker (Before / In Progress / After) appears before source picker so photos are always categorized on upload
+- Edit mode affordances on project page: Photos and Documents sections now show "Edit >" label in edit mode and open directly in edit mode when tapped — no double-tap required
+
 ### Changed
+
+- Browse page now surfaces custom project categories in a collapsible "Other categories" section rather than mixing them with core categories
+
+---
+
+## [3.0.0] - 2026-02-06
+
+### Added
+
+- Full project CRUD: create, edit, and delete projects from the app
+- Component management: add, reorder, and remove project components
+- Photo management: upload, reorder, delete, and set thumbnails per phase
+- Document (asset) management: upload, categorize, edit, and delete
+- Admin edit mode on project pages with inline field editing
+- "Design / Development" as a core project category with proper icon and browse support
 
 ---
 
@@ -23,8 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Aggregate all photos in full-home project page details
 
-### Changed
-
 ---
 
 ## [1.2.0] - 2025-11-17
@@ -33,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Build version checking system with TestFlight update notifications
 - App branding updated to "ACE Remodeling TX"
-- Add Showcase page of highlighted projects
+- Showcase page of highlighted projects
 
 ### Changed
 
@@ -48,12 +64,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Environment awareness with separate development and production databases
 - Gallery tabs for different project phases (Before, During, After)
 - Expanded meeting item checklist with enhanced functionality
-
-### Changed
-
-### Fixed
-
-### Removed
 
 ---
 
