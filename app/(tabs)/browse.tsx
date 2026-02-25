@@ -88,7 +88,8 @@ export default function ProjectsScreen() {
   }, [projects]);
 
   const handleCategoryPress = (category: CategoryItem) => {
-    router.push(`/category/${category.id}`);
+    // Use params object so Expo Router handles URL encoding of special chars (e.g. "/" in category id)
+    router.push({ pathname: "/category/[category]", params: { category: category.id } });
   };
 
   const renderCategoryItem = ({ item }: { item: CategoryItem }) => (
