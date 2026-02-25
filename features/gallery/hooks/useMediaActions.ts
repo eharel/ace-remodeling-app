@@ -51,15 +51,10 @@ interface UseMediaActionsResult {
 }
 
 /**
- * Convert PhotoCategory to MediaStage for new uploads
- *
- * If user is viewing "all", default to "after" stage.
- * Otherwise use the corresponding stage.
+ * Convert PhotoCategory to MediaStage for new uploads.
+ * Should not be called with "all" — callers must resolve the stage first.
  */
 function getUploadStage(category: PhotoCategory): MediaStage {
-  if (category === "all") {
-    return MEDIA_STAGES.AFTER;
-  }
   const stage = PHOTO_CATEGORY_TO_STAGE[category];
   return (stage as MediaStage) || MEDIA_STAGES.OTHER;
 }
@@ -108,10 +103,16 @@ export function useMediaActions({
 
   /**
    * Upload files and update the component
-   * Shared logic for both photo library and document picker
+   * Shared logic for both photo library and document picker.
+   *
+   * @param stageOverride - When provided (e.g. chosen from the stage picker on the
+   *   "all" tab), use this stage instead of deriving it from currentCategory.
    */
   const uploadFiles = useCallback(
-    async (files: Array<{ uri: string; filename: string }>) => {
+    async (
+      files: Array<{ uri: string; filename: string }>,
+      stageOverride?: MediaStage
+    ) => {
       if (files.length === 0) return;
 
       setLoadingOperation("add");
@@ -130,7 +131,7 @@ export function useMediaActions({
           projectId,
           componentCategory: component?.category || "unknown",
           subcategory: component?.subcategory,
-          stage: getUploadStage(currentCategory),
+          stage: stageOverride ?? getUploadStage(currentCategory),
           mediaType: MEDIA_TYPES.IMAGE,
           order: maxOrder + 1,
         };
@@ -186,7 +187,7 @@ export function useMediaActions({
   /**
    * Pick photos from the device photo library
    */
-  const pickFromPhotoLibrary = useCallback(async () => {
+  const pickFromPhotoLibrary = useCallback(async (stageOverride?: MediaStage) => {
     try {
       setError(null);
 
@@ -220,7 +221,7 @@ export function useMediaActions({
         filename: asset.fileName || getFilenameFromUri(asset.uri),
       }));
 
-      await uploadFiles(files);
+      await uploadFiles(files, stageOverride);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to pick photos";
@@ -232,7 +233,7 @@ export function useMediaActions({
   /**
    * Pick photos from the Files app (for Google Drive, Downloads, etc.)
    */
-  const pickFromFiles = useCallback(async () => {
+  const pickFromFiles = useCallback(async (stageOverride?: MediaStage) => {
     try {
       setError(null);
 
@@ -263,7 +264,7 @@ export function useMediaActions({
         return;
       }
 
-      await uploadFiles(files);
+      await uploadFiles(files, stageOverride);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to pick files";
@@ -273,37 +274,82 @@ export function useMediaActions({
   }, [uploadFiles]);
 
   /**
-   * Add photos - shows action sheet to choose source
+   * Show the source picker (Photo Library / Files).
+   * Extracted so it can be called either directly (specific-category tabs)
+   * or after the stage picker resolves (all-photos tab).
+   */
+  const showSourcePicker = useCallback(
+    (stageOverride?: MediaStage) => {
+      if (Platform.OS === "ios") {
+        ActionSheetIOS.showActionSheetWithOptions(
+          {
+            options: ["Cancel", "Photo Library", "Files"],
+            cancelButtonIndex: 0,
+            title: "Add Photos From",
+          },
+          (buttonIndex) => {
+            if (buttonIndex === 1) {
+              pickFromPhotoLibrary(stageOverride);
+            } else if (buttonIndex === 2) {
+              pickFromFiles(stageOverride);
+            }
+          }
+        );
+      } else {
+        Alert.alert("Add Photos From", undefined, [
+          { text: "Cancel", style: "cancel" },
+          { text: "Photo Library", onPress: () => pickFromPhotoLibrary(stageOverride) },
+          { text: "Files", onPress: () => pickFromFiles(stageOverride) },
+        ]);
+      }
+    },
+    [pickFromPhotoLibrary, pickFromFiles]
+  );
+
+  /**
+   * Add photos - shows action sheet to choose source.
    *
-   * Options:
-   * - Photo Library: Opens device photo gallery
-   * - Files: Opens document picker (for Google Drive, Downloads, etc.)
+   * When viewing "all" photos, first asks which phase (Before / In Progress /
+   * After) the photos belong to, then proceeds to the source picker.
+   * When viewing a specific phase tab, goes straight to the source picker.
    */
   const addPhotos = useCallback(async () => {
-    if (Platform.OS === "ios") {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: ["Cancel", "Photo Library", "Files"],
-          cancelButtonIndex: 0,
-          title: "Add Photos From",
-        },
-        (buttonIndex) => {
-          if (buttonIndex === 1) {
-            pickFromPhotoLibrary();
-          } else if (buttonIndex === 2) {
-            pickFromFiles();
+    if (currentCategory === "all") {
+      // Step 1: pick a phase
+      if (Platform.OS === "ios") {
+        ActionSheetIOS.showActionSheetWithOptions(
+          {
+            options: ["Cancel", "Before", "In Progress", "After"],
+            cancelButtonIndex: 0,
+            title: "Add photos to which phase?",
+          },
+          (buttonIndex) => {
+            const stageMap: Partial<Record<number, MediaStage>> = {
+              1: MEDIA_STAGES.BEFORE,
+              2: MEDIA_STAGES.IN_PROGRESS,
+              3: MEDIA_STAGES.AFTER,
+            };
+            const stage = stageMap[buttonIndex];
+            if (stage) {
+              // Step 2: pick source with chosen stage
+              showSourcePicker(stage);
+            }
           }
-        }
-      );
-    } else {
-      // Android: Use Alert as a simple action sheet
-      Alert.alert("Add Photos From", undefined, [
-        { text: "Cancel", style: "cancel" },
-        { text: "Photo Library", onPress: pickFromPhotoLibrary },
-        { text: "Files", onPress: pickFromFiles },
-      ]);
+        );
+      } else {
+        Alert.alert("Add photos to which phase?", undefined, [
+          { text: "Cancel", style: "cancel" },
+          { text: "Before", onPress: () => showSourcePicker(MEDIA_STAGES.BEFORE) },
+          { text: "In Progress", onPress: () => showSourcePicker(MEDIA_STAGES.IN_PROGRESS) },
+          { text: "After", onPress: () => showSourcePicker(MEDIA_STAGES.AFTER) },
+        ]);
+      }
+      return;
     }
-  }, [pickFromPhotoLibrary, pickFromFiles]);
+
+    // Specific phase tab: go straight to source picker
+    showSourcePicker();
+  }, [currentCategory, showSourcePicker]);
 
   /**
    * Delete selected photos
