@@ -287,7 +287,6 @@ export function PhotoGrid({ onImagePress, initialEditMode = false }: PhotoGridPr
           onSetThumbnail={handleSetThumbnailPress}
           isLoading={isLoading}
           loadingOperation={loadingOperation}
-          canAddPhotos={selectedCategory !== "all"}
         />
       )}
 
