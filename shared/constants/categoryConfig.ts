@@ -138,12 +138,12 @@ export const CATEGORY_CONFIG = {
     order: 7,
   },
   [CORE_CATEGORIES.DESIGN_DEVELOPMENT]: {
-    title: "Design & Development",
+    title: "Design / Development",
     subtitle: "Pre-construction design, planning, and development services",
-    galleryTitle: "Featured Design & Development Projects",
+    galleryTitle: "Featured Design / Development Projects",
     gallerySubtitle: "See our design and development work",
     emptyIcon: "design-services",
-    emptyTitle: "No Design & Development Projects Yet",
+    emptyTitle: "No Design / Development Projects Yet",
     emptyMessage:
       "We haven't completed any design and development projects yet. Check back soon for our latest work!",
     order: 8,

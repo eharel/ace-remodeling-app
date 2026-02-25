@@ -16,7 +16,7 @@ export const CORE_CATEGORIES = {
   OUTDOOR_LIVING: "outdoor-living",
   NEW_CONSTRUCTION: "new-construction",
   COMMERCIAL: "commercial",
-  DESIGN_DEVELOPMENT: "design-&-development",
+  DESIGN_DEVELOPMENT: "design-/-development",
   MISCELLANEOUS: "miscellaneous",
 } as const;
 
@@ -101,7 +101,7 @@ export const CORE_CATEGORY_LABELS: Record<CoreCategory, string> = {
   [CORE_CATEGORIES.OUTDOOR_LIVING]: "Outdoor",
   [CORE_CATEGORIES.NEW_CONSTRUCTION]: "New Construction",
   [CORE_CATEGORIES.COMMERCIAL]: "Commercial",
-  [CORE_CATEGORIES.DESIGN_DEVELOPMENT]: "Design & Development",
+  [CORE_CATEGORIES.DESIGN_DEVELOPMENT]: "Design / Development",
   [CORE_CATEGORIES.MISCELLANEOUS]: "Other",
 };
 
