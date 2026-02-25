@@ -653,6 +653,7 @@ export default function ProjectDetailScreen() {
             documents={currentDocuments}
             projectId={project.id}
             selectedComponentId={selectedComponent?.id || null}
+            isEditMode={isEditMode}
           />
 
           <ProjectLogsSection logs={project.sharedLogs} />

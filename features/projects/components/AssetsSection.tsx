@@ -20,6 +20,8 @@ export interface AssetsSectionProps {
   documents: Document[];
   projectId: string;
   selectedComponentId: string | null;
+  /** When true, shows edit affordances and opens documents screen in edit mode */
+  isEditMode?: boolean;
 }
 
 /**
@@ -30,12 +32,13 @@ export interface AssetsSectionProps {
  * - Horizontal scrolling thumbnail previews
  * - Opens image gallery modal for images
  * - Opens PDF viewer for documents
- * - "View All" link to full documents screen
+ * - "View All" / "Edit" link to full documents screen
  */
 export const AssetsSection: React.FC<AssetsSectionProps> = ({
   documents,
   projectId,
   selectedComponentId,
+  isEditMode = false,
 }) => {
   const { theme } = useTheme();
 
@@ -161,6 +164,16 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
     }
   };
 
+  const handleViewAllPress = () => {
+    router.push({
+      pathname: "/project/[id]/documents",
+      params: {
+        id: projectId,
+        ...(isEditMode && { editMode: "true" }),
+      },
+    });
+  };
+
   // Always show empty state (consistent with Photos section)
   if (!documents || documents.length === 0) {
     return (
@@ -173,12 +186,14 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
           </ThemedText>
           <Pressable
             style={styles.viewAllButton}
-            onPress={() => router.push(`/project/${projectId}/documents`)}
+            onPress={handleViewAllPress}
             accessible={true}
-            accessibilityLabel="View all assets"
+            accessibilityLabel={isEditMode ? "Edit assets" : "View all assets"}
             accessibilityRole="button"
           >
-            <ThemedText style={styles.viewAllButtonText}>View All</ThemedText>
+            <ThemedText style={styles.viewAllButtonText}>
+              {isEditMode ? "Edit" : "View All"}
+            </ThemedText>
             <MaterialIcons
               name="chevron-right"
               size={16}
@@ -211,12 +226,14 @@ export const AssetsSection: React.FC<AssetsSectionProps> = ({
           </ThemedText>
           <Pressable
             style={styles.viewAllButton}
-            onPress={() => router.push(`/project/${projectId}/documents`)}
+            onPress={handleViewAllPress}
             accessible={true}
-            accessibilityLabel="View all assets"
+            accessibilityLabel={isEditMode ? "Edit assets" : "View all assets"}
             accessibilityRole="button"
           >
-            <ThemedText style={styles.viewAllButtonText}>View All</ThemedText>
+            <ThemedText style={styles.viewAllButtonText}>
+              {isEditMode ? "Edit" : "View All"}
+            </ThemedText>
             <MaterialIcons
               name="chevron-right"
               size={16}

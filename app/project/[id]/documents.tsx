@@ -107,11 +107,11 @@ const isImageDocument = (fileType: string): boolean => {
  */
 export default function DocumentsPage() {
   const { theme } = useTheme();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, editMode } = useLocalSearchParams<{ id: string; editMode?: string }>();
   const { projects, isLoading, addDocument, deleteDocument, updateDocument } = useProjects();
 
-  // Edit mode and selection state
-  const [isEditMode, setIsEditMode] = useState(false);
+  // Edit mode and selection state — auto-start in edit mode when navigating from project edit mode
+  const [isEditMode, setIsEditMode] = useState(editMode === "true");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   // Add document modal state

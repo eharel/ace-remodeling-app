@@ -36,7 +36,7 @@ interface PhotoPreviewSectionProps {
 export function PhotoPreviewSection({
   photos,
   title = "Photos",
-  subtitle = "Tap any photo to view gallery",
+  subtitle,
   canEdit = false,
   isEditMode = false,
   activePhotoCategory,
@@ -45,6 +45,12 @@ export function PhotoPreviewSection({
   onOpenImage = (index: number) => {},
 }: PhotoPreviewSectionProps) {
   const { theme } = useTheme();
+
+  const resolvedSubtitle =
+    subtitle ??
+    (isEditMode
+      ? 'Tap "Edit" to add or manage photos'
+      : "Tap any photo to view gallery");
 
   const [pressedImageIndex, setPressedImageIndex] = useState<number | null>(
     null,
@@ -118,12 +124,14 @@ export function PhotoPreviewSection({
             {title} ({photos.length})
           </ThemedText>
           <Pressable
-            onPress={() => showPhotoGrid(false)}
+            onPress={() => showPhotoGrid(isEditMode)}
             style={styles.viewAllButton}
-            accessibilityLabel="View all photos"
+            accessibilityLabel={isEditMode ? "Edit photos" : "View all photos"}
             accessibilityRole="button"
           >
-            <ThemedText style={styles.viewAllButtonText}>View All</ThemedText>
+            <ThemedText style={styles.viewAllButtonText}>
+              {isEditMode ? "Edit" : "View All"}
+            </ThemedText>
             <MaterialIcons
               name="chevron-right"
               size={16}
@@ -137,7 +145,7 @@ export function PhotoPreviewSection({
             { color: theme.colors.text.secondary },
           ]}
         >
-          {subtitle}
+          {resolvedSubtitle}
         </ThemedText>
         {photos.length > 0 ? (
           <>
@@ -178,7 +186,7 @@ export function PhotoPreviewSection({
                     backgroundPhoto={
                       galleryImages[previewPhotos.length] || galleryImages[0]
                     }
-                    onPress={() => showPhotoGrid(false)}
+                    onPress={() => showPhotoGrid(isEditMode)}
                   />
                 )}
               </ThemedView>
