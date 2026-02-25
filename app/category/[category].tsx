@@ -6,7 +6,6 @@ import { DesignTokens } from "@/shared/themes";
 import { ProjectCardView, toProjectCardViewsByCategory } from "@/shared/types";
 import {
   ComponentCategory,
-  CoreCategory,
   getSubcategoryLabel,
 } from "@/shared/types/ComponentCategory";
 import { CategoryPicker } from "@/features/category";
@@ -22,7 +21,6 @@ import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
 import {
   filterCardViewsBySubcategory,
-  getAllCategories,
   getCategoryDisplayName,
   getSubcategories,
   getSubcategoryCount,
@@ -74,10 +72,10 @@ export default function CategoryScreen() {
   );
 
   // Validate category parameter
+  // Accept core categories AND any non-empty string (custom categories)
+  // We check for actual matching projects rather than a hardcoded allowlist
   const validCategory = category as ComponentCategory;
-  const allCategories = getAllCategories();
-  const isValidCategory =
-    category && allCategories.includes(category as CoreCategory);
+  const isValidCategory = !!category && category.length > 0;
 
   // Transform projects to ProjectCardView[] using centralized transformer
   // Use empty array if category is invalid to avoid errors
