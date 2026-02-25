@@ -137,6 +137,17 @@ export const CATEGORY_CONFIG = {
       "We haven't completed any commercial projects yet. Check back soon for our latest work!",
     order: 7,
   },
+  [CORE_CATEGORIES.DESIGN_DEVELOPMENT]: {
+    title: "Design & Development",
+    subtitle: "Pre-construction design, planning, and development services",
+    galleryTitle: "Featured Design & Development Projects",
+    gallerySubtitle: "See our design and development work",
+    emptyIcon: "design-services",
+    emptyTitle: "No Design & Development Projects Yet",
+    emptyMessage:
+      "We haven't completed any design and development projects yet. Check back soon for our latest work!",
+    order: 8,
+  },
   [CORE_CATEGORIES.MISCELLANEOUS]: {
     title: "Other Projects",
     subtitle: "Unique projects and specialized services",
@@ -146,7 +157,7 @@ export const CATEGORY_CONFIG = {
     emptyTitle: "No Projects Yet",
     emptyMessage:
       "We haven't completed any projects in this category yet. Check back soon for our latest work!",
-    order: 8,
+    order: 9,
   },
 } satisfies Record<CategoryKey, CategoryConfig>;
 

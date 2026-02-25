@@ -3,7 +3,9 @@ import {
   CoreCategory,
   ComponentCategory,
   getCategoryLabel,
+  isCoreCategory,
 } from "@/shared/types/ComponentCategory";
+import { Project } from "@/shared/types";
 
 /**
  * Default category order for consistent display throughout the app
@@ -17,6 +19,7 @@ export const CATEGORY_DISPLAY_ORDER: CoreCategory[] = [
   CORE_CATEGORIES.OUTDOOR_LIVING,
   CORE_CATEGORIES.NEW_CONSTRUCTION,
   CORE_CATEGORIES.COMMERCIAL,
+  CORE_CATEGORIES.DESIGN_DEVELOPMENT,
   CORE_CATEGORIES.MISCELLANEOUS,
 ];
 
@@ -41,6 +44,7 @@ export function getCategoryIcon(category: ComponentCategory): string {
     [CORE_CATEGORIES.OUTDOOR_LIVING]: "yard",
     [CORE_CATEGORIES.NEW_CONSTRUCTION]: "foundation",
     [CORE_CATEGORIES.COMMERCIAL]: "business",
+    [CORE_CATEGORIES.DESIGN_DEVELOPMENT]: "design-services",
     [CORE_CATEGORIES.MISCELLANEOUS]: "folder",
   };
   
@@ -59,4 +63,28 @@ export function getCategoryIcon(category: ComponentCategory): string {
  */
 export function getAllCategories(): CoreCategory[] {
   return CATEGORY_DISPLAY_ORDER;
+}
+
+/**
+ * Discover custom (non-core) categories present in a set of projects.
+ *
+ * Scans all project components and returns any category values that are not
+ * part of CORE_CATEGORIES. Results are deduplicated and sorted alphabetically.
+ *
+ * Used by the Browse page to surface custom categories that exist in the DB
+ * without requiring code changes when new ones are added.
+ *
+ * @param projects - All projects to scan
+ * @returns Sorted array of unique custom category strings
+ */
+export function getCustomCategories(projects: Project[]): string[] {
+  const custom = new Set<string>();
+  for (const project of projects) {
+    for (const component of project.components) {
+      if (component.category && !isCoreCategory(component.category)) {
+        custom.add(component.category);
+      }
+    }
+  }
+  return Array.from(custom).sort();
 }

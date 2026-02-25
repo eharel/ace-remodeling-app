@@ -15,11 +15,12 @@ import {
   ThemedView,
 } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
-import { 
+import {
   CATEGORY_DISPLAY_ORDER,
-  getAllCategories, 
-  getCategoryDisplayName, 
-  getCategoryIcon 
+  getAllCategories,
+  getCustomCategories,
+  getCategoryDisplayName,
+  getCategoryIcon
 } from "@/shared/utils";
 
 interface CategoryItem {
@@ -62,9 +63,9 @@ export default function ProjectsScreen() {
 
     // Filter to only show categories that have projects
     const filtered = categoryData.filter((category) => category.count > 0);
-    
+
     // Sort by display order
-    return filtered.sort((a, b) => {
+    const sorted = filtered.sort((a, b) => {
       const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a.id);
       const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b.id);
       // If not in order array, put at end
@@ -73,6 +74,21 @@ export default function ProjectsScreen() {
       if (orderB === -1) return -1;
       return orderA - orderB;
     });
+
+    // Discover and append any custom (non-core) categories present in the DB
+    const customCategoryIds = getCustomCategories(projects);
+    const customItems: CategoryItem[] = customCategoryIds
+      .map((id) => ({
+        id,
+        name: getCategoryDisplayName(id),
+        icon: getCategoryIcon(id), // "folder" for custom categories
+        count: projects.filter((p) =>
+          p.components.some((c) => normalizeCategory(c.category) === id)
+        ).length,
+      }))
+      .filter((item) => item.count > 0);
+
+    return [...sorted, ...customItems];
   }, [projects]);
 
   const handleCategoryPress = (category: CategoryItem) => {
