@@ -82,7 +82,9 @@ export const fetchAllProjects = async (): Promise<Project[]> => {
   const projectsCollection = collection(db, PROJECTS_COLLECTION);
   const querySnapshot = await getDocs(projectsCollection);
 
-  return querySnapshot.docs.map((doc) => {
+  console.log(`[fetchAllProjects] raw docs: ${querySnapshot.docs.length}`);
+
+  const results = querySnapshot.docs.map((doc) => {
     const data = doc.data();
     const projectId = doc.id;
 
@@ -97,6 +99,13 @@ export const fetchAllProjects = async (): Promise<Project[]> => {
       components,
     });
   });
+
+  const designDev = results.filter((p) =>
+    p.components.some((c) => c.category === "design-/-development")
+  );
+  console.log(`[fetchAllProjects] parsed: ${results.length}, design-/-development: ${designDev.length}`, designDev.map((p) => `${p.name} (#${p.number})`));
+
+  return results;
 };
 
 /**
