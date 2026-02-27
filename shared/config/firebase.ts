@@ -28,27 +28,35 @@ const DEV_FIREBASE_CONFIG = {
 
 /**
  * Determine which Firebase config to use
- * Priority:
- * 1. EXPO_PUBLIC_FIREBASE_ENV environment variable (if set to "production" or "dev")
- * 2. In React Native (__DEV__ is defined): Use __DEV__ flag
- * 3. In Node.js scripts (__DEV__ is undefined): Use NODE_ENV, default to dev
+ *
+ * React Native (app):
+ *   - Production builds (__DEV__ = false): always use PROD. The env override is
+ *     intentionally ignored so a stale .env value can never point a production
+ *     bundle at the wrong database.
+ *   - Dev builds (__DEV__ = true): EXPO_PUBLIC_FIREBASE_ENV can override to
+ *     "production" (useful for testing prod data in the simulator).
+ *
+ * Node.js scripts (__DEV__ is undefined):
+ *   - EXPO_PUBLIC_FIREBASE_ENV or NODE_ENV controls the target; defaults to dev.
  */
 function getFirebaseConfig() {
-  // Check for explicit environment override (useful for testing production in simulator)
-  const envOverride = process.env.EXPO_PUBLIC_FIREBASE_ENV;
-  if (envOverride === "production") {
-    return PROD_FIREBASE_CONFIG;
-  }
-  if (envOverride === "dev" || envOverride === "development") {
-    return DEV_FIREBASE_CONFIG;
-  }
-
-  // React Native context - use __DEV__
+  // React Native context
   if (typeof __DEV__ !== "undefined") {
-    return __DEV__ ? DEV_FIREBASE_CONFIG : PROD_FIREBASE_CONFIG;
+    if (!__DEV__) {
+      // Production build — always use prod, ignore any baked-in env override
+      return PROD_FIREBASE_CONFIG;
+    }
+    // Dev build (simulator) — allow override to test against prod data
+    const envOverride = process.env.EXPO_PUBLIC_FIREBASE_ENV;
+    if (envOverride === "production") return PROD_FIREBASE_CONFIG;
+    if (envOverride === "dev" || envOverride === "development") return DEV_FIREBASE_CONFIG;
+    return DEV_FIREBASE_CONFIG; // default for dev builds
   }
 
-  // Node.js script context - use NODE_ENV, default to dev for safety
+  // Node.js script context - use EXPO_PUBLIC_FIREBASE_ENV or NODE_ENV, default to dev
+  const envOverride = process.env.EXPO_PUBLIC_FIREBASE_ENV;
+  if (envOverride === "production") return PROD_FIREBASE_CONFIG;
+  if (envOverride === "dev" || envOverride === "development") return DEV_FIREBASE_CONFIG;
   const isProduction = process.env.NODE_ENV === "production";
   return isProduction ? PROD_FIREBASE_CONFIG : DEV_FIREBASE_CONFIG;
 }
@@ -74,18 +82,15 @@ export { db, storage };
 export default app;
 
 function getCurrentEnvironment(): "development" | "production" {
-  // Check for explicit environment override
-  const envOverride = process.env.EXPO_PUBLIC_FIREBASE_ENV;
-  if (envOverride === "production") {
-    return "production";
-  }
-  if (envOverride === "dev" || envOverride === "development") {
+  if (typeof __DEV__ !== "undefined") {
+    if (!__DEV__) return "production";
+    const envOverride = process.env.EXPO_PUBLIC_FIREBASE_ENV;
+    if (envOverride === "production") return "production";
     return "development";
   }
-
-  if (typeof __DEV__ !== "undefined") {
-    return __DEV__ ? "development" : "production";
-  }
+  const envOverride = process.env.EXPO_PUBLIC_FIREBASE_ENV;
+  if (envOverride === "production") return "production";
+  if (envOverride === "dev" || envOverride === "development") return "development";
   return process.env.NODE_ENV === "production" ? "production" : "development";
 }
 
