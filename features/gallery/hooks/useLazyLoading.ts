@@ -77,6 +77,9 @@ export const useLazyLoading = ({
   });
 
   const loadTimeouts = useRef<Map<number, number>>(new Map());
+  // Ref-based guards — avoids closing over stale lazyState
+  const loadedRef = useRef<Set<number>>(new Set());
+  const loadingRef = useRef<Set<number>>(new Set());
 
   // Get indices that should be visible (rendered) using utility function
   const getVisibleIndicesCallback = useCallback(() => {
@@ -90,6 +93,8 @@ export const useLazyLoading = ({
 
   // Mark image as loaded
   const markImageLoaded = useCallback((index: number) => {
+    loadedRef.current.add(index);
+    loadingRef.current.delete(index);
     setLazyState((prev) => ({
       ...prev,
       loadedIndices: new Set([...prev.loadedIndices, index]),
@@ -101,6 +106,7 @@ export const useLazyLoading = ({
 
   // Mark image as loading
   const markImageLoading = useCallback((index: number) => {
+    loadingRef.current.add(index);
     setLazyState((prev) => ({
       ...prev,
       loadingIndices: new Set([...prev.loadingIndices, index]),
@@ -110,10 +116,8 @@ export const useLazyLoading = ({
   // Load image with delay to avoid overwhelming the system
   const loadImage = useCallback(
     (index: number, delay: number = 0) => {
-      if (
-        lazyState.loadedIndices.has(index) ||
-        lazyState.loadingIndices.has(index)
-      ) {
+      // Guard with refs so this callback stays stable across renders
+      if (loadedRef.current.has(index) || loadingRef.current.has(index)) {
         return;
       }
 
@@ -130,7 +134,7 @@ export const useLazyLoading = ({
 
       loadTimeouts.current.set(index, timeout);
     },
-    [lazyState, markImageLoading, markImageLoaded]
+    [markImageLoading, markImageLoaded] // stable — guards use refs, not lazyState
   );
 
   // Update visible indices using utility function
@@ -167,6 +171,8 @@ export const useLazyLoading = ({
       if (!keepIndices.has(index)) {
         clearTimeout(timeout);
         loadTimeouts.current.delete(index);
+        loadedRef.current.delete(index);
+        loadingRef.current.delete(index);
       }
     });
 

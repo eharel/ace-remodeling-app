@@ -327,7 +327,12 @@ const ImageGalleryCarouselComponent = React.forwardRef<
         renderItem={renderItem}
         onMomentumScrollEnd={handleMomentumScrollEnd}
         keyExtractor={keyExtractor}
-        removeClippedSubviews={true}
+        onScrollToIndexFailed={(info) => {
+          flatListRef.current?.scrollToOffset({
+            offset: info.index * screenWidth,
+            animated: true,
+          });
+        }}
         maxToRenderPerBatch={3}
         windowSize={5}
         initialNumToRender={3}
