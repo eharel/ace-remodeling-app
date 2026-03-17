@@ -86,7 +86,9 @@ export function toProjectCardView(
     summary: component.summary ?? project.summary,
     thumbnailUrl: getProjectThumbnail(project, component),
     status: project.status,
-    category: component.category,
+    // Normalize legacy "outdoor" → "outdoor-living" on the way out
+    category:
+      component.category === "outdoor" ? "outdoor-living" : component.category,
     subcategory: component.subcategory,
     isFeatured: component.isFeatured ?? project.isFeatured,
     completedAt: getProjectCompletionDate(project),
@@ -119,10 +121,14 @@ export function toProjectCardViewsByCategory(
   const results: ProjectCardView[] = [];
 
   for (const project of projects) {
-    // Find all components matching the category
-    const matchingComponents = project.components.filter(
-      (c) => c.category === category
-    );
+    // Find all components matching the category.
+    // Normalize legacy "outdoor" → "outdoor-living" so category detail screens
+    // match the same projects counted in Browse (which normalizes for its count).
+    const matchingComponents = project.components.filter((c) => {
+      const normalized =
+        c.category === "outdoor" ? "outdoor-living" : c.category;
+      return normalized === category;
+    });
 
     // Transform each matching component
     for (const component of matchingComponents) {
