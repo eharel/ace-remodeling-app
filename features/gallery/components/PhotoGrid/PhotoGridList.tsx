@@ -87,6 +87,7 @@ export function PhotoGridList({
             isSelected={isSelected}
             onPress={() => onImagePress?.(index)}
             onSelect={onToggleSelection}
+            mediaType={item.mediaType}
           />
         </View>
       );

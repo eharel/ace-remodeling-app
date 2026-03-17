@@ -21,8 +21,10 @@ export function getPhotoCounts(media: MediaAsset[]): PhotoCounts {
     return { all: 0, before: 0, progress: 0, after: 0 };
   }
 
-  // Filter to images only (exclude videos)
-  const images = media.filter((m) => m.mediaType === "image");
+  // Include both images and videos in tab counts
+  const images = media.filter(
+    (m) => m.mediaType === "image" || m.mediaType === "video"
+  );
 
   return {
     all: images.length,
@@ -92,7 +94,9 @@ export function samplePreviewPhotos(
   allMedia: MediaAsset[],
   previewCount: number
 ): MediaAsset[] {
-  // Filter to images only
+  // Filter to images only — project card previews show static thumbnails.
+  // Videos are intentionally excluded here because they don't have guaranteed
+  // static thumbnail URLs and the card grid isn't a media player.
   const allPhotos = allMedia.filter((m) => m.mediaType === "image");
 
   if (!allPhotos || allPhotos.length === 0) {

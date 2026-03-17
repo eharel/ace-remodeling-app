@@ -69,8 +69,8 @@ export function convertDocumentsToPictures(documents: Document[]): Picture[] {
 /**
  * Converts MediaAsset to Picture format for ImageGalleryModal
  *
- * Filters media to only images and maps them to the format
- * expected by the image gallery modal.
+ * Includes both images and videos. Videos are rendered by VideoPlayer in the
+ * carousel; images are rendered by ZoomableImage.
  *
  * This is a PRESENTATION MODEL conversion - MediaAsset is the domain model,
  * Picture is the UI presentation model. This function bridges the gap.
@@ -87,13 +87,14 @@ export function convertDocumentsToPictures(documents: Document[]): Picture[] {
  */
 export function convertMediaToPictures(media: MediaAsset[]): Picture[] {
   return media
-    .filter((m) => m.mediaType === "image" && m.url)
+    .filter((m) => (m.mediaType === "image" || m.mediaType === "video") && m.url)
     .map((m) => ({
       uri: m.url,
       id: m.id,
       type: m.stage || "other",
       description: m.caption || m.description || undefined,
       thumbnailUrl: m.thumbnailUrl,
+      mediaType: m.mediaType,
     }));
 }
 

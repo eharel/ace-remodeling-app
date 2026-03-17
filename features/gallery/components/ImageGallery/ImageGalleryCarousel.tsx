@@ -21,6 +21,7 @@ import { useImageLoading } from "../../hooks/useImageLoading";
 import { useImagePreloading } from "../../hooks/useImagePreloading";
 import { useLazyLoading } from "../../hooks/useLazyLoading";
 import { ImageGalleryCarouselProps } from "../../types/gallery.types";
+import { VideoPlayer } from "../VideoPlayer/VideoPlayer";
 import { ImageErrorState } from "./ImageErrorState";
 import { ZoomableImage } from "./ZoomableImage";
 
@@ -224,7 +225,15 @@ const ImageGalleryCarouselComponent = React.forwardRef<
             />
           )}
 
-          {!imageError && (
+          {!imageError && image.mediaType === "video" && (
+            <VideoPlayer
+              uri={image.uri}
+              containerStyle={StyleSheet.absoluteFill}
+              isActive={isCurrentImage}
+            />
+          )}
+
+          {!imageError && image.mediaType !== "video" && (
             <ZoomableImage
               uri={image.uri}
               containerStyle={StyleSheet.absoluteFill}

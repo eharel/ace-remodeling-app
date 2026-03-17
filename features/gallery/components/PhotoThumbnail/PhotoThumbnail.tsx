@@ -20,6 +20,7 @@ interface PhotoThumbnailProps {
   inSelectionMode?: boolean;
   isSelected?: boolean;
   onSelect?: (photoId: string) => void;
+  mediaType?: "image" | "video";
 }
 
 // Using memo to prevent unnecessary re-renders during scrolls
@@ -31,6 +32,7 @@ export const PhotoThumbnail = memo(function PhotoThumbnail({
   inSelectionMode = false,
   isSelected = false,
   onSelect,
+  mediaType = "image",
 }: PhotoThumbnailProps) {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
@@ -137,6 +139,11 @@ export const PhotoThumbnail = memo(function PhotoThumbnail({
           justifyContent: "center",
           alignItems: "center",
         },
+        playBadge: {
+          ...StyleSheet.absoluteFillObject,
+          justifyContent: "center",
+          alignItems: "center",
+        },
       }),
     [size, theme, primaryColor]
   );
@@ -174,6 +181,17 @@ export const PhotoThumbnail = memo(function PhotoThumbnail({
               color={theme.colors.text.inverse}
             />
           </Animated.View>
+        )}
+
+        {/* Video play badge */}
+        {mediaType === "video" && !inSelectionMode && (
+          <View style={styles.playBadge} pointerEvents="none">
+            <MaterialIcons
+              name="play-circle-filled"
+              size={32}
+              color="rgba(255,255,255,0.9)"
+            />
+          </View>
         )}
 
         {/* Empty circle indicator when in selection mode but not selected */}
