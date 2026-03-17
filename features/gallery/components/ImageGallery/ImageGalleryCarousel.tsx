@@ -144,28 +144,21 @@ const ImageGalleryCarouselComponent = React.forwardRef<
     preloadRadius: 2,
   });
 
-  // For performance: Always render images for small/medium galleries
-  // This eliminates re-renders from lazy loading state changes
-  // Only use conditional rendering for very large galleries (20+ images)
-  const shouldUseLazyLoading = images.length > 20;
-
-  // Use lazy loading hook only for very large galleries
-  // For smaller galleries, always render to avoid re-render stutters
-  const { shouldRenderImage: lazyShouldRenderImage } = useLazyLoading({
+  // useLazyLoading is kept for API compatibility but its output is not used for
+  // rendering decisions. The custom React.memo comparison intentionally skips
+  // re-renders when currentIndex changes (FlatList manages scroll position itself),
+  // which means useLazyLoading's visibleIndices would be permanently stuck at the
+  // initial index and block all images outside the opening position.
+  // FlatList's windowSize virtualization + expo-image's memory-disk cache make
+  // a separate lazy rendering layer unnecessary.
+  useLazyLoading({
     images,
     currentIndex,
-    visibleRange: shouldUseLazyLoading ? 8 : images.length, // Wider range for large galleries
-    loadThreshold: shouldUseLazyLoading ? 4 : images.length,
+    visibleRange: images.length,
+    loadThreshold: images.length,
   });
 
-  // Wrapper that always returns true for small galleries
-  const shouldRenderImage = useCallback(
-    (index: number) => {
-      if (!shouldUseLazyLoading) return true;
-      return lazyShouldRenderImage(index);
-    },
-    [shouldUseLazyLoading, lazyShouldRenderImage]
-  );
+  const shouldRenderImage = useCallback((_index: number) => true, []);
 
   const styles = useMemo(
     () =>
