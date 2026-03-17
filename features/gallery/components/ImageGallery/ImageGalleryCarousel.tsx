@@ -4,6 +4,7 @@ import React, {
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import {
   Dimensions,
@@ -15,13 +16,13 @@ import {
 
 import { DesignTokens } from "@/shared/themes";
 import { Picture } from "@/shared/types";
-import { Image } from "expo-image";
 import { accessibilityStrings } from "../../constants/accessibilityStrings";
 import { useImageLoading } from "../../hooks/useImageLoading";
 import { useImagePreloading } from "../../hooks/useImagePreloading";
 import { useLazyLoading } from "../../hooks/useLazyLoading";
 import { ImageGalleryCarouselProps } from "../../types/gallery.types";
 import { ImageErrorState } from "./ImageErrorState";
+import { ZoomableImage } from "./ZoomableImage";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -41,6 +42,7 @@ export interface ImageGalleryCarouselRef {
  * Features:
  * - Native horizontal scrolling with paging
  * - Virtualization (only renders visible images)
+ * - Pinch-to-zoom, pan, and double-tap zoom on each image
  * - Loading states and error handling for individual images
  * - Performance optimizations (preloading, lazy loading)
  * - Accessibility support with screen reader announcements
@@ -78,6 +80,9 @@ const ImageGalleryCarouselComponent = React.forwardRef<
   const flatListRef = useRef<FlatList<Picture>>(null);
   const { hasError, getImageError, onImageLoad, onImageError } =
     useImageLoading({ images });
+
+  // When the active image is zoomed in, block FlatList paging so pan works instead
+  const [isZoomed, setIsZoomed] = useState(false);
 
   // Track pending image load callbacks to batch them and avoid blocking gestures
   const pendingLoadCallbacksRef = useRef<Set<string>>(new Set());
@@ -145,20 +150,14 @@ const ImageGalleryCarouselComponent = React.forwardRef<
   });
 
   // useLazyLoading is kept for API compatibility but its output is not used for
-  // rendering decisions. The custom React.memo comparison intentionally skips
-  // re-renders when currentIndex changes (FlatList manages scroll position itself),
-  // which means useLazyLoading's visibleIndices would be permanently stuck at the
-  // initial index and block all images outside the opening position.
-  // FlatList's windowSize virtualization + expo-image's memory-disk cache make
-  // a separate lazy rendering layer unnecessary.
+  // rendering decisions. FlatList's windowSize virtualization + expo-image's
+  // memory-disk cache make a separate lazy rendering layer unnecessary.
   useLazyLoading({
     images,
     currentIndex,
     visibleRange: images.length,
     loadThreshold: images.length,
   });
-
-  const shouldRenderImage = useCallback((_index: number) => true, []);
 
   const styles = useMemo(
     () =>
@@ -174,10 +173,6 @@ const ImageGalleryCarouselComponent = React.forwardRef<
           justifyContent: "center",
           alignItems: "center",
           paddingHorizontal: DesignTokens.spacing[6],
-        },
-        image: {
-          width: "100%",
-          height: "100%",
         },
       }),
     []
@@ -206,7 +201,6 @@ const ImageGalleryCarouselComponent = React.forwardRef<
       const isCurrentImage = index === currentIndex;
       const imageError = hasError(image.id);
       const errorMessage = getImageError(image.id);
-      const shouldRender = shouldRenderImage(index);
 
       return (
         <View
@@ -221,27 +215,22 @@ const ImageGalleryCarouselComponent = React.forwardRef<
           accessibilityRole="image"
           accessibilityHint={accessibilityStrings.image.getHint(isCurrentImage)}
         >
-          {shouldRender && imageError && (
+          {imageError && (
             <ImageErrorState
               error={errorMessage}
               onRetry={() => {
-                // Reset the image state and retry loading
                 onImageError(image.id, "");
               }}
             />
           )}
 
-          {shouldRender && !imageError && (
-            <Image
-              source={{ uri: image.uri }}
-              style={styles.image}
-              contentFit="contain"
-              // Performance optimizations
+          {!imageError && (
+            <ZoomableImage
+              uri={image.uri}
+              containerStyle={StyleSheet.absoluteFill}
               cachePolicy="memory-disk"
               priority={isCurrentImage ? "high" : "normal"}
-              transition={200}
               recyclingKey={image.id}
-              // Accessibility
               accessibilityLabel={accessibilityStrings.image.getLabel(
                 index,
                 images.length,
@@ -251,10 +240,10 @@ const ImageGalleryCarouselComponent = React.forwardRef<
               accessibilityHint={accessibilityStrings.image.getHint(
                 isCurrentImage
               )}
-              accessibilityRole="image"
-              // Event handlers
               onLoad={() => deferredOnImageLoad(image.id)}
               onError={() => onImageError(image.id, "Failed to load image")}
+              onZoomChange={setIsZoomed}
+              isActive={isCurrentImage}
             />
           )}
         </View>
@@ -265,7 +254,6 @@ const ImageGalleryCarouselComponent = React.forwardRef<
       images.length,
       hasError,
       getImageError,
-      shouldRenderImage,
       styles,
       deferredOnImageLoad,
       onImageError,
@@ -315,6 +303,8 @@ const ImageGalleryCarouselComponent = React.forwardRef<
         snapToInterval={screenWidth}
         snapToAlignment="center"
         decelerationRate="fast"
+        // Block paging while an image is zoomed so pan gesture takes over
+        scrollEnabled={!isZoomed}
         initialScrollIndex={currentIndex}
         getItemLayout={getItemLayout}
         renderItem={renderItem}
@@ -342,18 +332,9 @@ const ImageGalleryCarouselComponent = React.forwardRef<
 
 ImageGalleryCarouselComponent.displayName = "ImageGalleryCarousel";
 
-// Memoize with custom comparison
-export const ImageGalleryCarousel = React.memo(
-  ImageGalleryCarouselComponent,
-  (prevProps, nextProps) => {
-    // Optimized memo: Only re-render when images array or theme changes
-    // currentIndex changes are handled by FlatList's scroll position
-    return (
-      prevProps.images === nextProps.images &&
-      prevProps.theme === nextProps.theme &&
-      prevProps.onIndexChange === nextProps.onIndexChange
-    );
-  }
-);
+// Default React.memo (shallow prop comparison). The previous custom comparison
+// intentionally excluded currentIndex, which caused ZoomableImage's isActive
+// prop to never update and broke zoom auto-reset on navigation.
+export const ImageGalleryCarousel = React.memo(ImageGalleryCarouselComponent);
 
 ImageGalleryCarousel.displayName = "ImageGalleryCarousel";
