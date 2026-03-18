@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 /**
  * Core project categories that appear in main navigation.
  * These are the primary categories users browse.
@@ -14,14 +16,17 @@ export const CORE_CATEGORIES = {
   OUTDOOR_LIVING: "outdoor-living",
   NEW_CONSTRUCTION: "new-construction",
   COMMERCIAL: "commercial",
+  DESIGN_DEVELOPMENT: "design-/-development",
   MISCELLANEOUS: "miscellaneous",
 } as const;
 
-/**
- * Type-safe core category type derived from CORE_CATEGORIES
- */
 export type CoreCategory =
   (typeof CORE_CATEGORIES)[keyof typeof CORE_CATEGORIES];
+
+const coreCategoryValues = Object.values(CORE_CATEGORIES);
+export const CoreCategorySchema = z.enum(
+  coreCategoryValues as [CoreCategory, ...CoreCategory[]]
+);
 
 /**
  * Component category can be any core category OR a custom string.
@@ -33,14 +38,33 @@ export type CoreCategory =
 export type ComponentCategory = CoreCategory | string;
 
 /**
- * Common subcategory values for reference
+ * Common subcategories by category
  *
- * Note: ComponentSubcategory type accepts any string, not just these values.
- * This constant documents commonly-used subcategories but is not exhaustive.
+ * These are displayed as quick-select buttons in the UI.
+ * Users can also enter custom subcategories via text input.
  *
- * USAGE:
- * - ADU/Addition projects: "adu" or "addition"
- * - Outdoor projects: "pool", "deck", "patio", "bbq-island", etc.
+ * Only categories with meaningful, commonly-used subcategories are included.
+ * Categories not in this map simply won't show predefined subcategory options.
+ */
+export const COMMON_SUBCATEGORIES: Partial<
+  Record<CoreCategory, { value: string; label: string }[]>
+> = {
+  [CORE_CATEGORIES.ADU_ADDITION]: [
+    { value: "adu", label: "ADU" },
+    { value: "addition", label: "Addition" },
+  ],
+  [CORE_CATEGORIES.OUTDOOR_LIVING]: [
+    { value: "pool", label: "Pool" },
+    { value: "deck", label: "Deck" },
+    { value: "patio", label: "Patio" },
+    { value: "pergola", label: "Pergola" },
+    { value: "outdoor-kitchen", label: "Outdoor Kitchen" },
+  ],
+};
+
+/**
+ * @deprecated Use COMMON_SUBCATEGORIES instead.
+ * Kept for backwards compatibility.
  */
 export const COMPONENT_SUBCATEGORIES = {
   ADU: "adu",
@@ -77,6 +101,7 @@ export const CORE_CATEGORY_LABELS: Record<CoreCategory, string> = {
   [CORE_CATEGORIES.OUTDOOR_LIVING]: "Outdoor",
   [CORE_CATEGORIES.NEW_CONSTRUCTION]: "New Construction",
   [CORE_CATEGORIES.COMMERCIAL]: "Commercial",
+  [CORE_CATEGORIES.DESIGN_DEVELOPMENT]: "Design / Development",
   [CORE_CATEGORIES.MISCELLANEOUS]: "Other",
 };
 

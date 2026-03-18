@@ -66,6 +66,8 @@ export interface TextColors {
   disabled: string;
   /** Placeholder text color */
   placeholder: string;
+  /** Muted text color (for inactive tabs on dark navbar) */
+  muted?: string;
 }
 
 /**

@@ -1,23 +1,26 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 
 import { DesignTokens } from "@/shared/themes";
 import { ComponentCategory, CORE_CATEGORIES } from "@/shared/types/ComponentCategory";
 import {
+  Can,
   EmptyState,
   LoadingState,
   PageHeader,
+  ThemedIconButton,
   ThemedText,
   ThemedView,
 } from "@/shared/components";
 import { useProjects, useTheme } from "@/shared/contexts";
-import { 
+import {
   CATEGORY_DISPLAY_ORDER,
-  getAllCategories, 
-  getCategoryDisplayName, 
-  getCategoryIcon 
+  getAllCategories,
+  getCustomCategories,
+  getCategoryDisplayName,
+  getCategoryIcon
 } from "@/shared/utils";
 
 interface CategoryItem {
@@ -29,52 +32,64 @@ interface CategoryItem {
 
 export default function ProjectsScreen() {
   const { theme } = useTheme();
-  const { projects, loading, error } = useProjects();
+  const { projects, isLoading, error } = useProjects();
 
-  // Get categories with projects, sorted by display order
-  const categories = useMemo(() => {
+  // Whether the "Other categories" section is expanded
+  const [showCustom, setShowCustom] = useState(false);
+
+  // Normalize legacy category names (e.g., "outdoor" -> "outdoor-living")
+  const normalizeCategory = (category: string): ComponentCategory => {
+    if (category === "outdoor") return CORE_CATEGORIES.OUTDOOR_LIVING;
+    return category as ComponentCategory;
+  };
+
+  // Core categories with projects, sorted by display order
+  const coreCategories = useMemo(() => {
     if (!projects) return [];
 
-    // Normalize category names (e.g., "outdoor" -> "outdoor-living")
-    // This handles legacy data where projects may use "outdoor" instead of "outdoor-living"
-    const normalizeCategory = (category: string): ComponentCategory => {
-      if (category === "outdoor") {
-        return CORE_CATEGORIES.OUTDOOR_LIVING;
-      }
-      return category as ComponentCategory;
-    };
-
-    // Dynamically build category list from all available categories
     const allCategories = getAllCategories();
     const categoryData: CategoryItem[] = allCategories.map((category) => ({
       id: category,
       name: getCategoryDisplayName(category),
       icon: getCategoryIcon(category),
       count: projects.filter((p) =>
-        p.components.some((c) => {
-          const normalizedComponentCategory = normalizeCategory(c.category);
-          return normalizedComponentCategory === category;
-        })
+        p.components.some(
+          (c) => normalizeCategory(c.category) === category
+        )
       ).length,
     }));
 
-    // Filter to only show categories that have projects
-    const filtered = categoryData.filter((category) => category.count > 0);
-    
-    // Sort by display order
-    return filtered.sort((a, b) => {
-      const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a.id);
-      const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b.id);
-      // If not in order array, put at end
-      if (orderA === -1 && orderB === -1) return 0;
-      if (orderA === -1) return 1;
-      if (orderB === -1) return -1;
-      return orderA - orderB;
-    });
+    return categoryData
+      .filter((c) => c.count > 0)
+      .sort((a, b) => {
+        const orderA = CATEGORY_DISPLAY_ORDER.indexOf(a.id);
+        const orderB = CATEGORY_DISPLAY_ORDER.indexOf(b.id);
+        if (orderA === -1 && orderB === -1) return 0;
+        if (orderA === -1) return 1;
+        if (orderB === -1) return -1;
+        return orderA - orderB;
+      });
+  }, [projects]);
+
+  // Custom (non-core) categories with projects, sorted alphabetically
+  const customCategories = useMemo(() => {
+    if (!projects) return [];
+
+    return getCustomCategories(projects)
+      .map((id) => ({
+        id,
+        name: getCategoryDisplayName(id),
+        icon: getCategoryIcon(id),
+        count: projects.filter((p) =>
+          p.components.some((c) => normalizeCategory(c.category) === id)
+        ).length,
+      }))
+      .filter((item) => item.count > 0);
   }, [projects]);
 
   const handleCategoryPress = (category: CategoryItem) => {
-    router.push(`/category/${category.id}`);
+    // Use params object so Expo Router handles URL encoding of special chars (e.g. "/" in category id)
+    router.push({ pathname: "/category/[category]", params: { category: category.id } });
   };
 
   const renderCategoryItem = ({ item }: { item: CategoryItem }) => (
@@ -175,11 +190,38 @@ export default function ProjectsScreen() {
           fontFamily: DesignTokens.typography.fontFamily.medium,
           color: theme.colors.text.secondary,
         },
+        expandRow: {
+          paddingVertical: DesignTokens.spacing[3],
+          paddingHorizontal: DesignTokens.spacing[4],
+          gap: DesignTokens.spacing[2],
+        },
+        expandLabelRow: {
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: DesignTokens.spacing[1],
+        },
+        expandDivider: {
+          height: 1,
+          backgroundColor: theme.colors.border.primary,
+        },
+        expandLabel: {
+          fontSize: DesignTokens.typography.fontSize.sm,
+          lineHeight:
+            DesignTokens.typography.fontSize.sm *
+            DesignTokens.typography.lineHeight.tight,
+          color: theme.colors.text.tertiary,
+          fontFamily: DesignTokens.typography.fontFamily.medium,
+        },
       }),
     [theme]
   );
 
-  if (loading) {
+  const handleCreateProject = () => {
+    router.push("/project/create");
+  };
+
+  if (isLoading) {
     return (
       <ThemedView style={styles.container}>
         <LoadingState />
@@ -200,7 +242,7 @@ export default function ProjectsScreen() {
     );
   }
 
-  if (categories.length === 0) {
+  if (coreCategories.length === 0 && customCategories.length === 0) {
     return (
       <ThemedView style={styles.container}>
         <EmptyState
@@ -213,15 +255,58 @@ export default function ProjectsScreen() {
     );
   }
 
+  // Footer: "Other categories" expand toggle + custom items (only when they exist)
+  const listFooter = customCategories.length > 0 ? (
+    <View>
+      {/* Divider + toggle row */}
+      <Pressable
+        style={styles.expandRow}
+        onPress={() => setShowCustom((prev) => !prev)}
+        accessibilityRole="button"
+        accessibilityLabel={showCustom ? "Hide other categories" : "Show other categories"}
+      >
+        <View style={styles.expandDivider} />
+        <View style={styles.expandLabelRow}>
+          <ThemedText style={styles.expandLabel}>
+            Other categories
+          </ThemedText>
+          <MaterialIcons
+            name={showCustom ? "expand-less" : "expand-more"}
+            size={20}
+            color={theme.colors.text.tertiary}
+          />
+        </View>
+        <View style={styles.expandDivider} />
+      </Pressable>
+
+      {/* Custom category items, revealed when expanded */}
+      {showCustom && customCategories.map((item) => (
+        <View key={item.id} style={{ paddingHorizontal: DesignTokens.spacing[4] }}>
+          {renderCategoryItem({ item })}
+        </View>
+      ))}
+    </View>
+  ) : null;
+
   return (
     <ThemedView style={styles.container}>
       <PageHeader
         title="Projects"
         subtitle="Browse our various projects by category"
+        rightAction={
+          <Can edit>
+            <ThemedIconButton
+              icon="add"
+              onPress={handleCreateProject}
+              accessibilityLabel="Create new project"
+              variant="secondary"
+            />
+          </Can>
+        }
       />
 
       <FlatList
-        data={categories}
+        data={coreCategories}
         renderItem={renderCategoryItem}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
@@ -229,6 +314,7 @@ export default function ProjectsScreen() {
           paddingHorizontal: DesignTokens.spacing[4],
           paddingBottom: DesignTokens.spacing[8],
         }}
+        ListFooterComponent={listFooter}
       />
     </ThemedView>
   );

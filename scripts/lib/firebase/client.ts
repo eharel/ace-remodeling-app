@@ -21,9 +21,3 @@ export const environment = currentEnvironment;
  * Log which Firebase we're using
  * Only log once when module is imported
  */
-if (!process.env.SUPPRESS_FIREBASE_LOG) {
-  console.log(`🔧 Firebase Environment: ${environment}`);
-  console.log(
-    `📦 Project: ${isDevelopment ? "ace-remodeling-dev" : "ace-remodeling"}`
-  );
-}

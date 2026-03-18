@@ -4,17 +4,30 @@
  */
 
 // Core UI Components
+export { Can } from "./Can";
 export { EmptyState } from "./EmptyState";
 export { ErrorBoundary } from "./ErrorBoundary";
 export { ErrorState } from "./ErrorState";
+export { FAB } from "./FAB";
 export { LoadingState } from "./LoadingState";
 export { PageHeader } from "./PageHeader";
 export { RefreshableScrollView } from "./RefreshableScrollView";
 export { ThemeToggle } from "./ThemeToggle";
+export { EditButton } from "./EditButton";
+export { SelectionActionBar } from "./SelectionActionBar";
+export type { SelectionAction } from "./SelectionActionBar";
 
 // Themed Components
 export { ThemedButton } from "./themed/ThemedButton";
 export { ThemedIconButton } from "./themed/ThemedIconButton";
 export { ThemedInput } from "./themed/ThemedInput";
+export { ThemedSegmentedControl } from "./themed/ThemedSegmentedControl";
 export { ThemedText } from "./themed/ThemedText";
 export { ThemedView } from "./themed/ThemedView";
+
+// UI Components
+export { Toast } from "./ui/Toast";
+export type { ToastType } from "./ui/Toast";
+
+// Modals
+export { ModalBackdrop } from "./modals/ModalBackdrop";

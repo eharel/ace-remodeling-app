@@ -1,3 +1,7 @@
+import {
+  PERFORMANCE_PENALTIES as PENALTIES,
+  PERFORMANCE_TARGETS,
+} from "../constants/performanceConstants";
 import { PerformanceMetrics, PerformanceStats } from "../types/gallery.types";
 
 /**
@@ -8,32 +12,9 @@ import { PerformanceMetrics, PerformanceStats } from "../types/gallery.types";
  */
 
 /**
- * Performance scoring thresholds and weights
+ * @deprecated Use PERFORMANCE_TARGETS from constants/performanceConstants instead
  */
-export const PERFORMANCE_THRESHOLDS = {
-  /** Target render time for 60fps (16.67ms) */
-  TARGET_RENDER_TIME: 16,
-  /** Target image load time for good UX */
-  TARGET_IMAGE_LOAD_TIME: 500,
-  /** Target frame rate for smooth animations */
-  TARGET_FRAME_RATE: 50,
-  /** Target gesture response time for responsiveness */
-  TARGET_GESTURE_RESPONSE_TIME: 100,
-} as const;
-
-/**
- * Performance penalty weights for scoring
- */
-export const PERFORMANCE_PENALTIES = {
-  /** Maximum penalty for slow renders */
-  MAX_RENDER_PENALTY: 30,
-  /** Maximum penalty for slow image loads */
-  MAX_IMAGE_LOAD_PENALTY: 20,
-  /** Maximum penalty for low frame rate */
-  MAX_FRAME_RATE_PENALTY: 25,
-  /** Maximum penalty for slow gesture response */
-  MAX_GESTURE_PENALTY: 15,
-} as const;
+export const PERFORMANCE_THRESHOLDS = PERFORMANCE_TARGETS;
 
 /**
  * Calculates performance score based on current metrics
@@ -56,51 +37,46 @@ export const PERFORMANCE_PENALTIES = {
  * ```
  */
 export function calculatePerformanceScore(
-  stats: Omit<PerformanceStats, "performanceScore">
+  stats: Omit<PerformanceStats, "performanceScore">,
 ): number {
   let score = 100;
 
   // Penalize slow renders (target: <16ms for 60fps)
-  if (stats.averageRenderTime > PERFORMANCE_THRESHOLDS.TARGET_RENDER_TIME) {
+  if (stats.averageRenderTime > PERFORMANCE_TARGETS.RENDER_TIME) {
     const penalty = Math.min(
-      PERFORMANCE_PENALTIES.MAX_RENDER_PENALTY,
-      (stats.averageRenderTime - PERFORMANCE_THRESHOLDS.TARGET_RENDER_TIME) * 2
+      PENALTIES.MAX_RENDER_PENALTY,
+      (stats.averageRenderTime - PERFORMANCE_TARGETS.RENDER_TIME) * 2,
     );
     score -= penalty;
   }
 
   // Penalize slow image loads (target: <500ms)
-  if (
-    stats.averageImageLoadTime > PERFORMANCE_THRESHOLDS.TARGET_IMAGE_LOAD_TIME
-  ) {
+  if (stats.averageImageLoadTime > PERFORMANCE_TARGETS.IMAGE_LOAD_TIME) {
     const penalty = Math.min(
-      PERFORMANCE_PENALTIES.MAX_IMAGE_LOAD_PENALTY,
-      (stats.averageImageLoadTime -
-        PERFORMANCE_THRESHOLDS.TARGET_IMAGE_LOAD_TIME) /
-        50
+      PENALTIES.MAX_IMAGE_LOAD_PENALTY,
+      (stats.averageImageLoadTime - PERFORMANCE_TARGETS.IMAGE_LOAD_TIME) / 50,
     );
     score -= penalty;
   }
 
   // Penalize low frame rate (target: >50fps)
-  if (stats.averageFrameRate < PERFORMANCE_THRESHOLDS.TARGET_FRAME_RATE) {
+  if (stats.averageFrameRate < PERFORMANCE_TARGETS.FRAME_RATE) {
     const penalty = Math.min(
-      PERFORMANCE_PENALTIES.MAX_FRAME_RATE_PENALTY,
-      (PERFORMANCE_THRESHOLDS.TARGET_FRAME_RATE - stats.averageFrameRate) * 2
+      PENALTIES.MAX_FRAME_RATE_PENALTY,
+      (PERFORMANCE_TARGETS.FRAME_RATE - stats.averageFrameRate) * 2,
     );
     score -= penalty;
   }
 
   // Penalize slow gesture response (target: <100ms)
   if (
-    stats.averageGestureResponseTime >
-    PERFORMANCE_THRESHOLDS.TARGET_GESTURE_RESPONSE_TIME
+    stats.averageGestureResponseTime > PERFORMANCE_TARGETS.GESTURE_RESPONSE_TIME
   ) {
     const penalty = Math.min(
-      PERFORMANCE_PENALTIES.MAX_GESTURE_PENALTY,
+      PENALTIES.MAX_GESTURE_PENALTY,
       (stats.averageGestureResponseTime -
-        PERFORMANCE_THRESHOLDS.TARGET_GESTURE_RESPONSE_TIME) /
-        10
+        PERFORMANCE_TARGETS.GESTURE_RESPONSE_TIME) /
+        10,
     );
     score -= penalty;
   }
@@ -131,7 +107,7 @@ export function calculateAverageMetrics(
   metrics: PerformanceMetrics[],
   frameRateHistory: number[],
   totalRenders: number,
-  totalImageLoads: number
+  totalImageLoads: number,
 ): Omit<PerformanceStats, "performanceScore"> {
   const recentMetrics = metrics.slice(-50); // Last 50 measurements
 
@@ -196,27 +172,24 @@ export function calculateAverageMetrics(
  * ```
  */
 export function getPerformanceRecommendations(
-  stats: PerformanceStats
+  stats: PerformanceStats,
 ): string[] {
   const recommendations: string[] = [];
 
-  if (stats.averageRenderTime > PERFORMANCE_THRESHOLDS.TARGET_RENDER_TIME) {
+  if (stats.averageRenderTime > PERFORMANCE_TARGETS.RENDER_TIME) {
     recommendations.push("Consider reducing image sizes or using lazy loading");
   }
 
-  if (
-    stats.averageImageLoadTime > PERFORMANCE_THRESHOLDS.TARGET_IMAGE_LOAD_TIME
-  ) {
+  if (stats.averageImageLoadTime > PERFORMANCE_TARGETS.IMAGE_LOAD_TIME) {
     recommendations.push("Implement image preloading for better performance");
   }
 
-  if (stats.averageFrameRate < PERFORMANCE_THRESHOLDS.TARGET_FRAME_RATE) {
+  if (stats.averageFrameRate < PERFORMANCE_TARGETS.FRAME_RATE) {
     recommendations.push("Reduce animation complexity or optimize rendering");
   }
 
   if (
-    stats.averageGestureResponseTime >
-    PERFORMANCE_THRESHOLDS.TARGET_GESTURE_RESPONSE_TIME
+    stats.averageGestureResponseTime > PERFORMANCE_TARGETS.GESTURE_RESPONSE_TIME
   ) {
     recommendations.push("Optimize gesture handling for better responsiveness");
   }

@@ -39,33 +39,39 @@ export interface SegmentedControlProps<T extends string> {
   
   /** Custom label formatter - defaults to formatLabel utility */
   getLabel?: (option: T) => string;
-  
+
+  /** Optional render function for suffix content (e.g., edit icon on selected item) */
+  renderSuffix?: (option: T, isSelected: boolean) => React.ReactNode;
+
   /** Accessibility label for the entire control */
   ariaLabel?: string;
-  
+
   /** Optional test ID for testing */
   testID?: string;
 }
 
 /**
  * Individual option component props (used by variant components)
- * 
+ *
  * Variant components (PillOption, TabOption) receive these props
  * and handle only visual presentation.
  */
 export interface OptionComponentProps {
   /** Display label for the option */
   label: string;
-  
+
   /** Whether this option is currently selected */
   isSelected: boolean;
-  
+
   /** Callback when option is pressed */
   onPress: () => void;
-  
+
+  /** Optional suffix content to render after the label */
+  suffix?: React.ReactNode;
+
   /** Optional accessibility label */
   accessibilityLabel?: string;
-  
+
   /** Optional test ID */
   testID?: string;
 }

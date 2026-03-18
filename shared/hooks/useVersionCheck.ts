@@ -13,6 +13,10 @@ interface UseVersionCheckResult {
   updateRequired: boolean;
   /** Whether the version check is still in progress */
   isLoading: boolean;
+  /** Current app build number (null if unknown). Useful for debugging version banner. */
+  currentBuild: number | null;
+  /** Minimum required build from Firestore (null until loaded or on error). */
+  minimumBuild: number | null;
 }
 
 /**
@@ -39,6 +43,8 @@ interface UseVersionCheckResult {
 export function useVersionCheck(): UseVersionCheckResult {
   const [updateRequired, setUpdateRequired] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [currentBuild, setCurrentBuild] = useState<number | null>(null);
+  const [minimumBuild, setMinimumBuild] = useState<number | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -46,7 +52,8 @@ export function useVersionCheck(): UseVersionCheckResult {
     async function checkVersion() {
       try {
         // Get current build number
-        const currentBuild = getCurrentBuildNumber();
+        const build = getCurrentBuildNumber();
+        if (isMounted) setCurrentBuild(build);
 
         // Fetch minimum required build from Firestore
         const versionConfig = await fetchVersionConfig();
@@ -56,8 +63,9 @@ export function useVersionCheck(): UseVersionCheckResult {
 
         // If we successfully got the config, check if update is needed
         if (versionConfig !== null) {
+          setMinimumBuild(versionConfig.minimumBuildNumber);
           const needsUpdate = isUpdateRequired(
-            currentBuild,
+            build,
             versionConfig.minimumBuildNumber
           );
           setUpdateRequired(needsUpdate);
@@ -81,6 +89,6 @@ export function useVersionCheck(): UseVersionCheckResult {
     };
   }, []); // Empty dependency array = only run once on mount
 
-  return { updateRequired, isLoading };
+  return { updateRequired, isLoading, currentBuild, minimumBuild };
 }
 

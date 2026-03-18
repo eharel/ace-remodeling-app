@@ -3,41 +3,132 @@
  * Exports all gallery-related components, hooks, types, constants, and utils
  */
 
-// Components
-export { ImageErrorState } from "./components/ImageErrorState";
-export { ImageGalleryCarousel } from "./components/ImageGalleryCarousel";
-export { ImageGalleryFooter } from "./components/ImageGalleryFooter";
-export { ImageGalleryHeader } from "./components/ImageGalleryHeader";
-export { ImageGalleryModal } from "./components/ImageGalleryModal";
-export { ImageLoadingSkeleton } from "./components/ImageLoadingSkeleton";
-export { MorePhotosCard } from "./components/MorePhotosCard";
-export { PhotoTabs } from "./components/PhotoTabs";
-export type { PhotoTabValue, PhotoCounts } from "./components/PhotoTabs";
-export { AssetCategoryTabs } from "./components/AssetCategoryTabs";
-export type { AssetCategoryValue, AssetCounts } from "./components/AssetCategoryTabs";
-export { AssetThumbnail } from "./components/AssetThumbnail";
-export type { AssetThumbnailProps } from "./components/AssetThumbnail";
+// ============================================================================
+// COMPONENTS
+// ============================================================================
 
-// Constants
-export * from "./constants/accessibilityStrings";
-export * from "./constants/gestureConstants";
+// ImageGallery - Full-screen gallery viewer
+export {
+  ImageGallery,
+  ImageGalleryModal,
+  ImageGalleryCarousel,
+  ImageGalleryHeader,
+  ImageGalleryFooter,
+  ImageErrorState,
+  ImageLoadingSkeleton,
+  type ImageGalleryCarouselRef,
+} from "./components/ImageGallery";
 
-// Hooks
-export { useAccessibilityAnnouncements } from "./hooks/useAccessibilityAnnouncements";
+// PhotoGrid - Grid view for photo collections
+export { default as PhotoGrid } from "./components/PhotoGrid";
+
+// PhotoPreview - Preview section components
+export {
+  PhotoPreviewSection,
+  PhotoPreviewSection as PhotoGallery, // Alias for backward compatibility
+  PhotoTabs,
+  MorePhotosCard,
+} from "./components/PhotoPreview";
+export type {
+  PhotoCategory,
+  PhotoCounts,
+  MorePhotosCardProps,
+} from "./components/PhotoPreview";
+
+// Assets - Document/asset display components
+export { AssetCategoryTabs, AssetThumbnail } from "./components/Assets";
+export type {
+  AssetCategoryValue,
+  AssetCounts,
+  AssetThumbnailProps,
+} from "./components/Assets";
+
+// ============================================================================
+// HOOKS
+// ============================================================================
+
+// Core gallery hooks
 export { useImageGallery } from "./hooks/useImageGallery";
-export { useImageLoading } from "./hooks/useImageLoading";
 export { useImageNavigation } from "./hooks/useImageNavigation";
+export { usePhotoCategoryData } from "./hooks/usePhotoCategoryData";
+
+// Image loading hooks
+export { useImageLoading } from "./hooks/useImageLoading";
 export { useImagePreloading } from "./hooks/useImagePreloading";
 export { useLazyLoading } from "./hooks/useLazyLoading";
+
+// Performance & memory hooks
 export { useMemoryManagement } from "./hooks/useMemoryManagement";
 export { usePerformanceMonitoring } from "./hooks/usePerformanceMonitoring";
 
-// Types
+// Accessibility hooks
+export { useAccessibilityAnnouncements } from "./hooks/useAccessibilityAnnouncements";
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+// Accessibility
+export * from "./constants/accessibilityStrings";
+
+// Gestures
+export * from "./constants/gestureConstants";
+
+// Performance (centralized constants)
+export {
+  LAZY_LOADING,
+  PRELOADING,
+  MEMORY,
+  PERFORMANCE_TARGETS,
+  PERFORMANCE_PENALTIES,
+} from "./constants/performanceConstants";
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
 export * from "./types/gallery.types";
 
-// Utils
-export * from "./utils/assetViewer";
+// ============================================================================
+// UTILITIES
+// ============================================================================
+
+// Index calculations (shared between lazy loading & preloading)
+export {
+  getIndicesInRange,
+  getIndicesInRangeSet,
+  getCombinedRangeSet,
+  isIndexInRange,
+  getDistanceFromCurrent,
+  sortByDistanceFromCurrent,
+} from "./utils/indexCalculations";
+
+// Asset type conversion
+export {
+  isDocumentImage,
+  isDocumentPdf,
+  convertDocumentsToPictures,
+  convertMediaToPictures,
+  filterImageDocuments,
+  filterPdfDocuments,
+} from "./utils/assetTypeConversion";
+
+// Asset routing
+export {
+  openAsset,
+  openPdfViewer,
+  openImageGallery,
+  type AssetGalleryHandlers,
+} from "./utils/assetRouter";
+
+// Performance utilities
 export * from "./utils/galleryPerformance";
+
+// Image preloading utilities
 export * from "./utils/imagePreloading";
+
+// Lazy loading utilities
 export * from "./utils/lazyLoading";
+
+// Memory management utilities
 export * from "./utils/memoryManagement";

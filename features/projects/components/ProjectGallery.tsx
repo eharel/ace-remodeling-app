@@ -51,7 +51,7 @@ export function ProjectGallery({
 }: ProjectGalleryProps) {
   const { width } = useWindowDimensions();
   const { theme } = useTheme();
-  const { refetchProjects, loading } = useProjects();
+  const { refetchProjects, isLoading } = useProjects();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshStartTime = useRef<number | null>(null);
 
@@ -59,7 +59,7 @@ export function ProjectGallery({
   useEffect(() => {
     if (!enableRefresh) return;
 
-    if (loading) {
+    if (isLoading) {
       // Refresh started - record start time
       if (!refreshStartTime.current) {
         refreshStartTime.current = Date.now();
@@ -79,7 +79,7 @@ export function ProjectGallery({
         return () => clearTimeout(timeoutId);
       }
     }
-  }, [loading, enableRefresh]);
+  }, [isLoading, enableRefresh]);
 
   const handleRefresh = useCallback(async () => {
     if (!enableRefresh) return;
@@ -109,6 +109,7 @@ export function ProjectGallery({
       flex: 1,
     },
     listContent: {
+      flexGrow: 1,
       paddingHorizontal: DesignTokens.spacing[6],
       paddingBottom: DesignTokens.spacing[5],
     },

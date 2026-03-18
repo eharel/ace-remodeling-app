@@ -28,11 +28,12 @@ export const mainTheme: Theme = {
     text: {
       primary: "#0f172a", // Very dark blue-gray for primary text
       secondary: "#475569", // Medium gray for secondary text
-      tertiary: "#ffffff", // White for tertiary text (good contrast on dark backgrounds)
+      tertiary: "#64748b", // Muted gray for low-emphasis text (icons, hints)
       inverse: "#ffffff", // White for text on dark backgrounds
       accent: "#BB9D67", // Warm gold for accent text
       disabled: "#94a3b8", // Light gray for disabled text
       placeholder: "#9ca3af", // Light gray for placeholder text
+      muted: "#9ca3af", // Muted text for inactive tabs on dark navbar
     },
 
     // Border colors - Subtle, professional borders

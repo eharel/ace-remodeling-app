@@ -74,15 +74,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setEditPin(pin);
             // Cache for offline use
             await AsyncStorage.setItem(CACHED_PIN_KEY, pin);
-            console.log('PIN loaded from Firestore');
           }
         } catch (pinError) {
           // If offline or Firestore fails, use cached PIN
-          console.log('Using cached PIN (offline mode)');
           const cachedPin = await AsyncStorage.getItem(CACHED_PIN_KEY);
           if (cachedPin) {
             setEditPin(cachedPin);
-            console.log('PIN loaded from cache');
           }
         }
 
@@ -98,7 +95,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
             permissions: getRolePermissions('editor'),
           };
           setUser(editorUser);
-          console.log('Restored authenticated editor session');
         } else {
           // Default viewer user
           const defaultUser: User = {
@@ -108,10 +104,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
             permissions: getRolePermissions('viewer'),
           };
           setUser(defaultUser);
-          console.log('Initialized as viewer');
         }
       } catch (error) {
-        console.error('Failed to initialize auth:', error);
         // Fallback to viewer on any error
         const defaultUser: User = {
           id: 'guest-viewer',
@@ -163,12 +157,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         // Validate PIN
         if (!editPin) {
-          console.error('PIN not loaded yet');
           return false;
         }
 
         if (enteredPin !== editPin) {
-          console.log('Invalid PIN');
           return false;
         }
 
@@ -185,10 +177,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Persist authentication state
         await AsyncStorage.setItem(EDIT_MODE_ENABLED_KEY, 'true');
 
-        console.log('Authentication successful - edit mode enabled');
         return true;
       } catch (error) {
-        console.error('Sign in failed:', error);
         return false;
       }
     },
@@ -212,10 +202,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       // Clear authentication state
       await AsyncStorage.setItem(EDIT_MODE_ENABLED_KEY, 'false');
-
-      console.log('Signed out - returned to viewer mode');
     } catch (error) {
-      console.error('Sign out failed:', error);
+      // Silent fail on sign out
     }
   }, []);
 

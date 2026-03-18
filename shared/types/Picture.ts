@@ -48,5 +48,12 @@ export interface Picture {
    * Used for performance optimization in thumbnail grids
    */
   thumbnailUrl?: string;
+
+  /**
+   * Media type — image (default) or video
+   * For MediaAsset: maps directly from mediaType field
+   * Documents are always images (PDFs are excluded by convertDocumentsToPictures)
+   */
+  mediaType?: "image" | "video";
 }
 

@@ -1,4 +1,6 @@
 import { Picture } from "@/shared/types";
+import { PRELOADING } from "../constants/performanceConstants";
+import { getIndicesInRange } from "./indexCalculations";
 
 /**
  * Image preloading utility functions for gallery
@@ -8,14 +10,9 @@ import { Picture } from "@/shared/types";
  */
 
 /**
- * Configuration constants for image preloading
+ * @deprecated Use PRELOADING from constants/performanceConstants instead
  */
-export const PRELOADING_CONSTANTS = {
-  /** Default preload radius around current index */
-  DEFAULT_PRELOAD_RADIUS: 2,
-  /** Preload timeout duration (ms) */
-  PRELOAD_TIMEOUT: 10000,
-} as const;
+export const PRELOADING_CONSTANTS = PRELOADING;
 
 /**
  * Calculates which image indices should be preloaded around current index
@@ -36,20 +33,7 @@ export function getPreloadIndices(
   imagesLength: number,
   preloadRadius: number
 ): number[] {
-  if (imagesLength === 0) {
-    return [];
-  }
-
-  const indices = new Set<number>();
-
-  for (let i = -preloadRadius; i <= preloadRadius; i++) {
-    const index = currentIndex + i;
-    if (index >= 0 && index < imagesLength) {
-      indices.add(index);
-    }
-  }
-
-  return Array.from(indices);
+  return getIndicesInRange(currentIndex, imagesLength, preloadRadius);
 }
 
 /**

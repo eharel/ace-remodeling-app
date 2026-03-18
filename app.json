@@ -2,7 +2,7 @@
   "expo": {
     "name": "ACE Remodeling TX",
     "slug": "ace-remodeling-app",
-    "version": "2.1.0",
+    "version": "3.3.0",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
     "scheme": "aceremodelingapp",
@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.aceremodelingtx.app",
-      "buildNumber": "11",
+      "buildNumber": "16",
       "infoPlist": {
         "CFBundleDisplayName": "ACE Remodeling TX",
         "CFBundleName": "ACE Remodeling TX",
@@ -49,8 +49,15 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to add them to projects."
+        }
+      ],
       "@config-plugins/react-native-blob-util",
-      "@config-plugins/react-native-pdf"
+      "@config-plugins/react-native-pdf",
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true
@@ -58,7 +65,7 @@
     "updates": {
       "url": "https://u.expo.dev/ccb81db1-d023-4ef7-bcb9-b8c536378d91"
     },
-    "runtimeVersion": "2.0.0",
+    "runtimeVersion": "3.1.0",
     "extra": {
       "router": {},
       "eas": {

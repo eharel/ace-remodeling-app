@@ -69,6 +69,11 @@ export function SearchSuggestions({
       return [];
     }
 
+    // Defensive check for undefined cardViews
+    if (!cardViews || !Array.isArray(cardViews)) {
+      return [];
+    }
+
     const lowerQuery = query.toLowerCase().trim();
 
     // Create scored matches using pure utility function

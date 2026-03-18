@@ -21,15 +21,17 @@ import {
   ThemedView,
   ThemeToggle,
 } from "@/shared/components";
-import { useAuth, useTheme } from "@/shared/contexts";
+import { useAuth, useProjects, useTheme } from "@/shared/contexts";
 import { useVersionCheck } from "@/shared/hooks";
 
 export default function SettingsScreen() {
   const { theme } = useTheme();
   const router = useRouter();
-  const { updateRequired } = useVersionCheck();
+  const { updateRequired, isLoading, currentBuild, minimumBuild } =
+    useVersionCheck();
 
   const { isAuthenticated, signIn, signOut } = useAuth();
+  const { projects } = useProjects();
   const [pinInput, setPinInput] = useState("");
   const [isEnabling, setIsEnabling] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -467,10 +469,15 @@ export default function SettingsScreen() {
             <ThemedText variant="caption" style={styles.versionInfo}>
               Built for ACE Remodeling TX • Transforming Austin Homes
             </ThemedText>
+            {!isLoading && (currentBuild !== null || minimumBuild !== null) && (
+              <ThemedText variant="caption" style={styles.versionInfo}>
+                Build {currentBuild ?? "?"} • Min {minimumBuild ?? "?"}
+              </ThemedText>
+            )}
           </ThemedView>
         </View>
 
-        {__DEV__ && (
+        {isAuthenticated && (
           <ThemedText
             variant="caption"
             style={{
@@ -479,7 +486,12 @@ export default function SettingsScreen() {
             }}
           >
             Environment: {currentEnvironment}
-            {"\n"}Project: {currentProjectId}
+            {"\n"}Firebase project: {currentProjectId}
+            {"\n"}Projects loaded: {projects.length}
+            {"\n"}design-/-development count:{" "}
+            {projects.filter((p) =>
+              p.components.some((c) => c.category === "design-/-development")
+            ).length}
           </ThemedText>
         )}
       </ScrollView>

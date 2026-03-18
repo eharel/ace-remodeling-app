@@ -195,15 +195,7 @@ export class ProgressTracker {
    * Print final summary to console
    */
   printSummary(): void {
-    console.log("\n\n📊 Upload Summary:");
-    console.log(`   ✅ Completed: ${this.stats.completed}`);
-    console.log(`   ❌ Failed: ${this.stats.failed}`);
-    console.log(`   ⏭️  Skipped: ${this.stats.skipped}`);
-    console.log(`   📦 Total: ${this.stats.total}`);
-    console.log(
-      `   💾 Uploaded: ${formatBytes(this.stats.uploadedBytes)}`
-    );
-    console.log(`   ⏱️  Time: ${this.formatTime(this.stats.elapsedTime)}`);
+    // Summary removed - logs disabled
   }
 }
 

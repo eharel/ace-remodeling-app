@@ -5,19 +5,13 @@
  * visible, loaded, or cleaned up based on current position and configuration.
  */
 
+import { LAZY_LOADING } from "../constants/performanceConstants";
+import { getIndicesInRange, getCombinedRangeSet } from "./indexCalculations";
+
 /**
- * Configuration constants for lazy loading
+ * @deprecated Use LAZY_LOADING from constants/performanceConstants instead
  */
-export const LAZY_LOADING_CONSTANTS = {
-  /** Default visible range around current index */
-  DEFAULT_VISIBLE_RANGE: 3,
-  /** Default load threshold for preloading */
-  DEFAULT_LOAD_THRESHOLD: 2,
-  /** Staggered loading delay between images (ms) */
-  LOADING_DELAY_STEP: 50,
-  /** Simulated image load time (ms) */
-  SIMULATED_LOAD_TIME: 100,
-} as const;
+export const LAZY_LOADING_CONSTANTS = LAZY_LOADING;
 
 /**
  * Calculates which image indices should be visible (rendered) around current index
@@ -38,20 +32,7 @@ export function getVisibleIndices(
   imagesLength: number,
   visibleRange: number
 ): number[] {
-  if (imagesLength === 0) {
-    return [];
-  }
-
-  const indices = new Set<number>();
-
-  for (let i = -visibleRange; i <= visibleRange; i++) {
-    const index = currentIndex + i;
-    if (index >= 0 && index < imagesLength) {
-      indices.add(index);
-    }
-  }
-
-  return Array.from(indices);
+  return getIndicesInRange(currentIndex, imagesLength, visibleRange);
 }
 
 /**
@@ -73,20 +54,7 @@ export function getLoadIndices(
   imagesLength: number,
   loadThreshold: number
 ): number[] {
-  if (imagesLength === 0) {
-    return [];
-  }
-
-  const indices = new Set<number>();
-
-  for (let i = -loadThreshold; i <= loadThreshold; i++) {
-    const index = currentIndex + i;
-    if (index >= 0 && index < imagesLength) {
-      indices.add(index);
-    }
-  }
-
-  return Array.from(indices);
+  return getIndicesInRange(currentIndex, imagesLength, loadThreshold);
 }
 
 /**
@@ -110,14 +78,10 @@ export function getKeepIndices(
   visibleRange: number,
   loadThreshold: number
 ): Set<number> {
-  const visibleIndices = getVisibleIndices(
-    currentIndex,
-    imagesLength,
-    visibleRange
-  );
-  const loadIndices = getLoadIndices(currentIndex, imagesLength, loadThreshold);
-
-  return new Set([...visibleIndices, ...loadIndices]);
+  return getCombinedRangeSet(currentIndex, imagesLength, [
+    visibleRange,
+    loadThreshold,
+  ]);
 }
 
 /**
@@ -135,7 +99,7 @@ export function getKeepIndices(
  */
 export function calculateLoadingDelay(
   index: number,
-  baseDelay: number = LAZY_LOADING_CONSTANTS.LOADING_DELAY_STEP
+  baseDelay: number = LAZY_LOADING.LOADING_DELAY_STEP
 ): number {
   return index * baseDelay;
 }

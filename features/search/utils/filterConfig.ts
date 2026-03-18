@@ -28,11 +28,16 @@ import { FilterOption } from "../types/types";
  * // }
  */
 export function createFilterConfig(
-  availableProjectManagers: string[],
-  availableTags: string[]
+  availableProjectManagers: string[] = [],
+  availableTags: string[] = []
 ) {
+  // Ensure we have arrays (defensive programming)
+  const safeProjectManagers = Array.isArray(availableProjectManagers) ? availableProjectManagers : [];
+  const safeTags = Array.isArray(availableTags) ? availableTags : [];
+
   // Category options - dynamically generated from centralized category constants
-  const categoryOptions: FilterOption<ComponentCategory>[] = getAllCategories().map(
+  const categories = getAllCategories() || [];
+  const categoryOptions: FilterOption<ComponentCategory>[] = categories.map(
     (category) => ({
       value: category,
       label: getCategoryLabel(category),
@@ -47,7 +52,7 @@ export function createFilterConfig(
 
   // Project Manager options - dynamic based on available PMs
   const projectManagerOptions: FilterOption<string>[] = (() => {
-    if (availableProjectManagers.length === 0) {
+    if (safeProjectManagers.length === 0) {
       // Fallback options if no PMs are found (alphabetically ordered)
       return [
         { value: "Asaf Shoshanan", label: "Asaf Shoshanan" },
@@ -58,11 +63,11 @@ export function createFilterConfig(
         { value: "Rose Otano", label: "Rose Otano" },
       ];
     }
-    return availableProjectManagers.map((pm) => ({ value: pm, label: pm }));
+    return safeProjectManagers.map((pm) => ({ value: pm, label: pm }));
   })();
 
   // Tag options - dynamic based on available tags
-  const tagOptions: FilterOption<string>[] = availableTags.map((tag) => ({
+  const tagOptions: FilterOption<string>[] = safeTags.map((tag) => ({
     value: tag,
     label: tag,
   }));

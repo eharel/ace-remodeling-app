@@ -42,14 +42,6 @@ class ErrorLogger {
       this.logs = this.logs.slice(0, this.maxLogs);
     }
 
-    // Console logging for development
-    const logMessage = `[${level.toUpperCase()}] ${message}`;
-    if (context) {
-      console.log(logMessage, context);
-    } else {
-      console.log(logMessage);
-    }
-
     // In production, you would send this to your error reporting service
     // this.sendToErrorService(log);
   }

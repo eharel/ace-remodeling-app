@@ -1,11 +1,11 @@
 import {
   Document,
-  DocumentType,
-  DOCUMENT_TYPES,
+  DocumentCategory,
+  DOCUMENT_CATEGORIES,
 } from "@/shared/types";
 
 /**
- * Configuration for an asset section (group of documents by type)
+ * Configuration for an asset section (group of documents by category)
  */
 export interface AssetSection {
   /** Unique key for React rendering */
@@ -14,8 +14,8 @@ export interface AssetSection {
   /** Display label for the section */
   label: string;
 
-  /** Document type for this section */
-  type: DocumentType;
+  /** Document category for this section */
+  category: DocumentCategory;
 
   /** Documents in this section */
   documents: Document[];
@@ -25,73 +25,78 @@ export interface AssetSection {
 }
 
 /**
- * Human-readable labels for document types
- * Some types use plural forms for section headers
+ * Human-readable labels for document categories
+ * Some categories use plural forms for section headers
  */
-const TYPE_LABELS: Record<DocumentType, string> = {
-  [DOCUMENT_TYPES.RENDERING_3D]: "Renderings",
-  [DOCUMENT_TYPES.FLOOR_PLAN]: "Floor Plans",
-  [DOCUMENT_TYPES.MATERIALS]: "Materials",
-  [DOCUMENT_TYPES.PERMIT]: "Permits",
-  [DOCUMENT_TYPES.CONTRACT]: "Contracts",
-  [DOCUMENT_TYPES.INVOICE]: "Invoices",
-  [DOCUMENT_TYPES.OTHER]: "Other",
+const CATEGORY_LABELS: Record<DocumentCategory, string> = {
+  [DOCUMENT_CATEGORIES.RENDERING_3D]: "Renderings",
+  [DOCUMENT_CATEGORIES.FLOOR_PLAN]: "Floor Plans",
+  [DOCUMENT_CATEGORIES.MATERIALS]: "Materials",
+  [DOCUMENT_CATEGORIES.PERMIT]: "Permits",
+  [DOCUMENT_CATEGORIES.CONTRACT]: "Contracts",
+  [DOCUMENT_CATEGORIES.INVOICE]: "Invoices",
+  [DOCUMENT_CATEGORIES.OTHER]: "Other",
 };
 
 /**
- * Get display label for a document type
+ * Get display label for a document category
  *
- * @param type - The document type to get label for
- * @returns Human-readable label for the type
+ * @param category - The document category to get label for
+ * @returns Human-readable label for the category
  */
-export function getTypeLabel(type: DocumentType): string {
-  return TYPE_LABELS[type] || type;
+export function getCategoryLabel(category: DocumentCategory): string {
+  return CATEGORY_LABELS[category] || category;
 }
 
 /**
- * Determine appropriate layout for a document type
+ * @deprecated Use getCategoryLabel instead
+ */
+export const getTypeLabel = getCategoryLabel;
+
+/**
+ * Determine appropriate layout for a document category
  *
  * Visual content (renderings, plans, materials) uses grid layout.
  * Text documents (contracts, permits) use list layout.
  *
- * @param type - The document type to determine layout for
+ * @param category - The document category to determine layout for
  * @returns Layout hint: "grid" for visual content, "list" for text documents
  */
-function getLayoutForType(type: DocumentType): "grid" | "list" {
-  const visualTypes: DocumentType[] = [
-    DOCUMENT_TYPES.RENDERING_3D,
-    DOCUMENT_TYPES.FLOOR_PLAN,
-    DOCUMENT_TYPES.MATERIALS,
+function getLayoutForCategory(category: DocumentCategory): "grid" | "list" {
+  const visualCategories: DocumentCategory[] = [
+    DOCUMENT_CATEGORIES.RENDERING_3D,
+    DOCUMENT_CATEGORIES.FLOOR_PLAN,
+    DOCUMENT_CATEGORIES.MATERIALS,
   ];
 
-  return visualTypes.includes(type) ? "grid" : "list";
+  return visualCategories.includes(category) ? "grid" : "list";
 }
 
 /**
- * Logical display order for document types
+ * Logical display order for document categories
  * Visual content first, then administrative documents
  */
-const TYPE_ORDER: DocumentType[] = [
-  DOCUMENT_TYPES.RENDERING_3D,
-  DOCUMENT_TYPES.MATERIALS,
-  DOCUMENT_TYPES.FLOOR_PLAN,
-  DOCUMENT_TYPES.CONTRACT,
-  DOCUMENT_TYPES.PERMIT,
-  DOCUMENT_TYPES.INVOICE,
-  DOCUMENT_TYPES.OTHER,
+const CATEGORY_ORDER: DocumentCategory[] = [
+  DOCUMENT_CATEGORIES.RENDERING_3D,
+  DOCUMENT_CATEGORIES.MATERIALS,
+  DOCUMENT_CATEGORIES.FLOOR_PLAN,
+  DOCUMENT_CATEGORIES.CONTRACT,
+  DOCUMENT_CATEGORIES.PERMIT,
+  DOCUMENT_CATEGORIES.INVOICE,
+  DOCUMENT_CATEGORIES.OTHER,
 ];
 
 /**
- * Generate asset sections based on available document types
+ * Generate asset sections based on available document categories
  *
- * Groups documents by type and creates sections only for types that exist.
- * Each section includes layout hint (grid vs list) based on content type.
+ * Groups documents by category and creates sections only for categories that exist.
+ * Each section includes layout hint (grid vs list) based on content category.
  *
  * LOGIC:
- * - Groups documents by type
+ * - Groups documents by category
  * - Orders sections: visual content first, then administrative
  * - Provides layout hint for each section
- * - Only creates sections for types with actual documents
+ * - Only creates sections for categories with actual documents
  *
  * EXAMPLE:
  * Documents include renderings and contracts →
@@ -132,30 +137,30 @@ const TYPE_ORDER: DocumentType[] = [
 export function getAssetSections(
   documents: Document[] = []
 ): AssetSection[] {
-  // Group documents by type
+  // Group documents by category
   const grouped = documents.reduce(
     (acc, doc) => {
-      if (!acc[doc.type]) {
-        acc[doc.type] = [];
+      if (!acc[doc.category]) {
+        acc[doc.category] = [];
       }
-      acc[doc.type].push(doc);
+      acc[doc.category].push(doc);
       return acc;
     },
-    {} as Record<DocumentType, Document[]>
+    {} as Record<DocumentCategory, Document[]>
   );
 
-  // Create sections in logical order, only for types that exist
+  // Create sections in logical order, only for categories that exist
   const sections: AssetSection[] = [];
 
-  TYPE_ORDER.forEach((type) => {
-    const docs = grouped[type];
+  CATEGORY_ORDER.forEach((category) => {
+    const docs = grouped[category];
     if (docs && docs.length > 0) {
       sections.push({
-        key: type,
-        label: getTypeLabel(type),
-        type: type,
+        key: category,
+        label: getCategoryLabel(category),
+        category: category,
         documents: docs,
-        layout: getLayoutForType(type),
+        layout: getLayoutForCategory(category),
       });
     }
   });

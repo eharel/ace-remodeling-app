@@ -137,11 +137,6 @@ export async function createProjects(
 ): Promise<CreateSummary> {
   const { dryRun = false, clearExisting = false } = options;
 
-  console.log(`\n📝 Creating ${projects.length} projects in Firestore...`);
-  if (dryRun) {
-    console.log("   [DRY RUN MODE - No actual writes]\n");
-  }
-
   // Clear existing if requested
   if (clearExisting && !dryRun) {
     await clearAllProjects();
@@ -160,9 +155,6 @@ export async function createProjects(
         0
       );
 
-      console.log(
-        `   [DRY RUN] Would create: Project ${project.number} (${project.components.length} components, ${totalMedia} media, ${totalAssets} assets)`
-      );
       results.push({
         success: true,
         firestoreId: "dry-run-id",
@@ -182,16 +174,9 @@ export async function createProjects(
           0
         );
 
-        console.log(
-          `   ✅ Created: Project ${project.number} - ${project.name}`
-        );
-        console.log(`      Components: ${project.components.length}`);
-        console.log(`      Total media: ${totalMedia}`);
-        console.log(`      Total assets: ${totalAssets}`);
+        // Project created - logs disabled
       } else {
-        console.log(
-          `   ❌ Failed: Project ${project.number} - ${result.error}`
-        );
+        // Project failed - logs disabled
       }
     }
   }
@@ -199,11 +184,7 @@ export async function createProjects(
   const successCount = results.filter((r) => r.success).length;
   const failureCount = results.filter((r) => !r.success).length;
 
-  // Print summary
-  console.log(`\n📊 Firestore Creation Summary:`);
-  console.log(`   ✅ Success: ${successCount}`);
-  console.log(`   ❌ Failed: ${failureCount}`);
-  console.log(`   📦 Total: ${projects.length}`);
+  // Print summary - logs disabled
 
   return {
     success: failureCount === 0,
@@ -221,14 +202,11 @@ export async function createProjects(
  * @returns Promise<number> Number of projects deleted
  */
 export async function clearAllProjects(): Promise<number> {
-  console.log("🗑️  Clearing existing projects...");
-
   try {
     const projectsCollection = collection(db, "projects");
     const snapshot = await getDocs(projectsCollection);
 
     if (snapshot.empty) {
-      console.log("   No existing projects to delete");
       return 0;
     }
 
@@ -237,12 +215,10 @@ export async function clearAllProjects(): Promise<number> {
     );
     await Promise.all(deletePromises);
 
-    console.log(`   ✅ Deleted ${snapshot.size} existing projects\n`);
     return snapshot.size;
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : String(error);
-    console.error(`   ❌ Error clearing projects: ${errorMessage}`);
     throw error;
   }
 }
@@ -258,7 +234,6 @@ export async function getProjectCount(): Promise<number> {
     const snapshot = await getDocs(projectsCollection);
     return snapshot.size;
   } catch (error) {
-    console.error("Error getting project count:", error);
     return 0;
   }
 }
@@ -267,7 +242,7 @@ export async function getProjectCount(): Promise<number> {
 if (require.main === module) {
   (async () => {
     const count = await getProjectCount();
-    console.log(`Current projects in Firestore: ${count}`);
+    // Project count - logs disabled
   })();
 }
 

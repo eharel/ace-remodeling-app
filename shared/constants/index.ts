@@ -8,3 +8,6 @@ export * from "./categoryConfig";
 
 // Checklist configuration exports
 export * from "./ChecklistConfig";
+
+// Photo category configuration exports
+export * from "./photoCategoryConfig";

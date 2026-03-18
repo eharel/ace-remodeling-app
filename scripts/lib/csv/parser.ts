@@ -9,6 +9,7 @@
  */
 
 import * as fs from "fs/promises";
+import { nanoid } from "nanoid";
 import * as Papa from "papaparse";
 import {
   ComponentCategory,
@@ -314,27 +315,12 @@ function convertRowsToProject(projectNumber: string, rows: CSVRow[]): Project {
   }
 
   // Create components from all rows
-  // Track category usage to ensure unique IDs
-  const categoryCounts = new Map<string, number>();
   const components: ProjectComponent[] = rows.map((row) => {
     const categoryKey = row.category.trim();
-    const count = categoryCounts.get(categoryKey) || 0;
-    categoryCounts.set(categoryKey, count + 1);
-
-    // Generate unique component ID
-    // Format: {number}-{category}[-{subcategory}][-{index}]
-    let componentId = `${projectNumber}-${categoryKey}`;
-    if (row.subcategory?.trim()) {
-      componentId += `-${row.subcategory.trim()}`;
-    }
-    // Add index if multiple components share same category/subcategory
-    if (count > 0) {
-      componentId += `-${count}`;
-    }
 
     const component: ProjectComponent = {
-      // Identity
-      id: componentId,
+      // Identity - Generate unique ID using nanoid(12)
+      id: nanoid(12),
       category: categoryKey as ComponentCategory,
       ...(row.subcategory?.trim() && {
         subcategory: row.subcategory.trim() as ComponentSubcategory,
@@ -347,6 +333,9 @@ function convertRowsToProject(projectNumber: string, rows: CSVRow[]): Project {
 
       // Content (required, can be empty)
       media: [],
+
+      // Metadata
+      isFeatured: false,
 
       // Timestamps
       createdAt: new Date().toISOString(),
@@ -384,7 +373,7 @@ function convertRowsToProject(projectNumber: string, rows: CSVRow[]): Project {
     // Metadata
     status: normalizeStatus(firstRow.status) as ProjectStatus,
     ...(tags.length > 0 && { tags }),
-    ...(isFeatured && { isFeatured }),
+    isFeatured: isFeatured || false,
 
     // Timestamps
     createdAt: new Date().toISOString(),

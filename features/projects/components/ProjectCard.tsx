@@ -52,7 +52,6 @@ interface ProjectCardProps {
 
 // Constants for horizontal variant
 const HORIZONTAL_CARD_WIDTH = 300;
-const HORIZONTAL_CARD_HEIGHT = 240;
 const HORIZONTAL_IMAGE_HEIGHT = 160;
 
 function ProjectCardComponent({
@@ -169,7 +168,7 @@ function ProjectCardComponent({
           borderColor: theme.colors.border.primary,
           ...(variant === "horizontal" && {
             width: HORIZONTAL_CARD_WIDTH,
-            height: HORIZONTAL_CARD_HEIGHT,
+            // Height is dynamic - determined by content, not fixed
           }),
         },
         thumbnail: {
@@ -182,10 +181,7 @@ function ProjectCardComponent({
               ? DesignTokens.spacing[3]
               : DesignTokens.spacing[4],
           gap: DesignTokens.spacing[2],
-          ...(variant === "horizontal" && {
-            flex: 1,
-            justifyContent: "space-between",
-          }),
+          // Content height is determined by its children, not constrained
         },
         title: {
           fontSize:

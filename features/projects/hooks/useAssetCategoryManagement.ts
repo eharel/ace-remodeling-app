@@ -1,0 +1,219 @@
+import { useEffect, useMemo, useState } from "react";
+import { convertDocumentsToPictures } from "@/features/gallery";
+import type { AssetCategoryValue } from "@/features/gallery";
+import type { Document } from "@/shared/types";
+
+/**
+ * Map document category display value to AssetCategoryValue (kebab-case tab value)
+ * Database stores display format: "Floor Plan", "3D Rendering", etc.
+ * UI tabs use kebab-case: "floor-plan", "rendering-3d", etc.
+ */
+const categoryToTabValue = (category: string): AssetCategoryValue => {
+  const mapping: Record<string, AssetCategoryValue> = {
+    "Floor Plan": "floor-plan",
+    Materials: "materials",
+    "3D Rendering": "rendering-3d",
+    Contract: "contract",
+    Permit: "permit",
+    Invoice: "invoice",
+    Other: "other",
+  };
+
+  return mapping[category] || "other";
+};
+
+/**
+ * Get the category tab value for a document
+ */
+const getDocumentTabValue = (doc: Document): AssetCategoryValue => {
+  return categoryToTabValue(doc.category);
+};
+
+/**
+ * Get label for asset category
+ */
+const getAssetCategoryLabel = (category: AssetCategoryValue): string => {
+  const labels: Record<AssetCategoryValue, string> = {
+    "floor-plan": "Plans",
+    materials: "Materials",
+    "rendering-3d": "Renderings",
+    contract: "Contracts",
+    permit: "Permits",
+    invoice: "Invoices",
+    other: "Other",
+  };
+  return labels[category] || category;
+};
+
+interface UseAssetCategoryManagementParams {
+  documents: Document[];
+  selectedComponentId: string | null;
+}
+
+/**
+ * Hook for managing asset category selection, filtering, and counting
+ * Handles category mapping, priority-based selection, and document filtering
+ */
+export function useAssetCategoryManagement({
+  documents,
+  selectedComponentId,
+}: UseAssetCategoryManagementParams) {
+  const [selectedAssetCategory, setSelectedAssetCategory] =
+    useState<AssetCategoryValue | null>(null);
+  const [selectedAssetIndex, setSelectedAssetIndex] = useState(0);
+  const [assetGalleryVisible, setAssetGalleryVisible] = useState(false);
+
+  // Reset asset category when component changes - set to first available category
+  useEffect(() => {
+    if (documents.length === 0) {
+      setSelectedAssetCategory(null);
+      return;
+    }
+
+    // Find first available category from documents in priority order
+    const categoryOrder: AssetCategoryValue[] = [
+      "floor-plan",
+      "materials",
+      "rendering-3d",
+      "contract",
+      "permit",
+      "invoice",
+      "other",
+    ];
+
+    const documentCategories = new Set<string>();
+    documents.forEach((doc) => {
+      const category = getDocumentTabValue(doc);
+      documentCategories.add(category);
+    });
+
+    // Find first category in priority order that exists in documents
+    const firstCategory = categoryOrder.find((cat) =>
+      documentCategories.has(cat)
+    );
+
+    if (firstCategory) {
+      setSelectedAssetCategory(firstCategory);
+    } else if (documentCategories.size > 0) {
+      // Fallback: use first category from set if not in priority order
+      setSelectedAssetCategory(
+        Array.from(documentCategories)[0] as AssetCategoryValue
+      );
+    } else {
+      setSelectedAssetCategory(null);
+    }
+  }, [selectedComponentId, documents]);
+
+  /**
+   * Calculate asset counts for each category
+   * Used for SegmentedControl to show counts
+   */
+  const assetCounts = useMemo(() => {
+    const counts: Record<AssetCategoryValue, number> = {
+      "floor-plan": 0,
+      materials: 0,
+      "rendering-3d": 0,
+      contract: 0,
+      permit: 0,
+      invoice: 0,
+      other: 0,
+    };
+
+    documents.forEach((doc) => {
+      const tabValue = getDocumentTabValue(doc);
+      counts[tabValue]++;
+    });
+
+    return counts;
+  }, [documents]);
+
+  /**
+   * Available asset categories (only those with documents)
+   * Ordered by priority
+   */
+  const availableAssetCategories = useMemo(() => {
+    const categoryOrder: AssetCategoryValue[] = [
+      "floor-plan",
+      "materials",
+      "rendering-3d",
+      "contract",
+      "permit",
+      "invoice",
+      "other",
+    ];
+
+    return categoryOrder.filter((cat) => assetCounts[cat] > 0);
+  }, [assetCounts]);
+
+  /**
+   * Filtered documents based on selected asset category
+   * Uses doc.category instead of doc.type (which is legacy)
+   */
+  const filteredDocuments = useMemo(() => {
+    if (!selectedAssetCategory) {
+      return [];
+    }
+
+    return documents.filter((doc) => {
+      const docTabValue = getDocumentTabValue(doc);
+      return docTabValue === selectedAssetCategory;
+    });
+  }, [documents, selectedAssetCategory]);
+
+  /**
+   * Convert filtered documents to gallery format for images
+   * Used for displaying asset images in the gallery modal
+   */
+  const assetGalleryImages = useMemo(() => {
+    return convertDocumentsToPictures(filteredDocuments);
+  }, [filteredDocuments]);
+
+  // Create a map: document URL -> gallery image index
+  // Use URL as key since it's guaranteed to be unique and consistent
+  const documentToImageIndex = useMemo(() => {
+    const map = new Map<string, number>();
+
+    // For each image in the gallery, use its URI (URL) as the key
+    // URLs are unique and consistent between documents and gallery images
+    assetGalleryImages.forEach((galleryImage, galleryIndex) => {
+      map.set(galleryImage.uri, galleryIndex);
+    });
+
+    return map;
+  }, [assetGalleryImages]);
+
+  /**
+   * Ensure selectedAssetIndex is within bounds when assetGalleryImages changes
+   */
+  useEffect(() => {
+    if (assetGalleryImages.length > 0) {
+      if (
+        selectedAssetIndex >= assetGalleryImages.length ||
+        selectedAssetIndex < 0
+      ) {
+        setSelectedAssetIndex(0);
+      }
+    } else {
+      // If images array becomes empty, close the gallery
+      if (assetGalleryVisible) {
+        setAssetGalleryVisible(false);
+        setSelectedAssetIndex(0);
+      }
+    }
+  }, [assetGalleryImages.length, selectedAssetIndex, assetGalleryVisible]);
+
+  return {
+    selectedAssetCategory,
+    setSelectedAssetCategory,
+    selectedAssetIndex,
+    setSelectedAssetIndex,
+    assetGalleryVisible,
+    setAssetGalleryVisible,
+    assetCounts,
+    availableAssetCategories,
+    filteredDocuments,
+    assetGalleryImages,
+    documentToImageIndex,
+    getAssetCategoryLabel,
+  };
+}

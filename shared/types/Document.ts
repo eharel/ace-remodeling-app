@@ -1,13 +1,14 @@
-import { FileAsset } from "./FileAsset";
+import { FileAsset, FileAssetSchema } from "./FileAsset";
+import { z } from "zod";
 
 /**
- * Document types for better type safety
- * 
+ * Document categories for better type safety
+ *
  * Documents represent reference materials and supporting assets.
  * This includes PDFs (contracts, permits), images (floor plans, material samples),
  * and other file types that support the project but aren't gallery showcase photos.
  */
-export const DOCUMENT_TYPES = {
+export const DOCUMENT_CATEGORIES = {
   RENDERING_3D: "3D Rendering",
   FLOOR_PLAN: "Floor Plan",
   MATERIALS: "Materials",
@@ -17,19 +18,40 @@ export const DOCUMENT_TYPES = {
   OTHER: "Other",
 } as const;
 
-export type DocumentType = (typeof DOCUMENT_TYPES)[keyof typeof DOCUMENT_TYPES];
+export type DocumentCategory =
+  (typeof DOCUMENT_CATEGORIES)[keyof typeof DOCUMENT_CATEGORIES];
+
+const documentCategoryValues = Object.values(DOCUMENT_CATEGORIES);
+export const DocumentCategorySchema = z.enum(
+  documentCategoryValues as [DocumentCategory, ...DocumentCategory[]]
+);
+
+/**
+ * @deprecated Use DOCUMENT_CATEGORIES instead
+ */
+export const DOCUMENT_TYPES = DOCUMENT_CATEGORIES;
+
+/**
+ * @deprecated Use DocumentCategory instead
+ */
+export type DocumentType = DocumentCategory;
+
+/**
+ * @deprecated Use DocumentCategorySchema instead
+ */
+export const DocumentTypeSchema = DocumentCategorySchema;
 
 /**
  * Document represents project-related files (contracts, permits, plans, etc.)
  *
  * Extends FileAsset with document-specific fields for categorization and display.
- * Documents are organized by type (Floor Plan, Permit, Contract, etc.) and can
+ * Documents are organized by category (Floor Plan, Permit, Contract, etc.) and can
  * be PDFs, images, or other file formats.
  *
  * INHERITANCE:
  * Inherits common file fields (id, url, storagePath, etc.) from FileAsset.
  *
- * DOCUMENT TYPES:
+ * DOCUMENT CATEGORIES:
  * Categorized by purpose (Floor Plan, Permit, Contract, Invoice, etc.) to enable
  * organized document sections and filtered views.
  *
@@ -37,16 +59,11 @@ export type DocumentType = (typeof DOCUMENT_TYPES)[keyof typeof DOCUMENT_TYPES];
  * Documents can be any file type (PDF, PNG, JPG, etc.). The fileType field
  * stores the MIME type for proper handling.
  */
-export interface Document extends FileAsset {
-  /** Display name for the document */
-  name: string;
 
-  /** Type-safe document type category */
-  type: DocumentType;
+export const DocumentSchema = FileAssetSchema.extend({
+  name: z.string(),
+  category: DocumentCategorySchema,
+  fileType: z.string(),
+});
 
-  /** MIME type (e.g., "application/pdf", "image/jpeg") */
-  fileType: string;
-
-  /** @deprecated For compatibility with uploaded Firebase data */
-  category?: string;
-}
+export type Document = z.infer<typeof DocumentSchema>;

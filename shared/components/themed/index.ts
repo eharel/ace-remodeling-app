@@ -6,6 +6,8 @@ export type { ThemedButtonProps } from "./ThemedButton";
 export { ThemedIconButton } from "./ThemedIconButton";
 export type { ThemedIconButtonProps } from "./ThemedIconButton";
 export { ThemedInput } from "./ThemedInput";
+export { ThemedSegmentedControl } from "./ThemedSegmentedControl";
+export type { SegmentOption } from "./ThemedSegmentedControl";
 export { ThemedText, ThemedTextVariants } from "./ThemedText";
 export { ThemedView } from "./ThemedView";
 

@@ -33,11 +33,11 @@ import { CATEGORY_DISPLAY_ORDER } from "@/shared/utils";
 export default function ShowcaseScreen() {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const { featuredProjects, loading } = useProjects();
+  const { featuredProjects, isLoading } = useProjects();
 
   /**
    * Group featured projects by category dynamically
-   * Only includes categories that have at least 1 featured project
+   * Only includes categories where the component itself is featured
    * Returns a Map for efficient lookups and iteration
    */
   const featuredByCategory = useMemo(() => {
@@ -52,25 +52,26 @@ export default function ShowcaseScreen() {
     };
 
     featuredProjects.forEach((project) => {
-      // Group by ALL component categories - show project in each category it belongs to
-      // This way a project with [bathroom, kitchen, full-home] appears in all three sections
-      const categories = project.components.map((c) => c.category);
-      if (categories.length === 0) {
-        // Fallback if no components
-        const defaultCategory = normalizeCategory("miscellaneous");
-        const existing = grouped.get(defaultCategory) || [];
-        grouped.set(defaultCategory, [...existing, project]);
-      } else {
-        // Add project to each category it belongs to
-        categories.forEach((rawCategory) => {
-          const normalizedCategory = normalizeCategory(rawCategory);
-          const existing = grouped.get(normalizedCategory) || [];
-          // Only add if not already in this category (avoid duplicates)
-          if (!existing.includes(project)) {
-            grouped.set(normalizedCategory, [...existing, project]);
-          }
-        });
+      // Only group by FEATURED component categories
+      // A project only appears in a category section if that specific component is featured
+      const featuredCategories = project.components
+        .filter((c) => c.isFeatured === true)
+        .map((c) => c.category);
+
+      if (featuredCategories.length === 0) {
+        // Fallback if no featured components (shouldn't happen since featuredProjects is pre-filtered)
+        return;
       }
+
+      // Add project to each category where the component is featured
+      featuredCategories.forEach((rawCategory) => {
+        const normalizedCategory = normalizeCategory(rawCategory);
+        const existing = grouped.get(normalizedCategory) || [];
+        // Only add if not already in this category (avoid duplicates)
+        if (!existing.includes(project)) {
+          grouped.set(normalizedCategory, [...existing, project]);
+        }
+      });
     });
 
     return grouped;
@@ -180,7 +181,7 @@ export default function ShowcaseScreen() {
         contentContainerStyle={styles.content}
       >
         {/* Loading State - Only show on initial load, not during refresh */}
-        {loading && featuredProjects.length === 0 ? (
+        {isLoading && featuredProjects.length === 0 ? (
           <LoadingState message="Loading showcase..." />
         ) : (
           <>

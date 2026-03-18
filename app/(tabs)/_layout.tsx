@@ -14,7 +14,8 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: theme.colors.interactive.primary,
-        tabBarInactiveTintColor: theme.colors.text.tertiary,
+        // Use muted color for inactive tabs (lighter on dark navbar), fallback to semi-transparent white
+        tabBarInactiveTintColor: theme.colors.text.muted || "rgba(255, 255, 255, 0.6)",
         tabBarStyle: {
           backgroundColor: theme.colors.background.tertiary,
           borderTopColor: theme.colors.border.primary,

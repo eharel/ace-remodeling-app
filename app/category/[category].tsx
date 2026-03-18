@@ -6,7 +6,6 @@ import { DesignTokens } from "@/shared/themes";
 import { ProjectCardView, toProjectCardViewsByCategory } from "@/shared/types";
 import {
   ComponentCategory,
-  CoreCategory,
   getSubcategoryLabel,
 } from "@/shared/types/ComponentCategory";
 import { CategoryPicker } from "@/features/category";
@@ -22,7 +21,6 @@ import { SegmentedControl } from "@/shared/components/ui/SegmentedControl";
 import { useProjects, useTheme } from "@/shared/contexts";
 import {
   filterCardViewsBySubcategory,
-  getAllCategories,
   getCategoryDisplayName,
   getSubcategories,
   getSubcategoryCount,
@@ -31,7 +29,7 @@ import {
 
 export default function CategoryScreen() {
   const { theme } = useTheme();
-  const { projects, loading, error } = useProjects();
+  const { projects, isLoading, error } = useProjects();
   const { category } = useLocalSearchParams<{ category: string }>();
 
   // State for selected subcategory
@@ -74,10 +72,10 @@ export default function CategoryScreen() {
   );
 
   // Validate category parameter
+  // Accept core categories AND any non-empty string (custom categories)
+  // We check for actual matching projects rather than a hardcoded allowlist
   const validCategory = category as ComponentCategory;
-  const allCategories = getAllCategories();
-  const isValidCategory =
-    category && allCategories.includes(category as CoreCategory);
+  const isValidCategory = !!category && category.length > 0;
 
   // Transform projects to ProjectCardView[] using centralized transformer
   // Use empty array if category is invalid to avoid errors
@@ -168,7 +166,7 @@ export default function CategoryScreen() {
 
   // Show loading state only on initial load (when no projects exist yet)
   // During refresh, keep content visible and just show refresh spinner
-  if (loading && projects.length === 0) {
+  if (isLoading && projects.length === 0) {
     return (
       <ThemedView style={styles.container}>
         <Stack.Screen

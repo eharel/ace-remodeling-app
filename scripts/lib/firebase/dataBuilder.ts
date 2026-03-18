@@ -9,7 +9,7 @@
 
 import { randomUUID } from "crypto";
 
-import { Document, DOCUMENT_TYPES } from "../../../shared/types/Document";
+import { Document, DOCUMENT_CATEGORIES } from "../../../shared/types/Document";
 import { MEDIA_STAGES, MediaAsset } from "../../../shared/types/MediaAsset";
 import { Project } from "../../../shared/types/Project";
 import { ProjectComponent } from "../../../shared/types/ProjectComponent";
@@ -65,12 +65,6 @@ export function buildProjectDocument(sources: ProjectDataSources): BuildResult {
   const warnings: string[] = [];
 
   try {
-    console.log(`\n🔨 Building Project ${csvData.number}...`);
-    console.log(`   • CSV data: ✅`);
-    console.log(`   • Scanner data: ✅ (${componentFiles.length} components)`);
-    console.log(`   • Upload results: ✅ (${uploadResults.length} components)`);
-    console.log(`   • Merging...`);
-
     // Start with CSV data (has most metadata)
     const project: Project = {
       ...csvData,
@@ -104,11 +98,6 @@ export function buildProjectDocument(sources: ProjectDataSources): BuildResult {
       (sum, c) => sum + (c.documents?.length || 0),
       0
     );
-
-    console.log(`   ✅ Project ${csvData.number} built successfully`);
-    console.log(`      Components: ${project.components.length}`);
-    console.log(`      Media: ${totalMedia}`);
-    console.log(`      Assets: ${totalAssets}`);
 
     return {
       success: true,
@@ -316,9 +305,8 @@ function buildDocuments(
 
       // Document-specific fields
       name: discoveredAsset.filename,
-      type: mapAssetTypeToDocumentType(discoveredAsset.assetType),
+      category: mapAssetTypeToDocumentCategory(discoveredAsset.assetType),
       fileType: getFileTypeFromExtension(discoveredAsset.extension),
-      category: discoveredAsset.category,
     };
 
     documents.push(document);
@@ -348,21 +336,23 @@ function generateDocumentId(asset: DiscoveredAsset): string {
 }
 
 /**
- * Map asset type to Document type
+ * Map asset type to Document category
  *
  * @param assetType - Asset type from scanner
- * @returns DocumentType
+ * @returns DocumentCategory
  */
-function mapAssetTypeToDocumentType(assetType: AssetType): Document["type"] {
-  const mapping: Record<AssetType, Document["type"]> = {
-    plan: DOCUMENT_TYPES.FLOOR_PLAN,
-    rendering: DOCUMENT_TYPES.RENDERING_3D,
-    material: DOCUMENT_TYPES.MATERIALS,
-    document: DOCUMENT_TYPES.OTHER,
-    other: DOCUMENT_TYPES.OTHER,
+function mapAssetTypeToDocumentCategory(
+  assetType: AssetType
+): Document["category"] {
+  const mapping: Record<AssetType, Document["category"]> = {
+    plan: DOCUMENT_CATEGORIES.FLOOR_PLAN,
+    rendering: DOCUMENT_CATEGORIES.RENDERING_3D,
+    material: DOCUMENT_CATEGORIES.MATERIALS,
+    document: DOCUMENT_CATEGORIES.OTHER,
+    other: DOCUMENT_CATEGORIES.OTHER,
   };
 
-  return mapping[assetType] || DOCUMENT_TYPES.OTHER;
+  return mapping[assetType] || DOCUMENT_CATEGORIES.OTHER;
 }
 
 /**

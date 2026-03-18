@@ -7,7 +7,6 @@ import {
   getImagesToKeep,
   getPreloadIndices,
   PRELOADING_CONSTANTS,
-  shouldPreloadImage,
 } from "../utils/imagePreloading";
 
 interface UseImagePreloadingProps {
@@ -71,6 +70,8 @@ export const useImagePreloading = ({
   });
 
   const preloadTimeouts = useRef<Map<string, number>>(new Map());
+  // Ref-based guard for in-flight requests — avoids closing over stale preloadState
+  const inFlightRef = useRef<Set<string>>(new Set());
 
   // Get images that should be preloaded using utility function
   const getPreloadIndicesCallback = useCallback(() => {
@@ -80,16 +81,9 @@ export const useImagePreloading = ({
   // Preload a single image using utility functions
   const preloadImage = useCallback(
     async (image: Picture) => {
-      if (
-        !shouldPreloadImage(
-          image.id,
-          preloadState.loaded,
-          preloadState.loading,
-          preloadState.failed
-        )
-      ) {
-        return;
-      }
+      // Guard with ref so this callback stays stable across renders
+      if (inFlightRef.current.has(image.id)) return;
+      inFlightRef.current.add(image.id);
 
       setPreloadState((prev) => ({
         ...prev,
@@ -101,6 +95,7 @@ export const useImagePreloading = ({
         image.id,
         PRELOADING_CONSTANTS.PRELOAD_TIMEOUT,
         () => {
+          inFlightRef.current.delete(image.id);
           setPreloadState((prev) => ({
             ...prev,
             failed: new Set([...prev.failed, image.id]),
@@ -118,6 +113,7 @@ export const useImagePreloading = ({
         // Clear timeout on success
         clearTimeout(timeout);
         preloadTimeouts.current.delete(image.id);
+        inFlightRef.current.delete(image.id);
 
         setPreloadState((prev) => ({
           ...prev,
@@ -128,6 +124,7 @@ export const useImagePreloading = ({
         // Clear timeout on error
         clearTimeout(timeout);
         preloadTimeouts.current.delete(image.id);
+        inFlightRef.current.delete(image.id);
 
         setPreloadState((prev) => ({
           ...prev,
@@ -136,7 +133,7 @@ export const useImagePreloading = ({
         }));
       }
     },
-    [preloadState]
+    [] // stable — inFlightRef is a ref, all setState calls use functional updaters
   );
 
   // Preload images based on current index using utility function
@@ -166,6 +163,7 @@ export const useImagePreloading = ({
         // Clear timeout
         clearTimeout(timeout);
         preloadTimeouts.current.delete(imageId);
+        inFlightRef.current.delete(imageId);
 
         // Update state
         setPreloadState((prev) => ({
@@ -181,10 +179,12 @@ export const useImagePreloading = ({
   // Cleanup on unmount
   useEffect(() => {
     const timeouts = preloadTimeouts.current;
+    const inFlight = inFlightRef.current;
     return () => {
       // Clear all timeouts
       timeouts.forEach((timeout) => clearTimeout(timeout));
       timeouts.clear();
+      inFlight.clear();
     };
   }, []);
 

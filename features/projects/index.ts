@@ -4,3 +4,15 @@
 export { ProjectCard } from "./components/ProjectCard";
 export { ProjectGallery } from "./components/ProjectGallery";
 export { ComponentSelector } from "./components/ComponentSelector";
+export { EditDescriptionModal } from "./components/EditDescriptionModal";
+export { AddComponentModal } from "./components/AddComponentModal";
+export { EditComponentModal } from "./components/EditComponentModal";
+export { TestimonialSection } from "./components/TestimonialSection";
+export { ProjectLogsSection } from "./components/ProjectLogsSection";
+export { ProjectMetaGrid } from "./components/ProjectMetaGrid";
+export type { ProjectMetaGridRef } from "./components/ProjectMetaGrid";
+export { AssetsSection } from "./components/AssetsSection";
+export { FeaturedToggle } from "./components/FeaturedToggle";
+export { StatusPicker } from "./components/StatusPicker";
+export { CategoryPicker } from "./components/CategoryPicker";
+export { EditDocumentModal } from "./components/EditDocumentModal";

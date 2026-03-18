@@ -69,7 +69,6 @@ export function validateTheme(theme: any): theme is Theme {
 
   for (const prop of requiredProperties) {
     if (!(prop in theme)) {
-      console.warn(`Theme validation failed: Missing property '${prop}'`);
       return false;
     }
   }
@@ -86,7 +85,6 @@ export function validateTheme(theme: any): theme is Theme {
 
   for (const prop of colorProperties) {
     if (!theme.colors || !(prop in theme.colors)) {
-      console.warn(`Theme validation failed: Missing color property '${prop}'`);
       return false;
     }
   }
@@ -132,7 +130,6 @@ export function getThemeColor(
     if (current && typeof current === "object" && key in current) {
       current = current[key];
     } else {
-      console.warn(`Theme color path '${path}' not found, using fallback`);
       return fallback;
     }
   }

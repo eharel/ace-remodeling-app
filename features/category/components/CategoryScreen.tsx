@@ -15,7 +15,7 @@ interface CategoryScreenProps {
 }
 
 export function CategoryScreen({ category }: CategoryScreenProps) {
-  const { bathroomProjects, kitchenProjects, loading } = useProjects();
+  const { bathroomProjects, kitchenProjects, isLoading } = useProjects();
 
   // Get the appropriate projects based on category
   const projects = category === "bathroom" ? bathroomProjects : kitchenProjects;
@@ -45,7 +45,7 @@ export function CategoryScreen({ category }: CategoryScreenProps) {
   const config = getCategoryConfig(category);
 
   // Show loading state while projects are being fetched
-  if (loading) {
+  if (isLoading) {
     return <LoadingState message="Loading projects..." />;
   }
 

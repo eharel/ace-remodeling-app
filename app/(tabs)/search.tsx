@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
 
 export default function SearchScreen() {
   const { theme } = useTheme();
-  const { projects, loading: projectsLoading } = useProjects();
+  const { projects, isLoading: projectsIsLoading } = useProjects();
   const [searchQuery, setSearchQuery] = useState("");
 
   // SearchResult represents a matched component from a project
@@ -349,12 +349,12 @@ export default function SearchScreen() {
     if (
       debouncedSearchQuery.trim() !== "" &&
       !isSearching &&
-      !projectsLoading
+      !projectsIsLoading
     ) {
       // This would typically use AccessibilityInfo.announceForAccessibility
       // but for now we'll rely on the existing accessibility labels
     }
-  }, [searchResults, debouncedSearchQuery, isSearching, projectsLoading]);
+  }, [searchResults, debouncedSearchQuery, isSearching, projectsIsLoading]);
 
   const handleProjectPress = (result: SearchResult) => {
     try {
@@ -372,7 +372,7 @@ export default function SearchScreen() {
     }
   };
 
-  const isLoading = isSearching || projectsLoading;
+  const isLoading = isSearching || projectsIsLoading;
 
   // Determine if we should show results (either has text query or active filters)
   const shouldShowResults =
@@ -394,30 +394,26 @@ export default function SearchScreen() {
           onRemoveHistory={removeFromHistory}
           onClearHistory={clearHistory}
           onAddToHistory={addToHistory}
-          projects={searchResults.map((result) => ({
-            id: result.projectId,
-            projectNumber: result.projectNumber,
-            name: `${result.projectName}${
+          cardViews={searchResults.map((result) => ({
+            projectId: result.projectId,
+            componentId: result.componentId,
+            displayName: `${result.projectName}${
               result.componentName ? ` - ${result.componentName}` : ""
             }`,
+            summary: result.componentSummary || "",
+            thumbnailUrl: result.thumbnail,
             category: result.componentCategory,
-            briefDescription: result.componentSummary || "",
-            thumbnail: result.thumbnail,
             status: result.status,
             isFeatured: result.isFeatured,
             completedAt: result.completedAt,
+            isMultiComponent: false,
+            componentCount: 1,
           }))}
-          onSelectProject={(id) => {
-            // Find the result and navigate with componentId
-            const result = searchResults.find((r) => r.projectId === id);
-            if (result) {
-              router.push({
-                pathname: `/project/${result.projectId}` as any,
-                params: { componentId: result.componentId },
-              });
-            } else {
-              router.push(`/project/${id}` as any);
-            }
+          onSelectCard={(cardView) => {
+            router.push({
+              pathname: `/project/${cardView.projectId}` as any,
+              params: { componentId: cardView.componentId },
+            });
           }}
         />
       </PageHeader>
@@ -503,26 +499,25 @@ export default function SearchScreen() {
             </ThemedText>
           </ThemedView>
           <ProjectGallery
-            projects={searchResults.map((result) => ({
-              id: `${result.projectId}::${result.componentId}`, // Unique key: project + component (using :: separator to avoid UUID dash conflicts)
-              projectNumber: result.projectNumber,
-              name: `${result.projectName}${
+            cardViews={searchResults.map((result) => ({
+              projectId: result.projectId,
+              componentId: result.componentId,
+              displayName: `${result.projectName}${
                 result.componentName ? ` - ${result.componentName}` : ""
               }`,
+              summary: result.componentSummary || "",
+              thumbnailUrl: result.thumbnail,
               category: result.componentCategory,
-              briefDescription: result.componentSummary || "",
-              thumbnail: result.thumbnail,
               status: result.status,
               isFeatured: result.isFeatured,
               completedAt: result.completedAt,
+              isMultiComponent: false,
+              componentCount: 1,
             }))}
-            onProjectPress={(summary) => {
-              // Find the original result by extracting projectId and componentId from the composite key
-              // Format: "projectId::componentId" (using :: to avoid conflicts with UUID dashes)
-              const [projectId, componentId] = summary.id.split("::", 2);
+            onCardPress={(cardView) => {
               const result = searchResults.find(
                 (r) =>
-                  r.projectId === projectId && r.componentId === componentId
+                  r.projectId === cardView.projectId && r.componentId === cardView.componentId
               );
               if (result) {
                 handleProjectPress(result);
