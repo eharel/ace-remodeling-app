@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { StyleProp, StyleSheet, ViewStyle } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -66,6 +66,20 @@ export function ZoomableImage({
   const savedTranslateX = useSharedValue(0);
   const savedTranslateY = useSharedValue(0);
 
+  // Local zoom state as React state so .enabled() on the pan gesture can read it.
+  // (Shared values live on the UI thread and aren't accessible to JS-side gesture config.)
+  const [isZoomedLocal, setIsZoomedLocal] = useState(false);
+
+  // Single function that keeps local state and parent in sync.
+  // Used via runOnJS inside worklets and directly in the isActive effect.
+  const notifyZoomChange = useCallback(
+    (zoomed: boolean) => {
+      setIsZoomedLocal(zoomed);
+      onZoomChange(zoomed);
+    },
+    [onZoomChange]
+  );
+
   // Reset zoom when the carousel navigates away from this image
   useEffect(() => {
     if (!isActive) {
@@ -75,7 +89,7 @@ export function ZoomableImage({
       savedScale.value = MIN_SCALE;
       savedTranslateX.value = 0;
       savedTranslateY.value = 0;
-      onZoomChange(false);
+      notifyZoomChange(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive]);
@@ -100,17 +114,18 @@ export function ZoomableImage({
         savedScale.value = MIN_SCALE;
         savedTranslateX.value = 0;
         savedTranslateY.value = 0;
-        runOnJS(onZoomChange)(false);
+        runOnJS(notifyZoomChange)(false);
       } else {
         savedScale.value = scale.value;
-        runOnJS(onZoomChange)(scale.value > MIN_SCALE);
+        runOnJS(notifyZoomChange)(scale.value > MIN_SCALE);
       }
     });
 
   const panGesture = Gesture.Pan()
     // Disabled at 1× so FlatList handles carousel swipes freely.
     // Enabled only when zoomed — FlatList is already blocked via scrollEnabled={false}.
-    .enabled(isZoomed)
+    // Must be React state (not a shared value) so gesture config re-evaluates on re-render.
+    .enabled(isZoomedLocal)
     .onUpdate((e) => {
       "worklet";
       translateX.value = savedTranslateX.value + e.translationX;
@@ -134,12 +149,12 @@ export function ZoomableImage({
         savedScale.value = MIN_SCALE;
         savedTranslateX.value = 0;
         savedTranslateY.value = 0;
-        runOnJS(onZoomChange)(false);
+        runOnJS(notifyZoomChange)(false);
       } else {
         // At 1× — zoom to 2×
         scale.value = withSpring(ZOOM_IN_SCALE, SPRING_CONFIG);
         savedScale.value = ZOOM_IN_SCALE;
-        runOnJS(onZoomChange)(true);
+        runOnJS(notifyZoomChange)(true);
       }
     });
 
