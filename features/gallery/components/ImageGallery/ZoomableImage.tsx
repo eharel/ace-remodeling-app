@@ -108,13 +108,13 @@ export function ZoomableImage({
     });
 
   const panGesture = Gesture.Pan()
+    // Disabled at 1× so FlatList handles carousel swipes freely.
+    // Enabled only when zoomed — FlatList is already blocked via scrollEnabled={false}.
+    .enabled(isZoomed)
     .onUpdate((e) => {
       "worklet";
-      // Only translate while zoomed — when at 1× let FlatList handle horizontal swipes
-      if (scale.value > MIN_SCALE) {
-        translateX.value = savedTranslateX.value + e.translationX;
-        translateY.value = savedTranslateY.value + e.translationY;
-      }
+      translateX.value = savedTranslateX.value + e.translationX;
+      translateY.value = savedTranslateY.value + e.translationY;
     })
     .onEnd(() => {
       "worklet";
