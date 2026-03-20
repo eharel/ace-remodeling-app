@@ -30,7 +30,8 @@ interface PhotoPreviewSectionProps {
   onPhotoCategoryChange: (activeCategory: PhotoCategory) => void;
 
   onOpenGrid: (activeCategory?: PhotoCategory, editMode?: boolean) => void;
-  onOpenImage: (index: number) => void;
+  /** index is position within the filtered gallery for the active category */
+  onOpenImage: (index: number, category: PhotoCategory) => void;
 }
 
 export function PhotoPreviewSection({
@@ -73,7 +74,7 @@ export function PhotoPreviewSection({
   const styles = useMemo(() => createPhotoGalleryStyles(theme), [theme]);
 
   const handleImagePress = (index: number) => {
-    onOpenImage(index);
+    onOpenImage(index, activePhotoCategory);
   };
 
   const showPhotoGrid = (editMode: boolean = false) => {

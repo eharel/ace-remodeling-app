@@ -635,7 +635,7 @@ export default function ProjectDetailScreen() {
                 },
               })
             }
-            onOpenImage={(index) =>
+            onOpenImage={(index, category) =>
               project?.id &&
               router.push({
                 pathname: "/project/[id]/photos/viewer",
@@ -643,7 +643,7 @@ export default function ProjectDetailScreen() {
                   id: project.id,
                   initialIndex: index,
                   componentId: selectedComponent?.id,
-                  activePhotoCategory: activePhotoCategory || "all",
+                  activePhotoCategory: category,
                 },
               })
             }
