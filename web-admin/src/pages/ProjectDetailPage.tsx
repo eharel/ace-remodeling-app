@@ -268,7 +268,7 @@ function ComponentCard({
   // Photo upload state
   const [showPhotoUploader, setShowPhotoUploader] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
-  const [uploadStage, setUploadStage] = useState<MediaStage>("after");
+  const [uploadStage, setUploadStage] = useState<MediaStage | "">("");
   const [captions, setCaptions] = useState<Record<string, string>>({});
   const [isDragging, setIsDragging] = useState(false);
   const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
@@ -305,7 +305,7 @@ function ComponentCard({
   }, []);
 
   async function handlePhotoUpload() {
-    if (pendingFiles.length === 0) return;
+    if (pendingFiles.length === 0 || uploadStage === "") return;
     setIsUploadingPhotos(true);
     setPhotoError(null);
     try {
@@ -494,6 +494,7 @@ function ComponentCard({
                 if (showPhotoUploader) {
                   setPendingFiles([]);
                   setCaptions({});
+                  setUploadStage("");
                 }
               }}
               className="text-xs text-blue-600 hover:text-blue-800 font-medium"
@@ -611,10 +612,17 @@ function ComponentCard({
                 <select
                   value={uploadStage}
                   onChange={(e) =>
-                    setUploadStage(e.target.value as MediaStage)
+                    setUploadStage(e.target.value as MediaStage | "")
                   }
-                  className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  className={`px-2 py-1 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 ${
+                    uploadStage === ""
+                      ? "border-amber-400 bg-amber-50 text-amber-700"
+                      : "border-gray-300"
+                  }`}
                 >
+                  <option value="" disabled>
+                    — Select a stage —
+                  </option>
                   {Object.values(MEDIA_STAGES).map((value) => (
                     <option key={value} value={value}>
                       {value.charAt(0).toUpperCase() +
@@ -623,6 +631,11 @@ function ComponentCard({
                   ))}
                 </select>
               </div>
+              {uploadStage === "" && pendingFiles.length > 0 && (
+                <p className="text-xs text-amber-700">
+                  Select a stage before uploading.
+                </p>
+              )}
 
               {/* Pending files preview */}
               {pendingFiles.length > 0 && (
@@ -680,7 +693,7 @@ function ComponentCard({
 
               <button
                 onClick={handlePhotoUpload}
-                disabled={pendingFiles.length === 0 || isUploadingPhotos}
+                disabled={pendingFiles.length === 0 || isUploadingPhotos || uploadStage === ""}
                 className="px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-700 disabled:opacity-40 transition-colors"
               >
                 {isUploadingPhotos
