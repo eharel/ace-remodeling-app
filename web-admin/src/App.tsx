@@ -6,12 +6,7 @@ import { ProtectedRoute } from "@/auth/ProtectedRoute";
 import { AppShell } from "@/components/layout/AppShell";
 import { ProjectsPage } from "@/pages/ProjectsPage";
 import { ProjectDetailPage } from "@/pages/ProjectDetailPage";
-
-function SettingsPage() {
-  return (
-    <div className="p-6 text-gray-600 text-sm">Settings — coming soon</div>
-  );
-}
+import { SettingsPage } from "@/pages/SettingsPage";
 
 export function App() {
   return (
