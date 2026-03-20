@@ -67,9 +67,7 @@ export function matchesPhotoCategory(
     return asset.mediaType === "image";
   }
   const targetStage = getStageFromPhotoCategory(category);
-  return (
-    asset.mediaType === "image" &&
-    targetStage !== null &&
-    asset.stage === targetStage
-  );
+  // Include both images and videos when filtering by a specific stage.
+  // The "all" branch above is intentionally images-only (preview sampling).
+  return targetStage !== null && asset.stage === targetStage;
 }

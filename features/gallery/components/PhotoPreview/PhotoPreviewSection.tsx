@@ -87,6 +87,7 @@ export function PhotoPreviewSection({
     isMoreCell: boolean = false,
   ) => {
     const isPressed = pressedImageIndex === index;
+    const isVideo = item.mediaType === "video";
 
     return (
       <ThemedView key={`grid-image-${index}`} style={styles.gridImageContainer}>
@@ -98,15 +99,25 @@ export function PhotoPreviewSection({
           onPressOut={() => setPressedImageIndex(null)}
           style={isPressed ? styles.gridImageContainerPressed : undefined}
         >
-          <Image
-            source={{ uri: item.url }}
-            style={styles.gridImage}
-            contentFit="cover"
-            transition={150}
-            cachePolicy="memory-disk"
-            priority="normal"
-            recyclingKey={item.url}
-          />
+          {isVideo ? (
+            <View style={[styles.gridImage, styles.videoPlaceholder]}>
+              <MaterialIcons
+                name="play-circle-filled"
+                size={36}
+                color="rgba(255,255,255,0.9)"
+              />
+            </View>
+          ) : (
+            <Image
+              source={{ uri: item.url }}
+              style={styles.gridImage}
+              contentFit="cover"
+              transition={150}
+              cachePolicy="memory-disk"
+              priority="normal"
+              recyclingKey={item.url}
+            />
+          )}
         </Pressable>
       </ThemedView>
     );
@@ -278,6 +289,11 @@ const createPhotoGalleryStyles = (theme: any) =>
     gridImage: {
       width: "100%",
       height: "100%",
+    },
+    videoPlaceholder: {
+      backgroundColor: "#1a1a1a",
+      justifyContent: "center",
+      alignItems: "center",
     },
     emptyState: {
       padding: DesignTokens.spacing[8],
