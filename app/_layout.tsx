@@ -12,6 +12,7 @@ import "react-native-reanimated";
 // Disable development error overlay to test ErrorBoundary
 import { LogBox } from "react-native";
 
+import { setAudioModeAsync } from "expo-audio";
 import { FloatingChecklistButton } from "@/features/checklist";
 import { ErrorBoundary } from "@/shared/components";
 import {
@@ -67,6 +68,10 @@ function Navigation() {
     </ErrorBoundary>
   );
 }
+
+// Set audio session to Playback category so video audio is never silenced by
+// the device silent switch, and native video player controls are fully active.
+setAudioModeAsync({ playsInSilentMode: true });
 
 export default function RootLayout() {
   const [loaded] = useFonts({
