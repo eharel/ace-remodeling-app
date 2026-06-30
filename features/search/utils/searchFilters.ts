@@ -104,8 +104,11 @@ export function filterByTags(project: Project, tags: string[]): boolean {
     return true; // No filter applied
   }
 
-  const projectTags = project.tags || [];
-  return tags.some((tag) => projectTags.includes(tag));
+  const allTags = [
+    ...(project.tags ?? []),
+    ...project.components.flatMap((c) => c.tags ?? []),
+  ];
+  return tags.some((tag) => allTags.includes(tag));
 }
 
 /**

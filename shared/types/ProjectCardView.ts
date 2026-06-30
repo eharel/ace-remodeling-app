@@ -59,6 +59,9 @@ export interface ProjectCardView {
 
   /** Total number of components in the project */
   componentCount: number;
+
+  /** Combined tags from project and component (deduped) */
+  tags?: string[];
 }
 
 /**
@@ -100,6 +103,7 @@ export function toProjectCardView(
       : undefined,
     isMultiComponent,
     componentCount: project.components.length,
+    tags: [...new Set([...(project.tags ?? []), ...(component.tags ?? [])])],
   };
 }
 
