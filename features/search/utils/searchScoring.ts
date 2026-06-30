@@ -11,6 +11,7 @@ export const SEARCH_SCORING_CONSTANTS = {
   EXACT_MATCH_SCORE: 100, // Exact project name match (highest priority)
   STARTS_WITH_SCORE: 50, // Project name starts with query
   NAME_CONTAINS_SCORE: 30, // Project name contains query anywhere
+  TAG_SCORE: 25,          // Tag matches query (materials, finishes, etc.)
   DESCRIPTION_SCORE: 20, // Project description contains query
   LOCATION_SCORE: 10, // Project location contains query (lowest priority)
 } as const;
@@ -131,11 +132,19 @@ export function calculateLocationScore(
  * // Returns 50 (name starts with "kitchen")
  * ```
  */
+export function calculateTagScore(query: string, tags?: string[]): number {
+  if (!tags || tags.length === 0) return 0;
+  return tags.some((tag) => tag.toLowerCase().includes(query))
+    ? SEARCH_SCORING_CONSTANTS.TAG_SCORE
+    : 0;
+}
+
 export function calculateCardViewScore(
   query: string,
   cardView: ProjectCardView
 ): number {
   const nameScore = calculateNameScore(query, cardView.displayName);
+  const tagScore = calculateTagScore(query, cardView.tags);
   const descriptionScore = calculateDescriptionScore(query, cardView.summary);
   const locationScore = calculateLocationScore(
     query,
@@ -143,5 +152,5 @@ export function calculateCardViewScore(
   );
 
   // Return the highest score (don't sum multiple matches)
-  return Math.max(nameScore, descriptionScore, locationScore);
+  return Math.max(nameScore, tagScore, descriptionScore, locationScore);
 }

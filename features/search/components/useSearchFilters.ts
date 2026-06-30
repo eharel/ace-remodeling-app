@@ -63,15 +63,14 @@ export function useSearchFilters(projects: Project[]) {
     return Array.from(pmSet).sort();
   }, [projects]);
 
-  // Extract unique tags from all projects
+  // Extract unique tags from all projects and components
   const availableTags = useMemo(() => {
     if (!projects || !Array.isArray(projects)) return [];
     const tagSet = new Set<string>();
     projects.forEach((project) => {
-      project.tags?.forEach((tag) => {
-        if (tag.trim()) {
-          tagSet.add(tag.trim());
-        }
+      project.tags?.forEach((tag) => { if (tag.trim()) tagSet.add(tag.trim()); });
+      project.components.forEach((component) => {
+        component.tags?.forEach((tag) => { if (tag.trim()) tagSet.add(tag.trim()); });
       });
     });
     return Array.from(tagSet).sort();

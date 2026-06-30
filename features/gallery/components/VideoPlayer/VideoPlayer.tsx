@@ -19,6 +19,7 @@ export function VideoPlayer({ uri, containerStyle, isActive }: VideoPlayerProps)
   const player = useVideoPlayer(uri, (p) => {
     p.loop = false;
     p.muted = false;
+    p.volume = 1.0;
   });
 
   // Pause when the carousel navigates away from this item
