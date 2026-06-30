@@ -21,7 +21,7 @@ import {
   ThemedView,
   ThemeToggle,
 } from "@/shared/components";
-import { useAuth, useProjects, useTheme } from "@/shared/contexts";
+import { useAuth, useTheme } from "@/shared/contexts";
 import { useVersionCheck } from "@/shared/hooks";
 
 export default function SettingsScreen() {
@@ -31,7 +31,6 @@ export default function SettingsScreen() {
     useVersionCheck();
 
   const { isAuthenticated, signIn, signOut } = useAuth();
-  const { projects } = useProjects();
   const [pinInput, setPinInput] = useState("");
   const [isEnabling, setIsEnabling] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -477,7 +476,7 @@ export default function SettingsScreen() {
           </ThemedView>
         </View>
 
-        {isAuthenticated && (
+        {__DEV__ && (
           <ThemedText
             variant="caption"
             style={{
@@ -486,12 +485,7 @@ export default function SettingsScreen() {
             }}
           >
             Environment: {currentEnvironment}
-            {"\n"}Firebase project: {currentProjectId}
-            {"\n"}Projects loaded: {projects.length}
-            {"\n"}design-/-development count:{" "}
-            {projects.filter((p) =>
-              p.components.some((c) => c.category === "design-/-development")
-            ).length}
+            {"\n"}Project: {currentProjectId}
           </ThemedText>
         )}
       </ScrollView>
