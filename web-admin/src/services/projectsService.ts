@@ -176,6 +176,83 @@ export const addComponentToProject = async (
   });
 };
 
+export const renameDocument = async (
+  project: Project,
+  componentId: string,
+  docId: string,
+  newName: string
+): Promise<void> => {
+  const updatedComponents = project.components.map((c) =>
+    c.id === componentId
+      ? {
+          ...c,
+          documents: (c.documents ?? []).map((d) =>
+            d.id === docId ? { ...d, name: newName } : d
+          ),
+          updatedAt: new Date().toISOString(),
+        }
+      : c
+  );
+  await updateProject(project.id, { components: updatedComponents });
+};
+
+export const reorderComponents = async (
+  project: Project,
+  newOrder: ProjectComponent[]
+): Promise<void> => {
+  await updateProject(project.id, { components: newOrder });
+};
+
+export const reorderMediaInComponent = async (
+  project: Project,
+  componentId: string,
+  reorderedMedia: MediaAsset[]
+): Promise<void> => {
+  const updatedComponents = project.components.map((c) =>
+    c.id === componentId
+      ? {
+          ...c,
+          media: reorderedMedia.map((a, i) => ({ ...a, order: i })),
+          updatedAt: new Date().toISOString(),
+        }
+      : c
+  );
+  await updateProject(project.id, { components: updatedComponents });
+};
+
+export const updateProjectTags = async (
+  projectId: string,
+  tags: string[]
+): Promise<void> => {
+  await updateProject(projectId, { tags });
+};
+
+export const updateComponentTags = async (
+  project: Project,
+  componentId: string,
+  tags: string[]
+): Promise<void> => {
+  const updatedComponents = project.components.map((c) =>
+    c.id === componentId
+      ? { ...c, tags, updatedAt: new Date().toISOString() }
+      : c
+  );
+  await updateProject(project.id, { components: updatedComponents });
+};
+
+export const setComponentThumbnail = async (
+  project: Project,
+  componentId: string,
+  thumbnailUrl: string | undefined
+): Promise<void> => {
+  const updatedComponents = project.components.map((c) =>
+    c.id === componentId
+      ? { ...c, thumbnail: thumbnailUrl, updatedAt: new Date().toISOString() }
+      : c
+  );
+  await updateProject(project.id, { components: updatedComponents });
+};
+
 export const removeComponentFromProject = async (
   project: Project,
   componentId: string

@@ -12,6 +12,32 @@ export interface WebUploadMediaOptions {
   order?: number;
 }
 
+async function generateVideoThumbnail(file: File): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    const video = document.createElement("video");
+    video.muted = true;
+    video.playsInline = true;
+    const objectUrl = URL.createObjectURL(file);
+    video.src = objectUrl;
+
+    video.onloadedmetadata = () => {
+      video.currentTime = Math.min(video.duration * 0.1, 1);
+    };
+
+    video.onseeked = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { URL.revokeObjectURL(objectUrl); resolve(null); return; }
+      ctx.drawImage(video, 0, 0);
+      canvas.toBlob((blob) => { URL.revokeObjectURL(objectUrl); resolve(blob); }, "image/jpeg", 0.8);
+    };
+
+    video.onerror = () => { URL.revokeObjectURL(objectUrl); resolve(null); };
+  });
+}
+
 function detectMediaType(file: File): MediaType {
   return file.type.startsWith("video/") ? "video" : "image";
 }
@@ -51,11 +77,23 @@ export async function uploadMediaFile(
     await uploadBytes(storageRef, file, { contentType: file.type });
     const url = await getDownloadURL(storageRef);
 
+    let thumbnailUrl: string | undefined;
+    if (mediaType === "video") {
+      const thumbnailBlob = await generateVideoThumbnail(file);
+      if (thumbnailBlob) {
+        const thumbPath = storagePath.replace(/\/([^/]+)$/, `/thumbnails/$1`).replace(/\.[^/.]+$/, "_thumb.jpg");
+        const thumbRef = ref(storage, thumbPath);
+        await uploadBytes(thumbRef, thumbnailBlob, { contentType: "image/jpeg" });
+        thumbnailUrl = await getDownloadURL(thumbRef);
+      }
+    }
+
     const asset: MediaAsset = {
       id,
       filename,
       url,
       storagePath,
+      thumbnailUrl,
       mediaType,
       stage: options.stage,
       caption: options.caption,

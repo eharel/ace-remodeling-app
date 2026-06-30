@@ -22,6 +22,7 @@
     "build:preview": "eas build --platform ios --profile preview",
     "build:status": "eas build:list",
     "deploy:update": "eas update --branch production --platform ios",
+    "deploy:admin": "cd web-admin && npm run build && cd .. && firebase deploy",
     "deploy:full": "eas build --platform ios --profile production --auto-submit",
     "upload": "tsx scripts/uploadProjects.ts",
     "upload:dev": "NODE_ENV=development tsx scripts/uploadProjects.ts",

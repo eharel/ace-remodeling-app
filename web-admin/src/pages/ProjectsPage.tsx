@@ -247,7 +247,7 @@ export function ProjectsPage() {
         <h1 className="text-2xl font-semibold text-gray-900">Projects</h1>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
+          className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors shadow-sm"
         >
           + New Project
         </button>
@@ -293,9 +293,9 @@ export function ProjectsPage() {
           <div className="text-xs text-gray-400 mb-2">
             {filtered.length} of {projects.length} projects
           </div>
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+              <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 text-xs uppercase tracking-wide">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium w-16">#</th>
                   <th className="px-4 py-3 text-left font-medium">Name</th>
@@ -310,7 +310,7 @@ export function ProjectsPage() {
                   <th className="px-4 py-3 text-left font-medium">Updated</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 bg-white">
                 {filtered.length === 0 ? (
                   <tr>
                     <td
@@ -324,7 +324,7 @@ export function ProjectsPage() {
                   filtered.map((project) => (
                     <tr
                       key={project.id}
-                      className="hover:bg-gray-50 cursor-pointer transition-colors"
+                      className="hover:bg-blue-50/40 cursor-pointer transition-colors"
                       onClick={() => navigate(`/projects/${project.id}`)}
                     >
                       <td className="px-4 py-3 text-gray-500 font-mono">
